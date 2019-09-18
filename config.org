@@ -9,7 +9,8 @@
 ** Line numbers (but not in terminals)
 #+BEGIN_SRC emacs-lisp
 (global-display-line-numbers-mode 1)
-(add-hook 'term-mode-hook (lambda () (display-line-numbers-mode -1)))
+(add-hook 'term-mode-hook
+          (lambda () (display-line-numbers-mode -1)))
 #+END_SRC
 ** Prettify symbols
 #+BEGIN_SRC emacs-lisp
@@ -52,5 +53,6 @@
 #+BEGIN_SRC emacs-lisp
 (use-package org-bullets
   :ensure t
-  :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+END_SRC
