@@ -1,7 +1,7 @@
 # Makefile to choose font size
 
 smallfont:
-	cat init.el | sed 's/220/100/; s/160/100' > init.el.new
+	cat init.el | sed 's/220/100/; s/160/100/' > init.el.new
 	mv init.el.new init.el
 
 mediumfont:
