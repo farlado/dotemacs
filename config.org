@@ -20,7 +20,7 @@
 ** Server
 *** Initialize
 #+BEGIN_SRC emacs-lisp
-(start-server)
+(server-start)
 #+END_SRC
 ** Annoyances
 *** Don't make extra files on the filesystem
