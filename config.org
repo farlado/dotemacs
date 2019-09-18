@@ -49,10 +49,3 @@
   :ensure t
   :init (which-key-mode 1))
 #+END_SRC
-** org-bullets (nice looking bullet points for org-mode)
-#+BEGIN_SRC emacs-lisp
-(use-package org-bullets
-  :ensure t
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-#+END_SRC
