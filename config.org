@@ -49,3 +49,9 @@
   :ensure t
   :init (which-key-mode 1))
 #+END_SRC
+** telega (telegram client)
+#+BEGIN_SRC emacs-lisp
+(use-package telega
+  :ensure t
+  :config (global-set-key (kbd "<s-backspace>") 'telega))
+#+END_SRC
