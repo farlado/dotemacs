@@ -1,0 +1,56 @@
+* General looks
+** Hide menu bar, tooltips, tool bar, and scroll bar
+#+BEGIN_SRC emacs-lisp
+(menu-bar-mode -1)
+(tooltip-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+#+END_SRC
+** Line numbers (but not in terminals)
+#+BEGIN_SRC emacs-lisp
+(global-display-line-numbers-mode 1)
+(add-hook 'term-mode-hook (lambda () (display-line-numbers-mode -1)))
+#+END_SRC
+** Prettify symbols
+#+BEGIN_SRC emacs-lisp
+(global-prettify-symbols-mode 1)
+#+END_SRC
+* General functionality
+** Don't make extra files on the filesystem
+#+BEGIN_SRC emacs-lisp
+(setq make-backup-file nil)
+(setq auto-save-default nil)
+#+END_SRC
+** Make scrolling a little less crazy
+#+BEGIN_SRC emacs-lisp
+(setq scroll-conservatively 100)
+#+END_SRC
+** Replace "yes or no" prompts with "y or n"
+#+BEGIN_SRC emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+** If on a system with a bell, shut it up
+#+BEGIN_SRC emacs-lisp
+(setq ring-bell-function 'ignore)
+#+END_SRC
+** Terminal on Super+Return, skip asking for shell
+#+BEGIN_SRC emacs-lisp
+(defvar my-term-shell "/bin/zsh")
+(defadvice ansi-term (before force-bash)
+  (interactive (list my-term-shell)))
+(ad-activate 'ansi-term)
+(global-set-key (kbd "<s-return>") 'ansi-term)
+#+END_SRC
+* Packages
+** which-key (small menus to help guide me through commands)
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+  :ensure t
+  :init (which-key-mode 1))
+#+END_SRC
+** org-bullets (nice looking bullet points for org-mode)
+#+BEGIN_SRC emacs-lisp
+(use-package org-bullets
+  :ensure t
+  :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+#+END_SRC
