@@ -4,4 +4,4 @@
 #+BEGIN_SRC
 $ git clone https://gitlab.com/farlado/dotemacs ~/.emacs.d
 #+END_SRC
-2. Inside the repo, choose your font size using ~make~. The options are ~bigfont~ (22), ~mediumfont~ (16), and ~smallfont~ (10). The default is ~smallfont~.
+1. Inside the repo, choose your font size using ~make~. The options are ~bigfont~ (22), ~mediumfont~ (16), and ~smallfont~ (10). The default is ~smallfont~.
