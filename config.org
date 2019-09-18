@@ -17,6 +17,10 @@
 (global-prettify-symbols-mode 1)
 #+END_SRC
 * General functionality
+** Enable the emacs server
+#+BEGIN_SRC emacs-lisp
+(server-start)
+#+END_SRC
 ** Don't make extra files on the filesystem
 #+BEGIN_SRC emacs-lisp
 (setq make-backup-file nil)
@@ -28,6 +32,10 @@
 (setq ido-create-new-buffer 'always)
 (setq ido-everywhere t)
 (ido-mode 1)
+#+END_SRC
+** Enable ibuffer
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-x C-b") 'ibuffer)
 #+END_SRC
 ** Make scrolling a little less crazy
 #+BEGIN_SRC emacs-lisp
@@ -50,7 +58,7 @@
 (global-set-key (kbd "<s-return>") 'ansi-term)
 #+END_SRC
 * Packages
-** which-key (small menus to help guide me through commands)
+** which-key (small menus for commands)
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
   :ensure t
@@ -62,4 +70,10 @@
   :ensure t
   :init (ido-vertical-mode 1))
 (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+#+END_SRC
+** smex (M-x but ido style)
+#+BEGIN_SRC emacs-lisp
+(use-package smex
+  :ensure t
+  :bind ("M-x" . smex))
 #+END_SRC
