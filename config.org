@@ -17,44 +17,46 @@
 (global-prettify-symbols-mode 1)
 #+END_SRC
 * General functionality
-** Enable the emacs server
-#+BEGIN_SRC emacs-lisp
-(server-start)
-#+END_SRC
-** Don't make extra files on the filesystem
+** Annoyances
+*** Don't make extra files on the filesystem
 #+BEGIN_SRC emacs-lisp
 (setq make-backup-file nil)
 (setq auto-save-default nil)
 #+END_SRC
-** Enable ido-mode
+*** Make scrolling a little less crazy
+#+BEGIN_SRC emacs-lisp
+(setq scroll-conservatively 100)
+#+END_SRC
+*** Replace "yes or no" prompts with "y or n"
+#+BEGIN_SRC emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+*** If on a system with a bell, shut it up
+#+BEGIN_SRC emacs-lisp
+(setq ring-bell-function 'ignore)
+#+END_SRC
+** Convenience
+*** Enable ido-mode
 #+BEGIN_SRC emacs-lisp
 (setq ido-mode-flex-matching nil)
 (setq ido-create-new-buffer 'always)
 (setq ido-everywhere t)
 (ido-mode 1)
 #+END_SRC
-** Enable ibuffer
+*** Enable ibuffer
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 #+END_SRC
-** Make scrolling a little less crazy
-#+BEGIN_SRC emacs-lisp
-(setq scroll-conservatively 100)
-#+END_SRC
-** Replace "yes or no" prompts with "y or n"
-#+BEGIN_SRC emacs-lisp
-(defalias 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
-** If on a system with a bell, shut it up
-#+BEGIN_SRC emacs-lisp
-(setq ring-bell-function 'ignore)
-#+END_SRC
-** Terminal on Super+Return, skip asking for shell
+** Terminal
+*** Always use my shell
 #+BEGIN_SRC emacs-lisp
 (defvar my-term-shell "/bin/zsh")
 (defadvice ansi-term (before force-bash)
   (interactive (list my-term-shell)))
 (ad-activate 'ansi-term)
+#+END_SRC
+*** Bind Super+Return to terminal
+#+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "<s-return>") 'ansi-term)
 #+END_SRC
 * Packages
