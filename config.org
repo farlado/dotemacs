@@ -22,6 +22,13 @@
 (setq make-backup-file nil)
 (setq auto-save-default nil)
 #+END_SRC
+** Enable ido-mode
+#+BEGIN_SRC emacs-lisp
+(setq ido-mode-flex-matching nil)
+(setq ido-create-new-buffer 'always)
+(setq ido-everywhere t)
+(ido-mode 1)
+#+END_SRC
 ** Make scrolling a little less crazy
 #+BEGIN_SRC emacs-lisp
 (setq scroll-conservatively 100)
@@ -48,4 +55,11 @@
 (use-package which-key
   :ensure t
   :init (which-key-mode 1))
+#+END_SRC
+** ido-vertical-mode (make ido-mode less ugly)
+#+BEGIN_SRC emacs-lisp
+(use-package ido-vertical-mode
+  :ensure t
+  :init (ido-vertical-mode 1))
+(setq ido-vertical-define-keys 'C-n-and-C-p-only)
 #+END_SRC
