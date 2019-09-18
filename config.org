@@ -17,6 +17,11 @@
 (global-prettify-symbols-mode 1)
 #+END_SRC
 * General functionality
+** Server
+*** Initialize
+#+BEGIN_SRC emacs-lisp
+(start-server)
+#+END_SRC
 ** Annoyances
 *** Don't make extra files on the filesystem
 #+BEGIN_SRC emacs-lisp
