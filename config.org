@@ -1,113 +1,173 @@
-* General looks
+* Looks
 ** Hide menu bar, tooltips, tool bar, and scroll bar
 #+BEGIN_SRC emacs-lisp
-(menu-bar-mode -1)
-(tooltip-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
+  (menu-bar-mode -1)
+  (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
 #+END_SRC
 ** Line numbers (but not in terminals)
 #+BEGIN_SRC emacs-lisp
-(global-display-line-numbers-mode 1)
-(add-hook 'term-mode-hook
-          (lambda () (display-line-numbers-mode -1)))
+  (global-display-line-numbers-mode 1)
+  (add-hook 'term-mode-hook
+	    (lambda () (display-line-numbers-mode -1)))
 #+END_SRC
 ** Prettify symbols
 #+BEGIN_SRC emacs-lisp
-(global-prettify-symbols-mode 1)
+  (global-prettify-symbols-mode 1)
 #+END_SRC
-* General functionality
-** Server
-*** Initialize
-#+BEGIN_SRC emacs-lisp
-(server-start)
-#+END_SRC
+* Functionality
 ** Annoyances
 *** Don't make extra files on the filesystem
 #+BEGIN_SRC emacs-lisp
-(setq make-backup-file nil)
-(setq auto-save-default nil)
+  (setq make-backup-file nil)
+  (setq auto-save-default nil)
 #+END_SRC
 *** Make scrolling a little less crazy
 #+BEGIN_SRC emacs-lisp
-(setq scroll-conservatively 100)
+  (setq scroll-conservatively 100)
 #+END_SRC
 *** Replace "yes or no" prompts with "y or n"
 #+BEGIN_SRC emacs-lisp
-(defalias 'yes-or-no-p 'y-or-n-p)
+  (defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 *** If on a system with a bell, shut it up
 #+BEGIN_SRC emacs-lisp
-(setq ring-bell-function 'ignore)
+  (setq ring-bell-function 'ignore)
+#+END_SRC
+*** Move between SubWords as well as between words
+#+BEGIN_SRC emacs-lisp
+  (global-subword-mode 1)
 #+END_SRC
 ** Convenience
+*** Start emacs server on startup
+#+BEGIN_SRC emacs-lisp
+  (server-start)
+#+END_SRC
 *** Enable ido-mode
 #+BEGIN_SRC emacs-lisp
-(setq ido-mode-flex-matching nil)
-(setq ido-create-new-buffer 'always)
-(setq ido-everywhere t)
-(ido-mode 1)
+  (setq ido-mode-flex-matching nil)
+  (setq ido-create-new-buffer 'always)
+  (setq ido-everywhere t)
+  (ido-mode 1)
 #+END_SRC
-*** Enable ibuffer using C-x C-b
+*** Electric mode (OH MY GOD THIS IS SO GREAT)
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-x C-b") 'ibuffer)
+  (setq electric-pair-pairs '(
+			      (?\( . ?\))
+			      (?\[ . ?\])
+			      (?\" . ?\")))
+  (electric-pair-mode t)
+#+END_SRC
+*** Kill an entire word when you're in the middle of it
+#+BEGIN_SRC emacs-lisp
+  (defun whole-kill-word ()
+    (interactive)
+    (backward-word)
+    (kill-word 1))
+  (global-set-key (kbd "C-c DEL") 'whole-kill-word)
+#+END_SRC
+** Windows
+*** Use the current window when editing source code in org-mode
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-window-setup 'current-window)
+#+END_SRC
+*** Move focus when explicitly creating new windows
+#+BEGIN_SRC emacs-lisp
+  (defun split-and-follow-vertical ()
+    (interactive)
+    (split-window-below)
+    (balance-windows)
+    (other-window 1))
+  (global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
+
+  (defun split-and-follow-horizontal ()
+    (interactive)
+    (split-window-right)
+    (balance-windows)
+    (other-window 1))
+  (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
+#+END_SRC
+*** Use ibuffer so the buffer list doesn't open a new window
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
 #+END_SRC
 ** Terminal
-*** Always use my shell
+**** Always use zsh
 #+BEGIN_SRC emacs-lisp
-(defvar my-term-shell "/bin/zsh")
-(defadvice ansi-term (before force-bash)
-  (interactive (list my-term-shell)))
-(ad-activate 'ansi-term)
+  (defvar my-term-shell "/bin/zsh")
+  (defadvice ansi-term (before force-bash)
+    (interactive (list my-term-shell)))
+  (ad-activate 'ansi-term)
 #+END_SRC
-*** Bind C-c t to terminal
+**** Bind C-c t to terminal
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-c t") 'ansi-term)
+  (global-set-key (kbd "C-c t") 'ansi-term)
 #+END_SRC
 ** Configuration
 *** Open configuration with C-c e
 #+BEGIN_SRC emacs-lisp
-(defun config-visit ()
-  (interactive)
-  (find-file "~/.emacs.d/config.org"))
-(global-set-key (kbd "C-c e") 'config-visit)
+  (defun config-visit ()
+    (interactive)
+    (find-file "~/.emacs.d/config.org"))
+  (global-set-key (kbd "C-c e") 'config-visit)
 #+END_SRC
 *** Reload configuration with C-c r
 #+BEGIN_SRC emacs-lisp
-(defun config-reload ()
-  (interactive)
-  (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
-(global-set-key (kbd "C-c r") 'config-reload)
+  (defun config-reload ()
+    (interactive)
+    (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+  (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
 * Packages
+** switch-window (easier movement between windows)
+#+BEGIN_SRC emacs-lisp
+  (use-package switch-window
+    :ensure t
+    :config
+    (setq switch-window-input-style 'minibuffer)
+    (setq switch-window-increase 4)
+    (setq switch-window-threshold 2)
+    (setq switch-window-shortcut-style 'qwerty)
+    (setq switch-window-qwerty-shortcuts
+	  '("a" "s" "d" "f" "g" "z" "x" "c" "v" "b"))
+    :bind
+    ([remap other-window] . switch-window))
+#+END_SRC
+** hungry-delete (convenient deletion of trailing whitespace)
+#+BEGIN_SRC emacs-lisp
+  (use-package hungry-delete
+    :ensure t
+    :config (global-hungry-delete-mode))
+#+END_SRC
 ** which-key (small menus for commands)
 #+BEGIN_SRC emacs-lisp
-(use-package which-key
-  :ensure t
-  :init (which-key-mode 1))
+  (use-package which-key
+    :ensure t
+    :init (which-key-mode 1))
 #+END_SRC
 ** ido-vertical-mode (make ido-mode less ugly)
 #+BEGIN_SRC emacs-lisp
-(use-package ido-vertical-mode
-  :ensure t
-  :init (ido-vertical-mode 1))
-(setq ido-vertical-define-keys 'C-n-and-C-p-only)
+  (use-package ido-vertical-mode
+    :ensure t
+    :init (ido-vertical-mode 1))
+  (setq ido-vertical-define-keys 'C-n-and-C-p-only)
 #+END_SRC
 ** smex (M-x but ido style)
 #+BEGIN_SRC emacs-lisp
-(use-package smex
-  :ensure t
-  :bind ("M-x" . smex))
+  (use-package smex
+    :ensure t
+    :bind ("M-x" . smex))
 #+END_SRC
 ** avy (faster moving around documents)
 #+BEGIN_SRC emacs-lisp
-(use-package avy
-  :ensure t
-  :bind ("M-s" . avy-goto-char))
+  (use-package avy
+    :ensure t
+    :bind ("M-s" . avy-goto-char))
 #+END_SRC
 ** rainbow (show colors when typed as hex codes)
 #+BEGIN_SRC emacs-lisp
-(use-package rainbow-mode
-  :ensure t
-  :init (rainbow-mode 1))
+  (use-package rainbow-mode
+    :ensure t
+    :init (rainbow-mode 1))
 #+END_SRC
