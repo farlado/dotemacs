@@ -48,7 +48,7 @@
 (setq ido-everywhere t)
 (ido-mode 1)
 #+END_SRC
-*** Enable ibuffer
+*** Enable ibuffer using C-x C-b
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 #+END_SRC
@@ -60,9 +60,24 @@
   (interactive (list my-term-shell)))
 (ad-activate 'ansi-term)
 #+END_SRC
-*** Bind Super+Return to terminal
+*** Bind C-c t to terminal
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "<s-return>") 'ansi-term)
+(global-set-key (kbd "C-c t") 'ansi-term)
+#+END_SRC
+** Configuration
+*** Open configuration with C-c e
+#+BEGIN_SRC emacs-lisp
+(defun config-visit ()
+  (interactive)
+  (find-file "~/.emacs.d/config.org"))
+(global-set-key (kbd "C-c e") 'config-visit)
+#+END_SRC
+*** Reload configuration with C-c r
+#+BEGIN_SRC emacs-lisp
+(defun config-reload ()
+  (interactive)
+  (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+(global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
 * Packages
 ** which-key (small menus for commands)
@@ -83,4 +98,16 @@
 (use-package smex
   :ensure t
   :bind ("M-x" . smex))
+#+END_SRC
+** avy (faster moving around documents)
+#+BEGIN_SRC emacs-lisp
+(use-package avy
+  :ensure t
+  :bind ("M-s" . avy-goto-char))
+#+END_SRC
+** rainbow (show colors when typed as hex codes)
+#+BEGIN_SRC emacs-lisp
+(use-package rainbow-mode
+  :ensure t
+  :init (rainbow-mode 1))
 #+END_SRC
