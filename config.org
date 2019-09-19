@@ -1,71 +1,3 @@
-* Looks
-** Hide menu bar, tooltips, tool bar, and scroll bar
-#+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
-  (tooltip-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-#+END_SRC
-** Line/column numbers
-*** Show line and column numbers in the status line
-#+BEGIN_SRC emacs-lisp
-  (line-number-mode 1)
-  (column-number-mode 1)
-#+END_SRC
-*** Show line numbers in all modes unless I specify otherwise
-#+BEGIN_SRC emacs-lisp
-  (global-display-line-numbers-mode 1)
-  (add-hook 'term-mode-hook
-	    (lambda () (display-line-numbers-mode -1)))
-  (add-hook 'ibuffer-hook
-	    (lambda () (display-line-numbers-mode -1)))
-  (add-hook 'dashboard-mode-hook
-	    (lambda () (display-line-numbers-mode -1)))
-#+END_SRC
-** Prettify symbols/text
-*** Convert various text to symbols in programming modes
-#+BEGIN_SRC emacs-lisp
-  (global-prettify-symbols-mode 1)
-#+END_SRC
-*** rainbow package (show colors when typed as hex codes)
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-mode
-    :ensure t
-    :config (rainbow-mode 1))
-#+END_SRC
-*** rainbow-delimiters package (help make programs easier to read and organize)
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-delimiters
-    :ensure t
-    :init
-    (add-hook 'prog-mode-hook #'rainbow-delimiters-mode 1))
-#+END_SRC
-** Mode Line
-*** spaceline package (spacemacs mode line)
-#+BEGIN_SRC emacs-lisp
-  (use-package spaceline
-    :ensure t
-    :config
-    (require 'spaceline-config)
-    (setq powerline-default-separator (quote arrow))
-    (spaceline-spacemacs-theme))
-#+END_SRC
-*** diminish package (hide minor modes from mode line)
-#+BEGIN_SRC emacs-lisp
-    (use-package diminish
-      :ensure t
-      :init
-      (diminish 'hungry-delete-mode)
-      (diminish 'which-key-mode)
-      (diminish 'subword-mode)
-      (diminish 'company-mode)
-      (diminish 'rainbow-mode))
-#+END_SRC
-*** Show clock on mode line
-#+BEGIN_SRC emacs-lisp
-  (setq display-time-24hr-format t)
-  (display-time-mode 1)
-#+END_SRC
 * Functionality
 ** Startup
 *** Start emacs server
@@ -192,12 +124,13 @@
   (global-set-key (kbd "C-x k") 'kill-this-buffer)
   (global-set-key (kbd "C-x C-k") 'kill-buffer)
 #+END_SRC
-*** Kill all buffers
+*** Use ibuffer so the buffer list doesn't open a new window
 #+BEGIN_SRC emacs-lisp
-  (defun kill-all-buffers ()
-    (interactive)
-    (mapc 'kill-buffer (buffer-list)))
-  (global-set-key (kbd "C-M-s-k") 'kill-all-buffers)
+  (global-set-key (kbd "C-x b") 'ibuffer)
+#+END_SRC
+*** Use buffer switching on C-x C-b
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
 #+END_SRC
 ** Windows
 *** Move focus when explicitly creating new windows
@@ -215,10 +148,6 @@
     (balance-windows)
     (other-window 1))
   (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
-#+END_SRC
-*** Use ibuffer so the buffer list doesn't open a new window
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-x C-b") 'ibuffer)
 #+END_SRC
 *** switch-window package (easier movement between windows)
 #+BEGIN_SRC emacs-lisp
@@ -246,6 +175,11 @@
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c t") 'ansi-term)
 #+END_SRC
+*** Hide mode line in term-mode
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'term-mode-hook
+	    '(lambda () (setq mode-line-format nil)))
+#+END_SRC
 ** Configuration
 *** Open configuration with C-c e
 #+BEGIN_SRC emacs-lisp
@@ -261,4 +195,75 @@
     (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
   (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
-* Additional Programs
+* Looks
+** Hide menu bar, tooltips, tool bar, and scroll bar
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
+  (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+#+END_SRC
+** Line/column numbers
+*** Show line and column numbers in the status line
+#+BEGIN_SRC emacs-lisp
+  (line-number-mode 1)
+  (column-number-mode 1)
+#+END_SRC
+*** Show line numbers in all modes unless I specify otherwise
+#+BEGIN_SRC emacs-lisp
+  (global-display-line-numbers-mode 1)
+  (add-hook 'term-mode-hook
+	    (lambda () (display-line-numbers-mode -1)))
+  (add-hook 'ibuffer-hook
+	    (lambda () (display-line-numbers-mode -1)))
+  (add-hook 'dashboard-mode-hook
+	    (lambda () (display-line-numbers-mode -1)))
+#+END_SRC
+** Prettify symbols/text
+*** Convert various text to symbols in programming modes
+#+BEGIN_SRC emacs-lisp
+  (global-prettify-symbols-mode 1)
+#+END_SRC
+*** rainbow package (show colors when typed as hex codes)
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode
+    :ensure t
+    :config
+    (define-globalized-minor-mode global-rainbow-mode rainbow-mode
+      (lambda () (rainbow-mode 1)))
+    (global-rainbow-mode 1))
+#+END_SRC
+*** rainbow-delimiters package (help make programs easier to read and organize)
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :init
+    (add-hook 'prog-mode-hook #'rainbow-delimiters-mode 1))
+#+END_SRC
+** Mode Line
+*** Show clock on mode line
+#+BEGIN_SRC emacs-lisp
+  (setq display-time-24hr-format t)
+  (display-time-mode 1)
+#+END_SRC
+*** diminish (hide minor modes from mode line)
+#+BEGIN_SRC emacs-lisp
+    (use-package diminish
+      :ensure t
+      :init
+      (diminish 'hungry-delete-mode)
+      (diminish 'which-key-mode)
+      (diminish 'subword-mode)
+      (diminish 'company-mode)
+      (diminish 'rainbow-mode)
+      (diminish 'eldoc-mode))
+#+END_SRC
+*** spaceline (spacemacs mode line)
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline
+    :ensure t
+    :config
+    (require 'spaceline-config)
+    (setq powerline-default-separator (quote arrow))
+    (spaceline-spacemacs-theme))
+#+END_SRC
