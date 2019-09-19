@@ -6,18 +6,65 @@
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
 #+END_SRC
-** Line numbers (but not in terminals)
+** Line/column numbers
+*** Show line and column numbers in the status line
+#+BEGIN_SRC emacs-lisp
+  (line-number-mode 1)
+  (column-number-mode 1)
+#+END_SRC
+*** Show line numbers in all modes unless I specify otherwise
 #+BEGIN_SRC emacs-lisp
   (global-display-line-numbers-mode 1)
   (add-hook 'term-mode-hook
 	    (lambda () (display-line-numbers-mode -1)))
+  (add-hook 'ibuffer-hook
+	    (lambda () (display-line-numbers-mode -1)))
+  (add-hook 'dashboard-mode-hook
+	    (lambda () (display-line-numbers-mode -1)))
 #+END_SRC
-** Prettify symbols
+** Prettify symbols/text
+*** Convert various text to symbols in programming modes
 #+BEGIN_SRC emacs-lisp
   (global-prettify-symbols-mode 1)
 #+END_SRC
+*** rainbow package (show colors when typed as hex codes)
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode
+    :ensure t
+    :init (rainbow-mode 1))
+#+END_SRC
+*** rainbow-delimiters package (help make programs easier to read and organize)
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :init
+    (add-hook 'prog-mode-hook #'rainbow-delimiters-mode 1))
+#+END_SRC
 * Functionality
+** Startup
+*** Start emacs server
+#+BEGIN_SRC emacs-lisp
+  (server-start)
+#+END_SRC
+*** dashboard package (better start screen)
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard
+    :ensure t
+    :config
+    (dashboard-setup-startup-hook)
+    (setq dashboard-items '((recents . 10)))
+    (setq dashboard-banner-logo-title "Welcome to GNU Emacs")
+    (setq dashboard-set-footer nil))
+#+END_SRC
+*** Show dashboard at startup
+#+BEGIN_SRC emacs-lisp
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+#+END_SRC
 ** Annoyances
+*** Remove default start screen
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-message t)
+#+END_SRC
 *** Don't make extra files on the filesystem
 #+BEGIN_SRC emacs-lisp
   (setq make-backup-file nil)
@@ -39,11 +86,7 @@
 #+BEGIN_SRC emacs-lisp
   (global-subword-mode 1)
 #+END_SRC
-** Convenience
-*** Start emacs server on startup
-#+BEGIN_SRC emacs-lisp
-  (server-start)
-#+END_SRC
+** Menus/Commands
 *** Enable ido-mode
 #+BEGIN_SRC emacs-lisp
   (setq ido-mode-flex-matching nil)
@@ -51,13 +94,37 @@
   (setq ido-everywhere t)
   (ido-mode 1)
 #+END_SRC
-*** Electric mode (OH MY GOD THIS IS SO GREAT)
+*** ido-vertical-mode package (make ido-mode less ugly)
 #+BEGIN_SRC emacs-lisp
-  (setq electric-pair-pairs '(
-			      (?\( . ?\))
-			      (?\[ . ?\])
-			      (?\" . ?\")))
-  (electric-pair-mode t)
+  (use-package ido-vertical-mode
+    :ensure t
+    :init (ido-vertical-mode 1))
+  (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+#+END_SRC
+*** smex package (M-x but ido style)
+#+BEGIN_SRC emacs-lisp
+  (use-package smex
+    :ensure t
+    :bind ("M-x" . smex))
+#+END_SRC
+*** which-key package (small menus to help with commands)
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t
+    :init (which-key-mode 1))
+#+END_SRC
+** Convenience
+*** avy package (faster moving around documents)
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :ensure t
+    :bind ("M-s" . avy-goto-char))
+#+END_SRC
+*** hungry-delete package (convenient deletion of trailing whitespace)
+#+BEGIN_SRC emacs-lisp
+  (use-package hungry-delete
+    :ensure t
+    :config (global-hungry-delete-mode))
 #+END_SRC
 *** Kill an entire word when you're in the middle of it
 #+BEGIN_SRC emacs-lisp
@@ -66,6 +133,39 @@
     (backward-word)
     (kill-word 1))
   (global-set-key (kbd "C-c DEL") 'whole-kill-word)
+#+END_SRC
+*** Copy an entire line quickly
+#+BEGIN_SRC emacs-lisp
+  (defun copy-whole-line ()
+    (interactive)
+    (save-excursion
+      (kill-new
+       (buffer-substring
+	(point-at-bol)
+	(point-at-eol)))))
+  (global-set-key (kbd "C-c c l") 'copy-whole-line)
+#+END_SRC
+*** Electric mode (OH MY GOD THIS IS SO GREAT)
+#+BEGIN_SRC emacs-lisp
+  (setq electric-pair-pairs '(
+			      (?\{ . ?\})
+			      (?\( . ?\))
+			      (?\[ . ?\])
+			      (?\" . ?\")))
+  (electric-pair-mode t)
+#+END_SRC
+** Buffers
+*** Kill current buffer (and its window) with C-x k, use C-x C-k to kill another buffer
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-x k") 'kill-this-buffer)
+  (global-set-key (kbd "C-x C-k") 'kill-buffer)
+#+END_SRC
+*** Kill all buffers
+#+BEGIN_SRC emacs-lisp
+  (defun kill-all-buffers ()
+    (interactive)
+    (mapc 'kill-buffer (buffer-list)))
+  (global-set-key (kbd "C-M-s-k") 'kill-all-buffers)
 #+END_SRC
 ** Windows
 *** Use the current window when editing source code in org-mode
@@ -92,15 +192,29 @@
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x C-b") 'ibuffer)
 #+END_SRC
+*** switch-window package (easier movement between windows)
+#+BEGIN_SRC emacs-lisp
+  (use-package switch-window
+    :ensure t
+    :config
+    (setq switch-window-input-style 'minibuffer)
+    (setq switch-window-increase 4)
+    (setq switch-window-threshold 2)
+    (setq switch-window-shortcut-style 'qwerty)
+    (setq switch-window-qwerty-shortcuts
+	  '("a" "s" "d" "f" "g" "z" "x" "c" "v" "b"))
+    :bind
+    ([remap other-window] . switch-window))
+#+END_SRC
 ** Terminal
-**** Always use zsh
+*** Always use zsh
 #+BEGIN_SRC emacs-lisp
   (defvar my-term-shell "/bin/zsh")
   (defadvice ansi-term (before force-bash)
     (interactive (list my-term-shell)))
   (ad-activate 'ansi-term)
 #+END_SRC
-**** Bind C-c t to terminal
+*** Bind C-c t to terminal
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c t") 'ansi-term)
 #+END_SRC
@@ -119,55 +233,4 @@
     (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
   (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
-* Packages
-** switch-window (easier movement between windows)
-#+BEGIN_SRC emacs-lisp
-  (use-package switch-window
-    :ensure t
-    :config
-    (setq switch-window-input-style 'minibuffer)
-    (setq switch-window-increase 4)
-    (setq switch-window-threshold 2)
-    (setq switch-window-shortcut-style 'qwerty)
-    (setq switch-window-qwerty-shortcuts
-	  '("a" "s" "d" "f" "g" "z" "x" "c" "v" "b"))
-    :bind
-    ([remap other-window] . switch-window))
-#+END_SRC
-** hungry-delete (convenient deletion of trailing whitespace)
-#+BEGIN_SRC emacs-lisp
-  (use-package hungry-delete
-    :ensure t
-    :config (global-hungry-delete-mode))
-#+END_SRC
-** which-key (small menus for commands)
-#+BEGIN_SRC emacs-lisp
-  (use-package which-key
-    :ensure t
-    :init (which-key-mode 1))
-#+END_SRC
-** ido-vertical-mode (make ido-mode less ugly)
-#+BEGIN_SRC emacs-lisp
-  (use-package ido-vertical-mode
-    :ensure t
-    :init (ido-vertical-mode 1))
-  (setq ido-vertical-define-keys 'C-n-and-C-p-only)
-#+END_SRC
-** smex (M-x but ido style)
-#+BEGIN_SRC emacs-lisp
-  (use-package smex
-    :ensure t
-    :bind ("M-x" . smex))
-#+END_SRC
-** avy (faster moving around documents)
-#+BEGIN_SRC emacs-lisp
-  (use-package avy
-    :ensure t
-    :bind ("M-s" . avy-goto-char))
-#+END_SRC
-** rainbow (show colors when typed as hex codes)
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-mode
-    :ensure t
-    :init (rainbow-mode 1))
-#+END_SRC
+* Additional Programs
