@@ -313,6 +313,28 @@
   (global-set-key (kbd "s-g") 'run-gimp)
 #+END_SRC
 *** Other functions
+**** Volume control
+#+BEGIN_SRC emacs-lisp
+  (defun volctl-m ()
+    (interactive)
+    (shell-command "volctl m"))
+  (global-set-key (kbd "<XF86AudioMute>") 'volctl-m)
+
+  (defun volctl-t ()
+    (interactive)
+    (shell-command "volctl t"))
+  (global-set-key (kbd "<XF86AudioMicMute>") 'volctl-t)
+
+  (defun volctl-u ()
+    (interactive)
+    (shell-command "volctl u"))
+  (global-set-key (kbd "<XF86AudioRaiseVolume>") 'volctl-u)
+
+  (defun volctl-d ()
+    (interactive)
+    (shell-command "volctl d"))
+  (global-set-key (kbd "<XF86AudioLowerVolume>") 'volctl-d)
+#+END_SRC
 **** Brightness control
 #+BEGIN_SRC emacs-lisp
   (defun blctl-up ()
