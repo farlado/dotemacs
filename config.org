@@ -16,7 +16,8 @@
 #+END_SRC
 *** Show dashboard at startup
 #+BEGIN_SRC emacs-lisp
-  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+  (setq initial-buffer-choice
+	(lambda () (get-buffer "*dashboard*")))
 #+END_SRC
 ** Annoyances
 *** Remove default start screen
@@ -149,6 +150,10 @@
     (other-window 1))
   (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
 #+END_SRC
+*** Balance windows with C-c b
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c b") 'balance-windows)
+#+END_SRC
 *** switch-window package (easier movement between windows)
 #+BEGIN_SRC emacs-lisp
   (use-package switch-window
@@ -175,11 +180,6 @@
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c t") 'ansi-term)
 #+END_SRC
-*** Hide mode line in term-mode
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'term-mode-hook
-	    '(lambda () (setq mode-line-format nil)))
-#+END_SRC
 ** Configuration
 *** Open configuration with C-c e
 #+BEGIN_SRC emacs-lisp
@@ -192,8 +192,196 @@
 #+BEGIN_SRC emacs-lisp
   (defun config-reload ()
     (interactive)
-    (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+    (org-babel-load-file
+     (expand-file-name "~/.emacs.d/config.org")))
   (global-set-key (kbd "C-c r") 'config-reload)
+#+END_SRC
+* EXWM
+** exwm package (base window manager)
+#+BEGIN_SRC emacs-lisp
+  (use-package exwm
+    :ensure t
+    :config
+    (require 'exwm)
+    (require 'exwm-randr)
+    (require 'exwm-config)
+    (require 'exwm-systemtray))
+;    (exwm-enable)
+ ;   (exwm-systemtray-enable))
+#+END_SRC
+** Configure multi-head and start EXWM
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-randr-workspace-output-plist '(0 "LVDS1"
+					    0 "eDP-1-1"
+					    0 "DP-1-2-2"
+					    1 "DP-1-2-1"
+					    2 "DP-1-2-3"))
+  (setq exwm-workspace-number 4)
+  (add-hook 'exwm-randr-screen-change-hook
+	    (lambda ()
+	      (start-process-shell-command
+	       "xrandr" nil "ds")))
+  (exwm-randr-enable)
+  (exwm-enable)
+  (exwm-systemtray-enable)
+#+END_SRC
+** Main keybindings
+*** Global EXWM functions
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-input-global-keys
+	`(([?\s-r] . exwm-reset)
+	  ([?\s-w] . exwm-workspace-switch)
+	  ([?\s-q] . exwm-workspace-delete)
+	  ,@(mapcar (lambda (i)
+		      `(,(kbd (format "s-%d" i)) .
+			(lambda ()
+			  (interactive)
+			  (exwm-workspace-switch-create ,i))))
+		    (number-sequence 0 9))))
+#+END_SRC
+*** Local EXWM functions
+**** Send a key verbatim to the program more easily
+#+BEGIN_SRC emacs-lisp
+  (define-key exwm-mode-map (kbd "C-c C-q") nil)
+  (define-key exwm-mode-map (kbd "C-q") 'exwm-input-send-next-key)
+#+END_SRC
+**** Toggle fullscreen
+#+BEGIN_SRC emacs-lisp
+  (define-key exwm-mode-map (kbd "C-c C-f") 'exwm-layout-set-fullscreen)
+#+END_SRC
+**** Toggle/hide floating
+#+BEGIN_SRC emacs-lisp
+  (define-key exwm-mode-map (kbd "C-c C-t C-f") 'exwm-floating-toggle-floating)
+  (define-key exwm-mode-map (kbd "C-c C-t C-v") 'exwm-floating-hide)
+#+END_SRC
+**** Disable toggling the mode line
+#+BEGIN_SRC emacs-lisp
+  (define-key exwm-mode-map (kbd "C-c C-t C-m") nil)
+#+END_SRC
+*** Pass these to programs for emacs style navigation
+#+BEGIN_SRC emacs-lisp
+    (setq exwm-input-simulation-keys
+	  '(([?\C-b] . [left])
+	    ([?\C-f] . [right])
+	    ([?\C-p] . [up])
+	    ([?\C-n] . [down])
+	    ([?\C-a] . [home])
+	    ([?\C-e] . [end])
+	    ([?\C-v] . [next])
+	    ([?\M-v] . [prior])
+	    ([?\C-d] . [delete])
+	    ([?\C-k] . [S-end delete])
+	    ([?\C-w] . [?\C-x])
+	    ([?\M-w] . [?\C-c])
+	    ([?\C-y] . [?\C-v])
+	    ([?\C-s] . [?\C-f])))
+#+END_SRC
+*** Various programs
+**** Firefox
+#+BEGIN_SRC emacs-lisp
+  (defun run-firefox ()
+    (interactive)
+    (start-process-shell-command
+     "firefox" nil "firefox"))
+  (global-set-key (kbd "s-f") 'run-firefox)
+#+END_SRC
+**** Telegram
+#+BEGIN_SRC emacs-lisp
+  (defun run-tg ()
+    (interactive)
+    (start-process-shell-command
+     "telegram" nil "telegram"))
+  (global-set-key (kbd "s-t") 'run-tg)
+#+END_SRC
+**** Steam
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+**** GIMP
+#+BEGIN_SRC emacs-lisp
+  (defun run-gimp ()
+    (interactive)
+    (start-process-shell-command
+     "gimp" nil "gimp"))
+  (global-set-key (kbd "s-g") 'run-gimp)
+#+END_SRC
+*** Other functions
+**** Brightness control
+#+BEGIN_SRC emacs-lisp
+  (defun blctl-up ()
+    (interactive)
+    (shell-command "blctl -u"))
+  (global-set-key (kbd "<XF86MonBrightnessUp>") 'blctl-up)
+
+  (defun blctl-down ()
+    (interactive)
+    (shell-command "blctl -d"))
+  (global-set-key (kbd "<XF86MonBrightnessDown>") 'blctl-down)
+#+END_SRC
+**** Taking screenshots
+#+BEGIN_SRC emacs-lisp
+  (defun screencap-section ()
+    (interactive)
+    (shell-command
+     "maim -s /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
+  (global-set-key (kbd "<print>") 'screencap-section)
+
+  (defun screencap-full ()
+    (interactive)
+    (start-process-shell-command "screencap-full" nil
+     "maim /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
+  (global-set-key (kbd "<C-print>") 'screencap-full)
+#+END_SRC
+**** Cycle keyboard layouts
+#+BEGIN_SRC emacs-lisp
+  (defun kbd-cycle-cw ()
+    (interactive)
+    (shell-command "keybd -c us epo de"))
+  (global-set-key (kbd "s-SPC") 'kbd-cycle-cw)
+#+END_SRC
+**** Lock the screen
+#+BEGIN_SRC emacs-lisp
+  (defun lockscreen ()
+    (interactive)
+    (start-process-shell-command
+     "lockscreen" nil "i3l"))
+  (global-set-key (kbd "<XF86ScreenSaver>") 'lockscreen)
+  (global-set-key (kbd "s-l") 'lockscreen)
+#+END_SRC
+** Name EXWM buffers after the window class and title
+#+BEGIN_SRC emacs-lisp
+  (defun exwm-rename-buffer ()
+    (interactive)
+    (exwm-workspace-rename-buffer
+     (concat exwm-title)))
+  (add-hook 'exwm-update-title-hook 'exwm-rename-buffer)
+#+END_SRC
+** dmenu package (for launching things I haven't bound)
+#+BEGIN_SRC emacs-lisp
+  (use-package dmenu
+    :ensure t
+    :bind ("s-x" . dmenu))
+#+END_SRC
+** Startup applications
+*** Set fallback cursor
+#+BEGIN_SRC emacs-lisp
+  (shell-command "xsetroot -cursor_name left_ptr")
+#+END_SRC
+*** Disable trackpad
+#+BEGIN_SRC emacs-lisp
+  (shell-command "xinput disable 11")
+#+END_SRC
+*** Set keyboard layout to US
+#+BEGIN_SRC emacs-lisp
+  (shell-command "keybd -s us")
+#+END_SRC
+*** Compositor
+#+BEGIN_SRC emacs-lisp
+  (start-process-shell-command "xcompmgr" nil "xcompmgr")
+#+END_SRC
+*** Notification manager
+#+BEGIN_SRC emacs-lisp
+  (start-process-shell-command "dunst" nil "dunst")
 #+END_SRC
 * Looks
 ** Hide menu bar, tooltips, tool bar, and scroll bar
@@ -229,11 +417,12 @@
   (use-package rainbow-mode
     :ensure t
     :config
-    (define-globalized-minor-mode global-rainbow-mode rainbow-mode
+    (define-globalized-minor-mode global-rainbow-mode
+      rainbow-mode
       (lambda () (rainbow-mode 1)))
     (global-rainbow-mode 1))
 #+END_SRC
-*** rainbow-delimiters package (help make programs easier to read and organize)
+*** rainbow-delimiters package (better quotes/parentheses/brackets)
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
     :ensure t
@@ -246,7 +435,11 @@
   (setq display-time-24hr-format t)
   (display-time-mode 1)
 #+END_SRC
-*** diminish (hide minor modes from mode line)
+*** Show battery state on mode line
+#+BEGIN_SRC emacs-lisp
+  (display-battery-mode 1)
+#+END_SRC
+*** diminish package (hide minor modes from mode line)
 #+BEGIN_SRC emacs-lisp
     (use-package diminish
       :ensure t
@@ -258,7 +451,7 @@
       (diminish 'rainbow-mode)
       (diminish 'eldoc-mode))
 #+END_SRC
-*** spaceline (spacemacs mode line)
+*** spaceline package (spacemacs mode line)
 #+BEGIN_SRC emacs-lisp
   (use-package spaceline
     :ensure t
@@ -267,3 +460,4 @@
     (setq powerline-default-separator (quote arrow))
     (spaceline-spacemacs-theme))
 #+END_SRC
+

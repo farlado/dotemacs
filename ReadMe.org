@@ -1,7 +1,8 @@
 * Farlado's .emacs
 ** Installation and Configuration
-1. Clone the repo into your home directory as ~emacs.d~.
+1. Clone the repo into your home directory as ~.emacs.d~.
 1. Inside the repo, choose your font size using ~make~. The options are ~bigfont~ (22), ~mediumfont~ (16), and ~smallfont~ (10). The default is ~smallfont~.
+1. Make sure if you aren't going to use exwm you remove everything in the ~EXWM~ section of ~config.org~
 The commands to do this should look somewhat like this:
 #+BEGIN_SRC 
 $ git clone https://gitlab.com/farlado/dotemacs ~/.emacs.d
