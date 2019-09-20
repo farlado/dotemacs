@@ -467,25 +467,29 @@
 * EMMS (Emacs MultiMedia System)
 ** Install EMMS and bind playback keys
 #+BEGIN_SRC emacs-lisp
-  (use-package emms
-    :ensure t
-    :config
-    (require 'emms-setup)
-    (require 'emms-player-mpd)
-    (emms-all)
-    (setq emms-seek-seconds 5)
-    (setq emms-player-list '(emms-player-mpd))
-    (setq emms-info-functions '(emms-info mpd))
-    (setq emms-player-mpd-server-name "localhost")
-    (setq emms-player-mpd-server-port "6601")
-    :bind
-    ("s-a v" . emms)
-    ("s-a b" . emms-smart-browse)
-    ("s-a r c" . emms-player-mpd-update-all-reset-cache)
-    ("<XF86AudioPrev>" . emms-previous)
-    ("<XF86AudioNext>" . emms-next)
-    ("<XF86AudioPlay>" . emms-pause)
-    ("<XF86AudioStop>" . emms-stop))
+    (use-package emms
+      :ensure t
+      :config
+      (require 'emms-setup)
+      (require 'emms-player-mpd)
+      (emms-all)
+      (setq emms-seek-seconds 5)
+      (setq emms-player-list '(emms-player-mpd))
+      (setq emms-info-functions '(emms-info mpd))
+      (setq emms-player-mpd-server-name "localhost")
+      (setq emms-player-mpd-server-port "6601")
+      :bind
+      ("s-a v" . emms)
+      ("s-a b" . emms-smart-browse)
+      ("s-a r c" . emms-player-mpd-update-all-reset-cache)
+      ("<XF86AudioPrev>" . emms-previous)
+      ("<XF86AudioNext>" . emms-next)
+      ("<XF86AudioPlay>" . emms-pause)
+      ("<XF86AudioStop>" . emms-stop)
+      ("<s-left>" . emms-previous)
+      ("<s-right>" . emms-next)
+      ("<s-down>" . emms-pause)
+      ("<s-up>" . emms-stop))
 #+END_SRC
 ** MPC initialization
 #+BEGIN_SRC emacs-lisp
