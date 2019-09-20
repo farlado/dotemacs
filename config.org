@@ -215,7 +215,14 @@
 					    0 "eDP-1-1"
 					    0 "DP-1-2-2"
 					    1 "DP-1-2-1"
-					    2 "DP-1-2-3"))
+					    2 "DP-1-2-3"
+					    3 "DP-1-2-2"
+					    4 "DP-1-2-1"
+					    5 "DP-1-2-3"
+					    6 "DP-1-2-2"
+					    7 "DP-1-2-1"
+					    8 "DP-1-2-3"
+					    9 "DP-1-2-2"))
   (setq exwm-workspace-number 4)
   (add-hook 'exwm-randr-screen-change-hook
 	    (lambda ()
@@ -366,10 +373,6 @@
 *** Set fallback cursor
 #+BEGIN_SRC emacs-lisp
   (shell-command "xsetroot -cursor_name left_ptr")
-#+END_SRC
-*** Disable trackpad
-#+BEGIN_SRC emacs-lisp
-  (shell-command "xinput disable 11")
 #+END_SRC
 *** Set keyboard layout to US
 #+BEGIN_SRC emacs-lisp
