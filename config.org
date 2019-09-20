@@ -363,10 +363,10 @@
 #+END_SRC
 **** Cycle keyboard layouts
 #+BEGIN_SRC emacs-lisp
-  (defun kbd-cycle-cw ()
+  (defun keyctl-cycle ()
     (interactive)
-    (shell-command "keybd -c us epo de"))
-  (global-set-key (kbd "s-SPC") 'kbd-cycle-cw)
+    (shell-command "keyctl -c us epo de"))
+  (global-set-key (kbd "s-SPC") 'keyctl-cycle)
 #+END_SRC
 **** Lock the screen
 #+BEGIN_SRC emacs-lisp
