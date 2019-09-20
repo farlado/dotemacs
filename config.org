@@ -72,6 +72,11 @@
     :ensure t
     :init (which-key-mode 1))
 #+END_SRC
+*** Sloppy focus
+#+BEGIN_SRC emacs-lisp
+  (setq focus-follows-mouse t)
+  (setq mouse-autoselect-window t)
+#+END_SRC
 ** Convenience
 *** avy package (faster moving around documents)
 #+BEGIN_SRC emacs-lisp
@@ -91,6 +96,12 @@
     :ensure t
     :init
     (add-hook 'after-init-hook 'global-company-mode))
+#+END_SRC
+*** popup-kill-ring package (easier time managing the kill ring)
+#+BEGIN_SRC emacs-lisp
+  (use-package popup-kill-ring
+    :ensure t
+    :bind ("M-y" . popup-kill-ring))
 #+END_SRC
 *** Kill an entire word when you're in the middle of it
 #+BEGIN_SRC emacs-lisp
@@ -197,7 +208,8 @@
   (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
 * EXWM
-** exwm package (base window manager)
+** Initialization
+*** exwm package (base window manager)
 #+BEGIN_SRC emacs-lisp
   (use-package exwm
     :ensure t
@@ -209,7 +221,7 @@
 ;    (exwm-enable)
  ;   (exwm-systemtray-enable))
 #+END_SRC
-** Configure multi-head and start EXWM
+*** Configure multi-head and start EXWM
 #+BEGIN_SRC emacs-lisp
   (setq exwm-randr-workspace-output-plist '(0 "LVDS1"
 					    0 "eDP-1-1"
@@ -234,6 +246,7 @@
 #+END_SRC
 ** Main keybindings
 *** Global EXWM functions
+**** Main bindings
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-global-keys
 	`(([?\s-r] . exwm-reset)
@@ -252,14 +265,14 @@
   (define-key exwm-mode-map (kbd "C-c C-q") nil)
   (define-key exwm-mode-map (kbd "C-q") 'exwm-input-send-next-key)
 #+END_SRC
-**** Toggle fullscreen
+**** Inhibit toggling fullscreen
 #+BEGIN_SRC emacs-lisp
-  (define-key exwm-mode-map (kbd "C-c C-f") 'exwm-layout-set-fullscreen)
+  (define-key exwm-mode-map (kbd "C-c C-f") nil)
 #+END_SRC
-**** Toggle/hide floating
+**** Toggle floating, inhibit hiding
 #+BEGIN_SRC emacs-lisp
   (define-key exwm-mode-map (kbd "C-c C-t C-f") 'exwm-floating-toggle-floating)
-  (define-key exwm-mode-map (kbd "C-c C-t C-v") 'exwm-floating-hide)
+  (define-key exwm-mode-map (kbd "C-c C-t C-v") nil)
 #+END_SRC
 **** Disable toggling the mode line
 #+BEGIN_SRC emacs-lisp
@@ -300,9 +313,24 @@
      "telegram" nil "telegram"))
   (global-set-key (kbd "s-t") 'run-tg)
 #+END_SRC
-**** Steam
+**** Steam (need to spawn floating)
 #+BEGIN_SRC emacs-lisp
+  (defun run-steam ()
+    (interactive)
+    (start-process-shell-command
+     "steam" nil "steam"))
+  (global-set-key (kbd "s-s") 'run-steam)
 
+  (add-hook 'exwm-update-class-hook
+	    (lambda ()
+	      (unless (or (string-prefix-p "sun-awt-X11-" exwm-instance-name)
+			  (string= "steam" exwm-instance-name))
+		(rename-buffer exwm-class-name t))))
+  (add-hook 'exwm-update-title-hook
+	    (lambda ()
+	      (when (or (string-prefix-p "sun-awt-X11-" exwm-instance-name)
+			(string= "steam" exwm-instance-name))
+		(rename-buffer exwm-title t))))
 #+END_SRC
 **** GIMP
 #+BEGIN_SRC emacs-lisp
@@ -416,6 +444,10 @@
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
 #+END_SRC
+** Add window dividers
+#+BEGIN_SRC emacs-lisp
+  (window-divider-mode 1)
+#+END_SRC
 ** Line/column numbers
 *** Show line and column numbers in the status line
 #+BEGIN_SRC emacs-lisp
@@ -485,4 +517,3 @@
     (setq powerline-default-separator (quote arrow))
     (spaceline-spacemacs-theme))
 #+END_SRC
-
