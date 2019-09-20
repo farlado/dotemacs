@@ -1,4 +1,4 @@
-* Functionality
+* General Functionality
 ** Startup
 *** Start emacs server
 #+BEGIN_SRC emacs-lisp
@@ -207,7 +207,20 @@
      (expand-file-name "~/.emacs.d/config.org")))
   (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
-* EXWM
+* Extra dependency functions
+** buffer-line-count
+#+BEGIN_SRC emacs-lisp
+  (defun buffer-line-count ()
+    "Return the number of lines in this buffer."
+    (count-lines (point-min) (point-max)))
+#+END_SRC
+** goto-random-line
+#+BEGIN_SRC emacs-lisp
+  (defun goto-random-line ()
+    (interactive)
+    (goto-line (1+ (random (buffer-line-count)))))
+#+END_SRC
+* EXWM (Emacs X Window Manager)
 ** Initialization
 *** exwm package (base window manager)
 #+BEGIN_SRC emacs-lisp
@@ -246,18 +259,25 @@
 #+END_SRC
 ** Main keybindings
 *** Global EXWM functions
-**** Main bindings
+**** Switching workspaces
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-global-keys
-	`(([?\s-r] . exwm-reset)
-	  ([?\s-w] . exwm-workspace-switch)
-	  ([?\s-q] . exwm-workspace-delete)
-	  ,@(mapcar (lambda (i)
+	`(,@(mapcar (lambda (i)
 		      `(,(kbd (format "s-%d" i)) .
 			(lambda ()
 			  (interactive)
 			  (exwm-workspace-switch-create ,i))))
 		    (number-sequence 0 9))))
+#+END_SRC
+**** Switch to, swap, or delete workspaces
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "s-q") 'exwm-workspace-delete)
+  (global-set-key (kbd "s-w") 'exwm-workspace-switch)
+  (global-set-key (kbd "s-e") 'exwm-workspace-swap)
+#+END_SRC
+**** Reset EXWM
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "s-r") 'exwm-reset)
 #+END_SRC
 *** Local EXWM functions
 **** Send a key verbatim to the program more easily
@@ -312,6 +332,14 @@
     (start-process-shell-command
      "telegram" nil "telegram"))
   (global-set-key (kbd "s-t") 'run-tg)
+#+END_SRC
+**** Discord
+#+BEGIN_SRC emacs-lisp
+  (defun run-discord ()
+    (interactive)
+    (start-process-shell-command
+     "discord" nil "discord"))
+  (global-set-key (kbd "s-d") 'run-discord)
 #+END_SRC
 **** Steam (need to spawn floating)
 #+BEGIN_SRC emacs-lisp
@@ -436,7 +464,76 @@
 #+BEGIN_SRC emacs-lisp
   (start-process-shell-command "dunst" nil "dunst")
 #+END_SRC
-* Looks
+* EMMS (Emacs MultiMedia System)
+** Install EMMS and bind playback keys
+#+BEGIN_SRC emacs-lisp
+  (use-package emms
+    :ensure t
+    :config
+    (require 'emms-setup)
+    (require 'emms-player-mpd)
+    (emms-all)
+    (setq emms-seek-seconds 5)
+    (setq emms-player-list '(emms-player-mpd))
+    (setq emms-info-functions '(emms-info mpd))
+    (setq emms-player-mpd-server-name "localhost")
+    (setq emms-player-mpd-server-port "6601")
+    :bind
+    ("s-a v" . emms)
+    ("s-a b" . emms-smart-browse)
+    ("s-a r c" . emms-player-mpd-update-all-reset-cache)
+    ("<XF86AudioPrev>" . emms-previous)
+    ("<XF86AudioNext>" . emms-next)
+    ("<XF86AudioPlay>" . emms-pause)
+    ("<XF86AudioStop>" . emms-stop))
+#+END_SRC
+** MPC initialization
+#+BEGIN_SRC emacs-lisp
+  (setq mpc-host "localhost:6601")
+#+END_SRC
+** Other useful bindings
+*** Start the daemon
+#+BEGIN_SRC emacs-lisp
+  (defun mpd/start-music-daemon ()
+    "Start MPD, connect to it and syncs the metadata cache"
+    (interactive)
+    (shell-command "mpd")
+    (mpd/update-database)
+    (emms-player-mpd-connect)
+    (emms-cache-set-from-mpd-all)
+    (message "MPD started!"))
+  (global-set-key (kbd "s-a x") 'mpd/start-music-daemon)
+#+END_SRC
+*** Stop the daemon
+#+BEGIN_SRC emacs-lisp
+  (defun mpd/kill-music-daemon ()
+    "Stops playback and kills the music daemon."
+    (interactive)
+    (emms-stop)
+    (call-process "killall" nil nil nil "mpd")
+    (message "MPD killed!"))
+  (global-set-key (kbd "s-a q") 'mpd/kill-music-daemon)
+#+END_SRC
+*** Update the database
+#+BEGIN_SRC emacs-lisp
+  (defun mpd/update-database ()
+    "Update the MPD database synchronously."
+    (interactive)
+    (call-process "mpc" nil nil nil "update")
+    (message "MPD database updated!"))
+  (global-set-key (kbd "s-a r d") 'mpd/update-database)
+#+END_SRC
+*** Playback status (current track)
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "s-a a") 'emms-show)
+#+END_SRC
+*** Playback styles (repeat track/playlist55, shuffle)
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "s-a s") 'emms-toggle-random-playlist)
+  (global-set-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
+  (global-set-key (kbd "s-a r s") 'emms-toggle-repeat-track)
+#+END_SRC
+* Schwayyyyy Looks
 ** Hide menu bar, tooltips, tool bar, and scroll bar
 #+BEGIN_SRC emacs-lisp
   (menu-bar-mode -1)
