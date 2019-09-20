@@ -72,6 +72,12 @@
     :ensure t
     :init (which-key-mode 1))
 #+END_SRC
+*** swiper package (better searches)
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+    :ensure t
+    :bind ("C-s" . swiper))
+#+END_SRC
 *** Sloppy focus
 #+BEGIN_SRC emacs-lisp
   (setq focus-follows-mouse t)
@@ -219,6 +225,79 @@
   (defun goto-random-line ()
     (interactive)
     (goto-line (1+ (random (buffer-line-count)))))
+#+END_SRC
+* EMMS (Emacs MultiMedia System)
+** Install EMMS and bind playback keys
+#+BEGIN_SRC emacs-lisp
+    (use-package emms
+      :ensure t
+      :config
+      (require 'emms-setup)
+      (require 'emms-player-mpd)
+      (emms-all)
+      (setq emms-seek-seconds 5)
+      (setq emms-player-list '(emms-player-mpd))
+      (setq emms-info-functions '(emms-info mpd))
+      (setq emms-player-mpd-server-name "localhost")
+      (setq emms-player-mpd-server-port "6601")
+      :bind
+      ("s-a v" . emms)
+      ("s-a b" . emms-smart-browse)
+      ("s-a r c" . emms-player-mpd-update-all-reset-cache)
+      ("<XF86AudioPrev>" . emms-previous)
+      ("<XF86AudioNext>" . emms-next)
+      ("<XF86AudioPlay>" . emms-pause)
+      ("<XF86AudioStop>" . emms-stop)
+      ("<s-left>" . emms-previous)
+      ("<s-right>" . emms-next)
+      ("<s-down>" . emms-pause)
+      ("<s-up>" . emms-stop))
+#+END_SRC
+** MPC initialization
+#+BEGIN_SRC emacs-lisp
+  (setq mpc-host "localhost:6601")
+#+END_SRC
+** Other useful bindings
+*** Start the daemon
+#+BEGIN_SRC emacs-lisp
+  (defun mpd/start-music-daemon ()
+    "Start MPD, connect to it and syncs the metadata cache"
+    (interactive)
+    (shell-command "mpd")
+    (mpd/update-database)
+    (emms-player-mpd-connect)
+    (emms-cache-set-from-mpd-all)
+    (message "MPD started!"))
+  (global-set-key (kbd "s-a x") 'mpd/start-music-daemon)
+#+END_SRC
+*** Stop the daemon
+#+BEGIN_SRC emacs-lisp
+  (defun mpd/kill-music-daemon ()
+    "Stops playback and kills the music daemon."
+    (interactive)
+    (emms-stop)
+    (call-process "killall" nil nil nil "mpd")
+    (message "MPD killed!"))
+  (global-set-key (kbd "s-a q") 'mpd/kill-music-daemon)
+#+END_SRC
+*** Update the database
+#+BEGIN_SRC emacs-lisp
+  (defun mpd/update-database ()
+    "Update the MPD database synchronously."
+    (interactive)
+    (call-process "mpc" nil nil nil "update")
+    (message "MPD database updated!"))
+  (global-set-key (kbd "s-a r d") 'mpd/update-database)
+#+END_SRC
+*** Playback status (current track)
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "s-a a") 'emms-show)
+#+END_SRC
+*** Playback styles (repeat track/playlist55, shuffle)
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "s-a s") 'emms-toggle-random-playlist)
+  (global-set-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
+  (global-set-key (kbd "s-a r s") 'emms-toggle-repeat-track)
 #+END_SRC
 * EXWM (Emacs X Window Manager)
 ** Initialization
@@ -463,79 +542,6 @@
 *** Notification manager
 #+BEGIN_SRC emacs-lisp
   (start-process-shell-command "dunst" nil "dunst")
-#+END_SRC
-* EMMS (Emacs MultiMedia System)
-** Install EMMS and bind playback keys
-#+BEGIN_SRC emacs-lisp
-    (use-package emms
-      :ensure t
-      :config
-      (require 'emms-setup)
-      (require 'emms-player-mpd)
-      (emms-all)
-      (setq emms-seek-seconds 5)
-      (setq emms-player-list '(emms-player-mpd))
-      (setq emms-info-functions '(emms-info mpd))
-      (setq emms-player-mpd-server-name "localhost")
-      (setq emms-player-mpd-server-port "6601")
-      :bind
-      ("s-a v" . emms)
-      ("s-a b" . emms-smart-browse)
-      ("s-a r c" . emms-player-mpd-update-all-reset-cache)
-      ("<XF86AudioPrev>" . emms-previous)
-      ("<XF86AudioNext>" . emms-next)
-      ("<XF86AudioPlay>" . emms-pause)
-      ("<XF86AudioStop>" . emms-stop)
-      ("<s-left>" . emms-previous)
-      ("<s-right>" . emms-next)
-      ("<s-down>" . emms-pause)
-      ("<s-up>" . emms-stop))
-#+END_SRC
-** MPC initialization
-#+BEGIN_SRC emacs-lisp
-  (setq mpc-host "localhost:6601")
-#+END_SRC
-** Other useful bindings
-*** Start the daemon
-#+BEGIN_SRC emacs-lisp
-  (defun mpd/start-music-daemon ()
-    "Start MPD, connect to it and syncs the metadata cache"
-    (interactive)
-    (shell-command "mpd")
-    (mpd/update-database)
-    (emms-player-mpd-connect)
-    (emms-cache-set-from-mpd-all)
-    (message "MPD started!"))
-  (global-set-key (kbd "s-a x") 'mpd/start-music-daemon)
-#+END_SRC
-*** Stop the daemon
-#+BEGIN_SRC emacs-lisp
-  (defun mpd/kill-music-daemon ()
-    "Stops playback and kills the music daemon."
-    (interactive)
-    (emms-stop)
-    (call-process "killall" nil nil nil "mpd")
-    (message "MPD killed!"))
-  (global-set-key (kbd "s-a q") 'mpd/kill-music-daemon)
-#+END_SRC
-*** Update the database
-#+BEGIN_SRC emacs-lisp
-  (defun mpd/update-database ()
-    "Update the MPD database synchronously."
-    (interactive)
-    (call-process "mpc" nil nil nil "update")
-    (message "MPD database updated!"))
-  (global-set-key (kbd "s-a r d") 'mpd/update-database)
-#+END_SRC
-*** Playback status (current track)
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "s-a a") 'emms-show)
-#+END_SRC
-*** Playback styles (repeat track/playlist55, shuffle)
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "s-a s") 'emms-toggle-random-playlist)
-  (global-set-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
-  (global-set-key (kbd "s-a r s") 'emms-toggle-repeat-track)
 #+END_SRC
 * Schwayyyyy Looks
 ** Hide menu bar, tooltips, tool bar, and scroll bar
