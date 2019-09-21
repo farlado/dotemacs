@@ -227,87 +227,6 @@
     (interactive)
     (goto-line (1+ (random (buffer-line-count)))))
 #+END_SRC
-* EMMS (Emacs MultiMedia System)
-** Install EMMS and bind playback keys
-#+BEGIN_SRC emacs-lisp
-    (use-package emms
-      :ensure t
-      :config
-      (require 'emms-setup)
-      (require 'emms-player-mpd)
-      (emms-all)
-      (setq emms-seek-seconds 5)
-      (setq emms-player-list '(emms-player-mpd))
-      (setq emms-info-functions '(emms-info mpd))
-      (setq emms-player-mpd-server-name "localhost")
-      (setq emms-player-mpd-server-port "6601")
-      :bind
-      ("s-a v" . emms)
-      ("s-a b" . emms-smart-browse)
-      ("s-a r c" . emms-player-mpd-update-all-reset-cache)
-      ("<XF86AudioPrev>" . emms-previous)
-      ("<XF86AudioNext>" . emms-next)
-      ("<XF86AudioPlay>" . emms-pause)
-      ("<XF86AudioStop>" . emms-stop)
-      ("<s-left>" . emms-previous)
-      ("<s-right>" . emms-next)
-      ("<s-down>" . emms-pause)
-      ("<s-up>" . emms-stop))
-#+END_SRC
-** MPC initialization
-#+BEGIN_SRC emacs-lisp
-  (setq mpc-host "localhost:6601")
-#+END_SRC
-** Other useful bindings
-*** Start the daemon
-#+BEGIN_SRC emacs-lisp
-  (defun mpd/start-music-daemon ()
-    "Start MPD, connect to it and syncs the metadata cache"
-    (interactive)
-    (shell-command "mpd")
-    (mpd/update-database)
-    (emms-player-mpd-connect)
-    (emms-cache-set-from-mpd-all)
-    (message "MPD started!"))
-  (global-set-key (kbd "s-a x") 'mpd/start-music-daemon)
-#+END_SRC
-*** Stop the daemon
-#+BEGIN_SRC emacs-lisp
-  (defun mpd/kill-music-daemon ()
-    "Stops playback and kills the music daemon."
-    (interactive)
-    (emms-stop)
-    (call-process "killall" nil nil nil "mpd")
-    (message "MPD killed!"))
-  (global-set-key (kbd "s-a q") 'mpd/kill-music-daemon)
-#+END_SRC
-*** Update the database
-#+BEGIN_SRC emacs-lisp
-  (defun mpd/update-database ()
-    "Update the MPD database synchronously."
-    (interactive)
-    (call-process "mpc" nil nil nil "update")
-    (message "MPD database updated!"))
-  (global-set-key (kbd "s-a r d") 'mpd/update-database)
-#+END_SRC
-*** Playback status (current track)
-#+BEGIN_SRC emacs-lisp
-  (defun emms-status ()
-    (interactive)
-    (shell-command "mpc"))
-  (global-set-key (kbd "s-a a") 'emms-status)
-#+END_SRC
-*** Playback styles (repeat track/playlist55, shuffle)
-#+BEGIN_SRC emacs-lisp
-  (defun emms-shuffle-message ()
-    (interactive)
-    (emms-shuffle)
-    (message "Playlist has been shuffled."))
-
-  (global-set-key (kbd "s-a s") 'emms-shuffle-message)
-  (global-set-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
-  (global-set-key (kbd "s-a r s") 'emms-toggle-repeat-track)
-#+END_SRC
 * EXWM (Emacs X Window Manager)
 ** Initialization
 *** exwm package (base window manager)
@@ -320,7 +239,7 @@
     (require 'exwm-config)
     (require 'exwm-systemtray))
 #+END_SRC
-*** Configure multi-head and start EXWM
+*** Configure multi-head
 #+BEGIN_SRC emacs-lisp
   (setq exwm-randr-workspace-output-plist '(0 "LVDS1"
 					    0 "eDP-1-1"
@@ -340,32 +259,66 @@
 	      (start-process-shell-command
 	       "xrandr" nil "ds")))
   (exwm-randr-enable)
-  (exwm-enable)
-  (exwm-systemtray-enable)
 #+END_SRC
-** Main keybindings
-*** Global EXWM functions
-**** Switching workspaces
+*** Initialize EXWM
+#+BEGIN_SRC emacs-lisp
+    (exwm-enable)
+    (exwm-systemtray-enable)
+#+END_SRC
+** Keybindings
+*** Global commands
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-global-keys
-	`(,@(mapcar (lambda (i)
+	`(;; Workspace binds
+	  ([?\s-q] . exwm-workspace-delete)
+	  ([?\s-w] . exwm-workspace-switch)
+	  ([?\s-e] . exwm-workspace-swap)
+	  ([?\s-r] . exwm-reset)
+	  ,@(mapcar (lambda (i)
 		      `(,(kbd (format "s-%d" i)) .
 			(lambda ()
 			  (interactive)
 			  (exwm-workspace-switch-create ,i))))
-		    (number-sequence 0 9))))
+		    (number-sequence 0 9))
+
+	  ;; Binds to run programs
+	  ([?\s-t] . (lambda ()
+		       (interactive)
+		       (start-process-shell-command
+			"Telegram" nil "telegram")))
+	  ([?\s-s] . (lambda ()
+		       (interactive)
+		       (start-process-shell-command
+			"Steam" nil "steam")))
+	  ([?\s-d] . (lambda ()
+			(interactive)
+			(start-process-shell-command
+			 "Discord" nil "discord")))
+	  ([?\s-f] . (lambda ()
+		       (interactive)
+		       (start-process-shell-command
+			"Firefox" nil "firefox")))
+	  ([?\s-g] . (lambda ()
+		       (interactive)
+		       (start-process-shell-command
+			"GIMP" nil "gimp")))
+	  ([?\s-b] . (lambda ()
+		       (interactive)
+		       (start-process-shell-command
+			"LibreOffice" nil "libreoffice")))
+
+	  ;; Lockscreen
+	  ([?\s-l] . (lambda ()
+		       (interactive)
+		       (start-process-shell-command
+			"Lockscreen" nil "i3l")))
+	
+	  ;; Keyboard layout cycling
+	  ([?\s- ] . (lambda ()
+		       (interactive)
+		       (shell-command "keyctl -c us epo de")))))
 #+END_SRC
-**** Switch to, swap, or delete workspaces
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "s-q") 'exwm-workspace-delete)
-  (global-set-key (kbd "s-w") 'exwm-workspace-switch)
-  (global-set-key (kbd "s-e") 'exwm-workspace-swap)
-#+END_SRC
-**** Reset EXWM
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "s-r") 'exwm-reset)
-#+END_SRC
-*** Local EXWM functions
+*** EXWM-mode functions
 **** Send a key verbatim to the program more easily
 #+BEGIN_SRC emacs-lisp
   (define-key exwm-mode-map (kbd "C-c C-q") nil)
@@ -402,88 +355,32 @@
 	    ([?\C-y] . [?\C-v])
 	    ([?\C-s] . [?\C-f])))
 #+END_SRC
-*** Various programs
-**** Firefox
-#+BEGIN_SRC emacs-lisp
-  (defun run-firefox ()
-    (interactive)
-    (start-process-shell-command
-     "firefox" nil "firefox"))
-  (global-set-key (kbd "s-f") 'run-firefox)
-#+END_SRC
-**** Telegram
-#+BEGIN_SRC emacs-lisp
-  (defun run-tg ()
-    (interactive)
-    (start-process-shell-command
-     "telegram" nil "telegram"))
-  (global-set-key (kbd "s-t") 'run-tg)
-#+END_SRC
-**** Discord
-#+BEGIN_SRC emacs-lisp
-  (defun run-discord ()
-    (interactive)
-    (start-process-shell-command
-     "discord" nil "discord"))
-  (global-set-key (kbd "s-d") 'run-discord)
-#+END_SRC
-**** Steam (need to spawn floating)
-#+BEGIN_SRC emacs-lisp
-  (defun run-steam ()
-    (interactive)
-    (start-process-shell-command
-     "steam" nil "steam"))
-  (global-set-key (kbd "s-s") 'run-steam)
-
-  (add-hook 'exwm-update-class-hook
-	    (lambda ()
-	      (unless (or (string-prefix-p "sun-awt-X11-" exwm-instance-name)
-			  (string= "steam" exwm-instance-name))
-		(rename-buffer exwm-class-name t))))
-  (add-hook 'exwm-update-title-hook
-	    (lambda ()
-	      (when (or (string-prefix-p "sun-awt-X11-" exwm-instance-name)
-			(string= "steam" exwm-instance-name))
-		(rename-buffer exwm-title t))))
-#+END_SRC
-**** GIMP
-#+BEGIN_SRC emacs-lisp
-  (defun run-gimp ()
-    (interactive)
-    (start-process-shell-command
-     "gimp" nil "gimp"))
-  (global-set-key (kbd "s-g") 'run-gimp)
-#+END_SRC
-**** LibreOffice (I use it for simple school stuff)
-#+BEGIN_SRC emacs-lisp
-  (defun run-libreoffice ()
-    (interactive)
-    (start-process-shell-command
-     "libreoffice" nil "libreoffice"))
-  (global-set-key (kbd "s-b") 'run-libreoffice)
-#+END_SRC
-*** Other functions
+*** XF86 Keys (cannot be bound through the above methods)
 **** Volume control
 #+BEGIN_SRC emacs-lisp
   (defun volctl-m ()
     (interactive)
     (shell-command "volctl m"))
   (global-set-key (kbd "<XF86AudioMute>") 'volctl-m)
+  (define-key exwm-mode-map (kbd "<XF86AudioMute>") 'volctl-m)
 
   (defun volctl-t ()
     (interactive)
     (shell-command "volctl t"))
   (global-set-key (kbd "<XF86AudioMicMute>") 'volctl-t)
+  (define-key exwm-mode-map (kbd "<XF86AudioMicMute>") 'volctl-t)
 
   (defun volctl-u ()
     (interactive)
     (shell-command "volctl u"))
   (global-set-key (kbd "<XF86AudioRaiseVolume>") 'volctl-u)
+  (define-key exwm-mode-map (kbd "<XF86AudioRaiseVolume>") 'volctl-u)
 
   (defun volctl-d ()
     (interactive)
     (shell-command "volctl d"))
   (global-set-key (kbd "<XF86AudioLowerVolume>") 'volctl-d)
+  (define-key exwm-mode-map (kbd "<XF86AudioLowerVolume>") 'volctl-d)
 #+END_SRC
 **** Brightness control
 #+BEGIN_SRC emacs-lisp
@@ -491,11 +388,13 @@
     (interactive)
     (shell-command "blctl -u"))
   (global-set-key (kbd "<XF86MonBrightnessUp>") 'blctl-up)
+  (define-key exwm-mode-map (kbd "<XF86MonBrightnessUp>") 'blctl-up)
 
   (defun blctl-down ()
     (interactive)
     (shell-command "blctl -d"))
   (global-set-key (kbd "<XF86MonBrightnessDown>") 'blctl-down)
+  (define-key exwm-mode-map (kbd "<XF86MonBrightnessDown>") 'blctl-down)
 #+END_SRC
 **** Taking screenshots
 #+BEGIN_SRC emacs-lisp
@@ -504,28 +403,22 @@
     (shell-command
      "maim -s /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
   (global-set-key (kbd "<print>") 'screencap-section)
+  (define-key exwm-mode-map (kbd "<print>") 'screencap-section)
 
   (defun screencap-full ()
     (interactive)
-    (start-process-shell-command "screencap-full" nil
+    (shell-command
      "maim /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
   (global-set-key (kbd "<C-print>") 'screencap-full)
+  (define-key exwm-mode-map (kbd "<C-print>") 'screencap-full)
 #+END_SRC
-**** Cycle keyboard layouts
+**** Lockscreen
 #+BEGIN_SRC emacs-lisp
-  (defun keyctl-cycle ()
+  (defun lock-screen ()
     (interactive)
-    (shell-command "keyctl -c us epo de"))
-  (global-set-key (kbd "s-SPC") 'keyctl-cycle)
-#+END_SRC
-**** Lock the screen
-#+BEGIN_SRC emacs-lisp
-  (defun lockscreen ()
-    (interactive)
-    (start-process-shell-command
-     "lockscreen" nil "i3l"))
-  (global-set-key (kbd "<XF86ScreenSaver>") 'lockscreen)
-  (global-set-key (kbd "s-l") 'lockscreen)
+    (shell-command "i3l"))
+  (global-set-key (kbd "<XF86ScreenSaver>") 'lock-screen)
+  (define-key exwm-mode-map (kbd "<XF86ScreenSaver>") 'lock-screen)
 #+END_SRC
 ** Name EXWM buffers after the window class and title
 #+BEGIN_SRC emacs-lisp
@@ -557,6 +450,103 @@
 *** Notification manager
 #+BEGIN_SRC emacs-lisp
   (start-process-shell-command "dunst" nil "dunst")
+#+END_SRC
+* EMMS (Emacs MultiMedia System)
+** Install EMMS and bind playback keys
+#+BEGIN_SRC emacs-lisp
+  (use-package emms
+    :ensure t
+    :config
+    (require 'emms-setup)
+    (require 'emms-player-mpd)
+    (emms-all)
+    (setq emms-seek-seconds 5)
+    (setq emms-player-list '(emms-player-mpd))
+    (setq emms-info-functions '(emms-info mpd))
+    (setq emms-player-mpd-server-name "localhost")
+    (setq emms-player-mpd-server-port "6601")
+    (setq mpc-host "localhost:6601")
+    :bind (("s-a v" . emms)
+	   ("s-a b" . emms-smart-browse)
+	   ("s-a r c" . emms-player-mpd-update-all-reset-cache)
+	   ("<XF86AudioPrev>" . emms-previous)
+	   ("<XF86AudioNext>" . emms-next)
+	   ("<XF86AudioPlay>" . emms-pause)
+	   ("<XF86AudioStop>" . emms-stop)
+	   ("<s-left>" . emms-previous)
+	   ("<s-right>" . emms-next)
+	   ("<s-down>" . emms-pause)
+	   ("<s-up>" . emms-stop)
+	   :map exwm-mode-map
+	   ("s-a v" . emms)
+	   ("s-a b" . emms-smart-browse)
+	   ("s-a r c" . emms-player-mpd-update-all-reset-cache)
+	   ("<XF86AudioPrev>" . emms-previous)
+	   ("<XF86AudioNext>" . emms-next)
+	   ("<XF86AudioPlay>" . emms-pause)
+	   ("<XF86AudioStop>" . emms-stop)
+	   ("<s-left>" . emms-previous)
+	   ("<s-right>" . emms-next)
+	   ("<s-down>" . emms-pause)
+	   ("<s-up>" . emms-stop)))
+#+END_SRC
+** Other useful bindings
+*** Start the daemon
+#+BEGIN_SRC emacs-lisp
+  (defun mpd/start-music-daemon ()
+    "Start MPD, connect to it and syncs the metadata cache"
+    (interactive)
+    (shell-command "mpd")
+    (mpd/update-database)
+    (emms-player-mpd-connect)
+    (emms-cache-set-from-mpd-all)
+    (message "MPD started!"))
+  (global-set-key (kbd "s-a x") 'mpd/start-music-daemon)
+  (define-key exwm-mode-map (kbd "s-a x") 'mpd/start-music/daemon)
+#+END_SRC
+*** Stop the daemon
+#+BEGIN_SRC emacs-lisp
+  (defun mpd/kill-music-daemon ()
+    "Stops playback and kills the music daemon."
+    (interactive)
+    (emms-stop)
+    (call-process "killall" nil nil nil "mpd")
+    (message "MPD killed!"))
+  (global-set-key (kbd "s-a q") 'mpd/kill-music-daemon)
+  (define-key exwm-mode-map (kbd "s-a q") 'mpd/kill-music-daemon)
+#+END_SRC
+*** Update the database
+#+BEGIN_SRC emacs-lisp
+  (defun mpd/update-database ()
+    "Update the MPD database synchronously."
+    (interactive)
+    (call-process "mpc" nil nil nil "update")
+    (message "MPD database updated!"))
+  (global-set-key (kbd "s-a r d") 'mpd/update-database)
+  (define-key exwm-mode-map (kbd "s-a r d") 'mpd/update-database)
+#+END_SRC
+*** Playback status (current track)
+#+BEGIN_SRC emacs-lisp
+  (defun emms-status ()
+    (interactive)
+    (shell-command "mpc"))
+  (global-set-key (kbd "s-a a") 'emms-status)
+  (define-key exwm-mode-map (kbd "s-a a") 'exwm-status)
+#+END_SRC
+*** Playback styles (repeat track/playlist, shuffle)
+#+BEGIN_SRC emacs-lisp
+  (defun emms-shuffle-message ()
+    (interactive)
+    (emms-shuffle)
+    (message "Playlist has been shuffled."))
+
+  (global-set-key (kbd "s-a s") 'emms-shuffle-message)
+  (global-set-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
+  (global-set-key (kbd "s-a r t") 'emms-toggle-repeat-track)
+
+  (define-key exwm-mode-map (kbd "s-a s") 'emms-shuffle-message)
+  (define-key exwm-mode-map (kbd "s-a r a") 'emms-toggle-repeat-playlist)
+  (define-key exwm-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
 #+END_SRC
 * Schwayyyyy Looks
 ** Hide menu bar, tooltips, tool bar, and scroll bar
