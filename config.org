@@ -206,9 +206,10 @@
     (interactive (list my-term-shell)))
   (ad-activate 'ansi-term)
 #+END_SRC
-*** Bind C-c t to terminal
+*** Bind terminal launch command
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-c t") 'ansi-term)
+  (global-set-key (kbd "<s-return>") 'ansi-term)
+  (define-key exwm-mode-map (kbd "<s-return>") 'ansi-term)
 #+END_SRC
 ** Configuration
 *** Open configuration with C-c e
@@ -225,19 +226,6 @@
     (org-babel-load-file
      (expand-file-name "~/.emacs.d/config.org")))
   (global-set-key (kbd "C-c r") 'config-reload)
-#+END_SRC
-* Extra dependency functions
-** buffer-line-count
-#+BEGIN_SRC emacs-lisp
-  (defun buffer-line-count ()
-    "Return the number of lines in this buffer."
-    (count-lines (point-min) (point-max)))
-#+END_SRC
-** goto-random-line
-#+BEGIN_SRC emacs-lisp
-  (defun goto-random-line ()
-    (interactive)
-    (goto-line (1+ (random (buffer-line-count)))))
 #+END_SRC
 * EXWM (Emacs X Window Manager)
 ** Initialization
