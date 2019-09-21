@@ -198,19 +198,6 @@
     :bind
     ([remap other-window] . switch-window))
 #+END_SRC
-** Terminal
-*** Always use zsh
-#+BEGIN_SRC emacs-lisp
-  (defvar my-term-shell "/bin/zsh")
-  (defadvice ansi-term (before force-bash)
-    (interactive (list my-term-shell)))
-  (ad-activate 'ansi-term)
-#+END_SRC
-*** Bind terminal launch command
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "<s-return>") 'ansi-term)
-  (define-key exwm-mode-map (kbd "<s-return>") 'ansi-term)
-#+END_SRC
 ** Configuration
 *** Open configuration with C-c e
 #+BEGIN_SRC emacs-lisp
@@ -318,6 +305,19 @@
 	    ([?\C-s] . [?\C-f])))
 #+END_SRC
 *** Launch programs
+*** Terminal
+**** Always use zsh
+#+BEGIN_SRC emacs-lisp
+  (defvar my-term-shell "/bin/zsh")
+  (defadvice ansi-term (before force-bash)
+    (interactive (list my-term-shell)))
+  (ad-activate 'ansi-term)
+#+END_SRC
+**** Bind terminal launch command
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<s-return>") 'ansi-term)
+  (define-key exwm-mode-map (kbd "<s-return>") 'ansi-term)
+#+END_SRC
 **** Firefox
 #+BEGIN_SRC emacs-lisp
   (defun run-firefox ()
@@ -477,7 +477,7 @@
   (start-process-shell-command "dunst" nil "dunst")
 #+END_SRC
 * EMMS (Emacs MultiMedia System)
-** Install EMMS and bind playback keys
+** Install EMMS and bind main playback keys
 #+BEGIN_SRC emacs-lisp
   (use-package emms
     :ensure t
