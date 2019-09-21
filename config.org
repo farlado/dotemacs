@@ -78,11 +78,6 @@
     :ensure t
     :bind ("C-s" . swiper))
 #+END_SRC
-*** Sloppy focus
-#+BEGIN_SRC emacs-lisp
-  (setq focus-follows-mouse t)
-  (setq mouse-autoselect-window t)
-#+END_SRC
 ** Convenience
 *** avy package (faster moving around documents)
 #+BEGIN_SRC emacs-lisp
@@ -136,13 +131,26 @@
 #+BEGIN_SRC emacs-lisp
   (setq org-src-window-setup 'current-window)
 #+END_SRC
-** Buffers
+** Buffers/Windows
 *** Kill current buffer with C-x k, use C-x C-k to kill both the buffer and window
 #+BEGIN_SRC emacs-lisp
+  (defun kill-this-buffer-and-window ()
+    "Kill the current buffer and delete the selected window (adjusted for EXWM)."
+    (interactive)
+    (let ((window-to-delete (selected-window))
+	  (buffer-to-kill (current-buffer))
+	  (delete-window-hook (lambda () (ignore-errors (delete-window)))))
+      (unwind-protect
+	  (progn
+	    (add-hook 'kill-buffer-hook delete-window-hook t t)
+	    (if (kill-buffer (current-buffer))
+		;; If `delete-window' failed before, we return it to regenerate
+		;; the error so it can be seen in the echo area.
+		(when (eq (selected-window) window-to-delete)
+		  (delete-window)))))))
   (global-set-key (kbd "C-x k") 'kill-this-buffer)
-  (global-set-key (kbd "C-x C-k") 'kill-buffer-and-window)
+  (global-set-key (kbd "C-x C-k") 'kill-this-buffer-and-window)
 #+END_SRC
-*** Kill current buffer and window
 *** Use ibuffer so the buffer list doesn't open a new window
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x b") 'ibuffer)
@@ -151,7 +159,11 @@
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
 #+END_SRC
-** Windows
+*** Sloppy focus of windows
+#+BEGIN_SRC emacs-lisp
+  (setq focus-follows-mouse t)
+  (setq mouse-autoselect-window t)
+#+END_SRC
 *** Move focus when explicitly creating new windows
 #+BEGIN_SRC emacs-lisp
   (defun split-and-follow-vertical ()
@@ -266,11 +278,10 @@
     (exwm-systemtray-enable)
 #+END_SRC
 ** Keybindings
-*** Global commands
+*** General global commands
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-global-keys
-	`(;; Workspace binds
-	  ([?\s-q] . exwm-workspace-delete)
+	`(([?\s-q] . exwm-workspace-delete)
 	  ([?\s-w] . exwm-workspace-switch)
 	  ([?\s-e] . exwm-workspace-swap)
 	  ([?\s-r] . exwm-reset)
@@ -279,44 +290,7 @@
 			(lambda ()
 			  (interactive)
 			  (exwm-workspace-switch-create ,i))))
-		    (number-sequence 0 9))
-
-	  ;; Binds to run programs
-	  ([?\s-t] . (lambda ()
-		       (interactive)
-		       (start-process-shell-command
-			"Telegram" nil "telegram")))
-	  ([?\s-s] . (lambda ()
-		       (interactive)
-		       (start-process-shell-command
-			"Steam" nil "steam")))
-	  ([?\s-d] . (lambda ()
-			(interactive)
-			(start-process-shell-command
-			 "Discord" nil "discord")))
-	  ([?\s-f] . (lambda ()
-		       (interactive)
-		       (start-process-shell-command
-			"Firefox" nil "firefox")))
-	  ([?\s-g] . (lambda ()
-		       (interactive)
-		       (start-process-shell-command
-			"GIMP" nil "gimp")))
-	  ([?\s-b] . (lambda ()
-		       (interactive)
-		       (start-process-shell-command
-			"LibreOffice" nil "libreoffice")))
-
-	  ;; Lockscreen
-	  ([?\s-l] . (lambda ()
-		       (interactive)
-		       (start-process-shell-command
-			"Lockscreen" nil "i3l")))
-	
-	  ;; Keyboard layout cycling
-	  ([?\s- ] . (lambda ()
-		       (interactive)
-		       (shell-command "keyctl -c us epo de")))))
+		    (number-sequence 0 9))))
 #+END_SRC
 *** EXWM-mode functions
 **** Send a key verbatim to the program more easily
@@ -337,7 +311,7 @@
 #+BEGIN_SRC emacs-lisp
   (define-key exwm-mode-map (kbd "C-c C-t C-m") nil)
 #+END_SRC
-*** Pass these to programs for emacs style navigation
+*** Emacs key bindings in X windows
 #+BEGIN_SRC emacs-lisp
     (setq exwm-input-simulation-keys
 	  '(([?\C-b] . [left])
@@ -355,7 +329,62 @@
 	    ([?\C-y] . [?\C-v])
 	    ([?\C-s] . [?\C-f])))
 #+END_SRC
-*** XF86 Keys (cannot be bound through the above methods)
+*** Launch programs
+**** Firefox
+#+BEGIN_SRC emacs-lisp
+  (defun run-firefox ()
+    (interactive)
+    (start-process-shell-command
+     "Firefox" nil "firefox"))
+  (global-set-key (kbd "s-f") 'run-firefox)
+  (define-key exwm-mode-map (kbd "s-f") 'run-firefox)
+#+END_SRC
+**** LibreOffice
+#+BEGIN_SRC emacs-lisp
+  (defun run-libreoffice ()
+    (interactive)
+    (start-process-shell-command
+     "LibreOffice" nil "libreoffice"))
+  (global-set-key (kbd "s-b") 'run-libreoffice)
+  (define-key exwm-mode-map (kbd "s-b") 'run-libreoffice)
+#+END_SRC
+**** GIMP
+#+BEGIN_SRC emacs-lisp
+  (defun run-gimp ()
+    (interactive)
+    (start-process-shell-command
+     "GIMP" nil "gimp"))
+  (global-set-key (kbd "s-g") 'run-gimp)
+  (define-key exwm-mode-map (kbd "s-g") 'run-gimp)
+#+END_SRC
+**** Telegram
+#+BEGIN_SRC emacs-lisp
+  (defun run-tg ()
+    (interactive)
+    (start-process-shell-command
+     "Telegram" nil "telegram"))
+  (global-set-key (kbd "s-t") 'run-tg)
+  (define-key exwm-mode-map (kbd "s-t") 'run-tg)
+#+END_SRC
+**** Discord
+#+BEGIN_SRC emacs-lisp
+  (defun run-discord ()
+    (interactive)
+    (start-process-shell-command
+     "Discord" nil "discord"))
+  (global-set-key (kbd "s-d") 'run-discord)
+  (define-key exwm-mode-map (kbd "s-d") 'run-discord)
+#+END_SRC
+**** Steam
+#+BEGIN_SRC emacs-lisp
+  (defun run-steam ()
+    (interactive)
+    (start-process-shell-command
+     "Steam" nil "steam"))
+  (global-set-key (kbd "s-s") 'run-steam)
+  (define-key exwm-mode-map (kbd "s-s") 'run-steam)
+#+END_SRC
+*** Other useful functions
 **** Volume control
 #+BEGIN_SRC emacs-lisp
   (defun volctl-m ()
@@ -396,7 +425,7 @@
   (global-set-key (kbd "<XF86MonBrightnessDown>") 'blctl-down)
   (define-key exwm-mode-map (kbd "<XF86MonBrightnessDown>") 'blctl-down)
 #+END_SRC
-**** Taking screenshots
+**** Take screenshots
 #+BEGIN_SRC emacs-lisp
   (defun screencap-section ()
     (interactive)
@@ -411,6 +440,14 @@
      "maim /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
   (global-set-key (kbd "<C-print>") 'screencap-full)
   (define-key exwm-mode-map (kbd "<C-print>") 'screencap-full)
+#+END_SRC
+**** Keyboard layout selection
+#+BEGIN_SRC emacs-lisp
+  (defun cycle-kbd-layout ()
+    (interactive)
+    (shell-command "keyctl -c us epo de"))
+  (global-set-key (kbd "s-SPC") 'cycle-kbd-layout)
+  (define-key exwm-mode-map (kbd "s-SPC") 'cycle-kbd-layout)
 #+END_SRC
 **** Lockscreen
 #+BEGIN_SRC emacs-lisp
@@ -502,7 +539,7 @@
     (emms-cache-set-from-mpd-all)
     (message "MPD started!"))
   (global-set-key (kbd "s-a x") 'mpd/start-music-daemon)
-  (define-key exwm-mode-map (kbd "s-a x") 'mpd/start-music/daemon)
+  (define-key exwm-mode-map (kbd "s-a x") 'mpd/start-music-daemon)
 #+END_SRC
 *** Stop the daemon
 #+BEGIN_SRC emacs-lisp
@@ -527,25 +564,27 @@
 #+END_SRC
 *** Playback status (current track)
 #+BEGIN_SRC emacs-lisp
-  (defun emms-status ()
+  (defun mpc-status ()
     (interactive)
     (shell-command "mpc"))
-  (global-set-key (kbd "s-a a") 'emms-status)
-  (define-key exwm-mode-map (kbd "s-a a") 'exwm-status)
+  (global-set-key (kbd "s-a a") 'mpc-status)
+  (define-key exwm-mode-map (kbd "s-a a") 'mpc-status)
 #+END_SRC
-*** Playback styles (repeat track/playlist, shuffle)
+*** Shuffle current list or shuffle all songs
 #+BEGIN_SRC emacs-lisp
   (defun emms-shuffle-message ()
     (interactive)
     (emms-shuffle)
     (message "Playlist has been shuffled."))
-
   (global-set-key (kbd "s-a s") 'emms-shuffle-message)
-  (global-set-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
-  (global-set-key (kbd "s-a r t") 'emms-toggle-repeat-track)
-
   (define-key exwm-mode-map (kbd "s-a s") 'emms-shuffle-message)
+#+END_SRC
+*** Set repeat mode
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
   (define-key exwm-mode-map (kbd "s-a r a") 'emms-toggle-repeat-playlist)
+
+  (global-set-key (kbd "s-a r t") 'emms-toggle-repeat-track)
   (define-key exwm-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
 #+END_SRC
 * Schwayyyyy Looks
