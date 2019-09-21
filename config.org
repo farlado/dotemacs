@@ -137,11 +137,12 @@
   (setq org-src-window-setup 'current-window)
 #+END_SRC
 ** Buffers
-*** Kill current buffer (and its window) with C-x k, use C-x C-k to kill another buffer
+*** Kill current buffer with C-x k, use C-x C-k to kill both the buffer and window
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x k") 'kill-this-buffer)
-  (global-set-key (kbd "C-x C-k") 'kill-buffer)
+  (global-set-key (kbd "C-x C-k") 'kill-buffer-and-window)
 #+END_SRC
+*** Kill current buffer and window
 *** Use ibuffer so the buffer list doesn't open a new window
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x b") 'ibuffer)
@@ -291,7 +292,10 @@
 #+END_SRC
 *** Playback status (current track)
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "s-a a") 'emms-show)
+  (defun emms-status ()
+    (interactive)
+    (shell-command "mpc"))
+  (global-set-key (kbd "s-a a") 'emms-status)
 #+END_SRC
 *** Playback styles (repeat track/playlist55, shuffle)
 #+BEGIN_SRC emacs-lisp
