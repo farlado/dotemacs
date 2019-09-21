@@ -295,7 +295,12 @@
 #+END_SRC
 *** Playback styles (repeat track/playlist55, shuffle)
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "s-a s") 'emms-toggle-random-playlist)
+  (defun emms-shuffle-message ()
+    (interactive)
+    (emms-shuffle)
+    (message "Playlist has been shuffled."))
+
+  (global-set-key (kbd "s-a s") 'emms-shuffle-message)
   (global-set-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
   (global-set-key (kbd "s-a r s") 'emms-toggle-repeat-track)
 #+END_SRC
@@ -310,8 +315,6 @@
     (require 'exwm-randr)
     (require 'exwm-config)
     (require 'exwm-systemtray))
-;    (exwm-enable)
- ;   (exwm-systemtray-enable))
 #+END_SRC
 *** Configure multi-head and start EXWM
 #+BEGIN_SRC emacs-lisp
@@ -446,6 +449,14 @@
     (start-process-shell-command
      "gimp" nil "gimp"))
   (global-set-key (kbd "s-g") 'run-gimp)
+#+END_SRC
+**** LibreOffice (I use it for simple school stuff)
+#+BEGIN_SRC emacs-lisp
+  (defun run-libreoffice ()
+    (interactive)
+    (start-process-shell-command
+     "libreoffice" nil "libreoffice"))
+  (global-set-key (kbd "s-b") 'run-libreoffice)
 #+END_SRC
 *** Other functions
 **** Volume control
