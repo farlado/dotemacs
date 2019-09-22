@@ -308,21 +308,11 @@
 #+END_SRC
 *** Launch programs
 **** Terminal
-<<<<<<< HEAD
-***** Always use zsh
-=======
->>>>>>> 79f2428e809fad98dda90c6d6a3fbf94711cd267
 #+BEGIN_SRC emacs-lisp
   (defvar my-term-shell "/bin/zsh")
   (defadvice ansi-term (before force-bash)
     (interactive (list my-term-shell)))
   (ad-activate 'ansi-term)
-<<<<<<< HEAD
-#+END_SRC
-***** Bind terminal launch command
-#+BEGIN_SRC emacs-lisp
-=======
->>>>>>> 79f2428e809fad98dda90c6d6a3fbf94711cd267
   (global-set-key (kbd "<s-return>") 'ansi-term)
   (define-key exwm-mode-map (kbd "<s-return>") 'ansi-term)
 #+END_SRC
@@ -461,6 +451,14 @@
 	    (lambda () (exwm-workspace-rename-buffer
 		   exwm-title)))
 #+END_SRC
+*** dmenu package (dmenu but for emacs)
+#+BEGIN_SRC emacs-lisp
+  (use-package dmenu
+    :ensure t
+    :bind (("s-x" . dmenu)
+	   :map exwm-mode-map
+	   ("s-x" . dmenu)))
+#+END_SRC
 ** Startup applications
 *** Set fallback cursor
 #+BEGIN_SRC emacs-lisp
@@ -578,6 +576,14 @@
 
   (global-set-key (kbd "s-a r t") 'emms-toggle-repeat-track)
   (define-key exwm-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
+#+END_SRC
+* Other less involved modes
+** nov package (epub reader)
+#+BEGIN_SRC emacs-lisp
+  (use-package nov
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 #+END_SRC
 * Schwayyyyy Looks
 ** Hide menu bar, tooltips, tool bar, and scroll bar
