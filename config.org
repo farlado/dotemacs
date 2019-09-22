@@ -249,8 +249,9 @@
 #+END_SRC
 *** Initialize EXWM
 #+BEGIN_SRC emacs-lisp
-    (exwm-enable)
-    (exwm-systemtray-enable)
+  (exwm-enable)
+  (exwm-config-ido)
+  (exwm-systemtray-enable)
 #+END_SRC
 ** Keybindings
 *** General global commands
@@ -307,15 +308,21 @@
 #+END_SRC
 *** Launch programs
 **** Terminal
+<<<<<<< HEAD
 ***** Always use zsh
+=======
+>>>>>>> 79f2428e809fad98dda90c6d6a3fbf94711cd267
 #+BEGIN_SRC emacs-lisp
   (defvar my-term-shell "/bin/zsh")
   (defadvice ansi-term (before force-bash)
     (interactive (list my-term-shell)))
   (ad-activate 'ansi-term)
+<<<<<<< HEAD
 #+END_SRC
 ***** Bind terminal launch command
 #+BEGIN_SRC emacs-lisp
+=======
+>>>>>>> 79f2428e809fad98dda90c6d6a3fbf94711cd267
   (global-set-key (kbd "<s-return>") 'ansi-term)
   (define-key exwm-mode-map (kbd "<s-return>") 'ansi-term)
 #+END_SRC
@@ -446,19 +453,13 @@
   (global-set-key (kbd "<XF86ScreenSaver>") 'lock-screen)
   (define-key exwm-mode-map (kbd "<XF86ScreenSaver>") 'lock-screen)
 #+END_SRC
-** Name EXWM buffers after the window class and title
+
+** Configuration
+*** Name EXWM buffers after the window title
 #+BEGIN_SRC emacs-lisp
-  (defun exwm-rename-buffer ()
-    (interactive)
-    (exwm-workspace-rename-buffer
-     (concat exwm-title)))
-  (add-hook 'exwm-update-title-hook 'exwm-rename-buffer)
-#+END_SRC
-** dmenu package (for launching things I haven't bound)
-#+BEGIN_SRC emacs-lisp
-  (use-package dmenu
-    :ensure t
-    :bind ("s-x" . dmenu))
+  (add-hook 'exwm-update-title-hook 
+	    (lambda () (exwm-workspace-rename-buffer
+		   exwm-title)))
 #+END_SRC
 ** Startup applications
 *** Set fallback cursor
