@@ -94,9 +94,8 @@
     (switch-to-buffer "*dashboard*"))
   (global-set-key (kbd "C-c d") 'dashboard-restart)
 #+END_SRC
-** Convenience
-*** Helpful packages
-**** auto-package-update package (self-explanatory)
+** Helpful packages
+*** auto-package-update package (self-explanatory)
 #+BEGIN_SRC emacs-lisp
   (use-package auto-package-update
     :ensure t
@@ -106,38 +105,40 @@
     (setq auto-package-update-delete-old-versions t)
     (auto-package-update-maybe))
 #+END_SRC
-**** avy package (faster moving around documents)
+*** avy package (faster moving around documents)
 #+BEGIN_SRC emacs-lisp
   (use-package avy
     :ensure t
     :bind ("M-s" . avy-goto-char))
 #+END_SRC
-**** hungry-delete package (convenient deletion of trailing whitespace)
+*** hungry-delete package (convenient deletion of trailing whitespace)
 #+BEGIN_SRC emacs-lisp
   (use-package hungry-delete
     :ensure t
     :config (global-hungry-delete-mode))
 #+END_SRC
-**** company package (autocompletion backend)
+*** company package (autocompletion backend)
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :ensure t
     :init
     (add-hook 'after-init-hook 'global-company-mode))
 #+END_SRC
-**** popup-kill-ring package (easier time managing the kill ring)
+*** popup-kill-ring package (easier time managing the kill ring)
 #+BEGIN_SRC emacs-lisp
   (use-package popup-kill-ring
     :ensure t
     :bind ("M-y" . popup-kill-ring))
 #+END_SRC
-**** nov package (epub reader)
+*** nov package (epub reader)
 #+BEGIN_SRC emacs-lisp
   (use-package nov
     :ensure t
     :config
     (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 #+END_SRC
+
+** Convenience
 *** Kill an entire word when you're in the middle of it
 #+BEGIN_SRC emacs-lisp
   (defun whole-kill-word ()
