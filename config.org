@@ -86,6 +86,14 @@
     :ensure t
     :bind ("C-s" . swiper))
 #+END_SRC
+*** Restart and open dashboard with C-c d
+#+BEGIN_SRC emacs-lisp
+  (defun dashboard-restart ()
+    (interactive)
+    (dashboard-insert-startupify-lists)
+    (switch-to-buffer "*dashboard*"))
+  (global-set-key (kbd "C-c d") 'dashboard-restart)
+#+END_SRC
 ** Convenience
 *** Helpful packages
 **** auto-package-update package (self-explanatory)
