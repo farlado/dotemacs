@@ -16,7 +16,7 @@
   (package-install 'spacemacs-theme))
 
 ;; most of the actual config is in here
-(org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))
+(org-babel-load-file (expand-file-name "~/.emacs.d/ReadMe.org"))
 
 ;; automatically added: don't touch this!
 (custom-set-variables
