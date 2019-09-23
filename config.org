@@ -341,6 +341,7 @@
 #+END_SRC
 **** Calculator
 #+BEGIN_SRC emacs-lisp
+  (require 'calc)
   (global-set-key (kbd "C-x c") 'calc)
   (global-set-key (kbd "<XF86Calculator>") 'calc)
   (define-key exwm-mode-map (kbd "<XF86Calculator>") 'calc)
@@ -498,7 +499,7 @@
 #+END_SRC
 *** Set keyboard layout to US
 #+BEGIN_SRC emacs-lisp
-  (shell-command "keybd -s us")
+  (shell-command "keyctl -s us")
 #+END_SRC
 *** Compositor
 #+BEGIN_SRC emacs-lisp
