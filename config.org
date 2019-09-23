@@ -88,12 +88,15 @@
 #+END_SRC
 ** Convenience
 *** Helpful packages
-**** spu package (automatic updates)
+**** auto-package-update package (self-explanatory)
 #+BEGIN_SRC emacs-lisp
-  (use-package spu
+  (use-package auto-package-update
     :ensure t
     :config
-    (spu-package-upgrade-daily))
+    (require 'auto-package-update)
+    (setq auto-package-update-interval 2)
+    (setq auto-package-update-delete-old-versions t)
+    (auto-package-update-maybe))
 #+END_SRC
 **** avy package (faster moving around documents)
 #+BEGIN_SRC emacs-lisp
@@ -236,16 +239,6 @@
     (org-babel-load-file
      (expand-file-name "~/.emacs.d/config.org")))
   (global-set-key (kbd "C-c r") 'config-reload)
-#+END_SRC
-*** auto-package-update package (does what is on the tin)
-#+BEGIN_SRC emacs-lisp
-  (use-package auto-package-update
-    :ensure t
-    :config
-    (require 'auto-package-update)
-    (setq auto-package-update-interval 2)
-    (setq auto-package-update-delete-old-versions t)
-    (auto-package-update-maybe))
 #+END_SRC
 * EXWM (Emacs X Window Manager)
 ** Initialization
