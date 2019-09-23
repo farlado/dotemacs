@@ -249,7 +249,7 @@ $ make mediumfont
 #+BEGIN_SRC emacs-lisp
   (defun config-visit ()
     (interactive)
-    (find-file "~/.emacs.d/config.org"))
+    (find-file "~/.emacs.d/ReadMe.org"))
   (global-set-key (kbd "C-c e") 'config-visit)
 #+END_SRC
 *** Reload configuration with C-c r
@@ -257,7 +257,7 @@ $ make mediumfont
   (defun config-reload ()
     (interactive)
     (org-babel-load-file
-     (expand-file-name "~/.emacs.d/config.org")))
+     (expand-file-name "~/.emacs.d/ReadMe.org")))
   (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
 * EXWM (Emacs X Window Manager)
