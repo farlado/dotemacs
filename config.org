@@ -1,44 +1,47 @@
 #+STARTUP: overview
 #+TITLE: Farlado's .emacs
 #+CREATOR: Farlado
+
 * Installation
-1. Clone the repo into your home directory as ~.emacs.d~.
-1. Inside the repo, choose your font size using ~make~. The options are ~bigfont~ (22), ~mediumfont~ (16), and ~smallfont~ (10). The default is ~smallfont~.
-1. Make sure if you aren't going to use exwm you remove everything in the ~EXWM~ section of ~config.org~
-The commands to do this should look somewhat like this:
+1) Clone the repo into your home directory as ~.emacs.d~.
+2) Inside the repo, choose your font size using ~make~. The options are ~bigfont~ (22), ~mediumfont~ (16), and ~smallfont~ (10). The default is ~smallfont~.
+3) Make sure if you aren't going to use exwm you remove everything in the ~EXWM~ section of ~config.org~
+
+**** The commands should look somewhat like this:
 #+BEGIN_SRC 
 $ git clone https://gitlab.com/farlado/dotemacs ~/.emacs.d
 $ cd ~/.emacs.d
 $ make mediumfont
 #+END_SRC
-* General Functionality
+* Functionality
 ** Startup
 *** Start emacs server
-#+BEGIN_SRC emacs-lisp
-  (server-start)
-#+END_SRC
+ #+BEGIN_SRC emacs-lisp
+   (server-start)
+ #+END_SRC
 *** dashboard package (better start screen)
-#+BEGIN_SRC emacs-lisp
-  (use-package dashboard
-    :ensure t
-    :config
-    (dashboard-setup-startup-hook)
-    (setq dashboard-items '((recents . 10)))
-    (setq dashboard-banner-logo-title "Welcome to GNU Emacs")
-    (setq dashboard-set-footer nil))
-#+END_SRC
+ #+BEGIN_SRC emacs-lisp
+   (use-package dashboard
+     :ensure t
+     :config
+     (setq dashboard-items '((agenda . 10)
+			     (recents . 10)))
+     (setq dashboard-banner-logo-title "Welcome to GNU Emacs")
+     (setq dashboard-set-footer nil)
+     (dashboard-setup-startup-hook))
+ #+END_SRC
 *** Show dashboard at startup
-#+BEGIN_SRC emacs-lisp
-  (setq initial-buffer-choice
-	(lambda () (get-buffer "*dashboard*")))
-#+END_SRC
+ #+BEGIN_SRC emacs-lisp
+   (setq initial-buffer-choice
+	 (lambda () (get-buffer "*dashboard*")))
+ #+END_SRC
 *** Brag to my friends about the fact I use emacs when I run discord
-#+BEGIN_SRC emacs-lisp
-  (use-package elcord
-    :ensure t
-    :config
-    (require 'elcord))
-#+END_SRC
+ #+BEGIN_SRC emacs-lisp
+   (use-package elcord
+     :ensure t
+     :config
+     (require 'elcord))
+ #+END_SRC
 ** Annoyances
 *** Remove default start screen
 #+BEGIN_SRC emacs-lisp
@@ -106,7 +109,7 @@ $ make mediumfont
     (switch-to-buffer "*dashboard*"))
   (global-set-key (kbd "C-c d") 'dashboard-restart)
 #+END_SRC
-** Helpful packages
+** General packages
 *** auto-package-update package (self-explanatory)
 #+BEGIN_SRC emacs-lisp
   (use-package auto-package-update
@@ -147,7 +150,10 @@ $ make mediumfont
   (use-package nov
     :ensure t
     :config
-    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+    (add-hook 'nov-mode-hook
+	      (lambda ()
+		(visual-line-mode 1))))
 #+END_SRC
 ** Convenience
 *** Kill an entire word when you're in the middle of it
@@ -168,6 +174,24 @@ $ make mediumfont
   (electric-pair-mode t)
 #+END_SRC
 ** Org-mode
+*** Declare agenda file
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-files (quote ("~/agenda.org")))
+#+END_SRC
+*** C-c a to open org-agenda, C-x C-a for agenda file
+#+BEGIN_SRC emacs-lisp
+  (defun open-agenda ()
+    (interactive)
+    (find-file "~/agenda.org"))
+  (global-set-key (kbd "C-c a") 'org-agenda)
+  (global-set-key (kbd "C-c C-a") 'open-agenda)
+#+END_SRC
+*** Use visual-line-mode in org-mode
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-mode-hook
+	    (lambda ()
+	      (visual-line-mode 1)))
+#+END_SRC
 *** Shortcuts for various code snippets in org-mode
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'org-structure-template-alist
@@ -249,7 +273,7 @@ $ make mediumfont
 #+BEGIN_SRC emacs-lisp
   (defun config-visit ()
     (interactive)
-    (find-file "~/.emacs.d/ReadMe.org"))
+    (find-file "~/.emacs.d/config.org"))
   (global-set-key (kbd "C-c e") 'config-visit)
 #+END_SRC
 *** Reload configuration with C-c r
@@ -257,7 +281,7 @@ $ make mediumfont
   (defun config-reload ()
     (interactive)
     (org-babel-load-file
-     (expand-file-name "~/.emacs.d/ReadMe.org")))
+     (expand-file-name "~/.emacs.d/config.org")))
   (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
 * EXWM (Emacs X Window Manager)
@@ -350,7 +374,8 @@ $ make mediumfont
 	  ([?\M-w] . [?\C-c])
 	  ([?\C-y] . [?\C-v])
 	  ([?\C-s] . [?\C-f])
-	  ([?\C-\/] . [?\C-z])))
+	  ([?\C-\/] . [?\C-z])
+	  ([?\C-g] . [escape])))
 #+END_SRC
 *** Launch programs
 **** Terminal
@@ -643,7 +668,7 @@ $ make mediumfont
   (global-set-key (kbd "s-a r t") 'emms-toggle-repeat-track)
   (define-key exwm-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
 #+END_SRC
-* Schwayyyyy Looks
+* Looks
 ** Hide menu bar, tooltips, tool bar, and scroll bar
 #+BEGIN_SRC emacs-lisp
   (menu-bar-mode -1)
