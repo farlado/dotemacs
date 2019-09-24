@@ -26,12 +26,12 @@ $ make mediumfont
     :preface
     (setq inhibit-start-menu t)
     :config
-    (setq dashboard-items '((agenda . 10)
-			    (recents . 10)))
+    (setq dashboard-items '((recents . 10)))
+    (setq show-week-agenda-p t)
     (setq dashboard-banner-logo-title "Welcome to GNU Emacs")
     (setq dashboard-set-footer nil)
     (setq initial-buffer-choice
-          (lambda () (get-buffer "*dashboard*")))
+	  (lambda () (get-buffer "*dashboard*")))
     (dashboard-setup-startup-hook))
 #+END_SRC
 *** Brag to my friends about the fact I use emacs when I run discord
