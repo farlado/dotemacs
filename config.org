@@ -16,37 +16,32 @@ $ make mediumfont
 * Functionality
 ** Startup
 *** Start emacs server
- #+BEGIN_SRC emacs-lisp
-   (server-start)
- #+END_SRC
-*** dashboard package (better start screen)
- #+BEGIN_SRC emacs-lisp
-   (use-package dashboard
-     :ensure t
-     :config
-     (setq dashboard-items '((agenda . 10)
-			     (recents . 10)))
-     (setq dashboard-banner-logo-title "Welcome to GNU Emacs")
-     (setq dashboard-set-footer nil)
-     (dashboard-setup-startup-hook))
- #+END_SRC
-*** Show dashboard at startup
- #+BEGIN_SRC emacs-lisp
-   (setq initial-buffer-choice
-	 (lambda () (get-buffer "*dashboard*")))
- #+END_SRC
-*** Brag to my friends about the fact I use emacs when I run discord
- #+BEGIN_SRC emacs-lisp
-   (use-package elcord
-     :ensure t
-     :config
-     (require 'elcord))
- #+END_SRC
-** Annoyances
-*** Remove default start screen
 #+BEGIN_SRC emacs-lisp
-  (setq inhibit-startup-message t)
+  (server-start)
 #+END_SRC
+*** dashboard package (replacement start screen)
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard
+    :ensure t
+    :preface
+    (setq inhibit-start-menu t)
+    :config
+    (setq dashboard-items '((agenda . 10)
+			    (recents . 10)))
+    (setq dashboard-banner-logo-title "Welcome to GNU Emacs")
+    (setq dashboard-set-footer nil)
+    (setq initial-buffer-choice
+          (lambda () (get-buffer "*dashboard*")))
+    (dashboard-setup-startup-hook))
+#+END_SRC
+*** Brag to my friends about the fact I use emacs when I run discord
+#+BEGIN_SRC emacs-lisp
+  (use-package elcord
+    :ensure t
+    :config
+    (require 'elcord))
+#+END_SRC
+** Annoyances
 *** Don't make extra files on the filesystem
 #+BEGIN_SRC emacs-lisp
   (setq make-backup-file nil)
@@ -527,7 +522,6 @@ $ make mediumfont
   (global-set-key (kbd "s-l") 'lock-screen)
   (define-key exwm-mode-map (kbd "s-l") 'lock-screen)
 #+END_SRC
-
 ** Configuration
 *** Name EXWM buffers after the window title
 #+BEGIN_SRC emacs-lisp
