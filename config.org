@@ -44,7 +44,7 @@ $ make mediumfont
 ** Annoyances
 *** Don't make extra files on the filesystem
 #+BEGIN_SRC emacs-lisp
-  (setq make-backup-file nil)
+  (setq make-backup-files nil)
   (setq auto-save-default nil)
 #+END_SRC
 *** Make scrolling a little less crazy
@@ -521,6 +521,14 @@ $ make mediumfont
 
   (global-set-key (kbd "s-l") 'lock-screen)
   (define-key exwm-mode-map (kbd "s-l") 'lock-screen)
+#+END_SRC
+**** Shutting down
+#+BEGIN_SRC emacs-lisp
+  (defun shutdown-computer ()
+    (interactive)
+    (shell-command "shutdown now"))
+  (global-set-key (kbd "C-x C-M-c") 'shutdown-computer)
+  (define-key exwm-mode-map (kbd "C-x C-M-c") 'shutdown-computer)
 #+END_SRC
 ** Configuration
 *** Name EXWM buffers after the window title
