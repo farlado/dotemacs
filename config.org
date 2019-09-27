@@ -305,7 +305,7 @@ $ make mediumfont
 					    7 "DP-1-2-1"
 					    8 "DP-1-2-3"
 					    9 "DP-1-2-2"))
-  (setq exwm-workspace-number 4)
+  (setq exwm-workspace-number 3)
   (add-hook 'exwm-randr-screen-change-hook
 	    (lambda ()
 	      (start-process-shell-command
@@ -531,6 +531,11 @@ $ make mediumfont
   (define-key exwm-mode-map (kbd "C-x C-M-c") 'shutdown-computer)
 #+END_SRC
 ** Configuration
+*** Show window buffers in all workspaces
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-workspace-show-all-buffers t)
+  (setq exwm-workspace-show-all-buffers t)
+#+END_SRC
 *** Name EXWM buffers after the window title
 #+BEGIN_SRC emacs-lisp
   (add-hook 'exwm-update-title-hook 
