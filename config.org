@@ -534,7 +534,7 @@ $ make mediumfont
 *** Show window buffers in all workspaces
 #+BEGIN_SRC emacs-lisp
   (setq exwm-workspace-show-all-buffers t)
-  (setq exwm-workspace-show-all-buffers t)
+  (setq exwm-layout-show-all-buffers t)
 #+END_SRC
 *** Name EXWM buffers after the window title
 #+BEGIN_SRC emacs-lisp
