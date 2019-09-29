@@ -519,7 +519,8 @@ $ make mediumfont
 #+BEGIN_SRC emacs-lisp
   (defun lock-screen ()
     (interactive)
-    (shell-command "i3l"))
+    (start-process-shell-command
+     "Lockscreen" nil "i3l"))
   (global-set-key (kbd "<XF86ScreenSaver>") 'lock-screen)
   (define-key exwm-mode-map (kbd "<XF86ScreenSaver>") 'lock-screen)
 
