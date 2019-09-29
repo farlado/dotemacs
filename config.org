@@ -202,6 +202,11 @@ $ make mediumfont
   (setq org-src-window-setup 'current-window)
 #+END_SRC
 ** Buffers/Windows
+*** Sloppy focus
+#+BEGIN_SRC emacs-lisp
+  (setq focus-follows-mouse t
+	mouse-autoselect-window t)
+#+END_SRC
 *** Kill current buffer with C-x k, use C-x C-k to kill both the buffer and window
 #+BEGIN_SRC emacs-lisp
   (defun kill-this-buffer-and-window ()
