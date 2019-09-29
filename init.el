@@ -32,7 +32,7 @@
     ("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" default)))
  '(package-selected-packages
    (quote
-    (auto-package-update elcord nov swiper use-package company emms diminish popup-kill-ring exwm-randr dmenu exwm spaceline dash dashboard rainbow-delimiters hungry-delete smart-hungry-delete switch-window rainbow-mode avy smex ido-vertical-mode spacemacs-theme which-key))))
+    (auto-package-update nov swiper use-package company emms diminish popup-kill-ring exwm-randr dmenu exwm spaceline dash dashboard rainbow-delimiters hungry-delete smart-hungry-delete switch-window rainbow-mode avy smex ido-vertical-mode spacemacs-theme which-key))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

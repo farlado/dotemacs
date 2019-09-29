@@ -26,26 +26,33 @@ $ make mediumfont
     :preface
     (setq inhibit-start-menu t)
     :config
-    (setq dashboard-items '((recents . 10)))
-    (setq show-week-agenda-p t)
-    (setq dashboard-banner-logo-title "Welcome to GNU Emacs")
-    (setq dashboard-set-footer nil)
-    (setq initial-buffer-choice
-	  (lambda () (get-buffer "*dashboard*")))
+    (setq dashboard-items '((recents . 10))
+	  show-week-agenda-p t
+	  dashboard-banner-logo-title "Welcome to GNU Emacs"
+	  dashboard-set-footer nil
+	  initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
     (dashboard-setup-startup-hook))
 #+END_SRC
-*** Brag to my friends about the fact I use emacs when I run discord
+*** Restart and open dashboard with C-c d
 #+BEGIN_SRC emacs-lisp
-  (use-package elcord
-    :ensure t
-    :config
-    (require 'elcord))
+  (defun dashboard-restart ()
+    (interactive)
+    (dashboard-insert-startupify-lists)
+    (switch-to-buffer "*dashboard*"))
+  (global-set-key (kbd "C-c d") 'dashboard-restart)
 #+END_SRC
 ** Annoyances
+*** Hide menu bar, tooltips, tool bar, and scroll bar
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
+  (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+#+END_SRC
 *** Don't make extra files on the filesystem
 #+BEGIN_SRC emacs-lisp
-  (setq make-backup-files nil)
-  (setq auto-save-default nil)
+  (setq make-backup-files nil
+	auto-save-default nil)
 #+END_SRC
 *** Make scrolling a little less crazy
 #+BEGIN_SRC emacs-lisp
@@ -63,12 +70,17 @@ $ make mediumfont
 #+BEGIN_SRC emacs-lisp
   (global-subword-mode 1)
 #+END_SRC
+*** Disable suspending emacs
+#+BEGIN_SRC emacs-lisp
+  (global-unset-key (kbd "C-z"))
+  (global-unset-key (kbd "C-x C-z"))
+#+END_SRC
 ** Menus/Commands
 *** Enable ido-mode
 #+BEGIN_SRC emacs-lisp
-  (setq ido-mode-flex-matching nil)
-  (setq ido-create-new-buffer 'always)
-  (setq ido-everywhere t)
+  (setq ido-mode-flex-matching nil
+	ido-create-new-buffer 'always
+	ido-everywhere t)
   (ido-mode 1)
 #+END_SRC
 *** ido-vertical-mode package (make ido-mode less ugly)
@@ -96,14 +108,6 @@ $ make mediumfont
     :ensure t
     :bind ("C-s" . swiper))
 #+END_SRC
-*** Restart and open dashboard with C-c d
-#+BEGIN_SRC emacs-lisp
-  (defun dashboard-restart ()
-    (interactive)
-    (dashboard-insert-startupify-lists)
-    (switch-to-buffer "*dashboard*"))
-  (global-set-key (kbd "C-c d") 'dashboard-restart)
-#+END_SRC
 ** General packages
 *** auto-package-update package (self-explanatory)
 #+BEGIN_SRC emacs-lisp
@@ -111,8 +115,9 @@ $ make mediumfont
     :ensure t
     :config
     (require 'auto-package-update)
-    (setq auto-package-update-interval 2)
-    (setq auto-package-update-delete-old-versions t)
+    (setq auto-package-update-interval 2
+	  auto-package-update-delete-old-versions t
+	  auto-package-update-hide-results t)
     (auto-package-update-maybe))
 #+END_SRC
 *** avy package (faster moving around documents)
@@ -161,8 +166,7 @@ $ make mediumfont
 #+END_SRC
 *** Electric mode (OH MY GOD THIS IS SO GREAT)
 #+BEGIN_SRC emacs-lisp
-  (setq electric-pair-pairs '(
-			      (?\{ . ?\})
+  (setq electric-pair-pairs '((?\{ . ?\})
 			      (?\( . ?\))
 			      (?\[ . ?\])
 			      (?\" . ?\")))
@@ -226,8 +230,8 @@ $ make mediumfont
 #+END_SRC
 *** Sloppy focus of windows
 #+BEGIN_SRC emacs-lisp
-  (setq focus-follows-mouse t)
-  (setq mouse-autoselect-window t)
+  (setq focus-follows-mouse t
+	mouse-autoselect-window t)
 #+END_SRC
 *** Move focus when explicitly creating new windows
 #+BEGIN_SRC emacs-lisp
@@ -305,7 +309,7 @@ $ make mediumfont
 					    7 "DP-1-2-1"
 					    8 "DP-1-2-3"
 					    9 "DP-1-2-2"))
-  (setq exwm-workspace-number 3)
+  (setq exwm-workspace-number 10)
   (add-hook 'exwm-randr-screen-change-hook
 	    (lambda ()
 	      (start-process-shell-command
@@ -389,7 +393,7 @@ $ make mediumfont
   (global-set-key (kbd "<XF86Calculator>") 'calc)
   (define-key exwm-mode-map (kbd "<XF86Calculator>") 'calc)
 
-  (define-key calc-mode-map (kbd "ESC") 'kill-this-buffer-and-window)
+  (define-key calc-mode-map (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
 #+END_SRC
 **** Firefox
 #+BEGIN_SRC emacs-lisp
@@ -432,8 +436,7 @@ $ make mediumfont
   (defun run-discord ()
     (interactive)
     (start-process-shell-command
-     "Discord" nil "discord")
-    (elecord-mode 1))
+     "Discord" nil "discord"))
   (global-set-key (kbd "s-d") 'run-discord)
   (define-key exwm-mode-map (kbd "s-d") 'run-discord)
 #+END_SRC
@@ -531,11 +534,6 @@ $ make mediumfont
   (define-key exwm-mode-map (kbd "C-x C-M-c") 'shutdown-computer)
 #+END_SRC
 ** Configuration
-*** Show window buffers in all workspaces
-#+BEGIN_SRC emacs-lisp
-  (setq exwm-workspace-show-all-buffers t)
-  (setq exwm-layout-show-all-buffers t)
-#+END_SRC
 *** Name EXWM buffers after the window title
 #+BEGIN_SRC emacs-lisp
   (add-hook 'exwm-update-title-hook 
@@ -548,6 +546,11 @@ $ make mediumfont
 	'(((equal exwm-class-name "Steam")
 	   floating t
 	   floating-mode-line nil)))
+#+END_SRC
+*** Configure floating window borders
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-floating-window-border-width 0
+	exwm-floating-border-color "purple")
 #+END_SRC
 *** dmenu package (dmenu but for emacs)
 #+BEGIN_SRC emacs-lisp
@@ -585,12 +588,12 @@ $ make mediumfont
     (require 'emms-setup)
     (require 'emms-player-mpd)
     (emms-all)
-    (setq emms-seek-seconds 5)
-    (setq emms-player-list '(emms-player-mpd))
-    (setq emms-info-functions '(emms-info mpd))
-    (setq emms-player-mpd-server-name "localhost")
-    (setq emms-player-mpd-server-port "6601")
-    (setq mpc-host "localhost:6601")
+    (setq emms-seek-seconds 5
+	  emms-player-list '(emms-player-mpd)
+	  emms-info-functions '(emms-info mpd)
+	  emms-player-mpd-server-name "localhost"
+	  emms-player-mpd-server-port "6601"
+	  mpc-host "localhost:6601")
     :bind (("s-a v" . emms)
 	   ("s-a b" . emms-smart-browse)
 	   ("s-a r c" . emms-player-mpd-update-all-reset-cache)
@@ -675,14 +678,7 @@ $ make mediumfont
   (global-set-key (kbd "s-a r t") 'emms-toggle-repeat-track)
   (define-key exwm-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
 #+END_SRC
-* Looks
-** Hide menu bar, tooltips, tool bar, and scroll bar
-#+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
-  (tooltip-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-#+END_SRC
+* General Looks
 ** Add window dividers
 #+BEGIN_SRC emacs-lisp
   (window-divider-mode 1)
