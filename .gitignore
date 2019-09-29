@@ -1,5 +1,6 @@
 eshell
 .#recentf
+.#dmenu-items
 bookmarks
 .last-package-update-day
 emms
