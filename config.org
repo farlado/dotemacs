@@ -42,12 +42,13 @@ $ make mediumfont
   (global-set-key (kbd "C-c d") 'dashboard-restart)
 #+END_SRC
 ** Annoyances
-*** Hide menu bar, tooltips, tool bar, and scroll bar
+*** Hide menu bar, tooltips, tool bar, scroll bars, and dialog boxes
 #+BEGIN_SRC emacs-lisp
   (menu-bar-mode -1)
   (tooltip-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
+  (setq use-dialog-box nil)
 #+END_SRC
 *** Don't make extra files on the filesystem
 #+BEGIN_SRC emacs-lisp
@@ -227,11 +228,6 @@ $ make mediumfont
 *** Use buffer switching on C-x C-b
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
-#+END_SRC
-*** Sloppy focus of windows
-#+BEGIN_SRC emacs-lisp
-  (setq focus-follows-mouse t
-	mouse-autoselect-window t)
 #+END_SRC
 *** Move focus when explicitly creating new windows
 #+BEGIN_SRC emacs-lisp
