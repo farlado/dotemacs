@@ -542,12 +542,23 @@ $ make mediumfont
 	    (lambda () (exwm-workspace-rename-buffer
 		   exwm-title)))
 #+END_SRC
-*** Make certain windows always float
+*** Assign workspaces and floating to various windows
 #+BEGIN_SRC emacs-lisp
   (setq exwm-manage-configurations
-	'(((equal exwm-class-name "Steam")
+	'(((string= exwm-class-name "Steam")
+	   workspace 9
 	   floating t
-	   floating-mode-line nil)))
+	   floating-mode-line nil)
+	  ((string= exwm-instance-name "telegram")
+	   workspace 8)
+	  ((string= exwm-class-name "discord")
+	   workspace 7)
+	  ((string= exwm-instance-name "libreoffice")
+	   workspace 6)
+	  ((string= exwm-instance-name "gimp")
+	   workspace 6)
+	  ((string= exwm-title "Event Tester")
+	   floating t)))
 #+END_SRC
 *** Configure floating window borders
 #+BEGIN_SRC emacs-lisp
