@@ -403,7 +403,7 @@ $ make highres
 *** Launch programs
 **** Terminal
 #+BEGIN_SRC emacs-lisp
-n  (defvar my-term-shell "/bin/zsh")
+  (defvar my-term-shell "/bin/zsh")
   (defadvice ansi-term (before force-bash)
     (interactive (list my-term-shell)))
   (ad-activate 'ansi-term)
