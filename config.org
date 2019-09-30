@@ -4,14 +4,14 @@
 
 * Installation
 1) Clone the repo into your home directory as ~.emacs.d~.
-2) Inside the repo, choose your font size using ~make~. The options are ~bigfont~ (22), ~mediumfont~ (16), and ~smallfont~ (10). The default is ~smallfont~.
-3) Make sure if you aren't going to use exwm you remove everything in the ~EXWM~ section of ~config.org~
+2) Inside the repo, choose your font/border sizes using ~make~. The options are ~hires~ and ~lowres~. The default is ~lowres~.
+3) Make sure if you aren't going to use EXWM you remove everything in the ~EXWM~ section of ~config.org~
 
 **** The commands should look somewhat like this:
 #+BEGIN_SRC 
 $ git clone https://gitlab.com/farlado/dotemacs ~/.emacs.d
 $ cd ~/.emacs.d
-$ make mediumfont
+$ make highres
 #+END_SRC
 * Functionality
 ** Startup
@@ -277,7 +277,7 @@ $ make mediumfont
   (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
 * EXWM (Emacs X Window Manager)
-** Initialization
+** Configuration
 *** exwm package (base window manager)
 #+BEGIN_SRC emacs-lisp
   (use-package exwm
@@ -287,6 +287,14 @@ $ make mediumfont
     (require 'exwm-randr)
     (require 'exwm-config)
     (require 'exwm-systemtray))
+#+END_SRC
+*** dmenu package (dmenu but for emacs)
+#+BEGIN_SRC emacs-lisp
+  (use-package dmenu
+    :ensure t
+    :bind (("s-x" . dmenu)
+	   :map exwm-mode-map
+	   ("s-x" . dmenu)))
 #+END_SRC
 *** Configure multi-head
 #+BEGIN_SRC emacs-lisp
@@ -309,11 +317,34 @@ $ make mediumfont
 	       "xrandr" nil "ds")))
   (exwm-randr-enable)
 #+END_SRC
-*** Initialize EXWM
+*** Name EXWM buffers after the window title
 #+BEGIN_SRC emacs-lisp
-  (exwm-enable)
-  (exwm-config-ido)
-  (exwm-systemtray-enable)
+  (add-hook 'exwm-update-title-hook 
+	    (lambda () (exwm-workspace-rename-buffer
+		   exwm-title)))
+#+END_SRC
+*** Assign workspaces and floating to various windows
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-manage-configurations
+	'(((string= exwm-class-name "Steam")
+	   workspace 9
+	   floating t
+	   floating-mode-line nil)
+	  ((string= exwm-instance-name "telegram")
+	   workspace 8)
+	  ((string= exwm-class-name "discord")
+	   workspace 7)
+	  ((string= exwm-instance-name "libreoffice")
+	   workspace 6)
+	  ((string= exwm-instance-name "gimp")
+	   workspace 6)
+	  ((string= exwm-title "Event Tester")
+	   floating t)))
+#+END_SRC
+*** Configure floating window borders
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-floating-border-width 2
+	exwm-floating-border-color "#5d4d7a")
 #+END_SRC
 ** Keybindings
 *** General global commands
@@ -372,7 +403,7 @@ $ make mediumfont
 *** Launch programs
 **** Terminal
 #+BEGIN_SRC emacs-lisp
-  (defvar my-term-shell "/bin/zsh")
+n  (defvar my-term-shell "/bin/zsh")
   (defadvice ansi-term (before force-bash)
     (interactive (list my-term-shell)))
   (ad-activate 'ansi-term)
@@ -538,44 +569,6 @@ $ make mediumfont
   (global-set-key (kbd "C-x C-M-c") 'shutdown-computer)
   (define-key exwm-mode-map (kbd "C-x C-M-c") 'shutdown-computer)
 #+END_SRC
-** Configuration
-*** Name EXWM buffers after the window title
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'exwm-update-title-hook 
-	    (lambda () (exwm-workspace-rename-buffer
-		   exwm-title)))
-#+END_SRC
-*** Assign workspaces and floating to various windows
-#+BEGIN_SRC emacs-lisp
-  (setq exwm-manage-configurations
-	'(((string= exwm-class-name "Steam")
-	   workspace 9
-	   floating t
-	   floating-mode-line nil)
-	  ((string= exwm-instance-name "telegram")
-	   workspace 8)
-	  ((string= exwm-class-name "discord")
-	   workspace 7)
-	  ((string= exwm-instance-name "libreoffice")
-	   workspace 6)
-	  ((string= exwm-instance-name "gimp")
-	   workspace 6)
-	  ((string= exwm-title "Event Tester")
-	   floating t)))
-#+END_SRC
-*** Configure floating window borders
-#+BEGIN_SRC emacs-lisp
-  (setq exwm-floating-window-border-width 2
-	exwm-floating-border-color "#5d4d7a")
-#+END_SRC
-*** dmenu package (dmenu but for emacs)
-#+BEGIN_SRC emacs-lisp
-  (use-package dmenu
-    :ensure t
-    :bind (("s-x" . dmenu)
-	   :map exwm-mode-map
-	   ("s-x" . dmenu)))
-#+END_SRC
 ** Startup applications
 *** Set fallback cursor
 #+BEGIN_SRC emacs-lisp
@@ -594,6 +587,12 @@ $ make mediumfont
 #+BEGIN_SRC emacs-lisp
   (start-process-shell-command
    "Notifications" nil "dunst")
+#+END_SRC
+** Initialize EXWM
+#+BEGIN_SRC emacs-lisp
+  (exwm-enable)
+  (exwm-config-ido)
+  (exwm-systemtray-enable)
 #+END_SRC
 * EMMS (Emacs MultiMedia System)
 ** Install EMMS and bind main playback keys
