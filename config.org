@@ -4,7 +4,7 @@
 
 * Installation
 1) Clone the repo into your home directory as ~.emacs.d~.
-2) Inside the repo, choose your font/border sizes using ~make~. The options are ~hires~ and ~lowres~. The default is ~lowres~.
+2) Inside the repo, choose your font/border sizes using ~make~. The options are ~hires~ and ~lores~. The default is ~lores~.
 3) Make sure if you aren't going to use EXWM you remove everything in the ~EXWM~ section of ~config.org~
 
 **** The commands should look somewhat like this:

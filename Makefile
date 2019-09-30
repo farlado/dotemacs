@@ -4,7 +4,7 @@ update:
 	git checkout config.org init.el
 	git pull
 
-lowres: update
+lores: update
 
 hires: update
 	cat init.el | sed 's/100/220/' > init.el.new
