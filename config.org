@@ -42,14 +42,6 @@ $ make mediumfont
   (global-set-key (kbd "C-c d") 'dashboard-restart)
 #+END_SRC
 ** Annoyances
-*** Hide menu bar, tooltips, tool bar, scroll bars, and dialog boxes
-#+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
-  (tooltip-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  (setq use-dialog-box nil)
-#+END_SRC
 *** Don't make extra files on the filesystem
 #+BEGIN_SRC emacs-lisp
   (setq make-backup-files nil
@@ -451,6 +443,17 @@ $ make mediumfont
   (define-key exwm-mode-map (kbd "s-s") 'run-steam)
 #+END_SRC
 *** Other useful functions
+**** Network Settings
+#+BEGIN_SRC emacs-lisp
+  (defun network-settings ()
+    (interactive)
+    (start-process-shell-command
+     "Connections" nil "nm-connection-editor")
+    (async-shell-command "nmcli dev wifi list"))
+
+  (global-set-key (kbd "s-n") 'network-settings)
+  (define-key exwm-mode-map (kbd "s-n") 'network-settings)
+#+END_SRC
 **** Volume control
 #+BEGIN_SRC emacs-lisp
   (defun volctl-m ()
@@ -562,8 +565,8 @@ $ make mediumfont
 #+END_SRC
 *** Configure floating window borders
 #+BEGIN_SRC emacs-lisp
-  (setq exwm-floating-window-border-width 0
-	exwm-floating-border-color "purple")
+  (setq exwm-floating-window-border-width 2
+	exwm-floating-border-color "#5d4d7a")
 #+END_SRC
 *** dmenu package (dmenu but for emacs)
 #+BEGIN_SRC emacs-lisp
@@ -692,9 +695,24 @@ $ make mediumfont
   (define-key exwm-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
 #+END_SRC
 * General Looks
-** Add window dividers
+** Hide useless things
 #+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
+  (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq use-dialog-box nil)
+#+END_SRC
+** Window dividers, no fringes
+#+BEGIN_SRC emacs-lisp
+  (setq window-divider-default-places t
+	window-divider-default-bottom-width 2
+	window-divider-default-right-width 3)
+  (set-face-foreground 'window-divider-first-pixel "#5d4d7a")
+  (set-face-foreground 'window-divider "#5d4d7a")
+  (set-face-foreground 'window-divider-last-pixel "#5d4d7a")
   (window-divider-mode 1)
+  (fringe-mode 0)
 #+END_SRC
 ** Line/column numbers
 *** Show line and column numbers in the status line
@@ -710,6 +728,8 @@ $ make mediumfont
   (add-hook 'ibuffer-hook
 	    (lambda () (display-line-numbers-mode -1)))
   (add-hook 'dashboard-mode-hook
+	    (lambda () (display-line-numbers-mode -1)))
+  (add-hook 'shell-mode-hook
 	    (lambda () (display-line-numbers-mode -1)))
 #+END_SRC
 ** Prettify symbols/text
