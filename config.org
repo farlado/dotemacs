@@ -343,7 +343,7 @@ $ make highres
 #+END_SRC
 *** Configure floating window borders
 #+BEGIN_SRC emacs-lisp
-  (setq exwm-floating-border-width 2
+  (setq exwm-floating-border-width 3
 	exwm-floating-border-color "#5d4d7a")
 #+END_SRC
 ** Keybindings
@@ -705,8 +705,8 @@ $ make highres
 ** Window dividers, no fringes
 #+BEGIN_SRC emacs-lisp
   (setq window-divider-default-places t
-	window-divider-default-bottom-width 2
-	window-divider-default-right-width 3)
+	window-divider-default-bottom-width 4
+	window-divider-default-right-width 6)
   (set-face-foreground 'window-divider-first-pixel "#5d4d7a")
   (set-face-foreground 'window-divider "#5d4d7a")
   (set-face-foreground 'window-divider-last-pixel "#5d4d7a")
