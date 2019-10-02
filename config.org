@@ -231,14 +231,12 @@ $ make highres
   (defun split-and-follow-vertical ()
     (interactive)
     (split-window-below)
-    (balance-windows)
     (other-window 1))
   (global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
 
   (defun split-and-follow-horizontal ()
     (interactive)
     (split-window-right)
-    (balance-windows)
     (other-window 1))
   (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
 #+END_SRC
