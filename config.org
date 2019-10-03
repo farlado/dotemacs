@@ -397,6 +397,11 @@ $ make highres
 	  ([?\C-s] . [?\C-f])
 	  ([?\C-\/] . [?\C-z])
 	  ([?\C-g] . [escape])))
+
+  ;; I can't do sequences above, so this is separate
+  (defun exwm-ctrl-s ()
+    (interactive) (execute-kbd-macro (kbd "C-q C-s")))
+  (define-key exwm-mode-map (kbd "C-x C-s") 'exwm-ctrl-s)
 #+END_SRC
 *** Launch programs
 **** Terminal
@@ -571,6 +576,10 @@ $ make highres
 *** Set fallback cursor
 #+BEGIN_SRC emacs-lisp
   (shell-command "xsetroot -cursor_name left_ptr")
+#+END_SRC
+*** Disable screen blanking
+#+BEGIN_SRC emacs-lisp
+  (shell-command "xset s off -dpms")
 #+END_SRC
 *** Set keyboard layout to US
 #+BEGIN_SRC emacs-lisp
