@@ -28,4 +28,4 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (dracula-theme auto-package-update nov swiper use-package company emms diminish popup-kill-ring exwm-randr dmenu exwm spaceline dash dashboard rainbow-delimiters hungry-delete smart-hungry-delete switch-window rainbow-mode avy smex ido-vertical-mode which-key))))
+    (vterm dracula-theme auto-package-update nov swiper use-package company emms diminish popup-kill-ring exwm-randr dmenu exwm spaceline dash dashboard rainbow-delimiters hungry-delete smart-hungry-delete switch-window rainbow-mode avy smex ido-vertical-mode which-key))))

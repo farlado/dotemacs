@@ -412,14 +412,14 @@ $ make highres
   (define-key exwm-mode-map (kbd "C-x C-s") 'exwm-ctrl-s)
 #+END_SRC
 *** Launch programs
-**** Terminal
+**** vterm package (terminal)
 #+BEGIN_SRC emacs-lisp
-  (defvar my-term-shell "/bin/zsh")
-  (defadvice ansi-term (before force-bash)
-    (interactive (list my-term-shell)))
-  (ad-activate 'ansi-term)
-  (global-set-key (kbd "<s-return>") 'ansi-term)
-  (define-key exwm-mode-map (kbd "<s-return>") 'ansi-term)
+  (use-package vterm
+    :ensure t
+    :config (require 'vterm)
+    :bind (("<s-return>" . vterm)
+	   :map exwm-mode-map
+	   ("<s-return>" . vterm)))
 #+END_SRC
 **** Calculator
 #+BEGIN_SRC emacs-lisp
@@ -580,7 +580,7 @@ $ make highres
   (global-set-key (kbd "C-x C-M-c") 'shutdown-computer)
   (define-key exwm-mode-map (kbd "C-x C-M-c") 'shutdown-computer)
 #+END_SRC
-** Startup applications
+** On Startup
 *** Set fallback cursor
 #+BEGIN_SRC emacs-lisp
   (shell-command "xsetroot -cursor_name left_ptr")
@@ -592,6 +592,10 @@ $ make highres
 *** Set keyboard layout to US
 #+BEGIN_SRC emacs-lisp
   (shell-command "keyctl -s us")
+#+END_SRC
+*** Swap ctrl and capslock
+#+BEGIN_SRC emacs-lisp
+  (shell-command "setxkbmap -option ctrl:nocaps")
 #+END_SRC
 *** Compositor
 #+BEGIN_SRC emacs-lisp
@@ -733,7 +737,7 @@ $ make highres
 *** Show line numbers in all modes unless I specify otherwise
 #+BEGIN_SRC emacs-lisp
   (global-display-line-numbers-mode 1)
-  (add-hook 'term-mode-hook
+  (add-hook 'vterm-mode-hook
 	    (lambda () (display-line-numbers-mode -1)))
   (add-hook 'ibuffer-hook
 	    (lambda () (display-line-numbers-mode -1)))
