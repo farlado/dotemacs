@@ -709,8 +709,7 @@ $ make highres
   (define-key exwm-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
 #+END_SRC
 * General Looks
-** Theme/Font
-*** spacemacs-theme package (theme is spacemacs-light)
+** Theme
 #+BEGIN_SRC emacs-lisp
   (use-package dracula-theme
     :ensure t
@@ -719,9 +718,9 @@ $ make highres
 ** Window dividers, no fringes
 #+BEGIN_SRC emacs-lisp
   (setq window-divider-default-right-width 3)
-  (set-face-foreground 'window-divider-first-pixel "#5d4d7a")
-  (set-face-foreground 'window-divider "#5d4d7a")
-  (set-face-foreground 'window-divider-last-pixel "#5d4d7a")
+  (set-face-foreground 'window-divider-first-pixel "#b45bcf")
+  (set-face-foreground 'window-divider "#b45bcf")
+  (set-face-foreground 'window-divider-last-pixel "#b45bcf")
   (window-divider-mode 1)
   (fringe-mode 0)
 #+END_SRC

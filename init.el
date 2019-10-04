@@ -11,7 +11,7 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-;; most of the actual config is in herw
+;; most of the actual config is in here
 (org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))
 
 ;; Automatically created, don't touch these!
