@@ -1,6 +1,6 @@
 #+STARTUP: overview
 #+TITLE: Farlado's .emacs
-#+CREATOR: Farlado
+#+AUTHOR: Farlado
 
 * Installation
 1) Clone the repo into your home directory as ~.emacs.d~.
@@ -15,6 +15,14 @@ $ make highres
 #+END_SRC
 * Functionality
 ** Startup
+*** Hide useless things ASAP
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
+  (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq use-dialog-box nil)
+#+END_SRC
 *** Start emacs server
 #+BEGIN_SRC emacs-lisp
   (server-start)
@@ -701,13 +709,12 @@ $ make highres
   (define-key exwm-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
 #+END_SRC
 * General Looks
-** Hide useless things
+** Theme/Font
+*** spacemacs-theme package (theme is spacemacs-light)
 #+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
-  (tooltip-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  (setq use-dialog-box nil)
+  (use-package dracula-theme
+    :ensure t
+    :config (load-theme 'dracula t))
 #+END_SRC
 ** Window dividers, no fringes
 #+BEGIN_SRC emacs-lisp
@@ -784,8 +791,7 @@ $ make highres
 #+BEGIN_SRC emacs-lisp
   (use-package spaceline
     :ensure t
-    :config
-    (require 'spaceline-config)
+    :config (require 'spaceline-config)
     (setq powerline-default-separator (quote arrow))
-    (spaceline-spacemacs-theme))
+    (spaceline-emacs-theme))
 #+END_SRC
