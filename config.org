@@ -583,7 +583,8 @@ $ make highres
 ** On Startup
 *** Display setup
 #+BEGIN_SRC emacs-lisp
-  (shell-command "dr")
+  (start-process-shell-command
+   "Display Setup" nil "dr")
 #+END_SRC
 *** Set fallback cursor
 #+BEGIN_SRC emacs-lisp
