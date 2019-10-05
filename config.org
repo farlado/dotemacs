@@ -581,6 +581,10 @@ $ make highres
   (define-key exwm-mode-map (kbd "C-x C-M-c") 'shutdown-computer)
 #+END_SRC
 ** On Startup
+*** Display setup
+#+BEGIN_SRC emacs-lisp
+  (shell-command "dr")
+#+END_SRC
 *** Set fallback cursor
 #+BEGIN_SRC emacs-lisp
   (shell-command "xsetroot -cursor_name left_ptr")
