@@ -174,19 +174,19 @@
     #+END_SRC
 ** Org-mode
 *** Agenda (only enabled if an agenda is found)
-**** Declare agenda file if found, then...
-     #+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
        (if (file-exists-p "~/agenda.org")
-	   (setq org-agenda-files (quote ("~/agenda.org")))
-     #+END_SRC
-**** C-c a to open org-agenda, C-x C-a for agenda file
-     #+BEGIN_SRC emacs-lisp
-       (defun open-agenda ()
-	 (interactive)
-	 (find-file "~/agenda.org"))
-       (global-set-key (kbd "C-c a") 'org-agenda)
-       (global-set-key (kbd "C-c C-a") 'open-agenda))
-     #+END_SRC
+	   (progn
+	     ;; Declare agenda file
+	     (setq org-agenda-files (quote ("~/agenda.org")))
+
+	     ;; C-c a for org-agenda, C-c C-a for the agenda file
+	     (defun open-agenda ()
+	       (interactive)
+	       (find-file "~/agenda.org"))
+	     (global-set-key (kbd "C-c a") 'org-agenda)
+	     (global-set-key (kbd "C-c C-a") 'open-agenda)))
+    #+END_SRC
 *** Use visual-line-mode in org-mode
     #+BEGIN_SRC emacs-lisp
       (add-hook 'org-mode-hook
