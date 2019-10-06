@@ -7,7 +7,7 @@
 2) Inside the repo, choose your font/border sizes using ~make~. The options are ~hires~ and ~lores~. The default is ~lores~.
 3) Make sure if you aren't going to use EXWM you remove everything in the ~EXWM~ section of ~config.org~
 
-**** The commands should look somewhat like this:
+** The commands should look somewhat like this:
 #+BEGIN_SRC 
 $ git clone https://gitlab.com/farlado/dotemacs ~/.emacs.d
 $ cd ~/.emacs.d
@@ -772,6 +772,15 @@ $ make highres
     :ensure t
     :init
     (add-hook 'prog-mode-hook #'rainbow-delimiters-mode 1))
+#+END_SRC
+*** org-bullets package (nicer bullet points in org-mode)
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :config (require 'org-bullets)
+    (add-hook 'org-mode-hook (lambda ()
+			       (org-bullets-mode 1)))
+    (setq inhibit-compacting-font-caches t))
 #+END_SRC
 ** Mode Line
 *** Show clock on mode line

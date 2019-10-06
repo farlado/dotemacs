@@ -6,7 +6,7 @@
 			 ("org"   . "https://orgmode.org/elpa/")))
 (package-initialize)
 
-;; install use-package and theme if not installed
+;; install use-package if not installed
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -28,4 +28,4 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (vterm dracula-theme auto-package-update nov swiper use-package company emms diminish popup-kill-ring exwm-randr dmenu exwm spaceline dash dashboard rainbow-delimiters hungry-delete smart-hungry-delete switch-window rainbow-mode avy smex ido-vertical-mode which-key))))
+    (org-bullets vterm dracula-theme auto-package-update nov swiper use-package company emms diminish popup-kill-ring exwm-randr dmenu exwm spaceline dash dashboard rainbow-delimiters hungry-delete smart-hungry-delete switch-window rainbow-mode avy smex ido-vertical-mode which-key))))
