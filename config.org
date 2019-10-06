@@ -584,7 +584,7 @@ $ make highres
 *** Display setup
 #+BEGIN_SRC emacs-lisp
   (start-process-shell-command
-   "Display Setup" nil "dr")
+   "Display Setup" nil "rm $HOME/.config/monitorstate; ds")
 #+END_SRC
 *** Set fallback cursor
 #+BEGIN_SRC emacs-lisp
@@ -731,7 +731,7 @@ $ make highres
   (set-face-foreground 'window-divider "#b45bcf")
   (set-face-foreground 'window-divider-last-pixel "#b45bcf")
   (window-divider-mode 1)
-  (fringe-mode 0)
+  (fringe-mode 5)
 #+END_SRC
 ** Line/column numbers
 *** Show line and column numbers in the status line
