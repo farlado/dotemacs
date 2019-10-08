@@ -6,762 +6,760 @@
   1) Clone the repo into your home directory as ~.emacs.d~.
   2) Inside the repo, choose your font/border sizes using ~make~. The options are ~hires~ and ~lores~. The default is ~lores~.
   3) Make sure if you aren't going to use EXWM you remove everything in the ~EXWM~ section of ~config.org~
-** The commands should look somewhat like this:
-   #+BEGIN_SRC sh
-     $ git clone https://gitlab.com/farlado/dotemacs ~/.emacs.d
-     $ cd ~/.emacs.d
-     $ make highres
-   #+END_SRC
 * General Functionality
 ** Startup
 *** Start emacs server
-    #+BEGIN_SRC emacs-lisp
-      (server-start)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (server-start)
+#+END_SRC
 *** dashboard package (replacement start screen)
-    #+BEGIN_SRC emacs-lisp
-      (use-package dashboard
-	:ensure t
-	:preface (setq inhibit-start-menu t)
-	:config
-	(setq dashboard-items '((recents . 10))
-	      show-week-agenda-p t
-	      dashboard-banner-logo-title "Welcome to GNU Emacs"
-	      dashboard-set-footer nil
-	      initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-	(dashboard-setup-startup-hook))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard
+    :ensure t
+    :preface (setq inhibit-start-menu t)
+    :config
+    (setq dashboard-items '((recents . 10))
+	  show-week-agenda-p t
+	  dashboard-banner-logo-title "Welcome to GNU Emacs"
+	  dashboard-set-footer nil
+	  initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+    (dashboard-setup-startup-hook))
+#+END_SRC
 *** Restart and open dashboard with C-c d
-    #+BEGIN_SRC emacs-lisp
-      (defun dashboard-restart ()
-	(interactive)
-	(dashboard-insert-startupify-lists)
-	(switch-to-buffer "*dashboard*"))
-      (global-set-key (kbd "C-c d") 'dashboard-restart)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun dashboard-restart ()
+    (interactive)
+    (dashboard-insert-startupify-lists)
+    (switch-to-buffer "*dashboard*"))
+  (global-set-key (kbd "C-c d") 'dashboard-restart)
+#+END_SRC
 ** Annoyances
 *** Don't make extra files on the filesystem
-    #+BEGIN_SRC emacs-lisp
-      (setq make-backup-files nil
-	    auto-save-default nil)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq make-backup-files nil
+	auto-save-default nil)
+#+END_SRC
 *** Make scrolling a little less crazy
-    #+BEGIN_SRC emacs-lisp
-      (setq scroll-conservatively 100)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq scroll-conservatively 100)
+#+END_SRC
 *** Replace "yes or no" prompts with "y or n"
-    #+BEGIN_SRC emacs-lisp
-      (defalias 'yes-or-no-p 'y-or-n-p)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
 *** If on a system with a bell, shut it up
-    #+BEGIN_SRC emacs-lisp
-      (setq ring-bell-function 'ignore)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq ring-bell-function 'ignore)
+#+END_SRC
 *** Move between SubWords as well as between words
-    #+BEGIN_SRC emacs-lisp
-      (global-subword-mode 1)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (global-subword-mode 1)
+#+END_SRC
 *** UTF-8 encoding
-    #+BEGIN_SRC emacs-lisp
-      (setq locale-coding-system 'utf-8)
-      (set-terminal-coding-system 'utf-8)
-      (set-keyboard-coding-system 'utf-8)
-      (set-selection-coding-system 'utf-8)
-      (prefer-coding-system 'utf-8)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq locale-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (prefer-coding-system 'utf-8)
+#+END_SRC
 *** Disable suspending emacs
-    #+BEGIN_SRC emacs-lisp
-      (global-unset-key (kbd "C-z"))
-      (global-unset-key (kbd "C-x C-z"))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (global-unset-key (kbd "C-z"))
+  (global-unset-key (kbd "C-x C-z"))
+#+END_SRC
 ** Menus/Commands
 *** Enable ido-mode
-    #+BEGIN_SRC emacs-lisp
-      (setq ido-mode-flex-matching nil
-	    ido-create-new-buffer 'always
-	    ido-everywhere t)
-      (ido-mode 1)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq ido-mode-flex-matching nil
+	ido-create-new-buffer 'always
+	ido-everywhere t)
+  (ido-mode 1)
+#+END_SRC
 *** ido-vertical-mode package (make ido-mode less ugly)
-    #+BEGIN_SRC emacs-lisp
-      (use-package ido-vertical-mode
-	:ensure t
-	:init (ido-vertical-mode 1))
-      (setq ido-vertical-define-keys 'C-n-and-C-p-only)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package ido-vertical-mode
+    :ensure t
+    :init (ido-vertical-mode 1))
+  (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+#+END_SRC
 *** smex package (M-x but ido style)
-    #+BEGIN_SRC emacs-lisp
-      (use-package smex
-	:ensure t
-	:bind ("M-x" . smex))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package smex
+    :ensure t
+    :bind ("M-x" . smex))
+#+END_SRC
 *** which-key package (small menus to help with commands)
-    #+BEGIN_SRC emacs-lisp
-      (use-package which-key
-	:ensure t
-	:init (which-key-mode 1))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t
+    :init (which-key-mode 1))
+#+END_SRC
 *** popup-kill-ring package (easier time managing the kill ring)
-    #+BEGIN_SRC emacs-lisp
-      (use-package popup-kill-ring
-	:ensure t
-	:bind ("M-y" . popup-kill-ring))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package popup-kill-ring
+    :ensure t
+    :bind ("M-y" . popup-kill-ring))
+#+END_SRC
 *** swiper package (better searches)
-    #+BEGIN_SRC emacs-lisp
-      (use-package swiper
-	:ensure t
-	:bind ("C-s" . swiper))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+    :ensure t
+    :bind ("C-s" . swiper))
+#+END_SRC
 ** General packages
 *** auto-package-update package (self-explanatory)
-    #+BEGIN_SRC emacs-lisp
-      (use-package auto-package-update
-	:ensure t
-	:config
-	(require 'auto-package-update)
-	(setq auto-package-update-interval 2
-	      auto-package-update-delete-old-versions t
-	      auto-package-update-hide-results t)
-	(auto-package-update-maybe))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package auto-package-update
+    :ensure t
+    :config
+    (require 'auto-package-update)
+    (setq auto-package-update-interval 2
+	  auto-package-update-delete-old-versions t
+	  auto-package-update-hide-results t)
+    (auto-package-update-maybe))
+#+END_SRC
 *** avy package (faster moving around documents)
-    #+BEGIN_SRC emacs-lisp
-      (use-package avy
-	:ensure t
-	:bind ("M-s" . avy-goto-char))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :ensure t
+    :bind ("M-s" . avy-goto-char))
+#+END_SRC
 *** hungry-delete package (convenient deletion of trailing whitespace)
-    #+BEGIN_SRC emacs-lisp
-      (use-package hungry-delete
-	:ensure t
-	:config (global-hungry-delete-mode))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package hungry-delete
+    :ensure t
+    :config (global-hungry-delete-mode))
+#+END_SRC
 *** nov package (epub reader)
-    #+BEGIN_SRC emacs-lisp
-      (use-package nov
-	:ensure t
-	:config
-	(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-	(add-hook 'nov-mode-hook
-		  (lambda ()
-		    (visual-line-mode 1))))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package nov
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+    (add-hook 'nov-mode-hook
+	      (lambda ()
+		(visual-line-mode 1))))
+#+END_SRC
 ** Convenience
 *** Kill an entire word when you're in the middle of it
-    #+BEGIN_SRC emacs-lisp
-      (defun whole-kill-word ()
-	(interactive)
-	(backward-word)
-	(kill-word 1))
-      (global-set-key (kbd "C-c DEL") 'whole-kill-word)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun whole-kill-word ()
+    (interactive)
+    (backward-word)
+    (kill-word 1))
+  (global-set-key (kbd "C-c DEL") 'whole-kill-word)
+#+END_SRC
 *** Electric mode (OH MY GOD THIS IS SO GREAT)
-    #+BEGIN_SRC emacs-lisp
-      (setq electric-pair-pairs '((?\{ . ?\})
-				  (?\( . ?\))
-				  (?\[ . ?\])
-				  (?\" . ?\")))
-      (electric-pair-mode t)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq electric-pair-pairs '((?\{ . ?\})
+			      (?\( . ?\))
+			      (?\[ . ?\])
+			      (?\" . ?\")))
+  (electric-pair-mode t)
+#+END_SRC
 ** company package (autocompletion menu backend)
 *** Installation/configuration for use everywhere
-    #+BEGIN_SRC emacs-lisp
-      (use-package company
-	:ensure t
-	:init (add-hook 'after-init-hook 'global-company-mode)
-	:config (setq company-idle-delay 1
-		      company-minimum-prefix-length 3))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :ensure t
+    :init (add-hook 'after-init-hook 'global-company-mode)
+    :config (setq company-idle-delay 0
+		  company-minimum-prefix-length 3))
+#+END_SRC
 *** A few keybind alterations to company-active-mode
-    #+BEGIN_SRC emacs-lisp
-      (with-eval-after-load 'company
-	(define-key company-active-map (kbd "M-n") nil)
-	(define-key company-active-map (kbd "M-p") nil)
-	(define-key company-active-map (kbd "C-n") #'company-select-next)
-	(define-key company-active-map (kbd "C-p") #'company-select-previous)
-	(define-key company-active-map (kbd "SPC") #'company-abort))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (with-eval-after-load 'company
+    (define-key company-active-map (kbd "M-n") nil)
+    (define-key company-active-map (kbd "M-p") nil)
+    (define-key company-active-map (kbd "C-n") #'company-select-next)
+    (define-key company-active-map (kbd "C-p") #'company-select-previous)
+    (define-key company-active-map (kbd "SPC") #'company-abort))
+#+END_SRC
 ** Org-mode
 *** Agenda (only enabled if an agenda is found)
-    #+BEGIN_SRC emacs-lisp
-       (if (file-exists-p "~/agenda.org")
-	   (progn
-	     ;; Declare agenda file
-	     (setq org-agenda-files (quote ("~/agenda.org")))
+#+BEGIN_SRC emacs-lisp
+  (if (file-exists-p "~/agenda.org")
+      (progn
+	;; Declare agenda file
+	(setq org-agenda-files (quote ("~/agenda.org")))
 
-	     ;; C-c a for org-agenda, C-c C-a for the agenda file
-	     (defun open-agenda ()
-	       (interactive)
-	       (find-file "~/agenda.org"))
-	     (global-set-key (kbd "C-c a") 'org-agenda)
-	     (global-set-key (kbd "C-c C-a") 'open-agenda)))
-    #+END_SRC
+	;; C-c a for org-agenda, C-c C-a for the agenda file
+	(defun open-agenda ()
+	  (interactive)
+	  (find-file "~/agenda.org"))
+	(global-set-key (kbd "C-c a") 'org-agenda)
+	(global-set-key (kbd "C-c C-a") 'open-agenda)))
+#+END_SRC
 *** Use visual-line-mode in org-mode
-    #+BEGIN_SRC emacs-lisp
-      (add-hook 'org-mode-hook
-		(lambda ()
-		  (visual-line-mode 1)))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-mode-hook
+	    (lambda ()
+	      (visual-line-mode 1)))
+#+END_SRC
 *** Shortcuts for various code snippets in org-mode
-    #+BEGIN_SRC emacs-lisp
-      (add-to-list 'org-structure-template-alist
-		   '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
-      (add-to-list 'org-structure-template-alist
-		   '("py" "#+BEGIN_SRC python\n?\n#+END_SRC"))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-structure-template-alist
+	       '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+  (add-to-list 'org-structure-template-alist
+	       '("py" "#+BEGIN_SRC python\n?\n#+END_SRC"))
+#+END_SRC
 *** Use the current window when editing source code in org-mode
-    #+BEGIN_SRC emacs-lisp
-      (setq org-src-window-setup 'current-window)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-window-setup 'current-window)
+#+END_SRC
 ** Buffers/Windows
 *** Sloppy focus
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (setq focus-follows-mouse t
 	mouse-autoselect-window t)
-    #+END_SRC
+#+END_SRC
 *** Kill current buffer with C-x k, use C-x C-k to kill both the buffer and window
-    #+BEGIN_SRC emacs-lisp
-      (defun kill-this-buffer-and-window ()
-	"Kill the current buffer and delete the selected window (adjusted for EXWM)."
-	(interactive)
-	(let ((window-to-delete (selected-window))
-	      (buffer-to-kill (current-buffer))
-	      (delete-window-hook (lambda () (ignore-errors (delete-window)))))
-	  (unwind-protect
-	      (progn
-		(add-hook 'kill-buffer-hook delete-window-hook t t)
-		(if (kill-buffer (current-buffer))
-		    ;; If `delete-window' failed before, we return it to regenerate
-		    ;; the error so it can be seen in the echo area.
-		    (when (eq (selected-window) window-to-delete)
-		      (delete-window)))))))
-      (global-set-key (kbd "C-x k") 'kill-this-buffer)
-      (global-set-key (kbd "C-x C-k") 'kill-this-buffer-and-window)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun kill-this-buffer-and-window ()
+    "Kill the current buffer and delete the selected window (adjusted for EXWM)."
+    (interactive)
+    (let ((window-to-delete (selected-window))
+	  (buffer-to-kill (current-buffer))
+	  (delete-window-hook (lambda () (ignore-errors (delete-window)))))
+      (unwind-protect
+	  (progn
+	    (add-hook 'kill-buffer-hook delete-window-hook t t)
+	    (if (kill-buffer (current-buffer))
+		;; If `delete-window' failed before, we return it to regenerate
+		;; the error so it can be seen in the echo area.
+		(when (eq (selected-window) window-to-delete)
+		  (delete-window)))))))
+  (global-set-key (kbd "C-x k") 'kill-this-buffer)
+  (global-set-key (kbd "C-x C-k") 'kill-this-buffer-and-window)
+#+END_SRC
 *** Use ibuffer so the buffer list doesn't open a new window
-    #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x b") 'ibuffer)
-    #+END_SRC
+#+END_SRC
 *** Use buffer switching on C-x C-b
-    #+BEGIN_SRC emacs-lisp
-      (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
+#+END_SRC
 *** Move focus when explicitly creating new windows
-    #+BEGIN_SRC emacs-lisp
-      (defun split-and-follow-vertical ()
-	(interactive)
-	(split-window-below)
-	(other-window 1))
-      (global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
+#+BEGIN_SRC emacs-lisp
+  (defun split-and-follow-vertical ()
+    (interactive)
+    (split-window-below)
+    (other-window 1))
+  (global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
 
-      (defun split-and-follow-horizontal ()
-	(interactive)
-	(split-window-right)
-	(other-window 1))
-      (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
-    #+END_SRC
+  (defun split-and-follow-horizontal ()
+    (interactive)
+    (split-window-right)
+    (other-window 1))
+  (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
+#+END_SRC
 *** Balance windows with C-c b
-    #+BEGIN_SRC emacs-lisp
-      (global-set-key (kbd "C-c b") 'balance-windows)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c b") 'balance-windows)
+#+END_SRC
 *** switch-window package (easier movement between windows)
-    #+BEGIN_SRC emacs-lisp
-      (use-package switch-window
-	:ensure t
-	:config
-	(setq switch-window-input-style 'minibuffer)
-	(setq switch-window-increase 4)
-	(setq switch-window-threshold 2)
-	(setq switch-window-shortcut-style 'qwerty)
-	(setq switch-window-qwerty-shortcuts
-	      '("a" "s" "d" "f" "g" "z" "x" "c" "v" "b"))
-	:bind
-	([remap other-window] . switch-window))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package switch-window
+    :ensure t
+    :config
+    (setq switch-window-input-style 'minibuffer
+	  switch-window-increase 4
+	  switch-window-threshold 2
+	  switch-window-shortcut-style 'qwerty
+	  switch-window-qwerty-shortcuts '("a" "s" "d" "f" "g"
+					   "z" "x" "c" "v" "b"))
+    :bind
+    ([remap other-window] . switch-window))
+#+END_SRC
 ** Configuration
 *** Open configuration with C-c e
-    #+BEGIN_SRC emacs-lisp
-      (defun config-visit ()
-	(interactive)
-	(find-file "~/.emacs.d/config.org"))
-      (global-set-key (kbd "C-c e") 'config-visit)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun config-visit ()
+    (interactive)
+    (find-file "~/.emacs.d/config.org"))
+  (global-set-key (kbd "C-c e") 'config-visit)
+#+END_SRC
 *** Reload configuration with C-c r
-    #+BEGIN_SRC emacs-lisp
-      (defun config-reload ()
-	(interactive)
-	(org-babel-load-file
-	 (expand-file-name "~/.emacs.d/config.org")))
-      (global-set-key (kbd "C-c r") 'config-reload)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun config-reload ()
+    (interactive)
+    (org-babel-load-file
+     (expand-file-name "~/.emacs.d/config.org")))
+  (global-set-key (kbd "C-c r") 'config-reload)
+#+END_SRC
 ** Programming
 *** magit package (git but made easier)
-    #+BEGIN_SRC emacs-lisp
-      (use-package magit
-	:ensure t
-	:bind ("C-c g" . magit-status))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure t
+    :bind ("C-c g" . magit-status))
+#+END_SRC
 * EXWM (Emacs X Window Manager)
 ** Configuration
 *** exwm package (base window manager)
-    #+BEGIN_SRC emacs-lisp
-      (use-package exwm
-	:ensure t
-	:config
-	(require 'exwm)
-	(require 'exwm-randr)
-	(require 'exwm-config)
-	(require 'exwm-systemtray))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package exwm
+    :ensure t
+    :config
+    (require 'exwm)
+    (require 'exwm-randr)
+    (require 'exwm-config)
+    (require 'exwm-systemtray))
+#+END_SRC
 *** dmenu package (dmenu but for emacs)
-    #+BEGIN_SRC emacs-lisp
-      (use-package dmenu
-	:ensure t
-	:bind (("s-x" . dmenu)
-	       :map exwm-mode-map
-	       ("s-x" . dmenu)))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package dmenu
+    :ensure t
+    :bind (("s-x" . dmenu)
+	   :map exwm-mode-map
+	   ("s-x" . dmenu)))
+#+END_SRC
 *** Configure multi-head
-    #+BEGIN_SRC emacs-lisp
-      (setq exwm-randr-workspace-output-plist '(0 "LVDS1"
-						0 "eDP-1-1"
-						0 "DP-1-2-2"
-						1 "DP-1-2-1"
-						2 "DP-1-2-3"
-						3 "DP-1-2-2"
-						4 "DP-1-2-1"
-						5 "DP-1-2-3"
-						6 "DP-1-2-2"
-						7 "DP-1-2-1"
-						8 "DP-1-2-3"
-						9 "DP-1-2-2"))
-      (setq exwm-workspace-number 10)
-      (add-hook 'exwm-randr-screen-change-hook
-		(lambda ()
-		  (start-process-shell-command
-		   "xrandr" nil "ds")))
-      (exwm-randr-enable)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-randr-workspace-output-plist '(0 "LVDS1"
+					    0 "eDP-1-1"
+					    0 "DP-1-2-2"
+					    1 "DP-1-2-1"
+					    2 "DP-1-2-3"
+					    3 "DP-1-2-2"
+					    4 "DP-1-2-1"
+					    5 "DP-1-2-3"
+					    6 "DP-1-2-2"
+					    7 "DP-1-2-1"
+					    8 "DP-1-2-3"
+					    9 "DP-1-2-2"))
+  (setq exwm-workspace-number 10)
+  (add-hook 'exwm-randr-screen-change-hook
+	    (lambda ()
+	      (start-process-shell-command
+	       "xrandr" nil "ds")))
+  (exwm-randr-enable)
+#+END_SRC
 *** Name EXWM buffers after the window title
-    #+BEGIN_SRC emacs-lisp
-      (add-hook 'exwm-update-title-hook 
-		(lambda () (exwm-workspace-rename-buffer
-		       exwm-title)))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'exwm-update-title-hook 
+	    (lambda () (exwm-workspace-rename-buffer
+		   exwm-title)))
+#+END_SRC
 *** Assign workspaces and floating to various windows
-    #+BEGIN_SRC emacs-lisp
-      (setq exwm-manage-configurations
-	    '(((string= exwm-class-name "Steam")
-	       workspace 9
-	       floating t
-	       floating-mode-line nil)
-	      ((string= exwm-instance-name "telegram")
-	       workspace 8)
-	      ((string= exwm-class-name "discord")
-	       workspace 7)
-	      ((string= exwm-instance-name "libreoffice")
-	       workspace 6)
-	      ((string= exwm-instance-name "gimp")
-	       workspace 6)
-	      ((string= exwm-title "Event Tester")
-	       floating t)))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-manage-configurations
+	'(((string= exwm-class-name "Steam")
+	   workspace 9
+	   floating t
+	   floating-mode-line nil)
+	  ((string= exwm-instance-name "telegram")
+	   workspace 8)
+	  ((string= exwm-class-name "discord")
+	   workspace 7)
+	  ((string= exwm-instance-name "libreoffice")
+	   workspace 6)
+	  ((string= exwm-instance-name "gimp")
+	   workspace 6)
+	  ((string= exwm-title "Event Tester")
+	   floating t)))
+#+END_SRC
 *** Configure floating window borders
-    #+BEGIN_SRC emacs-lisp
-      (setq exwm-floating-border-width 3
-	    exwm-floating-border-color "#5d4d7a")
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-floating-border-width 3
+	exwm-floating-border-color "#335ea8")
+#+END_SRC
 ** Keybindings
 *** General global commands
-    #+BEGIN_SRC emacs-lisp
-      (setq exwm-input-global-keys
-	    `(([?\s-q] . exwm-workspace-delete)
-	      ([?\s-w] . exwm-workspace-switch)
-	      ([?\s-e] . exwm-workspace-swap)
-	      ([?\s-r] . exwm-reset)
-	      ,@(mapcar (lambda (i)
-			  `(,(kbd (format "s-%d" i)) .
-			    (lambda ()
-			      (interactive)
-			      (exwm-workspace-switch-create ,i))))
-			(number-sequence 0 9))))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-input-global-keys
+	`(([?\s-q] . exwm-workspace-delete)
+	  ([?\s-w] . exwm-workspace-switch)
+	  ([?\s-e] . exwm-workspace-swap)
+	  ([?\s-r] . exwm-reset)
+	  ,@(mapcar (lambda (i)
+		      `(,(kbd (format "s-%d" i)) .
+			(lambda ()
+			  (interactive)
+			  (exwm-workspace-switch-create ,i))))
+		    (number-sequence 0 9))))
+#+END_SRC
 *** EXWM-mode functions
 **** Send a key verbatim to the program more easily
-     #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
        (define-key exwm-mode-map (kbd "C-c C-q") nil)
        (define-key exwm-mode-map (kbd "C-q") 'exwm-input-send-next-key)
-     #+END_SRC
+#+END_SRC
 **** Inhibit toggling fullscreen
-     #+BEGIN_SRC emacs-lisp
-       (define-key exwm-mode-map (kbd "C-c C-f") nil)
-     #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (define-key exwm-mode-map (kbd "C-c C-f") nil)
+#+END_SRC
 **** Toggle floating, inhibit hiding
-     #+BEGIN_SRC emacs-lisp
-       (define-key exwm-mode-map (kbd "C-c C-t C-f") 'exwm-floating-toggle-floating)
-       (define-key exwm-mode-map (kbd "C-c C-t C-v") nil)
-     #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (define-key exwm-mode-map (kbd "C-c C-t C-f") 'exwm-floating-toggle-floating)
+  (define-key exwm-mode-map (kbd "C-c C-t C-v") nil)
+#+END_SRC
 **** Disable toggling the mode line
-     #+BEGIN_SRC emacs-lisp
-       (define-key exwm-mode-map (kbd "C-c C-t C-m") nil)
-     #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (define-key exwm-mode-map (kbd "C-c C-t C-m") nil)
+#+END_SRC
 *** Emacs key bindings in X windows
-    #+BEGIN_SRC emacs-lisp
-      (setq exwm-input-simulation-keys
-	    '(([?\C-b] . [left])
-	      ([?\C-f] . [right])
-	      ([?\C-p] . [up])
-	      ([?\C-n] . [down])
-	      ([?\C-a] . [home])
-	      ([?\C-e] . [end])
-	      ([?\C-v] . [next])
-	      ([?\M-v] . [prior])
-	      ([?\C-d] . [delete])
-	      ([?\C-k] . [S-end delete])
-	      ([?\C-w] . [?\C-x])
-	      ([?\M-w] . [?\C-c])
-	      ([?\C-y] . [?\C-v])
-	      ([?\C-s] . [?\C-f])
-	      ([?\C-\/] . [?\C-z])
-	      ([?\C-g] . [escape])))
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-input-simulation-keys
+	'(([?\C-b] . [left])
+	  ([?\C-f] . [right])
+	  ([?\C-p] . [up])
+	  ([?\C-n] . [down])
+	  ([?\C-a] . [home])
+	  ([?\C-e] . [end])
+	  ([?\C-v] . [next])
+	  ([?\M-v] . [prior])
+	  ([?\C-d] . [delete])
+	  ([?\C-k] . [S-end delete])
+	  ([?\C-w] . [?\C-x])
+	  ([?\M-w] . [?\C-c])
+	  ([?\C-y] . [?\C-v])
+	  ([?\C-s] . [?\C-f])
+	  ([?\C-\/] . [?\C-z])
+	  ([?\C-g] . [escape])))
 
-      ;; I can't do sequences above, so this is separate
-      (defun exwm-ctrl-s ()
-	(interactive) (execute-kbd-macro (kbd "C-q C-s")))
-      (define-key exwm-mode-map (kbd "C-x C-s") 'exwm-ctrl-s)
-    #+END_SRC
+  ;; I can't do sequences above, so this is separate
+  (defun exwm-ctrl-s ()
+    (interactive) (execute-kbd-macro (kbd "C-q C-s")))
+  (define-key exwm-mode-map (kbd "C-x C-s") 'exwm-ctrl-s)
+#+END_SRC
 *** Launch programs
 **** vterm package (terminal)
-     #+BEGIN_SRC emacs-lisp
-       (use-package vterm
-	 :ensure t
-	 :config (require 'vterm)
-	 :bind (("<s-return>" . vterm)
-		:map exwm-mode-map
-		("<s-return>" . vterm)))
-     #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package vterm
+    :ensure t
+    :config (require 'vterm)
+    :bind (("<s-return>" . vterm)
+	   :map exwm-mode-map
+	   ("<s-return>" . vterm)))
+#+END_SRC
 **** Calculator
-     #+BEGIN_SRC emacs-lisp
-       (require 'calc)
-       (global-set-key (kbd "C-x c") 'calc)
-       (global-set-key (kbd "<XF86Calculator>") 'calc)
-       (define-key exwm-mode-map (kbd "<XF86Calculator>") 'calc)
+#+BEGIN_SRC emacs-lisp
+  (require 'calc)
+  (global-set-key (kbd "C-x c") 'calc)
+  (global-set-key (kbd "<XF86Calculator>") 'calc)
+  (define-key exwm-mode-map (kbd "<XF86Calculator>") 'calc)
 
-       (define-key calc-mode-map (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
-     #+END_SRC
+  (define-key calc-mode-map (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
+#+END_SRC
 **** Firefox
-     #+BEGIN_SRC emacs-lisp
-       (defun run-firefox ()
-	 (interactive)
-	 (start-process-shell-command
-	  "Firefox" nil "firefox"))
-       (global-set-key (kbd "s-f") 'run-firefox)
-       (define-key exwm-mode-map (kbd "s-f") 'run-firefox)
-     #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun run-firefox ()
+    (interactive)
+    (start-process-shell-command
+     "Firefox" nil "firefox"))
+  (global-set-key (kbd "s-f") 'run-firefox)
+  (define-key exwm-mode-map (kbd "s-f") 'run-firefox)
+#+END_SRC
 **** LibreOffice
-     #+BEGIN_SRC emacs-lisp
-       (defun run-libreoffice ()
-	 (interactive)
-	 (start-process-shell-command
-	  "LibreOffice" nil "libreoffice"))
-       (global-set-key (kbd "s-b") 'run-libreoffice)
-       (define-key exwm-mode-map (kbd "s-b") 'run-libreoffice)
-     #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun run-libreoffice ()
+    (interactive)
+    (start-process-shell-command
+     "LibreOffice" nil "libreoffice"))
+  (global-set-key (kbd "s-b") 'run-libreoffice)
+  (define-key exwm-mode-map (kbd "s-b") 'run-libreoffice)
+#+END_SRC
 **** GIMP
-     #+BEGIN_SRC emacs-lisp
-       (defun run-gimp ()
-	 (interactive)
-	 (start-process-shell-command
-	  "GIMP" nil "gimp"))
-       (global-set-key (kbd "s-g") 'run-gimp)
-       (define-key exwm-mode-map (kbd "s-g") 'run-gimp)
-     #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun run-gimp ()
+    (interactive)
+    (start-process-shell-command
+     "GIMP" nil "gimp"))
+  (global-set-key (kbd "s-g") 'run-gimp)
+  (define-key exwm-mode-map (kbd "s-g") 'run-gimp)
+#+END_SRC
 **** Telegram
-     #+BEGIN_SRC emacs-lisp
-       (defun run-tg ()
-	 (interactive)
-	 (start-process-shell-command
-	  "Telegram" nil "telegram"))
-       (global-set-key (kbd "s-t") 'run-tg)
-       (define-key exwm-mode-map (kbd "s-t") 'run-tg)
-     #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun run-tg ()
+    (interactive)
+    (start-process-shell-command
+     "Telegram" nil "telegram"))
+  (global-set-key (kbd "s-t") 'run-tg)
+  (define-key exwm-mode-map (kbd "s-t") 'run-tg)
+#+END_SRC
 **** Discord
-     #+BEGIN_SRC emacs-lisp
-       (defun run-discord ()
-	 (interactive)
-	 (start-process-shell-command
-	  "Discord" nil "discord"))
-       (global-set-key (kbd "s-d") 'run-discord)
-       (define-key exwm-mode-map (kbd "s-d") 'run-discord)
-     #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun run-discord ()
+    (interactive)
+    (start-process-shell-command
+     "Discord" nil "discord"))
+  (global-set-key (kbd "s-d") 'run-discord)
+  (define-key exwm-mode-map (kbd "s-d") 'run-discord)
+#+END_SRC
 **** Steam
-     #+BEGIN_SRC emacs-lisp
-       (defun run-steam ()
-	 (interactive)
-	 (start-process-shell-command
-	  "Steam" nil "steam"))
-       (global-set-key (kbd "s-s") 'run-steam)
-       (define-key exwm-mode-map (kbd "s-s") 'run-steam)
-     #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun run-steam ()
+    (interactive)
+    (start-process-shell-command
+     "Steam" nil "steam"))
+  (global-set-key (kbd "s-s") 'run-steam)
+  (define-key exwm-mode-map (kbd "s-s") 'run-steam)
+#+END_SRC
 **** Network Settings
-     #+BEGIN_SRC emacs-lisp
-       (defun network-settings ()
-	 (interactive)
-	 (start-process-shell-command
-	  "Connections" nil "nm-connection-editor")
-	 (async-shell-command "nmcli dev wifi list"))
+#+BEGIN_SRC emacs-lisp
+  (defun network-settings ()
+    (interactive)
+    (start-process-shell-command
+     "Connections" nil "nm-connection-editor")
+    (async-shell-command "nmcli dev wifi list"))
 
-       (global-set-key (kbd "s-n") 'network-settings)
-       (define-key exwm-mode-map (kbd "s-n") 'network-settings)
-    #+END_SRC
+  (global-set-key (kbd "s-n") 'network-settings)
+  (define-key exwm-mode-map (kbd "s-n") 'network-settings)
+#+END_SRC
 *** Other useful functions
 **** Volume control
-     #+BEGIN_SRC emacs-lisp
-       (defun volume-mute ()
-	 (interactive)
-	 (shell-command "volctl m"))
-       (global-set-key (kbd "<XF86AudioMute>") 'volume-mute)
-       (define-key exwm-mode-map (kbd "<XF86AudioMute>") 'volume-mute)
+#+BEGIN_SRC emacs-lisp
+  (defun volume-mute ()
+    (interactive)
+    (shell-command "volctl m"))
+  (global-set-key (kbd "<XF86AudioMute>") 'volume-mute)
+  (define-key exwm-mode-map (kbd "<XF86AudioMute>") 'volume-mute)
 
-       (defun volume-mic-mute ()
-	 (interactive)
-	 (shell-command "volctl t"))
-       (global-set-key (kbd "<XF86AudioMicMute>") 'volume-mic-mute)
-       (define-key exwm-mode-map (kbd "<XF86AudioMicMute>") 'volume-mic-mute)
+  (defun volume-mic-mute ()
+    (interactive)
+    (shell-command "volctl t"))
+  (global-set-key (kbd "<XF86AudioMicMute>") 'volume-mic-mute)
+  (define-key exwm-mode-map (kbd "<XF86AudioMicMute>") 'volume-mic-mute)
 
-       (defun volume-up ()
-	 (interactive)
-	 (shell-command "volctl u"))
-       (global-set-key (kbd "<XF86AudioRaiseVolume>") 'volume-up)
-       (define-key exwm-mode-map (kbd "<XF86AudioRaiseVolume>") 'volume-up)
+  (defun volume-up ()
+    (interactive)
+    (shell-command "volctl u"))
+  (global-set-key (kbd "<XF86AudioRaiseVolume>") 'volume-up)
+  (define-key exwm-mode-map (kbd "<XF86AudioRaiseVolume>") 'volume-up)
 
-       (defun volume-down ()
-	 (interactive)
-	 (shell-command "volctl d"))
-       (global-set-key (kbd "<XF86AudioLowerVolume>") 'volume-down)
-       (define-key exwm-mode-map (kbd "<XF86AudioLowerVolume>") 'volume-down)
-     #+END_SRC
+  (defun volume-down ()
+    (interactive)
+    (shell-command "volctl d"))
+  (global-set-key (kbd "<XF86AudioLowerVolume>") 'volume-down)
+  (define-key exwm-mode-map (kbd "<XF86AudioLowerVolume>") 'volume-down)
+#+END_SRC
 **** Brightness control
-     #+BEGIN_SRC emacs-lisp
-       (defun backlight-up ()
-	 (interactive)
-	 (shell-command "blctl -u"))
-       (global-set-key (kbd "<XF86MonBrightnessUp>") 'backlight-up)
-       (define-key exwm-mode-map (kbd "<XF86MonBrightnessUp>") 'backlight-up)
+#+BEGIN_SRC emacs-lisp
+  (defun backlight-up ()
+    (interactive)
+    (shell-command "blctl -u"))
+  (global-set-key (kbd "<XF86MonBrightnessUp>") 'backlight-up)
+  (define-key exwm-mode-map (kbd "<XF86MonBrightnessUp>") 'backlight-up)
 
-       (defun backlight-down ()
-	 (interactive)
-	 (shell-command "blctl -d"))
-       (global-set-key (kbd "<XF86MonBrightnessDown>") 'backlight-down)
-       (define-key exwm-mode-map (kbd "<XF86MonBrightnessDown>") 'backlight-down)
-     #+END_SRC
+  (defun backlight-down ()
+    (interactive)
+    (shell-command "blctl -d"))
+  (global-set-key (kbd "<XF86MonBrightnessDown>") 'backlight-down)
+  (define-key exwm-mode-map (kbd "<XF86MonBrightnessDown>") 'backlight-down)
+#+END_SRC
 **** Take screenshots
-     #+BEGIN_SRC emacs-lisp
-       (defun screencap-section ()
-	 (interactive)
-	 (shell-command
-	  "maim -s /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
-       (global-set-key (kbd "<print>") 'screencap-section)
-       (define-key exwm-mode-map (kbd "<print>") 'screencap-section)
+#+BEGIN_SRC emacs-lisp
+  (defun screencap-section ()
+    (interactive)
+    (shell-command
+     "maim -s /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
+  (global-set-key (kbd "<print>") 'screencap-section)
+  (define-key exwm-mode-map (kbd "<print>") 'screencap-section)
 
-       (defun screencap-full ()
-	 (interactive)
-	 (shell-command
-	  "maim /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
-       (global-set-key (kbd "<C-print>") 'screencap-full)
-       (define-key exwm-mode-map (kbd "<C-print>") 'screencap-full)
-     #+END_SRC
+  (defun screencap-full ()
+    (interactive)
+    (shell-command
+     "maim /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
+  (global-set-key (kbd "<C-print>") 'screencap-full)
+  (define-key exwm-mode-map (kbd "<C-print>") 'screencap-full)
+#+END_SRC
 **** Keyboard layout selection
-     #+BEGIN_SRC emacs-lisp
-       (defun cycle-kbd-layout ()
-	 (interactive)
-	 (shell-command "keyctl -c us epo de"))
-       (global-set-key (kbd "s-SPC") 'cycle-kbd-layout)
-       (define-key exwm-mode-map (kbd "s-SPC") 'cycle-kbd-layout)
-     #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun cycle-kbd-layout ()
+    (interactive)
+    (shell-command "keyctl -c us epo de"))
+  (global-set-key (kbd "s-SPC") 'cycle-kbd-layout)
+  (define-key exwm-mode-map (kbd "s-SPC") 'cycle-kbd-layout)
+#+END_SRC
 **** Lockscreen
-     #+BEGIN_SRC emacs-lisp
-       (defun lock-screen ()
-	 (interactive)
-	 (start-process-shell-command
-	  "Lockscreen" nil "i3l"))
-       (global-set-key (kbd "<XF86ScreenSaver>") 'lock-screen)
-       (define-key exwm-mode-map (kbd "<XF86ScreenSaver>") 'lock-screen)
+#+BEGIN_SRC emacs-lisp
+  (defun lock-screen ()
+    (interactive)
+    (start-process-shell-command
+     "Lockscreen" nil "i3l"))
+  (global-set-key (kbd "<XF86ScreenSaver>") 'lock-screen)
+  (define-key exwm-mode-map (kbd "<XF86ScreenSaver>") 'lock-screen)
 
-       (global-set-key (kbd "s-l") 'lock-screen)
-       (define-key exwm-mode-map (kbd "s-l") 'lock-screen)
-     #+END_SRC
+  (global-set-key (kbd "s-l") 'lock-screen)
+  (define-key exwm-mode-map (kbd "s-l") 'lock-screen)
+#+END_SRC
 **** Shutting down
-     #+BEGIN_SRC emacs-lisp
-       (defun shutdown-computer ()
-	 (interactive)
-	 (shell-command "shutdown now"))
-       (global-set-key (kbd "C-x C-M-c") 'shutdown-computer)
-       (define-key exwm-mode-map (kbd "C-x C-M-c") 'shutdown-computer)
-     #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun shutdown-computer ()
+    (interactive)
+    (shell-command "shutdown now"))
+  (global-set-key (kbd "C-x C-M-c") 'shutdown-computer)
+  (define-key exwm-mode-map (kbd "C-x C-M-c") 'shutdown-computer)
+#+END_SRC
 ** On Startup
 *** Set fallback cursor
-    #+BEGIN_SRC emacs-lisp
-      (shell-command "xsetroot -cursor_name left_ptr")
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (shell-command "xsetroot -cursor_name left_ptr")
+#+END_SRC
 *** Disable screen blanking
-    #+BEGIN_SRC emacs-lisp
-      (shell-command "xset s off -dpms")
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (shell-command "xset s off -dpms")
+#+END_SRC
 *** Set keyboard layout to US
-    #+BEGIN_SRC emacs-lisp
-      (shell-command "keyctl -s us")
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (shell-command "keyctl -s us")
+#+END_SRC
 *** Swap ctrl and capslock
-    #+BEGIN_SRC emacs-lisp
-      (shell-command "setxkbmap -option ctrl:nocaps")
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (shell-command "setxkbmap -option ctrl:nocaps")
+#+END_SRC
 *** Compositor
-    #+BEGIN_SRC emacs-lisp
-      (start-process-shell-command
-       "Compositor" nil "xcompmgr")
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (start-process-shell-command
+   "Compositor" nil "xcompmgr")
+#+END_SRC
 *** Notification manager
-    #+BEGIN_SRC emacs-lisp
-      (start-process-shell-command
-       "Notifications" nil "dunst")
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (start-process-shell-command
+   "Notifications" nil "dunst")
+#+END_SRC
 ** Initialize EXWM
-   #+BEGIN_SRC emacs-lisp
-    (exwm-enable)
-    (exwm-config-ido)
-    (exwm-systemtray-enable)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (exwm-enable)
+  (exwm-config-ido)
+  (exwm-systemtray-enable)
+#+END_SRC
 * EMMS (Emacs MultiMedia System)
 ** Install EMMS and bind main playback keys
-   #+BEGIN_SRC emacs-lisp
-     (use-package emms
-       :ensure t
-       :config
-       (require 'emms-setup)
-       (require 'emms-player-mpd)
-       (emms-all)
-       (setq emms-seek-seconds 5
-	     emms-player-list '(emms-player-mpd)
-	     emms-info-functions '(emms-info mpd)
-	     emms-player-mpd-server-name "localhost"
-	     emms-player-mpd-server-port "6601"
-	     mpc-host "localhost:6601")
-       :bind (("s-a v" . emms)
-	      ("s-a b" . emms-smart-browse)
-	      ("s-a r c" . emms-player-mpd-update-all-reset-cache)
-	      ("<XF86AudioPrev>" . emms-previous)
-	      ("<XF86AudioNext>" . emms-next)
-	      ("<XF86AudioPlay>" . emms-pause)
-	      ("<XF86AudioStop>" . emms-stop)
-	      ("<s-left>" . emms-previous)
-	      ("<s-right>" . emms-next)
-	      ("<s-down>" . emms-pause)
-	      ("<s-up>" . emms-stop)
-	      :map exwm-mode-map
-	      ("s-a v" . emms)
-	      ("s-a b" . emms-smart-browse)
-	      ("s-a r c" . emms-player-mpd-update-all-reset-cache)
-	      ("<XF86AudioPrev>" . emms-previous)
-	      ("<XF86AudioNext>" . emms-next)
-	      ("<XF86AudioPlay>" . emms-pause)
-	      ("<XF86AudioStop>" . emms-stop)
-	      ("<s-left>" . emms-previous)
-	      ("<s-right>" . emms-next)
-	      ("<s-down>" . emms-pause)
-	      ("<s-up>" . emms-stop)))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package emms
+    :ensure t
+    :config
+    (require 'emms-setup)
+    (require 'emms-player-mpd)
+    (emms-all)
+    (setq emms-seek-seconds 5
+	  emms-player-list '(emms-player-mpd)
+	  emms-info-functions '(emms-info mpd)
+	  emms-player-mpd-server-name "localhost"
+	  emms-player-mpd-server-port "6601"
+	  mpc-host "localhost:6601")
+    :bind (("s-a v" . emms)
+	   ("s-a b" . emms-smart-browse)
+	   ("s-a r c" . emms-player-mpd-update-all-reset-cache)
+	   ("<XF86AudioPrev>" . emms-previous)
+	   ("<XF86AudioNext>" . emms-next)
+	   ("<XF86AudioPlay>" . emms-pause)
+	   ("<XF86AudioStop>" . emms-stop)
+	   ("<s-left>" . emms-previous)
+	   ("<s-right>" . emms-next)
+	   ("<s-down>" . emms-pause)
+	   ("<s-up>" . emms-stop)
+	   :map exwm-mode-map
+	   ("s-a v" . emms)
+	   ("s-a b" . emms-smart-browse)
+	   ("s-a r c" . emms-player-mpd-update-all-reset-cache)
+	   ("<XF86AudioPrev>" . emms-previous)
+	   ("<XF86AudioNext>" . emms-next)
+	   ("<XF86AudioPlay>" . emms-pause)
+	   ("<XF86AudioStop>" . emms-stop)
+	   ("<s-left>" . emms-previous)
+	   ("<s-right>" . emms-next)
+	   ("<s-down>" . emms-pause)
+	   ("<s-up>" . emms-stop)))
+#+END_SRC
 ** Other useful bindings
 *** Start the daemon
-    #+BEGIN_SRC emacs-lisp
-      (defun mpd/start-music-daemon ()
-	"Start MPD, connect to it and syncs the metadata cache"
-	(interactive)
-	(shell-command "mpd")
-	(mpd/update-database)
-	(emms-player-mpd-connect)
-	(emms-cache-set-from-mpd-all)
-	(message "MPD started!"))
-      (global-set-key (kbd "s-a x") 'mpd/start-music-daemon)
-      (define-key exwm-mode-map (kbd "s-a x") 'mpd/start-music-daemon)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun mpd/start-music-daemon ()
+    "Start MPD, connect to it and syncs the metadata cache"
+    (interactive)
+    (shell-command "mpd")
+    (mpd/update-database)
+    (emms-player-mpd-connect)
+    (emms-cache-set-from-mpd-all)
+    (message "MPD started!"))
+  (global-set-key (kbd "s-a x") 'mpd/start-music-daemon)
+  (define-key exwm-mode-map (kbd "s-a x") 'mpd/start-music-daemon)
+#+END_SRC
 *** Stop the daemon
-    #+BEGIN_SRC emacs-lisp
-      (defun mpd/kill-music-daemon ()
-	"Stops playback and kills the music daemon."
-	(interactive)
-	(emms-stop)
-	(call-process "killall" nil nil nil "mpd")
-	(message "MPD killed!"))
-      (global-set-key (kbd "s-a q") 'mpd/kill-music-daemon)
-      (define-key exwm-mode-map (kbd "s-a q") 'mpd/kill-music-daemon)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun mpd/kill-music-daemon ()
+    "Stops playback and kills the music daemon."
+    (interactive)
+    (emms-stop)
+    (call-process "killall" nil nil nil "mpd")
+    (message "MPD killed!"))
+  (global-set-key (kbd "s-a q") 'mpd/kill-music-daemon)
+  (define-key exwm-mode-map (kbd "s-a q") 'mpd/kill-music-daemon)
+#+END_SRC
 *** Update the database
-    #+BEGIN_SRC emacs-lisp
-      (defun mpd/update-database ()
-	"Update the MPD database synchronously."
-	(interactive)
-	(call-process "mpc" nil nil nil "update")
-	(message "MPD database updated!"))
-      (global-set-key (kbd "s-a r d") 'mpd/update-database)
-      (define-key exwm-mode-map (kbd "s-a r d") 'mpd/update-database)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun mpd/update-database ()
+    "Update the MPD database synchronously."
+    (interactive)
+    (call-process "mpc" nil nil nil "update")
+    (message "MPD database updated!"))
+  (global-set-key (kbd "s-a r d") 'mpd/update-database)
+  (define-key exwm-mode-map (kbd "s-a r d") 'mpd/update-database)
+#+END_SRC
 *** Playback status (current track)
-    #+BEGIN_SRC emacs-lisp
-      (defun mpc-status ()
-	(interactive)
-	(shell-command "mpc"))
-      (global-set-key (kbd "s-a a") 'mpc-status)
-      (define-key exwm-mode-map (kbd "s-a a") 'mpc-status)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun mpc-status ()
+    (interactive)
+    (shell-command "mpc"))
+  (global-set-key (kbd "s-a a") 'mpc-status)
+  (define-key exwm-mode-map (kbd "s-a a") 'mpc-status)
+#+END_SRC
 *** Shuffle current list or shuffle all songs
-    #+BEGIN_SRC emacs-lisp
-      (defun emms-shuffle-message ()
-	(interactive)
-	(emms-shuffle)
-	(message "Playlist has been shuffled."))
-      (global-set-key (kbd "s-a s") 'emms-shuffle-message)
-      (define-key exwm-mode-map (kbd "s-a s") 'emms-shuffle-message)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun emms-shuffle-message ()
+    (interactive)
+    (emms-shuffle)
+    (message "Playlist has been shuffled."))
+  (global-set-key (kbd "s-a s") 'emms-shuffle-message)
+  (define-key exwm-mode-map (kbd "s-a s") 'emms-shuffle-message)
+#+END_SRC
 *** Set repeat mode
-    #+BEGIN_SRC emacs-lisp
-      (global-set-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
-      (define-key exwm-mode-map (kbd "s-a r a") 'emms-toggle-repeat-playlist)
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
+  (define-key exwm-mode-map (kbd "s-a r a") 'emms-toggle-repeat-playlist)
 
-      (global-set-key (kbd "s-a r t") 'emms-toggle-repeat-track)
-      (define-key exwm-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
-    #+END_SRC
+  (global-set-key (kbd "s-a r t") 'emms-toggle-repeat-track)
+  (define-key exwm-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
+#+END_SRC
 * General Looks
 ** Theme
-   #+BEGIN_SRC emacs-lisp
-     (use-package dracula-theme
-       :ensure t
-       :config (load-theme 'dracula t))
-   #+END_SRC
-** Hide useless things ASAP
-    #+BEGIN_SRC emacs-lisp
-      (menu-bar-mode -1)
-      (tooltip-mode -1)
-      (tool-bar-mode -1)
-      (scroll-bar-mode -1)
-      (setq use-dialog-box nil)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package leuven-theme
+    :ensure t
+    :config
+    (setq org-fontify-whole-heading-line t
+	  leuven-scale-org-agenda-structure t
+	  leuven-scale-outline-headlines t)
+    (load-theme 'leuven t))
+#+END_SRC
+** Hide useless things
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
+  (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq use-dialog-box nil)
+#+END_SRC
 ** Window dividers, no fringes
-   #+BEGIN_SRC emacs-lisp
-     (setq window-divider-default-right-width 3)
-     (set-face-foreground 'window-divider-first-pixel "#b45bcf")
-     (set-face-foreground 'window-divider "#b45bcf")
-     (set-face-foreground 'window-divider-last-pixel "#b45bcf")
-     (window-divider-mode 1)
-     (fringe-mode 5)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq window-divider-default-right-width 3)
+  (set-face-foreground 'window-divider-first-pixel "#335ea8")
+  (set-face-foreground 'window-divider "#335ea8")
+  (set-face-foreground 'window-divider-last-pixel "#335ea8")
+  (window-divider-mode 1)
+  (fringe-mode 5)
+#+END_SRC
 ** Line/column numbers
 *** Show line and column numbers in the status line
-    #+BEGIN_SRC emacs-lisp
-      (line-number-mode 1)
-      (column-number-mode 1)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (line-number-mode 1)
+  (column-number-mode 1)
+#+END_SRC
 *** Show line numbers in all modes unless I specify otherwise
     #+BEGIN_SRC emacs-lisp
       (global-display-line-numbers-mode 1)
@@ -776,66 +774,66 @@
     #+END_SRC
 ** Prettify symbols/text
 *** Convert various text to symbols in programming modes
-    #+BEGIN_SRC emacs-lisp
-      (global-prettify-symbols-mode 1)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (global-prettify-symbols-mode 1)
+#+END_SRC
 *** rainbow package (show colors when typed as hex codes)
-    #+BEGIN_SRC emacs-lisp
-      (use-package rainbow-mode
-	:ensure t
-	:config
-	(define-globalized-minor-mode global-rainbow-mode rainbow-mode
-	  (lambda () (rainbow-mode 1)))
-	(global-rainbow-mode 1))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode
+    :ensure t
+    :config
+    (define-globalized-minor-mode global-rainbow-mode rainbow-mode
+      (lambda () (rainbow-mode 1)))
+    (global-rainbow-mode 1))
+#+END_SRC
 *** rainbow-delimiters package (better quotes/parentheses/brackets)
-    #+BEGIN_SRC emacs-lisp
-      (use-package rainbow-delimiters
-	:ensure t
-	:init
-	(add-hook 'prog-mode-hook #'rainbow-delimiters-mode 1))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :init
+    (add-hook 'prog-mode-hook #'rainbow-delimiters-mode 1))
+#+END_SRC
 *** org-bullets package (nicer bullet points in org-mode)
-    #+BEGIN_SRC emacs-lisp
-      (use-package org-bullets
-	:ensure t
-	:config (require 'org-bullets)
-	(add-hook 'org-mode-hook (lambda ()
-				   (org-bullets-mode 1)))
-	(setq inhibit-compacting-font-caches t))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :config (require 'org-bullets)
+    (add-hook 'org-mode-hook (lambda ()
+			       (org-bullets-mode 1)))
+    (setq inhibit-compacting-font-caches t))
+#+END_SRC
 ** Mode Line
 *** Show clock on mode line
-    #+BEGIN_SRC emacs-lisp
-      (setq display-time-24hr-format t)
-      (display-time-mode 1)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq display-time-24hr-format t)
+  (display-time-mode 1)
+#+END_SRC
 *** fancy-battery package (battery on mode line)
-    #+BEGIN_SRC emacs-lisp
-      (use-package fancy-battery
-	:ensure t
-	:config
-	(setq fancy-battery-show-percentage t
-	      battery-update-interval 15)
-	(fancy-battery-mode))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package fancy-battery
+    :ensure t
+    :config
+    (setq fancy-battery-show-percentage t
+	  battery-update-interval 15)
+    (fancy-battery-mode))
+#+END_SRC
 *** diminish package (hide minor modes from mode line)
-    #+BEGIN_SRC emacs-lisp
-      (use-package diminish
-	:ensure t
-	:init
-	(diminish 'hungry-delete-mode)
-	(diminish 'which-key-mode)
-	(diminish 'subword-mode)
-	(diminish 'company-mode)
-	(diminish 'rainbow-mode)
-	(diminish 'eldoc-mode))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :ensure t
+    :init
+    (diminish 'hungry-delete-mode)
+    (diminish 'which-key-mode)
+    (diminish 'subword-mode)
+    (diminish 'company-mode)
+    (diminish 'rainbow-mode)
+    (diminish 'eldoc-mode))
+#+END_SRC
 *** spaceline package (spacemacs mode line)
-    #+BEGIN_SRC emacs-lisp
-      (use-package spaceline
-	:ensure t
-	:config (require 'spaceline-config)
-	(setq powerline-default-separator (quote arrow))
-	(spaceline-emacs-theme))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline
+    :ensure t
+    :config (require 'spaceline-config)
+    (setq powerline-default-separator (quote arrow))
+    (spaceline-spacemacs-theme))
+#+END_SRC
