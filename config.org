@@ -12,16 +12,8 @@
      $ cd ~/.emacs.d
      $ make highres
    #+END_SRC
-* Functionality
+* General Functionality
 ** Startup
-*** Hide useless things ASAP
-    #+BEGIN_SRC emacs-lisp
-      (menu-bar-mode -1)
-      (tooltip-mode -1)
-      (tool-bar-mode -1)
-      (scroll-bar-mode -1)
-      (setq use-dialog-box nil)
-    #+END_SRC
 *** Start emacs server
     #+BEGIN_SRC emacs-lisp
       (server-start)
@@ -30,8 +22,7 @@
     #+BEGIN_SRC emacs-lisp
       (use-package dashboard
 	:ensure t
-	:preface
-	(setq inhibit-start-menu t)
+	:preface (setq inhibit-start-menu t)
 	:config
 	(setq dashboard-items '((recents . 10))
 	      show-week-agenda-p t
@@ -70,6 +61,14 @@
     #+BEGIN_SRC emacs-lisp
       (global-subword-mode 1)
     #+END_SRC
+*** UTF-8 encoding
+    #+BEGIN_SRC emacs-lisp
+      (setq locale-coding-system 'utf-8)
+      (set-terminal-coding-system 'utf-8)
+      (set-keyboard-coding-system 'utf-8)
+      (set-selection-coding-system 'utf-8)
+      (prefer-coding-system 'utf-8)
+    #+END_SRC
 *** Disable suspending emacs
     #+BEGIN_SRC emacs-lisp
       (global-unset-key (kbd "C-z"))
@@ -102,6 +101,12 @@
 	:ensure t
 	:init (which-key-mode 1))
     #+END_SRC
+*** popup-kill-ring package (easier time managing the kill ring)
+    #+BEGIN_SRC emacs-lisp
+      (use-package popup-kill-ring
+	:ensure t
+	:bind ("M-y" . popup-kill-ring))
+    #+END_SRC
 *** swiper package (better searches)
     #+BEGIN_SRC emacs-lisp
       (use-package swiper
@@ -132,19 +137,6 @@
 	:ensure t
 	:config (global-hungry-delete-mode))
     #+END_SRC
-*** company package (autocompletion backend)
-    #+BEGIN_SRC emacs-lisp
-      (use-package company
-	:ensure t
-	:init
-	(add-hook 'after-init-hook 'global-company-mode))
-    #+END_SRC
-*** popup-kill-ring package (easier time managing the kill ring)
-    #+BEGIN_SRC emacs-lisp
-      (use-package popup-kill-ring
-	:ensure t
-	:bind ("M-y" . popup-kill-ring))
-    #+END_SRC
 *** nov package (epub reader)
     #+BEGIN_SRC emacs-lisp
       (use-package nov
@@ -171,6 +163,24 @@
 				  (?\[ . ?\])
 				  (?\" . ?\")))
       (electric-pair-mode t)
+    #+END_SRC
+** company package (autocompletion menu backend)
+*** Installation/configuration for use everywhere
+    #+BEGIN_SRC emacs-lisp
+      (use-package company
+	:ensure t
+	:init (add-hook 'after-init-hook 'global-company-mode)
+	:config (setq company-idle-delay 1
+		      company-minimum-prefix-length 3))
+    #+END_SRC
+*** A few keybind alterations to company-active-mode
+    #+BEGIN_SRC emacs-lisp
+      (with-eval-after-load 'company
+	(define-key company-active-map (kbd "M-n") nil)
+	(define-key company-active-map (kbd "M-p") nil)
+	(define-key company-active-map (kbd "C-n") #'company-select-next)
+	(define-key company-active-map (kbd "C-p") #'company-select-previous)
+	(define-key company-active-map (kbd "SPC") #'company-abort))
     #+END_SRC
 ** Org-mode
 *** Agenda (only enabled if an agenda is found)
@@ -284,6 +294,13 @@
 	(org-babel-load-file
 	 (expand-file-name "~/.emacs.d/config.org")))
       (global-set-key (kbd "C-c r") 'config-reload)
+    #+END_SRC
+** Programming
+*** magit package (git but made easier)
+    #+BEGIN_SRC emacs-lisp
+      (use-package magit
+	:ensure t
+	:bind ("C-c g" . magit-status))
     #+END_SRC
 * EXWM (Emacs X Window Manager)
 ** Configuration
@@ -722,6 +739,14 @@
        :ensure t
        :config (load-theme 'dracula t))
    #+END_SRC
+** Hide useless things ASAP
+    #+BEGIN_SRC emacs-lisp
+      (menu-bar-mode -1)
+      (tooltip-mode -1)
+      (tool-bar-mode -1)
+      (scroll-bar-mode -1)
+      (setq use-dialog-box nil)
+    #+END_SRC
 ** Window dividers, no fringes
    #+BEGIN_SRC emacs-lisp
      (setq window-divider-default-right-width 3)
@@ -758,11 +783,7 @@
     #+BEGIN_SRC emacs-lisp
       (use-package rainbow-mode
 	:ensure t
-	:config
-	(define-globalized-minor-mode global-rainbow-mode
-	  rainbow-mode
-	  (lambda () (rainbow-mode 1)))
-	(global-rainbow-mode 1))
+	:config (add-hook 'prog-mode-hook 'rainbow-mode)
     #+END_SRC
 *** rainbow-delimiters package (better quotes/parentheses/brackets)
     #+BEGIN_SRC emacs-lisp
@@ -786,9 +807,14 @@
       (setq display-time-24hr-format t)
       (display-time-mode 1)
     #+END_SRC
-*** Show battery state on mode line
+*** fancy-battery package (battery on mode line)
     #+BEGIN_SRC emacs-lisp
-      (display-battery-mode 1)
+      (use-package fancy-battery
+	:ensure t
+	:config
+	(setq fancy-battery-show-percentage t
+	      battery-update-interval 15)
+	(fancy-battery-mode))
     #+END_SRC
 *** diminish package (hide minor modes from mode line)
     #+BEGIN_SRC emacs-lisp
