@@ -555,14 +555,16 @@
   (defun screencap-section ()
     (interactive)
     (shell-command
-     "maim -s /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
+     "maim -s /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null")
+    (message ""))
   (global-set-key (kbd "<print>") 'screencap-section)
   (define-key exwm-mode-map (kbd "<print>") 'screencap-section)
 
   (defun screencap-full ()
     (interactive)
     (shell-command
-     "maim /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
+     "maim /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null")
+    (message ""))
   (global-set-key (kbd "<C-print>") 'screencap-full)
   (define-key exwm-mode-map (kbd "<C-print>") 'screencap-full)
 #+END_SRC
