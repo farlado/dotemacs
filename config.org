@@ -504,102 +504,102 @@
        (global-set-key (kbd "s-s") 'run-steam)
        (define-key exwm-mode-map (kbd "s-s") 'run-steam)
      #+END_SRC
-*** Other useful functions
 **** Network Settings
-#+BEGIN_SRC emacs-lisp
-  (defun network-settings ()
-    (interactive)
-    (start-process-shell-command
-     "Connections" nil "nm-connection-editor")
-    (async-shell-command "nmcli dev wifi list"))
+     #+BEGIN_SRC emacs-lisp
+       (defun network-settings ()
+	 (interactive)
+	 (start-process-shell-command
+	  "Connections" nil "nm-connection-editor")
+	 (async-shell-command "nmcli dev wifi list"))
 
-  (global-set-key (kbd "s-n") 'network-settings)
-  (define-key exwm-mode-map (kbd "s-n") 'network-settings)
-#+END_SRC
+       (global-set-key (kbd "s-n") 'network-settings)
+       (define-key exwm-mode-map (kbd "s-n") 'network-settings)
+    #+END_SRC
+*** Other useful functions
 **** Volume control
-#+BEGIN_SRC emacs-lisp
-  (defun volctl-m ()
-    (interactive)
-    (shell-command "volctl m"))
-  (global-set-key (kbd "<XF86AudioMute>") 'volctl-m)
-  (define-key exwm-mode-map (kbd "<XF86AudioMute>") 'volctl-m)
+     #+BEGIN_SRC emacs-lisp
+       (defun volume-mute ()
+	 (interactive)
+	 (shell-command "volctl m"))
+       (global-set-key (kbd "<XF86AudioMute>") 'volume-mute)
+       (define-key exwm-mode-map (kbd "<XF86AudioMute>") 'volume-mute)
 
-  (defun volctl-t ()
-    (interactive)
-    (shell-command "volctl t"))
-  (global-set-key (kbd "<XF86AudioMicMute>") 'volctl-t)
-  (define-key exwm-mode-map (kbd "<XF86AudioMicMute>") 'volctl-t)
+       (defun volume-mic-mute ()
+	 (interactive)
+	 (shell-command "volctl t"))
+       (global-set-key (kbd "<XF86AudioMicMute>") 'volume-mic-mute)
+       (define-key exwm-mode-map (kbd "<XF86AudioMicMute>") 'volume-mic-mute)
 
-  (defun volctl-u ()
-    (interactive)
-    (shell-command "volctl u"))
-  (global-set-key (kbd "<XF86AudioRaiseVolume>") 'volctl-u)
-  (define-key exwm-mode-map (kbd "<XF86AudioRaiseVolume>") 'volctl-u)
+       (defun volume-up ()
+	 (interactive)
+	 (shell-command "volctl u"))
+       (global-set-key (kbd "<XF86AudioRaiseVolume>") 'volume-up)
+       (define-key exwm-mode-map (kbd "<XF86AudioRaiseVolume>") 'volume-up)
 
-  (defun volctl-d ()
-    (interactive)
-    (shell-command "volctl d"))
-  (global-set-key (kbd "<XF86AudioLowerVolume>") 'volctl-d)
-  (define-key exwm-mode-map (kbd "<XF86AudioLowerVolume>") 'volctl-d)
-#+END_SRC
+       (defun volume-down ()
+	 (interactive)
+	 (shell-command "volctl d"))
+       (global-set-key (kbd "<XF86AudioLowerVolume>") 'volume-down)
+       (define-key exwm-mode-map (kbd "<XF86AudioLowerVolume>") 'volume-down)
+     #+END_SRC
 **** Brightness control
-#+BEGIN_SRC emacs-lisp
-  (defun blctl-up ()
-    (interactive)
-    (shell-command "blctl -u"))
-  (global-set-key (kbd "<XF86MonBrightnessUp>") 'blctl-up)
-  (define-key exwm-mode-map (kbd "<XF86MonBrightnessUp>") 'blctl-up)
+     #+BEGIN_SRC emacs-lisp
+       (defun backlight-up ()
+	 (interactive)
+	 (shell-command "blctl -u"))
+       (global-set-key (kbd "<XF86MonBrightnessUp>") 'backlight-up)
+       (define-key exwm-mode-map (kbd "<XF86MonBrightnessUp>") 'backlight-up)
 
-  (defun blctl-down ()
-    (interactive)
-    (shell-command "blctl -d"))
-  (global-set-key (kbd "<XF86MonBrightnessDown>") 'blctl-down)
-  (define-key exwm-mode-map (kbd "<XF86MonBrightnessDown>") 'blctl-down)
-#+END_SRC
+       (defun backlight-down ()
+	 (interactive)
+	 (shell-command "blctl -d"))
+       (global-set-key (kbd "<XF86MonBrightnessDown>") 'backlight-down)
+       (define-key exwm-mode-map (kbd "<XF86MonBrightnessDown>") 'backlight-down)
+     #+END_SRC
 **** Take screenshots
-#+BEGIN_SRC emacs-lisp
-  (defun screencap-section ()
-    (interactive)
-    (shell-command
-     "maim -s /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
-  (global-set-key (kbd "<print>") 'screencap-section)
-  (define-key exwm-mode-map (kbd "<print>") 'screencap-section)
+     #+BEGIN_SRC emacs-lisp
+       (defun screencap-section ()
+	 (interactive)
+	 (shell-command
+	  "maim -s /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
+       (global-set-key (kbd "<print>") 'screencap-section)
+       (define-key exwm-mode-map (kbd "<print>") 'screencap-section)
 
-  (defun screencap-full ()
-    (interactive)
-    (shell-command
-     "maim /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
-  (global-set-key (kbd "<C-print>") 'screencap-full)
-  (define-key exwm-mode-map (kbd "<C-print>") 'screencap-full)
-#+END_SRC
+       (defun screencap-full ()
+	 (interactive)
+	 (shell-command
+	  "maim /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null"))
+       (global-set-key (kbd "<C-print>") 'screencap-full)
+       (define-key exwm-mode-map (kbd "<C-print>") 'screencap-full)
+     #+END_SRC
 **** Keyboard layout selection
-#+BEGIN_SRC emacs-lisp
-  (defun cycle-kbd-layout ()
-    (interactive)
-    (shell-command "keyctl -c us epo de"))
-  (global-set-key (kbd "s-SPC") 'cycle-kbd-layout)
-  (define-key exwm-mode-map (kbd "s-SPC") 'cycle-kbd-layout)
-#+END_SRC
+     #+BEGIN_SRC emacs-lisp
+       (defun cycle-kbd-layout ()
+	 (interactive)
+	 (shell-command "keyctl -c us epo de"))
+       (global-set-key (kbd "s-SPC") 'cycle-kbd-layout)
+       (define-key exwm-mode-map (kbd "s-SPC") 'cycle-kbd-layout)
+     #+END_SRC
 **** Lockscreen
-#+BEGIN_SRC emacs-lisp
-  (defun lock-screen ()
-    (interactive)
-    (start-process-shell-command
-     "Lockscreen" nil "i3l"))
-  (global-set-key (kbd "<XF86ScreenSaver>") 'lock-screen)
-  (define-key exwm-mode-map (kbd "<XF86ScreenSaver>") 'lock-screen)
+     #+BEGIN_SRC emacs-lisp
+       (defun lock-screen ()
+	 (interactive)
+	 (start-process-shell-command
+	  "Lockscreen" nil "i3l"))
+       (global-set-key (kbd "<XF86ScreenSaver>") 'lock-screen)
+       (define-key exwm-mode-map (kbd "<XF86ScreenSaver>") 'lock-screen)
 
-  (global-set-key (kbd "s-l") 'lock-screen)
-  (define-key exwm-mode-map (kbd "s-l") 'lock-screen)
-#+END_SRC
+       (global-set-key (kbd "s-l") 'lock-screen)
+       (define-key exwm-mode-map (kbd "s-l") 'lock-screen)
+     #+END_SRC
 **** Shutting down
-#+BEGIN_SRC emacs-lisp
-  (defun shutdown-computer ()
-    (interactive)
-    (shell-command "shutdown now"))
-  (global-set-key (kbd "C-x C-M-c") 'shutdown-computer)
-  (define-key exwm-mode-map (kbd "C-x C-M-c") 'shutdown-computer)
-#+END_SRC
+     #+BEGIN_SRC emacs-lisp
+       (defun shutdown-computer ()
+	 (interactive)
+	 (shell-command "shutdown now"))
+       (global-set-key (kbd "C-x C-M-c") 'shutdown-computer)
+       (define-key exwm-mode-map (kbd "C-x C-M-c") 'shutdown-computer)
+     #+END_SRC
 ** On Startup
 *** Set fallback cursor
     #+BEGIN_SRC emacs-lisp
@@ -783,7 +783,10 @@
     #+BEGIN_SRC emacs-lisp
       (use-package rainbow-mode
 	:ensure t
-	:config (add-hook 'prog-mode-hook 'rainbow-mode))
+	:config
+	(define-globalized-minor-mode global-rainbow-mode rainbow-mode
+	  (lambda () (rainbow-mode 1)))
+	(global-rainbow-mode 1))
     #+END_SRC
 *** rainbow-delimiters package (better quotes/parentheses/brackets)
     #+BEGIN_SRC emacs-lisp
