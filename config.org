@@ -783,7 +783,7 @@
     #+BEGIN_SRC emacs-lisp
       (use-package rainbow-mode
 	:ensure t
-	:config (add-hook 'prog-mode-hook 'rainbow-mode)
+	:config (add-hook 'prog-mode-hook 'rainbow-mode))
     #+END_SRC
 *** rainbow-delimiters package (better quotes/parentheses/brackets)
     #+BEGIN_SRC emacs-lisp
