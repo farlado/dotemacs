@@ -748,14 +748,14 @@
   (scroll-bar-mode -1)
   (setq use-dialog-box nil)
 #+END_SRC
-** Window dividers, no fringes
+** Window dividers/fringes
 #+BEGIN_SRC emacs-lisp
   (setq window-divider-default-right-width 3)
   (set-face-foreground 'window-divider-first-pixel "#335ea8")
   (set-face-foreground 'window-divider "#335ea8")
   (set-face-foreground 'window-divider-last-pixel "#335ea8")
   (window-divider-mode 1)
-  (fringe-mode 5)
+  (fringe-mode 10)
 #+END_SRC
 ** Line/column numbers
 *** Show line and column numbers in the status line
