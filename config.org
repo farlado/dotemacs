@@ -226,9 +226,12 @@ This is the base package. I changed some keybinds to make it more pleasant to us
     (with-eval-after-load 'company
       (define-key company-active-map (kbd "M-n") nil)
       (define-key company-active-map (kbd "M-p") nil)
-      (define-key company-active-map (kbd "C-n") #'company-select-next)
-      (define-key company-active-map (kbd "C-p") #'company-select-previous)
-      (define-key company-active-map (kbd "SPC") #'company-abort)))
+      (define-key company-active-map
+	(kbd "C-n") #'company-select-next)
+      (define-key company-active-map
+	(kbd "C-p") #'company-select-previous)
+      (define-key company-active-map
+	(kbd "SPC") #'company-abort)))
 #+END_SRC
 * Buffers/Windows
 ** Sloppy focus
@@ -898,46 +901,6 @@ I prefer having line numbers in buffers I edit text in, but if I'm using a termi
   (add-hook 'nov-mode-hook
 	    (lambda () (display-line-numbers-mode -1)))
 #+END_SRC
-** Mode line
-*** spaceline package (spacemacs mode line)
-I *hate* the default modeline. This one is much less sucky.
-#+BEGIN_SRC emacs-lisp
-  (use-package spaceline
-    :ensure t
-    :config (require 'spaceline-config)
-    (setq powerline-default-separator (quote arrow))
-    (spaceline-spacemacs-theme))
-#+END_SRC
-*** Show clock on mode line
-#+BEGIN_SRC emacs-lisp
-  (setq display-time-24hr-format t)
-  (display-time-mode 1)
-#+END_SRC
-*** fancy-battery package (battery on mode line)
-I used to just use the default battery modeline setting, but I decided I want something a little nicer.
-#+BEGIN_SRC emacs-lisp
-  (use-package fancy-battery
-    :ensure t
-    :config
-    (setq fancy-battery-show-percentage t
-	  battery-update-interval 15)
-    (fancy-battery-mode))
-#+END_SRC
-*** diminish package (hide minor modes from mode line)
-Supposedly ~use-package~ is going to have this feature soon, but till that rolls out I'll be using this.
-#+BEGIN_SRC emacs-lisp
-  (use-package diminish
-    :ensure t
-    :init
-    (diminish 'hungry-delete-mode)
-    (diminish 'which-key-mode)
-    (diminish 'subword-mode)
-    (diminish 'company-mode)
-    (diminish 'rainbow-mode)
-    (diminish 'eldoc-mode)
-    (diminish 'flycheck-mode)
-    (diminish 'visual-line-mode))
-#+END_SRC
 ** Pretty symbols/text
 *** pretty-mode package (prettify symbols)
 I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so much more to make things look nice, especially in functional programming languages.
@@ -983,4 +946,44 @@ It's kinda slow, but bullet points are very very nice, much better than asterisk
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
     (setq inhibit-compacting-font-caches t))
+#+END_SRC
+** Mode line
+*** spaceline package (spacemacs mode line)
+I *hate* the default modeline. This one is much less sucky.
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline
+    :ensure t
+    :config (require 'spaceline-config)
+    (setq powerline-default-separator (quote arrow))
+    (spaceline-spacemacs-theme))
+#+END_SRC
+*** Show clock on mode line
+#+BEGIN_SRC emacs-lisp
+  (setq display-time-24hr-format t)
+  (display-time-mode 1)
+#+END_SRC
+*** fancy-battery package (battery on mode line)
+I used to just use the default battery modeline setting, but I decided I want something a little nicer.
+#+BEGIN_SRC emacs-lisp
+  (use-package fancy-battery
+    :ensure t
+    :config
+    (setq fancy-battery-show-percentage t
+	  battery-update-interval 15)
+    (fancy-battery-mode))
+#+END_SRC
+*** diminish package (hide minor modes from mode line)
+Supposedly ~use-package~ is going to have this feature soon, but till that rolls out I'll be using this.
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :ensure t
+    :init
+    (diminish 'hungry-delete-mode)
+    (diminish 'which-key-mode)
+    (diminish 'subword-mode)
+    (diminish 'company-mode)
+    (diminish 'rainbow-mode)
+    (diminish 'eldoc-mode)
+    (diminish 'flycheck-mode)
+    (diminish 'visual-line-mode))
 #+END_SRC
