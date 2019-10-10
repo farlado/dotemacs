@@ -20,7 +20,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 100 :width normal :family "Input Mono Compressed")))))
+ '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 100 :width normal :family "Fira Code")))))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -28,4 +28,4 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (flycheck leuven-theme magit fancy-battery org-bullets vterm auto-package-update nov swiper use-package company emms diminish popup-kill-ring dmenu exwm spaceline dash dashboard rainbow-delimiters hungry-delete smart-hungry-delete switch-window rainbow-mode avy smex ido-vertical-mode which-key))))
+    (pretty-mode flycheck leuven-theme magit fancy-battery org-bullets vterm auto-package-update nov swiper use-package company emms diminish popup-kill-ring dmenu exwm spaceline dash dashboard rainbow-delimiters hungry-delete smart-hungry-delete switch-window rainbow-mode avy smex ido-vertical-mode which-key))))
