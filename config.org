@@ -1,6 +1,6 @@
 #+STARTUP: overview
 #+TITLE: Farlado's .emacs
-#+AUTHOR: Farlado
+#+CREATOR: Farlado
 
 * Installation
 1) Clone the repo into your home directory as ~.emacs.d~.
@@ -35,7 +35,8 @@ I love the default start screen, but it just doesn't cut it for me. I just use t
 	  show-week-agenda-p t
 	  dashboard-banner-logo-title "Welcome to GNU Emacs"
 	  dashboard-set-footer nil
-	  initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+	  initial-buffer-choice (lambda ()
+				  (get-buffer "*dashboard*")))
     (dashboard-setup-startup-hook))
 #+END_SRC
 ** auto-package-update package (self-explanatory)
@@ -61,11 +62,11 @@ I don't need my laptop's screen shutting off just because I'm sitting and watchi
   (shell-command "xset s off -dpms")
 #+END_SRC
 ** Set keyboard layout to US
-Again, this uses stuff from my dotfiles. Link is above.
+This is a script from [[https://gitlab.com/farlado/dotfiles][my dotfiles]].
 #+BEGIN_SRC emacs-lisp
   (shell-command "keyctl -s us")
 #+END_SRC
-** Swap ctrl and capslock
+** Give capslock the functionality of control
 I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
 #+BEGIN_SRC emacs-lisp
   (shell-command "setxkbmap -option ctrl:nocaps")
@@ -236,21 +237,22 @@ I hate having to click to focus a different window, so I would rather just have 
   (setq focus-follows-mouse t
 	mouse-autoselect-window t)
 #+END_SRC
-** Kill current buffer with C-x k, use C-x C-k to kill both the buffer and window
+** Kill current buffer with C-x k, use C-x C-k to kill the window too
 I had to adjust the function which kills both the current buffer and the current window, because it did not cooperate with EXWM buffers. That's why I have this weird chunk I don't actually have the expertise yet to fully parse.
 #+BEGIN_SRC emacs-lisp
   (defun kill-this-buffer-and-window ()
-    "Kill the current buffer and delete the selected window (adjusted for EXWM)."
+    "Kill the current buffer and delete the selected window."
     (interactive)
     (let ((window-to-delete (selected-window))
 	  (buffer-to-kill (current-buffer))
-	  (delete-window-hook (lambda () (ignore-errors (delete-window)))))
+	  (delete-window-hook
+	   (lambda () (ignore-errors (delete-window)))))
       (unwind-protect
 	  (progn
 	    (add-hook 'kill-buffer-hook delete-window-hook t t)
 	    (if (kill-buffer (current-buffer))
-		;; If `delete-window' failed before, we return it to regenerate
-		;; the error so it can be seen in the echo area.
+		;; If `delete-window' failed before, we repeat
+		;; to regenerate the error in the echo area.
 		(when (eq (selected-window) window-to-delete)
 		  (delete-window)))))))
   (global-set-key (kbd "C-x k") 'kill-this-buffer)
@@ -603,10 +605,12 @@ I do a crapload here, but basically the two main things I do here is configure m
 *** Setting repeat mode
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
-  (define-key exwm-mode-map (kbd "s-a r a") 'emms-toggle-repeat-playlist)
+  (define-key exwm-mode-map
+    (kbd "s-a r a") 'emms-toggle-repeat-playlist)
 
   (global-set-key (kbd "s-a r t") 'emms-toggle-repeat-track)
-  (define-key exwm-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
+  (define-key exwm-mode-map
+    (kbd "s-a r t") 'emms-toggle-repeat-track)
 #+END_SRC
 * Other programs
 This is other stuff I use, whether emacs functionality or X windows.
@@ -629,7 +633,8 @@ I love this. I really really really really really love this. I can use my number
   (global-set-key (kbd "<XF86Calculator>") 'calc)
   (define-key exwm-mode-map (kbd "<XF86Calculator>") 'calc)
 
-  (define-key calc-mode-map (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
+  (define-key calc-mode-map
+    (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
 #+END_SRC
 ** Firefox
 #+BEGIN_SRC emacs-lisp
@@ -706,25 +711,29 @@ This one uses two windows: one to open the NetworkManager connection editor, and
     (interactive)
     (shell-command "volctl m"))
   (global-set-key (kbd "<XF86AudioMute>") 'volume-mute)
-  (define-key exwm-mode-map (kbd "<XF86AudioMute>") 'volume-mute)
+  (define-key exwm-mode-map
+    (kbd "<XF86AudioMute>") 'volume-mute)
 
   (defun volume-mic-mute ()
     (interactive)
     (shell-command "volctl t"))
   (global-set-key (kbd "<XF86AudioMicMute>") 'volume-mic-mute)
-  (define-key exwm-mode-map (kbd "<XF86AudioMicMute>") 'volume-mic-mute)
+  (define-key exwm-mode-map
+    (kbd "<XF86AudioMicMute>") 'volume-mic-mute)
 
   (defun volume-up ()
     (interactive)
     (shell-command "volctl u"))
   (global-set-key (kbd "<XF86AudioRaiseVolume>") 'volume-up)
-  (define-key exwm-mode-map (kbd "<XF86AudioRaiseVolume>") 'volume-up)
+  (define-key exwm-mode-map
+    (kbd "<XF86AudioRaiseVolume>") 'volume-up)
 
   (defun volume-down ()
     (interactive)
     (shell-command "volctl d"))
   (global-set-key (kbd "<XF86AudioLowerVolume>") 'volume-down)
-  (define-key exwm-mode-map (kbd "<XF86AudioLowerVolume>") 'volume-down)
+  (define-key exwm-mode-map
+    (kbd "<XF86AudioLowerVolume>") 'volume-down)
 #+END_SRC
 *** Brightness control
 #+BEGIN_SRC emacs-lisp
@@ -732,13 +741,15 @@ This one uses two windows: one to open the NetworkManager connection editor, and
     (interactive)
     (shell-command "blctl -u"))
   (global-set-key (kbd "<XF86MonBrightnessUp>") 'backlight-up)
-  (define-key exwm-mode-map (kbd "<XF86MonBrightnessUp>") 'backlight-up)
+  (define-key exwm-mode-map
+    (kbd "<XF86MonBrightnessUp>") 'backlight-up)
 
   (defun backlight-down ()
     (interactive)
     (shell-command "blctl -d"))
   (global-set-key (kbd "<XF86MonBrightnessDown>") 'backlight-down)
-  (define-key exwm-mode-map (kbd "<XF86MonBrightnessDown>") 'backlight-down)
+  (define-key exwm-mode-map
+    (kbd "<XF86MonBrightnessDown>") 'backlight-down)
 #+END_SRC
 *** Take screenshots
 I love maim specifically for this reason. It's super easy to do this and it's very good quality as a screen capture tool.
@@ -937,9 +948,10 @@ I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so mu
     (global-pretty-mode 1)
     ;; Enable ALL of them!
     (pretty-activate-groups
-     '(:ordering :equality :logic :sets :sub-and-superscripts :function
-		 :greek :punctuation :types :arrows :quantifiers :nil
-		 :arithmetic :undefined :parentheses :other)))
+     '(:ordering :equality :logic :sets :sub-and-superscripts
+		 :function :greek :punctuation :types :arrows
+		 :quantifiers :nil :arithmetic :undefined
+		 :parentheses :other)))
 #+END_SRC
 *** Highlight matching parentheses et al. when hoving near one
 #+BEGIN_SRC emacs-lisp
