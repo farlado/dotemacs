@@ -122,9 +122,6 @@ Not the best way to do epub reading, but at least it's in emacs.
     :ensure t
     :config
     (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-    (add-hook 'nov-mode-hook
-	      (lambda ()
-		(visual-line-mode 1))))
 #+END_SRC
 ** Restart and open dashboard with C-c d
 I constantly accidentally close dashboard, so I made a way to open it again if I accidentally kill it.
@@ -213,7 +210,7 @@ This saves me tons of time when it comes to managing whitespace.
 #+BEGIN_SRC emacs-lisp
   (use-package hungry-delete
     :ensure t
-    :config (global-hungry-delete-mode))
+    :config (global-hungry-delete-mode 1))
 #+END_SRC
 ** company package (autocomplete backend)
 This is the base package. I changed some keybinds to make it more pleasant to use.
@@ -318,7 +315,7 @@ This is nice to have so I can be told right away when I'm doing something wrong.
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :ensure t
-    :config (global-flycheck-mode))
+    :config (global-flycheck-mode 1))
 #+END_SRC
 ** company-jedi package (Python autocompletion)
 I will probably be adding company autocompletion for more languages as I start working in more languages.
@@ -326,6 +323,23 @@ I will probably be adding company autocompletion for more languages as I start w
   (use-package company-jedi
     :ensure t
     :config (add-to-list 'company-backends 'company-jedi))
+#+END_SRC
+** haskell-mode package (self-explanatory)
+I have started to mess around with Haskell, so I needed to grab a mode for that. This supplies basically everything I need, e.g. company autocompletion and flycheck information.
+#+BEGIN_SRC emacs-lisp
+  (use-package haskell-mode
+    :ensure t
+    :init
+    (require 'haskell-mode)
+    (require 'haskell-process)
+    (require 'haskell-interactive-mode)
+    :hook
+    (haskell-mode-hook . interactive-haskell-mode)
+    (haskell-mode-hook . turn-on-haskell-doc-mode)
+    (haskell-mode-hook . turn-on-haskell-indentation)
+    (haskell-mode-hook . haskell-auto-insert-module-template)
+    :config
+    (setq haskell-stylish-on-save t))
 #+END_SRC
 ** electric-pair-mode (OH MY GOD THIS IS SO GREAT)
 I have no words for how convenient this has been and how much faster I get things done thanks to these five lines of elisp.
