@@ -279,36 +279,6 @@
   (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
 * Programming
-** Python
-*** Symbols
-#+BEGIN_SRC emacs-lisp
-  (add-hook
-   'python-mode-hook
-   (lambda ()
-     (mapc (lambda (pair) (push pair prettify-symbols-alist))
-	   '(;; Syntax
-	     ("def" .      #x2131)
-	     ("not" .      #x2757)
-	     ("in" .       #x2208)
-	     ("not in" .   #x2209)
-	     ("return" .   #x27fc)
-	     ("yield" .    #x27fb)
-	     ("for" .      #x2200)
-	     ;; Base Types
-	     ("int" .      #x2124)
-	     ("float" .    #x211d)
-	     ("str" .      #x1d54a)
-	     ("True" .     #x1d54b)
-	     ("False" .    #x1d53d)
-	     ;; Mypy
-	     ("Dict" .     #x1d507)
-	     ("List" .     #x2112)
-	     ("Tuple" .    #x2a02)
-	     ("Set" .      #x2126)
-	     ("Iterable" . #x1d50a)
-	     ("Any" .      #x2754)
-	     ("Union" .    #x22c3)))))
-#+END_SRC
 ** magit package (git but made easier)
 #+BEGIN_SRC emacs-lisp
   (use-package magit
@@ -781,22 +751,16 @@
   (setq use-dialog-box nil)
 #+END_SRC
 ** Pretty symbols/text
-*** Prettify some symbols by default
-#+BEGIN_SRC emacs-lisp
-  (global-prettify-symbols-mode 1)
-#+END_SRC
-*** pretty-mode package (further prettification)
+*** pretty-mode package (prettify symbols)
 #+BEGIN_SRC emacs-lisp
   (use-package pretty-mode
     :ensure t
     :config (require 'pretty-mode)
-    (global-pretty-mode t)
-    (pretty-deactivate-groups
-     '(:equality :ordering :ordering-double :ordering-triple
-		 :arrows :arrows-twoheaded :punctuation
-		 :logic :sets))
+    (global-pretty-mode 1)
     (pretty-activate-groups
-     '(:sub-and-superscripts :greek :arithmetic-nary)))
+     '(:equality :ordering :ordering-double :ordering-triple
+		 :arrows :arrows-twoheaded :punctuation :logic
+		 :sets :sub-and-superscripts :greek :arithmetic-nary)))
 #+END_SRC
 *** Highlight matching parentheses et al. when hoving near one
 #+BEGIN_SRC emacs-lisp
