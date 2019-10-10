@@ -121,7 +121,7 @@ Not the best way to do epub reading, but at least it's in emacs.
   (use-package nov
     :ensure t
     :config
-    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 #+END_SRC
 ** Restart and open dashboard with C-c d
 I constantly accidentally close dashboard, so I made a way to open it again if I accidentally kill it.
