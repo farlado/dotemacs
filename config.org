@@ -999,5 +999,7 @@ Supposedly ~use-package~ is going to have this feature soon, but till that rolls
     (diminish 'rainbow-mode)
     (diminish 'eldoc-mode)
     (diminish 'flycheck-mode)
-    (diminish 'visual-line-mode))
+    (diminish 'visual-line-mode)
+    (diminish 'interactive-haskell-mode)
+    (diminish 'haskell-doc-mode))
 #+END_SRC
