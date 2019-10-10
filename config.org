@@ -394,9 +394,9 @@
 #+BEGIN_SRC emacs-lisp
   (define-key exwm-mode-map (kbd "C-c C-f") nil)
 #+END_SRC
-**** Toggle floating, inhibit hiding
+**** Inhibit floating and hiding
 #+BEGIN_SRC emacs-lisp
-  (define-key exwm-mode-map (kbd "C-c C-t C-f") 'exwm-floating-toggle-floating)
+  (define-key exwm-mode-map (kbd "C-c C-t C-f") nil)
   (define-key exwm-mode-map (kbd "C-c C-t C-v") nil)
 #+END_SRC
 **** Disable toggling the mode line
@@ -429,14 +429,15 @@
   (define-key exwm-mode-map (kbd "C-x C-s") 'exwm-ctrl-s)
 #+END_SRC
 *** Launch programs
-**** vterm package (terminal)
+**** Terminal
 #+BEGIN_SRC emacs-lisp
-  (use-package vterm
-    :ensure t
-    :config (require 'vterm)
-    :bind (("<s-return>" . vterm)
-	   :map exwm-mode-map
-	   ("<s-return>" . vterm)))
+  (defvar term-shell "/bin/zsh")
+  (defadvice ansi-term (before force-bash)
+    (interactive (list term-shell)))
+  (ad-activate 'ansi-term)
+
+  (global-set-key (kbd "<s-return>") 'ansi-term)
+  (define-key exwm-mode-map (kbd "<s-return>") 'ansi-term)
 #+END_SRC
 **** Calculator
 #+BEGIN_SRC emacs-lisp
@@ -752,15 +753,17 @@
 #+END_SRC
 ** Pretty symbols/text
 *** pretty-mode package (prettify symbols)
+I don't like prettify-symbols-mode. It doesn't do enough. This one helps so much more to make things look nice, especially in functional programming languages.
 #+BEGIN_SRC emacs-lisp
   (use-package pretty-mode
     :ensure t
     :config (require 'pretty-mode)
     (global-pretty-mode 1)
+    ;; Enable ALL of them!
     (pretty-activate-groups
-     '(:equality :ordering :ordering-double :ordering-triple
-		 :arrows :arrows-twoheaded :punctuation :logic
-		 :sets :sub-and-superscripts :greek :arithmetic-nary)))
+     '(:ordering :equality :logic :sets :sub-and-superscripts :function
+		 :greek :punctuation :types :arrows :quantifiers :nil
+		 :arithmetic :undefined :parentheses :other)))
 #+END_SRC
 *** Highlight matching parentheses et al. when hoving near one
 #+BEGIN_SRC emacs-lisp
@@ -808,7 +811,7 @@
 *** Show line numbers in all modes unless I specify otherwise
     #+BEGIN_SRC emacs-lisp
       (global-display-line-numbers-mode 1)
-      (add-hook 'vterm-mode-hook
+      (add-hook 'term-mode-hook
 		(lambda () (display-line-numbers-mode -1)))
       (add-hook 'ibuffer-hook
 		(lambda () (display-line-numbers-mode -1)))
