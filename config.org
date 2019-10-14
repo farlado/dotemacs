@@ -28,13 +28,14 @@ I probably don't have to do this but it makes things work a little smoother.
 I love the default start screen, but it just doesn't cut it for me. I just use this to have a nice screen when I start emacs or close all my buffers.
 #+BEGIN_SRC emacs-lisp
   (use-package dashboard :ensure t
-    :config (setq inhibit-start-menu t
-		  dashboard-items '((recents . 10))
-		  show-week-agenda-p t
-		  dashboard-banner-logo-title "Welcome to GNU Emacs"
-		  dashboard-set-footer nil
-		  initial-buffer-choice (lambda ()
-					  (get-buffer "*dashboard*")))
+    :config
+    (setq inhibit-start-menu t
+	  dashboard-items '((recents . 10))
+	  show-week-agenda-p t
+	  dashboard-banner-logo-title "Welcome to GNU Emacs"
+	  dashboard-set-footer nil
+	  initial-buffer-choice (lambda ()
+				  (get-buffer "*dashboard*")))
     (dashboard-setup-startup-hook))
 #+END_SRC
 ** auto-package-update package (self-explanatory)
@@ -148,8 +149,7 @@ I /love/ ~ido-mode~. God I love ~ido-mode~.
 However, I /HATE/ ~ido-mode~ right out of the box. A vertical list looks craptons nicer.
 #+BEGIN_SRC emacs-lisp
   (use-package ido-vertical-mode :ensure t
-    :config (setq ido-vertical-define-keys
-		  'C-n-and-C-p-only)
+    :config (setq ido-vertical-define-keys 'C-n-and-C-p-only)
     (ido-vertical-mode 1))
 #+END_SRC
 Default M-x behavior doesn't use ~ido-mode~, so we install a package which gives it ~ido-mode~.
@@ -314,7 +314,8 @@ I have started to mess around with Haskell, so I needed to grab a mode for that.
     :init (require 'haskell-mode)
     (require 'haskell-process)
     (require 'haskell-interactive-mode)
-    :hook (haskell-mode-hook . interactive-haskell-mode)
+    :hook
+    (haskell-mode-hook . interactive-haskell-mode)
     (haskell-mode-hook . turn-on-haskell-doc-mode)
     (haskell-mode-hook . turn-on-haskell-indentation)
     (haskell-mode-hook . haskell-auto-insert-module-template)
