@@ -81,7 +81,7 @@ I haven't integrated notifications into emacs just yet, sadly.
    "Notifications" nil "dunst")
 #+END_SRC
 * General Functionality
-This is just general stuff not pertaining to a given task and not complex enough to warrant entire sections for them.
+This is just stuff not pertaining to a specific task and/or not complex enough to warrant entire sections for them.
 ** Don't make extra files on the filesystem
 I don't use autosaves and backups. I love living on the edge.
 #+BEGIN_SRC emacs-lisp
@@ -617,7 +617,7 @@ I make sure we use the right shell and use super+return to open a terminal. Usin
   (define-key exwm-mode-map (kbd "<s-return>") 'ansi-term)
 #+END_SRC
 ** Calculator
-I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and subsequently close it.
+I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and then use the numpad to close it as well.
 #+BEGIN_SRC emacs-lisp
   (require 'calc)
   (global-set-key (kbd "C-c c") 'calc)
@@ -627,7 +627,19 @@ I love this. I really really really *really* love this. I can use my number pad 
   (define-key calc-mode-map
     (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
 #+END_SRC
+** Weather forecasts
+Picking a service to use for this was a pain. I ended up settling for wttrin because it is the fastest and easiest to use, and plays nice with my setup.
+#+BEGIN_SRC emacs-lisp
+  (use-package wttrin :ensure t
+    :init (defun wttrin-local ()
+	    (interactive)
+	    (wttrin "Indianapolis, IN")
+	    (delete-other-windows))
+    :bind (("C-c w" . wttrin-local)
+	   ("C-c C-w" . wttrin)))
+#+END_SRC
 ** Firefox
+Firefox has some unique abilities when it comes to how to make windows behave which work better for me. I don't use tabs, and I don't want anything to do with them, and Firefox lets me hide the tab bar and force all tabs to actually open as new windows.
 #+BEGIN_SRC emacs-lisp
   (defun run-firefox ()
     (interactive)
@@ -647,6 +659,7 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
   (define-key exwm-mode-map (kbd "s-b") 'run-libreoffice)
 #+END_SRC
 ** GIMP
+Until GIMP's functionality gets merged into emacs, guess I'm stuck having it.
 #+BEGIN_SRC emacs-lisp
   (defun run-gimp ()
     (interactive)
@@ -656,6 +669,7 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
   (define-key exwm-mode-map (kbd "s-g") 'run-gimp)
 #+END_SRC
 ** Telegram
+I have a painfully white theme which fits perfectly with my setup.
 #+BEGIN_SRC emacs-lisp
   (defun run-tg ()
     (interactive)
@@ -665,6 +679,7 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
   (define-key exwm-mode-map (kbd "s-t") 'run-tg)
 #+END_SRC
 ** Discord
+Yeah, I also use a light theme for Discord. It looks comfy, even if Discord is a garbage application.
 #+BEGIN_SRC emacs-lisp
   (defun run-discord ()
     (interactive)
@@ -674,6 +689,7 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
   (define-key exwm-mode-map (kbd "s-d") 'run-discord)
 #+END_SRC
 ** Steam
+Gaming is possible with EXWM, if you run games windowed.
 #+BEGIN_SRC emacs-lisp
   (defun run-steam ()
     (interactive)
@@ -782,9 +798,9 @@ I love maim specifically for this reason. It's super easy to do this and it's ve
   (define-key exwm-mode-map (kbd "s-l") 'lock-screen)
 #+END_SRC
 *** Shutting down
-I need to mess around with this one more, so that I can have confirmation before shutting down.
+I copied the function for quitting emacs to handle shutting down.
 #+BEGIN_SRC emacs-lisp
-  (defun shut-down (&optional arg)
+  (defun save-buffers-shut-down (&optional arg)
     "Offer to save each buffer, then shut down the computer.
   This function is literally just a copycat of `save-buffers-kill-emacs'.
   With prefix ARG, silently save all file-visiting buffers without asking.
@@ -834,10 +850,10 @@ I need to mess around with this one more, so that I can have confirmation before
 	   (funcall confirm "Really shut down? "))
        (shell-command "shutdown now"))))
 
-  (global-set-key (kbd "C-x C-M-c") 'shut-down)
-  (define-key exwm-mode-map (kbd "C-x C-M-c") 'shut-down)
+  (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
+  (define-key exwm-mode-map (kbd "C-x C-M-c") 'save-buffers-shut-down)
 #+END_SRC
-* General Looks
+* Looks
 ** Theme
 I used to hate light themes. I'm not in that camp anymore. I love this elegant theme.
 #+BEGIN_SRC emacs-lisp
@@ -867,22 +883,26 @@ Since I use EXWM, X windows will remove the thin divider which is present by def
   (fringe-mode 10)
 #+END_SRC
 ** Line/column numbers
-I prefer having line numbers in buffers I edit text in, but if I'm using a terminal, switching buffers, using shells, or doing other tasks that aren't editing text, it's probably better I remove line numbers. I do, however, prefer having the current line highlighted in all modes.
+I like having line numbers and the current cursor position and a highlighted current line.
 #+BEGIN_SRC emacs-lisp
   (line-number-mode 1)
   (column-number-mode 1)
   (global-hl-line-mode 1)
   (global-display-line-numbers-mode 1)
-  (add-hook 'term-mode-hook
-	    (lambda () (display-line-numbers-mode -1)))
-  (add-hook 'ibuffer-hook
-	    (lambda () (display-line-numbers-mode -1)))
-  (add-hook 'dashboard-mode-hook
-	    (lambda () (display-line-numbers-mode -1)))
-  (add-hook 'shell-mode-hook
-	    (lambda () (display-line-numbers-mode -1)))
-  (add-hook 'nov-mode-hook
-	    (lambda () (display-line-numbers-mode -1)))
+#+END_SRC
+However, I don't like line numbers in modes where it breaks the mode.
+#+BEGIN_SRC emacs-lisp
+  (defun disable-line-numbers-for (hook)
+    "Disable `display-line-numbers-mode` for HOOK."
+    (add-hook hook (lambda () (display-line-numbers-mode 0))))
+
+  (disable-line-numbers-for 'term-mode-hook)
+  (disable-line-numbers-for 'tetris-mode-hook)
+  (disable-line-numbers-for 'snake-mode-hook)
+  (disable-line-numbers-for 'ibuffer-hook)
+  (disable-line-numbers-for 'dashboard-mode-hook)
+  (disable-line-numbers-for 'shell-mode-hook)
+  (disable-line-numbers-for 'nov-mode-hook)
 #+END_SRC
 ** Pretty symbols/text
 *** pretty-mode package (prettify symbols)
@@ -929,7 +949,7 @@ I *hate* the default modeline. This one is much less sucky.
 #+BEGIN_SRC emacs-lisp
   (use-package spaceline :ensure t
     :config (require 'spaceline-config)
-    (setq powerline-default-separator (quote arrow))
+    (setq powerline-default-separator (quote butt))
     (spaceline-spacemacs-theme))
 #+END_SRC
 *** Show clock on mode line
@@ -943,7 +963,7 @@ I used to just use the default battery modeline setting, but I decided I want so
   (use-package fancy-battery :ensure t
     :config (setq fancy-battery-show-percentage t
 		  battery-update-interval 15)
-    (fancy-battery-mode))
+    (fancy-battery-mode 1))
 #+END_SRC
 *** diminish package (hide minor modes from mode line)
 Supposedly ~use-package~ is going to have this feature soon, but till that rolls out I'll be using this.
