@@ -27,25 +27,21 @@ I probably don't have to do this but it makes things work a little smoother.
 ** dashboard package (replacement start screen)
 I love the default start screen, but it just doesn't cut it for me. I just use this to have a nice screen when I start emacs or close all my buffers.
 #+BEGIN_SRC emacs-lisp
-  (use-package dashboard
-    :ensure t
-    :preface (setq inhibit-start-menu t)
-    :config
-    (setq dashboard-items '((recents . 10))
-	  show-week-agenda-p t
-	  dashboard-banner-logo-title "Welcome to GNU Emacs"
-	  dashboard-set-footer nil
-	  initial-buffer-choice (lambda ()
-				  (get-buffer "*dashboard*")))
+  (use-package dashboard :ensure t
+    :config (setq inhibit-start-menu t
+		  dashboard-items '((recents . 10))
+		  show-week-agenda-p t
+		  dashboard-banner-logo-title "Welcome to GNU Emacs"
+		  dashboard-set-footer nil
+		  initial-buffer-choice (lambda ()
+					  (get-buffer "*dashboard*")))
     (dashboard-setup-startup-hook))
 #+END_SRC
 ** auto-package-update package (self-explanatory)
 I don't want to have to manually update my stuff. This solution is literally plop-and-forget.
 #+BEGIN_SRC emacs-lisp
-  (use-package auto-package-update
-    :ensure t
-    :config
-    (require 'auto-package-update)
+  (use-package auto-package-update :ensure t
+    :config (require 'auto-package-update)
     (setq auto-package-update-interval 2
 	  auto-package-update-delete-old-versions t
 	  auto-package-update-hide-results t)
@@ -118,10 +114,9 @@ Why even is this a key that is bound?
 ** nov package (epub reader)
 Not the best way to do epub reading, but at least it's in emacs.
 #+BEGIN_SRC emacs-lisp
-  (use-package nov
-    :ensure t
-    :config
-    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+  (use-package nov :ensure t
+    :config (add-to-list 'auto-mode-alist
+			 '("\\.epub\\'" . nov-mode)))
 #+END_SRC
 ** Restart and open dashboard with C-c d
 I constantly accidentally close dashboard, so I made a way to open it again if I accidentally kill it.
@@ -152,15 +147,14 @@ I /love/ ~ido-mode~. God I love ~ido-mode~.
 #+END_SRC
 However, I /HATE/ ~ido-mode~ right out of the box. A vertical list looks craptons nicer.
 #+BEGIN_SRC emacs-lisp
-  (use-package ido-vertical-mode
-    :ensure t
-    :init (ido-vertical-mode 1))
-  (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+  (use-package ido-vertical-mode :ensure t
+    :config (setq ido-vertical-define-keys
+		  'C-n-and-C-p-only)
+    (ido-vertical-mode 1))
 #+END_SRC
 Default M-x behavior doesn't use ~ido-mode~, so we install a package which gives it ~ido-mode~.
 #+BEGIN_SRC emacs-lisp
-  (use-package smex
-    :ensure t
+  (use-package smex :ensure t
     :bind ("M-x" . smex))
 #+END_SRC
 ** Replace "yes or no" prompts with "y or n"
@@ -171,22 +165,19 @@ Beauty in brevity.
 ** which-key package (small menus to help with commands)
 Even as I've gotten used to emacs key bindings, it is always nice to have this around so that if I want to know, I can easily see what's what.
 #+BEGIN_SRC emacs-lisp
-  (use-package which-key
-    :ensure t
+  (use-package which-key :ensure t
     :init (which-key-mode 1))
 #+END_SRC
 ** popup-kill-ring package (easier time managing the kill ring)
 Having the whole kill ring easy to scroll through is much less hassle than default behavior.
 #+BEGIN_SRC emacs-lisp
-  (use-package popup-kill-ring
-    :ensure t
+  (use-package popup-kill-ring :ensure t
     :bind ("M-y" . popup-kill-ring))
 #+END_SRC
 ** swiper package (better searches)
 This search behavior is *SO* much nicer than the default.
 #+BEGIN_SRC emacs-lisp
-  (use-package swiper
-    :ensure t
+  (use-package swiper :ensure t
     :bind ("C-s" . swiper))
 #+END_SRC
 ** Kill an entire word when you're in the middle of it
@@ -201,22 +192,19 @@ I don't need it super often, but it's still nice to have.
 ** avy package (faster moving around documents)
 If I want to hop around in a document without calling swiper, ~avy~ is definitely the way to go.
 #+BEGIN_SRC emacs-lisp
-  (use-package avy
-    :ensure t
+  (use-package avy :ensure t
     :bind ("M-s" . avy-goto-char))
 #+END_SRC
 ** hungry-delete package (convenient deletion of trailing whitespace)
 This saves me tons of time when it comes to managing whitespace.
 #+BEGIN_SRC emacs-lisp
-  (use-package hungry-delete
-    :ensure t
+  (use-package hungry-delete :ensure t
     :config (global-hungry-delete-mode 1))
 #+END_SRC
 ** company package (autocomplete backend)
 This is the base package. I changed some keybinds to make it more pleasant to use.
 #+BEGIN_SRC emacs-lisp
-  (use-package company
-    :ensure t
+  (use-package company :ensure t
     :init (add-hook 'after-init-hook 'global-company-mode)
     :config (setq company-idle-delay 0.75
 		  company-minimum-prefix-length 3)
@@ -289,8 +277,7 @@ I only have this bound for the rare occasions where ibuffer won't cut it.
 ** switch-window package (easier movement between windows)
 You know what sucks? Yeah, ~other-window~ sucks. It really sucks. So, I use ~switch-window~ instead so that I can more easily move between windows when I have more than two.
 #+BEGIN_SRC emacs-lisp
-  (use-package switch-window
-    :ensure t
+  (use-package switch-window :ensure t
     :config
     (setq switch-window-input-style 'minibuffer
 	  switch-window-increase 4
@@ -298,48 +285,40 @@ You know what sucks? Yeah, ~other-window~ sucks. It really sucks. So, I use ~swi
 	  switch-window-shortcut-style 'qwerty
 	  switch-window-qwerty-shortcuts '("a" "s" "d" "f" "g"
 					   "z" "x" "c" "v" "b"))
-    :bind
-    ([remap other-window] . switch-window))
+    :bind ([remap other-window] . switch-window))
 #+END_SRC
 * Programming
 This is quite barren, but mostly because my needs are not currently particularly that big.
 ** magit package (git but made easier)
-I used to use a terminal for this, but holy crap this is a lot easier, a lot faster, and a whole lot nicer.
+I used to use a terminal for this, but holy crap this is a lot easier, a lot faster, and a whole lot nicer to use overall.
 #+BEGIN_SRC emacs-lisp
-  (use-package magit
-    :ensure t
+  (use-package magit :ensure t
     :bind ("C-c g" . magit-status))
 #+END_SRC
 ** flycheck package (on-the-fly syntax checker)
 This is nice to have so I can be told right away when I'm doing something wrong.
 #+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :ensure t
+  (use-package flycheck :ensure t
     :config (global-flycheck-mode 1))
 #+END_SRC
 ** company-jedi package (Python autocompletion)
 I will probably be adding company autocompletion for more languages as I start working in more languages.
 #+BEGIN_SRC emacs-lisp
-  (use-package company-jedi
-    :ensure t
+  (use-package company-jedi :ensure t
     :config (add-to-list 'company-backends 'company-jedi))
 #+END_SRC
 ** haskell-mode package (self-explanatory)
 I have started to mess around with Haskell, so I needed to grab a mode for that. This supplies basically everything I need, e.g. company autocompletion and flycheck information.
 #+BEGIN_SRC emacs-lisp
-  (use-package haskell-mode
-    :ensure t
-    :init
-    (require 'haskell-mode)
+  (use-package haskell-mode :ensure t
+    :init (require 'haskell-mode)
     (require 'haskell-process)
     (require 'haskell-interactive-mode)
-    :hook
-    (haskell-mode-hook . interactive-haskell-mode)
+    :hook (haskell-mode-hook . interactive-haskell-mode)
     (haskell-mode-hook . turn-on-haskell-doc-mode)
     (haskell-mode-hook . turn-on-haskell-indentation)
     (haskell-mode-hook . haskell-auto-insert-module-template)
-    :config
-    (setq haskell-stylish-on-save t))
+    :config (setq haskell-stylish-on-save t))
 #+END_SRC
 ** electric-pair-mode (OH MY GOD THIS IS SO GREAT)
 I have no words for how convenient this has been and how much faster I get things done thanks to these five lines of elisp.
@@ -356,10 +335,8 @@ I use C-c a and C-c C-a to do things related to my agenda. Only one of my system
 #+BEGIN_SRC emacs-lisp
   (if (file-exists-p "~/agenda.org")
       (progn
-	;; Declare agenda file
 	(setq org-agenda-files (quote ("~/agenda.org")))
 
-	;; C-c a for org-agenda, C-c C-a for the agenda file
 	(defun open-agenda ()
 	  (interactive)
 	  (find-file "~/agenda.org"))
@@ -385,10 +362,8 @@ Yes, emacs is my window manager. You should probably remove this stuff if you do
 *** exwm package (base window manager)
 This isn't actually where we do all the configuration, it's just where we install EXWM and grab what we need to configure it.
 #+BEGIN_SRC emacs-lisp
-  (use-package exwm
-    :ensure t
-    :config
-    (require 'exwm)
+  (use-package exwm :ensure t
+    :config (require 'exwm)
     (require 'exwm-randr)
     (require 'exwm-config)
     (require 'exwm-systemtray))
@@ -396,8 +371,7 @@ This isn't actually where we do all the configuration, it's just where we instal
 *** dmenu package (dmenu but for emacs)
 Since I'm using emacs as a window manager, I need dmenu so I can open X windows I haven't bound to keys.
 #+BEGIN_SRC emacs-lisp
-  (use-package dmenu
-    :ensure t
+  (use-package dmenu :ensure t
     :bind (("s-x" . dmenu)
 	   :map exwm-mode-map
 	   ("s-x" . dmenu)))
@@ -527,14 +501,12 @@ Now that we've got all the variables nice and ready, let's start it up!
   (exwm-systemtray-enable)
 #+END_SRC
 * EMMS (Emacs MultiMedia System)
-I am big on doing as much in emacs for as much as possible. Having my music player moved to emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it.
+I am big on doing as much in emacs as possible. Having my music player moved to emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it.
 ** Install EMMS and bind main playback keys
 I do a crapload here, but basically the two main things I do here is configure mpd information and bind some keys for emms controls and music controls.
 #+BEGIN_SRC emacs-lisp
-  (use-package emms
-    :ensure t
-    :config
-    (require 'emms-setup)
+  (use-package emms :ensure t
+    :config (require 'emms-setup)
     (require 'emms-player-mpd)
     (emms-all)
     (setq emms-seek-seconds 5
@@ -867,12 +839,10 @@ I need to mess around with this one more, so that I can have confirmation before
 ** Theme
 I used to hate light themes. I'm not in that camp anymore. I love this elegant theme.
 #+BEGIN_SRC emacs-lisp
-  (use-package leuven-theme
-    :ensure t
-    :config
-    (setq org-fontify-whole-heading-line t
-	  leuven-scale-org-agenda-structure t
-	  leuven-scale-outline-headlines t)
+  (use-package leuven-theme :ensure t
+    :config (setq org-fontify-whole-heading-line t
+		  leuven-scale-org-agenda-structure t
+		  leuven-scale-outline-headlines t)
     (load-theme 'leuven t))
 #+END_SRC
 ** Hide useless things
@@ -895,15 +865,12 @@ Since I use EXWM, X windows will remove the thin divider which is present by def
   (fringe-mode 10)
 #+END_SRC
 ** Line/column numbers
-*** Show line and column numbers
+I prefer having line numbers in buffers I edit text in, but if I'm using a terminal, switching buffers, using shells, or doing other tasks that aren't editing text, it's probably better I remove line numbers. I do, however, prefer having the current line highlighted in all modes.
 #+BEGIN_SRC emacs-lisp
   (line-number-mode 1)
   (column-number-mode 1)
+  (global-hl-line-mode 1)
   (global-display-line-numbers-mode 1)
-#+END_SRC
-*** Disable line numbers in certain modes
-I prefer having line numbers in buffers I edit text in, but if I'm using a terminal, switching buffers, using shells, or doing other tasks that aren't editing text, it's probably better I remove line numbers.
-#+BEGIN_SRC emacs-lisp
   (add-hook 'term-mode-hook
 	    (lambda () (display-line-numbers-mode -1)))
   (add-hook 'ibuffer-hook
@@ -917,13 +884,11 @@ I prefer having line numbers in buffers I edit text in, but if I'm using a termi
 #+END_SRC
 ** Pretty symbols/text
 *** pretty-mode package (prettify symbols)
-I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so much more to make things look nice, especially in functional programming languages.
+I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so much more to make things look nice, especially in functional programming languages. I enable /all/ of them.
 #+BEGIN_SRC emacs-lisp
-  (use-package pretty-mode
-    :ensure t
+  (use-package pretty-mode :ensure t
     :config (require 'pretty-mode)
     (global-pretty-mode 1)
-    ;; Enable ALL of them!
     (pretty-activate-groups
      '(:ordering :equality :logic :sets :sub-and-superscripts
 		 :function :greek :punctuation :types :arrows
@@ -937,36 +902,30 @@ I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so mu
 *** rainbow package (show colors when typed as hex codes)
 I don't use it too much, but it's nice to have it around.
 #+BEGIN_SRC emacs-lisp
-  (use-package rainbow-mode
-    :ensure t
-    :config
-    (define-globalized-minor-mode global-rainbow-mode rainbow-mode
-      (lambda () (rainbow-mode 1)))
+  (use-package rainbow-mode :ensure t
+    :config (define-globalized-minor-mode global-rainbow-mode
+	      rainbow-mode (lambda () (rainbow-mode 1)))
     (global-rainbow-mode 1))
 #+END_SRC
 *** rainbow-delimiters package (better quotes/parentheses/brackets)
 It's subtle on my theme, but it still helps me keep track of my brackets and parentheses.
 #+BEGIN_SRC emacs-lisp
-  (use-package rainbow-delimiters
-    :ensure t
-    :init
-    (add-hook 'prog-mode-hook #'rainbow-delimiters-mode 1))
+  (use-package rainbow-delimiters :ensure t
+    :init (add-hook 'prog-mode-hook #'rainbow-delimiters-mode 1))
 #+END_SRC
 *** org-bullets package (nicer bullet points in org-mode)
 It's kinda slow, but bullet points are very very nice, much better than asterisks.
 #+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :ensure t
-    :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  (use-package org-bullets :ensure t
+    :config (add-hook 'org-mode-hook (lambda ()
+				       (org-bullets-mode 1)))
     (setq inhibit-compacting-font-caches t))
 #+END_SRC
 ** Mode line
 *** spaceline package (spacemacs mode line)
 I *hate* the default modeline. This one is much less sucky.
 #+BEGIN_SRC emacs-lisp
-  (use-package spaceline
-    :ensure t
+  (use-package spaceline :ensure t
     :config (require 'spaceline-config)
     (setq powerline-default-separator (quote arrow))
     (spaceline-spacemacs-theme))
@@ -979,18 +938,15 @@ I *hate* the default modeline. This one is much less sucky.
 *** fancy-battery package (battery on mode line)
 I used to just use the default battery modeline setting, but I decided I want something a little nicer.
 #+BEGIN_SRC emacs-lisp
-  (use-package fancy-battery
-    :ensure t
-    :config
-    (setq fancy-battery-show-percentage t
-	  battery-update-interval 15)
+  (use-package fancy-battery :ensure t
+    :config (setq fancy-battery-show-percentage t
+		  battery-update-interval 15)
     (fancy-battery-mode))
 #+END_SRC
 *** diminish package (hide minor modes from mode line)
 Supposedly ~use-package~ is going to have this feature soon, but till that rolls out I'll be using this.
 #+BEGIN_SRC emacs-lisp
-  (use-package diminish
-    :ensure t
+  (use-package diminish :ensure t
     :init
     (diminish 'hungry-delete-mode)
     (diminish 'which-key-mode)
