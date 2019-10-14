@@ -287,6 +287,34 @@ You know what sucks? Yeah, ~other-window~ sucks. It really sucks. So, I use ~swi
 					   "z" "x" "c" "v" "b"))
     :bind ([remap other-window] . switch-window))
 #+END_SRC
+* Org-mode
+I don't need much extending for org-mode.
+** Agenda (only enabled if an agenda is found)
+I use C-c a and C-c C-a to do things related to my agenda. Only one of my systems actually has my agenda, so this only runs on that machine so I don't try any funny business on other machines.
+#+BEGIN_SRC emacs-lisp
+  (if (file-exists-p "~/agenda.org")
+      (progn
+	(setq org-agenda-files (quote ("~/agenda.org")))
+
+	(defun open-agenda ()
+	  (interactive)
+	  (find-file "~/agenda.org"))
+	(global-set-key (kbd "C-c a") 'org-agenda)
+	(global-set-key (kbd "C-c C-a") 'open-agenda)))
+#+END_SRC
+** Shortcuts for various code snippets in org-mode
+This will expand as I get into more and more languages and take more notes in classes with different snippets of different languages.
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-structure-template-alist
+	       '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+  (add-to-list 'org-structure-template-alist
+	       '("py" "#+BEGIN_SRC python\n?\n#+END_SRC"))
+#+END_SRC
+** Use the current window when editing source code in org-mode
+This is just a convenience thing.
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-window-setup 'current-window)
+#+END_SRC
 * Programming
 This is quite barren, but mostly because my needs are not currently particularly that big.
 ** magit package (git but made easier)
@@ -329,33 +357,6 @@ I have no words for how convenient this has been and how much faster I get thing
 			      (?\[ . ?\])
 			      (?\" . ?\")))
   (electric-pair-mode t)
-#+END_SRC
-* Org-mode
-** Agenda (only enabled if an agenda is found)
-I use C-c a and C-c C-a to do things related to my agenda. Only one of my systems actually has my agenda, so this only runs on that machine so I don't try any funny business on other machines.
-#+BEGIN_SRC emacs-lisp
-  (if (file-exists-p "~/agenda.org")
-      (progn
-	(setq org-agenda-files (quote ("~/agenda.org")))
-
-	(defun open-agenda ()
-	  (interactive)
-	  (find-file "~/agenda.org"))
-	(global-set-key (kbd "C-c a") 'org-agenda)
-	(global-set-key (kbd "C-c C-a") 'open-agenda)))
-#+END_SRC
-** Shortcuts for various code snippets in org-mode
-This will expand as I get into more and more languages and take more notes in classes with different snippets of different languages.
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'org-structure-template-alist
-	       '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
-  (add-to-list 'org-structure-template-alist
-	       '("py" "#+BEGIN_SRC python\n?\n#+END_SRC"))
-#+END_SRC
-** Use the current window when editing source code in org-mode
-This is just a convenience thing.
-#+BEGIN_SRC emacs-lisp
-  (setq org-src-window-setup 'current-window)
 #+END_SRC
 * EXWM (Emacs X Window Manager)
 Yes, emacs is my window manager. You should probably remove this stuff if you don't plan to use emacs as your window manager.
@@ -616,10 +617,10 @@ I make sure we use the right shell and use super+return to open a terminal. Usin
   (define-key exwm-mode-map (kbd "<s-return>") 'ansi-term)
 #+END_SRC
 ** Calculator
-I love this. I really really really really really love this. I can use my number pad exclusively to call a calculator and subsequently close it.
+I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and subsequently close it.
 #+BEGIN_SRC emacs-lisp
   (require 'calc)
-  (global-set-key (kbd "C-x c") 'calc)
+  (global-set-key (kbd "C-c c") 'calc)
   (global-set-key (kbd "<XF86Calculator>") 'calc)
   (define-key exwm-mode-map (kbd "<XF86Calculator>") 'calc)
 
