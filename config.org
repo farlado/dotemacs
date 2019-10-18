@@ -4,7 +4,9 @@
 #+LANGUAGE: en
 #+ATTR_HTML: :style margin-left: auto; margin-right: auto;
 
+#+BEGIN_CENTER
 [[./logo.png]]
+#+END_CENTER
 
 * Installation
 1) Clone the repo into your home directory as ~.emacs.d~.
