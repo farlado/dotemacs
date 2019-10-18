@@ -321,11 +321,6 @@ This to me is preferable to the default behavior.
   (global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
   (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
 #+END_SRC
-** Kill the window on Q in buffer-menu
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'buffer-menu-mode-hook (lambda ()
-				     (bind-key (kbd "Q") 'delete-window)))
-#+END_SRC
 ** Balance windows with C-c b
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c b") 'balance-windows)
