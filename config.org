@@ -1,11 +1,10 @@
 #+STARTUP: overview
-#+OPTIONS: toc:2 p:t 
 #+TITLE: Farlado's .emacs
 #+DESCRIPTION: Farlado's personal emacs configuration
 #+AUTHOR: Farlado
 #+LANGUAGE: en
 
-| [[./logo.png]] |
+[[./logo.png]]
 
 * Installation
 1) Clone the repo into your home directory as ~.emacs.d~.
