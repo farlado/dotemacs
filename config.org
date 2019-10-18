@@ -248,8 +248,7 @@ I had to adjust the function which kills both the current buffer and the current
     (interactive)
     (let ((window-to-delete (selected-window))
 	  (buffer-to-kill (current-buffer))
-	  (delete-window-hook
-	   (lambda () (ignore-errors (delete-window)))))
+	  (delete-window-hook (lambda () (ignore-errors (delete-window)))))
       (unwind-protect
 	  (progn
 	    (add-hook 'kill-buffer-hook delete-window-hook t t)
@@ -262,6 +261,7 @@ I had to adjust the function which kills both the current buffer and the current
   (global-set-key (kbd "C-x C-k") 'kill-this-buffer-and-window)
 #+END_SRC
 ** Close all buffers and kill all windows with C-x C-M-k
+I wanted a way to quickly and gracefully destroy all my open stuff at once.
 #+BEGIN_SRC emacs-lisp
   (defun close-buffers-and-windows ()
     (interactive)
@@ -270,29 +270,32 @@ I had to adjust the function which kills both the current buffer and the current
     (delete-other-windows))
   (global-set-key (kbd "C-x C-M-k") 'close-buffers-and-windows)
 #+END_SRC
-** Use ibuffer so the buffer list doesn't open a new window
-Just another point of personal convenience.
+** Use buffer-menu on C-x b so the buffer list doesn't open a new window
+Just another point of personal convenience. I don't like ~ibuffer~ just because aesthetic reasons.
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-x b") 'ibuffer)
+  (global-set-key (kbd "C-x b") 'buffer-menu)
+  (global-unset-key (kbd "C-x C-b"))
 #+END_SRC
-** Use buffer switching on C-x C-b
-I only have this bound for the rare occasions where ibuffer won't cut it.
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
-#+END_SRC
-** Move focus when explicitly creating new windows
+** Move focus and show buffer-menu when explicitly creating new windows
+This to me is preferable to the default behavior.
 #+BEGIN_SRC emacs-lisp
   (defun split-and-follow-vertical ()
     (interactive)
     (split-window-below)
-    (other-window 1))
+    (other-window 1)
+    (buffer-menu))
   (global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
 
   (defun split-and-follow-horizontal ()
     (interactive)
     (split-window-right)
-    (other-window 1))
+    (other-window 1)
+    (buffer-menu))
   (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
+#+END_SRC
+** Kill the window on Q in buffer-menu
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'buffer-menu-mode-hook (lambda () (bind-key (kbd "Q") 'delete-window)))
 #+END_SRC
 ** Balance windows with C-c b
 #+BEGIN_SRC emacs-lisp
@@ -307,8 +310,7 @@ You know what sucks? Yeah, ~other-window~ sucks. It really sucks. So, I use ~swi
 	  switch-window-increase 4
 	  switch-window-threshold 2
 	  switch-window-shortcut-style 'qwerty
-	  switch-window-qwerty-shortcuts '("a" "s" "d" "f" "g"
-					   "z" "x" "c" "v" "b"))
+	  switch-window-qwerty-shortcuts '("a" "s" "d" "f" "g" "z" "x" "c" "v" "b"))
     :bind ([remap other-window] . switch-window))
 #+END_SRC
 * Org-mode
@@ -323,6 +325,7 @@ I use C-c a and C-c C-a to do things related to my agenda. Only one of my system
 	(defun open-agenda ()
 	  (interactive)
 	  (find-file "~/agenda.org"))
+
 	(global-set-key (kbd "C-c a") 'org-agenda)
 	(global-set-key (kbd "C-c C-a") 'open-agenda)))
 #+END_SRC
@@ -405,50 +408,40 @@ Since I'm using emacs as a window manager, I need dmenu so I can open X windows 
 *** Configure multi-head
 I use this configuration for two different machines, so there's a lot of outputs listed here.
 #+BEGIN_SRC emacs-lisp
-  (setq exwm-randr-workspace-output-plist '(0 "LVDS1"
-					    0 "eDP-1-1"
-					    0 "DP-1-2-2"
-					    1 "DP-1-2-1"
-					    2 "DP-1-2-3"
-					    3 "DP-1-2-2"
-					    4 "DP-1-2-1"
-					    5 "DP-1-2-3"
-					    6 "DP-1-2-2"
-					    7 "DP-1-2-1"
-					    8 "DP-1-2-3"
-					    9 "DP-1-2-2"))
-  (setq exwm-workspace-number 10)
-  (add-hook 'exwm-randr-screen-change-hook
-	    (lambda ()
-	      (start-process-shell-command
-	       "xrandr" nil "ds")))
-  (exwm-randr-enable)
+    (setq exwm-randr-workspace-output-plist '(0 "LVDS1"
+					      0 "eDP-1-1"
+					      0 "DP-1-2-2"
+					      1 "DP-1-2-1"
+					      2 "DP-1-2-3"
+					      3 "DP-1-2-2"
+					      4 "DP-1-2-1"
+					      5 "DP-1-2-3"
+					      6 "DP-1-2-2"
+					      7 "DP-1-2-1"
+					      8 "DP-1-2-3"
+					      9 "DP-1-2-2"))
+    (setq exwm-workspace-number 10)
+    (add-hook 'exwm-randr-screen-change-hook
+	      (lambda () (start-process-shell-command "xrandr" nil "ds")))
+    (exwm-randr-enable)
 #+END_SRC
 *** Name EXWM buffers after the window title
 This was annoying when I first installed EXWM. Thankfully this is a very easy fix.
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'exwm-update-title-hook 
-	    (lambda () (exwm-workspace-rename-buffer
-		   exwm-title)))
+    (add-hook 'exwm-update-title-hook 
+	      (lambda () (exwm-workspace-rename-buffer exwm-title)))
 #+END_SRC
 *** Assign workspaces and floating to various windows
 This is the part of the window manager configuration which is just how to control X windows as they spawn.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-manage-configurations
-	'(((string= exwm-class-name "Steam")
-	   workspace 9
-	   floating t
+	'(((string= exwm-class-name "Steam") workspace 9 floating t
 	   floating-mode-line nil)
-	  ((string= exwm-instance-name "telegram")
-	   workspace 8)
-	  ((string= exwm-class-name "discord")
-	   workspace 7)
-	  ((string= exwm-instance-name "libreoffice")
-	   workspace 6)
-	  ((string= exwm-instance-name "gimp")
-	   workspace 6)
-	  ((string= exwm-title "Event Tester")
-	   floating t)))
+	  ((string= exwm-instance-name "telegram") workspace 8)
+	  ((string= exwm-class-name "discord") workspace 7)
+	  ((string= exwm-instance-name "libreoffice") workspace 6)
+	  ((string= exwm-instance-name "gimp") workspace 6)
+	  ((string= exwm-title "Event Tester") floating t)))
 #+END_SRC
 *** Configure floating window borders
 Uses the same color as my modeline, uses the same width as window divider width. See below.
@@ -464,12 +457,9 @@ Uses the same color as my modeline, uses the same width as window divider width.
 	  ([?\s-w] . exwm-workspace-switch)
 	  ([?\s-e] . exwm-workspace-swap)
 	  ([?\s-r] . exwm-reset)
-	  ,@(mapcar (lambda (i)
-		      `(,(kbd (format "s-%d" i)) .
-			(lambda ()
-			  (interactive)
-			  (exwm-workspace-switch-create ,i))))
-		    (number-sequence 0 9))))
+	  ,@(mapc (lambda (i) `(,(kbd (format "s-%d" i)) .
+			   (lambda () (interactive) (exwm-workspace-switch-create ,i))))
+		  (number-sequence 0 9))))
 #+END_SRC
 *** EXWM-mode functions
 **** Send a key verbatim to the program more easily
@@ -515,8 +505,7 @@ This is super nice, because I love these key bindings and they are just intuitiv
 	  ([?\C-g] . [escape])))
 
   ;; I can't do sequences above, so this is separate
-  (defun exwm-ctrl-s ()
-    (interactive) (execute-kbd-macro (kbd "C-q C-s")))
+  (defun exwm-ctrl-s () (interactive) (execute-kbd-macro (kbd "C-q C-s")))
   (define-key exwm-mode-map (kbd "C-x C-s") 'exwm-ctrl-s)
 #+END_SRC
 ** Initialize EXWM
@@ -603,19 +592,16 @@ I do a crapload here, but basically the two main things I do here is configure m
 *** Showing playback status
 #+BEGIN_SRC emacs-lisp
   (defun mpc-status ()
-    (interactive)
-    (shell-command "mpc"))
+    (interactive) (shell-command "mpc"))
   (global-set-key (kbd "s-a a") 'mpc-status)
   (define-key exwm-mode-map (kbd "s-a a") 'mpc-status)
 #+END_SRC
 *** Shuffling the playlist
 #+BEGIN_SRC emacs-lisp
-  (defun emms-shuffle-message ()
-    (interactive)
-    (emms-shuffle)
-    (message "Playlist has been shuffled."))
-  (global-set-key (kbd "s-a s") 'emms-shuffle-message)
-  (define-key exwm-mode-map (kbd "s-a s") 'emms-shuffle-message)
+    (defun emms-shuffle-message ()
+      (interactive) (emms-shuffle) (message "Playlist has been shuffled."))
+    (global-set-key (kbd "s-a s") 'emms-shuffle-message)
+    (define-key exwm-mode-map (kbd "s-a s") 'emms-shuffle-message)
 #+END_SRC
 *** Setting repeat mode
 #+BEGIN_SRC emacs-lisp
@@ -634,8 +620,7 @@ This is other stuff I use.
 I make sure we use the right shell and use super+return to open a terminal. Using emacs as my terminal has helped wean me off using the terminal for things.
 #+BEGIN_SRC emacs-lisp
   (defvar term-shell "/bin/zsh")
-  (defadvice ansi-term (before force-bash)
-    (interactive (list term-shell)))
+  (defadvice ansi-term (before force-bash) (interactive (list term-shell)))
   (ad-activate 'ansi-term)
 
   (global-set-key (kbd "<s-return>") 'ansi-term)
@@ -668,9 +653,7 @@ Picking a service to use for this was a pain. I ended up settling for wttrin bec
 Firefox has some unique abilities when it comes to how to make windows behave which work better for me. I don't use tabs, and I don't want anything to do with them, and Firefox lets me hide the tab bar and force all tabs to actually open as new windows.
 #+BEGIN_SRC emacs-lisp
   (defun run-firefox ()
-    (interactive)
-    (start-process-shell-command
-     "Firefox" nil "firefox"))
+    (interactive) (start-process-shell-command "Firefox" nil "firefox"))
   (global-set-key (kbd "s-f") 'run-firefox)
   (define-key exwm-mode-map (kbd "s-f") 'run-firefox)
 #+END_SRC
@@ -678,29 +661,21 @@ Firefox has some unique abilities when it comes to how to make windows behave wh
 Shame me all you want. I'm still in introductory courses and haven't learned enough Org-mode to use it more meaningfully.
 #+BEGIN_SRC emacs-lisp
   (defun run-libreoffice ()
-    (interactive)
-    (start-process-shell-command
-     "LibreOffice" nil "libreoffice"))
+    (interactive) (start-process-shell-command "LibreOffice" nil "libreoffice"))
   (global-set-key (kbd "s-b") 'run-libreoffice)
   (define-key exwm-mode-map (kbd "s-b") 'run-libreoffice)
 #+END_SRC
 *** GIMP
 Until GIMP's functionality gets merged into emacs, guess I'm stuck having it.
 #+BEGIN_SRC emacs-lisp
-  (defun run-gimp ()
-    (interactive)
-    (start-process-shell-command
-     "GIMP" nil "gimp"))
+  (defun run-gimp () (interactive) (start-process-shell-command "GIMP" nil "gimp"))
   (global-set-key (kbd "s-g") 'run-gimp)
   (define-key exwm-mode-map (kbd "s-g") 'run-gimp)
 #+END_SRC
 *** Telegram
 I have a painfully white theme which fits perfectly with my setup.
 #+BEGIN_SRC emacs-lisp
-  (defun run-tg ()
-    (interactive)
-    (start-process-shell-command
-     "Telegram" nil "telegram"))
+  (defun run-tg () (interactive) (start-process-shell-command "Telegram" nil "telegram"))
   (global-set-key (kbd "s-t") 'run-tg)
   (define-key exwm-mode-map (kbd "s-t") 'run-tg)
 #+END_SRC
@@ -708,9 +683,7 @@ I have a painfully white theme which fits perfectly with my setup.
 Yeah, I also use a light theme for Discord. It looks comfy, even if Discord is a garbage application.
 #+BEGIN_SRC emacs-lisp
   (defun run-discord ()
-    (interactive)
-    (start-process-shell-command
-     "Discord" nil "discord"))
+    (interactive) (start-process-shell-command "Discord" nil "discord"))
   (global-set-key (kbd "s-d") 'run-discord)
   (define-key exwm-mode-map (kbd "s-d") 'run-discord)
 #+END_SRC
@@ -718,9 +691,7 @@ Yeah, I also use a light theme for Discord. It looks comfy, even if Discord is a
 Gaming is possible with EXWM, if you run games windowed.
 #+BEGIN_SRC emacs-lisp
   (defun run-steam ()
-    (interactive)
-    (start-process-shell-command
-     "Steam" nil "steam"))
+    (interactive) (start-process-shell-command "Steam" nil "steam"))
   (global-set-key (kbd "s-s") 'run-steam)
   (define-key exwm-mode-map (kbd "s-s") 'run-steam)
 #+END_SRC
@@ -731,8 +702,7 @@ This one uses two windows: one to open the NetworkManager connection editor, and
 #+BEGIN_SRC emacs-lisp
   (defun network-settings ()
     (interactive)
-    (start-process-shell-command
-     "Connections" nil "nm-connection-editor")
+    (start-process-shell-command "Connections" nil "nm-connection-editor")
     (async-shell-command "nmcli dev wifi list"))
 
   (global-set-key (kbd "s-n") 'network-settings)
@@ -744,29 +714,25 @@ This one uses two windows: one to open the NetworkManager connection editor, and
     (interactive)
     (shell-command "volctl m"))
   (global-set-key (kbd "<XF86AudioMute>") 'volume-mute)
-  (define-key exwm-mode-map
-    (kbd "<XF86AudioMute>") 'volume-mute)
+  (define-key exwm-mode-map (kbd "<XF86AudioMute>") 'volume-mute)
 
   (defun volume-mic-mute ()
     (interactive)
     (shell-command "volctl t"))
   (global-set-key (kbd "<XF86AudioMicMute>") 'volume-mic-mute)
-  (define-key exwm-mode-map
-    (kbd "<XF86AudioMicMute>") 'volume-mic-mute)
+  (define-key exwm-mode-map (kbd "<XF86AudioMicMute>") 'volume-mic-mute)
 
   (defun volume-up ()
     (interactive)
     (shell-command "volctl u"))
   (global-set-key (kbd "<XF86AudioRaiseVolume>") 'volume-up)
-  (define-key exwm-mode-map
-    (kbd "<XF86AudioRaiseVolume>") 'volume-up)
+  (define-key exwm-mode-map (kbd "<XF86AudioRaiseVolume>") 'volume-up)
 
   (defun volume-down ()
     (interactive)
     (shell-command "volctl d"))
   (global-set-key (kbd "<XF86AudioLowerVolume>") 'volume-down)
-  (define-key exwm-mode-map
-    (kbd "<XF86AudioLowerVolume>") 'volume-down)
+  (define-key exwm-mode-map (kbd "<XF86AudioLowerVolume>") 'volume-down)
 #+END_SRC
 *** Brightness control
 #+BEGIN_SRC emacs-lisp
@@ -774,15 +740,13 @@ This one uses two windows: one to open the NetworkManager connection editor, and
     (interactive)
     (shell-command "blctl -u"))
   (global-set-key (kbd "<XF86MonBrightnessUp>") 'backlight-up)
-  (define-key exwm-mode-map
-    (kbd "<XF86MonBrightnessUp>") 'backlight-up)
+  (define-key exwm-mode-map (kbd "<XF86MonBrightnessUp>") 'backlight-up)
 
   (defun backlight-down ()
     (interactive)
     (shell-command "blctl -d"))
   (global-set-key (kbd "<XF86MonBrightnessDown>") 'backlight-down)
-  (define-key exwm-mode-map
-    (kbd "<XF86MonBrightnessDown>") 'backlight-down)
+  (define-key exwm-mode-map (kbd "<XF86MonBrightnessDown>") 'backlight-down)
 #+END_SRC
 *** Take screenshots
 I love maim specifically for this reason. It's super easy to do this and it's very good quality as a screen capture tool.
@@ -820,9 +784,7 @@ I love maim specifically for this reason. It's super easy to do this and it's ve
 *** Lockscreen
 #+BEGIN_SRC emacs-lisp
   (defun lock-screen ()
-    (interactive)
-    (start-process-shell-command
-     "Lockscreen" nil "i3l"))
+    (interactive) (start-process-shell-command "Lockscreen" nil "i3l"))
   (global-set-key (kbd "<XF86ScreenSaver>") 'lock-screen)
   (define-key exwm-mode-map (kbd "<XF86ScreenSaver>") 'lock-screen)
 
@@ -961,10 +923,9 @@ It's subtle on my theme, but it still helps me keep track of my brackets and par
 *** org-bullets package (nicer bullet points in org-mode)
 It's kinda slow, but bullet points are very very nice, much better than asterisks.
 #+BEGIN_SRC emacs-lisp
-  (use-package org-bullets :ensure t
-    :config (add-hook 'org-mode-hook (lambda ()
-				       (org-bullets-mode 1)))
-    (setq inhibit-compacting-font-caches t))
+    (use-package org-bullets :ensure t
+      :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+      (setq inhibit-compacting-font-caches t))
 #+END_SRC
 ** Mode line
 *** spaceline package (spacemacs mode line)
