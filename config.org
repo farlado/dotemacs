@@ -1,9 +1,10 @@
 #+STARTUP: overview
 #+TITLE: Farlado's .emacs
 #+DESCRIPTION: Farlado's personal emacs configuration
-#+AUTHOR: Farlado
+#+CREATOR: Farlado
 #+LANGUAGE: en
-
+#+OPTIONS: num:nil
+#+ATTR_HTML: :style margin-left: auto; margin-right: auto;
 [[./logo.png]]
 
 * Installation
@@ -259,6 +260,15 @@ I had to adjust the function which kills both the current buffer and the current
 		  (delete-window)))))))
   (global-set-key (kbd "C-x k") 'kill-this-buffer)
   (global-set-key (kbd "C-x C-k") 'kill-this-buffer-and-window)
+#+END_SRC
+** Close all buffers and kill all windows with C-x C-M-k
+#+BEGIN_SRC emacs-lisp
+  (defun close-buffers-and-windows ()
+    (interactive)
+    (save-some-buffers)
+    (mapc 'kill-buffer (buffer-list))
+    (delete-other-windows))
+  (global-set-key (kbd "C-x C-M-k") 'close-buffers-and-windows)
 #+END_SRC
 ** Use ibuffer so the buffer list doesn't open a new window
 Just another point of personal convenience.
