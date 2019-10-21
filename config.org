@@ -529,21 +529,32 @@ This is just a matter of personal comfort. It makes no sense to me on an aesthet
 This is super nice, because I love these key bindings and they are just intuitive to me, and now they can carry over safely to other programs.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-simulation-keys
-	'(([?\C-b] . [left])
+	'(;; Navigation
+	  ([?\C-b] . [left])
 	  ([?\C-f] . [right])
 	  ([?\C-p] . [up])
 	  ([?\C-n] . [down])
+
+	  ([?\M-b] . [C-left])
+	  ([?\M-f] . [C-right])
+	  ([?\M-p] . [C-up])
+	  ([?\M-n] . [C-down])
+
 	  ([?\C-a] . [home])
 	  ([?\C-e] . [end])
 	  ([?\C-v] . [next])
 	  ([?\M-v] . [prior])
-	  ([?\C-d] . [delete])
-	  ([?\C-k] . [S-end delete])
+
+	  ;; Copy/Paste
 	  ([?\C-w] . [?\C-x])
 	  ([?\M-w] . [?\C-c])
 	  ([?\C-y] . [?\C-v])
 	  ([?\C-s] . [?\C-f])
 	  ([?\C-\/] . [?\C-z])
+
+	  ;; Other
+	  ([?\C-d] . [delete])
+	  ([?\C-k] . [S-end delete])
 	  ([?\C-g] . [escape])))
 
   ;; I can't do sequences above, so this is separate
@@ -703,8 +714,13 @@ Picking a service to use for this was a pain. I ended up settling for wttrin bec
       (interactive)
       (wttrin "Indianapolis, IN")
       (delete-other-windows))
+    (defun wttrin-not-local ()
+      "Show a weather report for a user-defined locality."
+      (interactive)
+      (wttrin)
+      (delete-other-windows))
     :bind (("C-c w" . wttrin-local)
-	   ("C-c C-w" . wttrin)))
+	   ("C-c C-w" . wttrin-not-local)))
 #+END_SRC
 ** X applications
 *** Firefox
