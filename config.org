@@ -636,7 +636,7 @@ I copied the function for quitting emacs to handle shutting down.
        (run-hook-with-args-until-failure 'kill-emacs-query-functions)
        (or (null confirm)
 	   (funcall confirm "Really shut down? "))
-       (shell-command "shutdown now"))))
+       (shell-command "sudo shutdown -h now"))))
 
   (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
   (define-key exwm-mode-map (kbd "C-x C-M-c") 'save-buffers-shut-down)
