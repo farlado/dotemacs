@@ -377,6 +377,10 @@ I love this. I really really really *really* love this. I can use my number pad 
 
   (define-key calc-mode-map (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
 #+END_SRC
+*** Calendar
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c C-c") 'calendar)
+#+END_SRC
 *** Weather forecasts
 Picking a service to use for this was a pain. I ended up settling for wttrin because it is the fastest and easiest to use, and plays nice with my setup.
 #+BEGIN_SRC emacs-lisp
