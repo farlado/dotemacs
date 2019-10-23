@@ -481,7 +481,7 @@ This one uses two windows: one to open the NetworkManager connection editor, and
     "Open a NetworkManager connection editor."
     (interactive)
     (start-process-shell-command
-     "Connections" nil "nm-connection-editor")
+     "Connections" nil "sudo nm-connection-editor")
     (async-shell-command "nmcli dev wifi list"))
 
   (global-set-key (kbd "s-n") 'network-settings)
@@ -640,7 +640,8 @@ I copied the function for quitting emacs to handle shutting down.
        (run-hook-with-args-until-failure 'kill-emacs-query-functions)
        (or (null confirm)
 	   (funcall confirm "Really shut down? "))
-       (shell-command "sudo shutdown -h now"))))
+       (shell-command "sudo shutdown -h now")
+       (kill-emacs))))
 
   (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
   (define-key exwm-mode-map (kbd "C-x C-M-c") 'save-buffers-shut-down)
@@ -696,7 +697,8 @@ I copied the function for quitting emacs to handle shutting down.
        (run-hook-with-args-until-failure 'kill-emacs-query-functions)
        (or (null confirm)
 	   (funcall confirm "Really reboot? "))
-       (shell-command "sudo reboot"))))
+       (shell-command "sudo reboot")
+       (kill-emacs))))
 
   (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
   (define-key exwm-mode-map (kbd "C-x C-M-r") 'save-buffers-reboot)
