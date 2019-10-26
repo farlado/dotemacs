@@ -34,7 +34,8 @@ I love the default start screen, but it just doesn't cut it for me. I just use t
 #+BEGIN_SRC emacs-lisp
   (use-package dashboard
     :ensure t
-    :config
+    :defer t
+    :init
     (setq inhibit-start-menu t
 	  dashboard-startup-banner "~/.emacs.d/logo.png"
 	  dashboard-items '((recents . 10))
@@ -50,7 +51,8 @@ I don't want to have to manually update my stuff. This solution is literally plo
 #+BEGIN_SRC emacs-lisp
   (use-package auto-package-update
     :ensure t
-    :config
+    :defer t
+    :init
     (require 'auto-package-update)
     (setq auto-package-update-interval 2
 	  auto-package-update-delete-old-versions t
@@ -108,6 +110,7 @@ Since I'm using emacs as a window manager, I need dmenu so I can open X windows 
 #+BEGIN_SRC emacs-lisp
   (use-package dmenu
     :ensure t
+    :defer t
     :bind (("s-x" . dmenu)
 	   :map exwm-mode-map
 	   ("s-x" . dmenu)))
@@ -252,7 +255,8 @@ I do a crapload here, but basically the two main things I do here is configure m
 #+BEGIN_SRC emacs-lisp
   (use-package emms
     :ensure t
-    :config
+    :defer t
+    :init
     (require 'emms-setup)
     (require 'emms-player-mpd)
     (emms-all)
@@ -377,10 +381,16 @@ I love this. I really really really *really* love this. I can use my number pad 
 
   (define-key calc-mode-map (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
 #+END_SRC
+*** Calendar
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c C-c") 'calendar)
+#+END_SRC
 *** Weather forecasts
 Picking a service to use for this was a pain. I ended up settling for wttrin because it is the fastest and easiest to use, and plays nice with my setup.
 #+BEGIN_SRC emacs-lisp
-  (use-package wttrin :ensure t
+  (use-package wttrin
+    :ensure t
+    :defer t
     :init
     (defun wttrin-local ()
       "Show a weather report for a given locality."
@@ -477,7 +487,7 @@ This one uses two windows: one to open the NetworkManager connection editor, and
     "Open a NetworkManager connection editor."
     (interactive)
     (start-process-shell-command
-     "Connections" nil "nm-connection-editor")
+     "Connections" nil "sudo nm-connection-editor")
     (async-shell-command "nmcli dev wifi list"))
 
   (global-set-key (kbd "s-n") 'network-settings)
@@ -636,10 +646,68 @@ I copied the function for quitting emacs to handle shutting down.
        (run-hook-with-args-until-failure 'kill-emacs-query-functions)
        (or (null confirm)
 	   (funcall confirm "Really shut down? "))
-       (shell-command "shutdown now"))))
+       (shell-command "sudo shutdown -h now")
+       (kill-emacs))))
 
   (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
   (define-key exwm-mode-map (kbd "C-x C-M-c") 'save-buffers-shut-down)
+#+END_SRC
+*** Reboot
+I copied the function for quitting emacs to handle shutting down.
+#+BEGIN_SRC emacs-lisp
+  (defun save-buffers-reboot (&optional arg)
+    "Offer to save each buffer, then shut down the computer.
+  This function is literally just a copycat of `save-buffers-kill-emacs'.
+  With prefix ARG, silently save all file-visiting buffers without asking.
+  If there are active processes where `process-query-on-exit-flag'
+  returns non-nil and `confirm-kill-processes' is non-nil,
+  asks whether processes should be killed.
+  Runs the members of `kill-emacs-query-functions' in turn and stops
+  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
+  Instead of just killing Emacs, shuts down the system."
+    (interactive "P")
+    ;; Don't use save-some-buffers-default-predicate, because we want
+    ;; to ask about all the buffers before killing Emacs.
+    (save-some-buffers arg t)
+    (let ((confirm confirm-kill-emacs))
+      (and
+       (or (not (memq t (mapcar (function
+				 (lambda (buf) (and (buffer-file-name buf)
+						    (buffer-modified-p buf))))
+				(buffer-list))))
+	   (progn (setq confirm nil)
+		  (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
+       (or (not (fboundp 'process-list))
+	   ;; process-list is not defined on MSDOS.
+	   (not confirm-kill-processes)
+	   (let ((processes (process-list))
+		 active)
+	     (while processes
+	       (and (memq (process-status (car processes)) '(run stop open listen))
+		    (process-query-on-exit-flag (car processes))
+		    (setq active t))
+	       (setq processes (cdr processes)))
+	     (or (not active)
+		 (with-current-buffer-window
+		  (get-buffer-create "*Process List*") nil
+		  #'(lambda (window _value)
+		      (with-selected-window window
+			(unwind-protect
+			    (progn
+			      (setq confirm nil)
+			      (yes-or-no-p "Active processes exist; kill them and reboot anyway? "))
+			  (when (window-live-p window)
+			    (quit-restore-window window 'kill)))))
+		  (list-processes t)))))
+       ;; Query the user for other things, perhaps.
+       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
+       (or (null confirm)
+	   (funcall confirm "Really reboot? "))
+       (shell-command "sudo reboot")
+       (kill-emacs))))
+
+  (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
+  (define-key exwm-mode-map (kbd "C-x C-M-r") 'save-buffers-reboot)
 #+END_SRC
 * General Functionality
 This is just stuff not pertaining to a specific task and/or not complex enough to warrant entire sections for them.
@@ -678,7 +746,8 @@ Not the best way to do epub reading, but at least it's in emacs.
 #+BEGIN_SRC emacs-lisp
   (use-package nov
     :ensure t
-    :config
+    :defer t
+    :init
     (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 #+END_SRC
 ** Restart and open dashboard with C-c d
@@ -702,6 +771,13 @@ Since this thing is changing all the time, I really like having it available on 
 
   (global-set-key (kbd "C-c e") 'config-visit)
 #+END_SRC
+** Edit with superuser privs via C-x C-M-f
+#+BEGIN_SRC emacs-lisp
+  (use-package sudo-edit
+    :ensure t
+    :defer t
+    :bind ("C-x C-M-f" . sudo-edit))
+#+END_SRC
 * Menus/Commands
 Menus, commands, and commands which involve menus.
 ** Enable ido-mode, install ido-vertical-mode and smex
@@ -716,7 +792,8 @@ However, I /HATE/ ~ido-mode~ right out of the box. A vertical list looks crapton
 #+BEGIN_SRC emacs-lisp
   (use-package ido-vertical-mode
     :ensure t
-    :config
+    :defer t
+    :init
     (setq ido-vertical-define-keys 'C-n-and-C-p-only)
     (ido-vertical-mode 1))
 #+END_SRC
@@ -724,6 +801,7 @@ Default M-x behavior doesn't use ~ido-mode~, so we install a package which gives
 #+BEGIN_SRC emacs-lisp
   (use-package smex
     :ensure t
+    :defer t
     :bind ("M-x" . smex))
 #+END_SRC
 ** Replace "yes or no" prompts with "y or n"
@@ -736,6 +814,7 @@ Even as I've gotten used to emacs key bindings, it is always nice to have this a
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
     :ensure t
+    :defer t
     :init
     (which-key-mode 1))
 #+END_SRC
@@ -744,6 +823,7 @@ Having the whole kill ring easy to scroll through is much less hassle than defau
 #+BEGIN_SRC emacs-lisp
   (use-package popup-kill-ring
     :ensure t
+    :defer t
     :bind ("M-y" . popup-kill-ring))
 #+END_SRC
 ** swiper package (better searches)
@@ -751,6 +831,7 @@ This search behavior is *SO* much nicer than the default.
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
     :ensure t
+    :defer t
     :bind ("C-s" . swiper))
 #+END_SRC
 ** Kill an entire word when you're in the middle of it
@@ -769,6 +850,7 @@ If I want to hop around in a document without calling swiper, ~avy~ is definitel
 #+BEGIN_SRC emacs-lisp
   (use-package avy
     :ensure t
+    :defer t
     :bind ("M-s" . avy-goto-char))
 #+END_SRC
 ** hungry-delete package (convenient deletion of trailing whitespace)
@@ -776,25 +858,26 @@ This saves me tons of time when it comes to managing whitespace.
 #+BEGIN_SRC emacs-lisp
   (use-package hungry-delete
     :ensure t
-    :config
+    :defer t
+    :init
     (global-hungry-delete-mode 1))
 #+END_SRC
 ** company package (autocomplete backend)
 This is the base package. I changed some keybinds to make it more pleasant to use.
 #+BEGIN_SRC emacs-lisp
-  (use-package company
-    :ensure t
-    :init
-    (add-hook 'after-init-hook 'global-company-mode)
-    :config
-    (setq company-idle-delay 0.75
-	  company-minimum-prefix-length 3)
-    (with-eval-after-load 'company
-      (define-key company-active-map (kbd "M-n") nil)
-      (define-key company-active-map (kbd "M-p") nil)
-      (define-key company-active-map (kbd "C-n") #'company-select-next)
-      (define-key company-active-map (kbd "C-p") #'company-select-previous)
-      (define-key company-active-map (kbd "SPC") #'company-abort)))
+    (use-package company
+      :ensure t
+      :defer t
+      :init
+      (setq company-idle-delay 0.75
+	    company-minimum-prefix-length 3)
+      (with-eval-after-load 'company
+	(define-key company-active-map (kbd "M-n") nil)
+	(define-key company-active-map (kbd "M-p") nil)
+	(define-key company-active-map (kbd "C-n") #'company-select-next)
+	(define-key company-active-map (kbd "C-p") #'company-select-previous)
+	(define-key company-active-map (kbd "SPC") #'company-abort))
+      (global-company-mode 1))
 #+END_SRC
 * Buffers/Windows
 ** Sloppy focus
@@ -873,6 +956,7 @@ You know what sucks? Yeah, ~other-window~ sucks. It really sucks. So, I use ~swi
 #+BEGIN_SRC emacs-lisp
   (use-package switch-window
     :ensure t
+    :defer t
     :config
     (setq switch-window-input-style 'minibuffer
 	  switch-window-increase 4
@@ -897,6 +981,7 @@ You know what sucks? Yeah, ~other-window~ sucks. It really sucks. So, I use ~swi
 #+BEGIN_SRC emacs-lisp
   (use-package buffer-move
     :ensure t
+    :defer t
     :bind (("<C-s-up>" . buf-move-up)
 	   ("<C-s-down>" . buf-move-down)
 	   ("<C-s-left>" . buf-move-left)
@@ -944,6 +1029,7 @@ I used to use a terminal for this, but holy crap this is a lot easier, a lot fas
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure t
+    :defer t
     :bind ("C-c g" . magit-status))
 #+END_SRC
 ** flycheck package (on-the-fly syntax checker)
@@ -951,30 +1037,35 @@ This is nice to have so I can be told right away when I'm doing something wrong.
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :ensure t
-    :config (global-flycheck-mode 1))
+    :defer t
+    :init
+    (global-flycheck-mode 1))
 #+END_SRC
 ** company-jedi package (Python autocompletion)
 I will probably be adding company autocompletion for more languages as I start working in more languages.
 #+BEGIN_SRC emacs-lisp
   (use-package company-jedi
     :ensure t
-    :config (add-to-list 'company-backends 'company-jedi))
+    :defer t
+    :config
+    (add-to-list 'company-backends 'company-jedi))
 #+END_SRC
 ** haskell-mode package (self-explanatory)
 I have started to mess around with Haskell, so I needed to grab a mode for that. This supplies basically everything I need, e.g. company autocompletion and flycheck information.
 #+BEGIN_SRC emacs-lisp
   (use-package haskell-mode
     :ensure t
+    :defer t
     :init
     (require 'haskell-mode)
     (require 'haskell-process)
     (require 'haskell-interactive-mode)
-    :hook
-    (haskell-mode-hook . interactive-haskell-mode)
-    (haskell-mode-hook . turn-on-haskell-doc-mode)
-    (haskell-mode-hook . turn-on-haskell-indentation)
-    (haskell-mode-hook . haskell-auto-insert-module-template)
-    :config (setq haskell-stylish-on-save t))
+    :hook ((haskell-mode-hook . interactive-haskell-mode)
+	   (haskell-mode-hook . turn-on-haskell-doc-mode)
+	   (haskell-mode-hook . turn-on-haskell-indentation)
+	   (haskell-mode-hook . haskell-auto-insert-module-template))
+    :config
+    (setq haskell-stylish-on-save t))
 #+END_SRC
 ** electric-pair-mode (OH MY GOD THIS IS SO GREAT)
 I have no words for how convenient this has been and how much faster I get things done thanks to these five lines of elisp.
@@ -986,12 +1077,13 @@ I have no words for how convenient this has been and how much faster I get thing
   (electric-pair-mode t)
 #+END_SRC
 * Looks
-** Theme
+** leuven-theme package (theme)
 I used to hate light themes. I'm not in that camp anymore. I love this elegant theme.
 #+BEGIN_SRC emacs-lisp
   (use-package leuven-theme
     :ensure t
-    :config
+    :defer t
+    :init
     (setq org-fontify-whole-heading-line t
 	  leuven-scale-org-agenda-structure t
 	  leuven-scale-outline-headlines t)
@@ -1045,8 +1137,8 @@ I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so mu
 #+BEGIN_SRC emacs-lisp
   (use-package pretty-mode
     :ensure t
-    :config
-    (require 'pretty-mode)
+    :defer t
+    :init
     (global-pretty-mode 1)
     (pretty-activate-groups
      '(:ordering :equality :logic :sets :sub-and-superscripts
@@ -1063,7 +1155,8 @@ I don't use it too much, but it's nice to have it around.
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode
     :ensure t
-    :config
+    :defer t
+    :init
     (define-globalized-minor-mode global-rainbow-mode rainbow-mode (lambda ()
 								     (rainbow-mode 1)))
     (global-rainbow-mode 1))
@@ -1073,6 +1166,7 @@ It's subtle on my theme, but it still helps me keep track of my brackets and par
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
     :ensure t
+    :defer t
     :init
     (add-hook 'prog-mode-hook #'rainbow-delimiters-mode 1))
 #+END_SRC
@@ -1081,7 +1175,8 @@ It's kinda slow, but bullet points are very very nice, much better than asterisk
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
     :ensure t
-    :config
+    :defer t
+    :init
     (add-hook 'org-mode-hook (lambda ()
 			       (org-bullets-mode 1)))
     (setq inhibit-compacting-font-caches t))
@@ -1097,7 +1192,8 @@ I *hate* the default modeline. This one is much less sucky.
 #+BEGIN_SRC emacs-lisp
   (use-package spaceline
     :ensure t
-    :config
+    :defer t
+    :init
     (require 'spaceline-config)
     (setq powerline-default-separator (quote butt))
     (spaceline-spacemacs-theme))
@@ -1112,7 +1208,8 @@ I used to just use the default battery modeline setting, but I decided I want so
 #+BEGIN_SRC emacs-lisp
   (use-package fancy-battery
     :ensure t
-    :config
+    :defer t
+    :init
     (setq fancy-battery-show-percentage t
 	  battery-update-interval 15)
     (fancy-battery-mode 1))
