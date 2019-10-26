@@ -1086,6 +1086,11 @@ It's kinda slow, but bullet points are very very nice, much better than asterisk
 			       (org-bullets-mode 1)))
     (setq inhibit-compacting-font-caches t))
 #+END_SRC
+*** Hide emphasis markers in org-mode
+Just a point of /personal preference./
+#+BEGIN_SRC emacs-lisp
+  (setq org-hide-emphasis-markers t)
+#+END_SRC
 ** Mode line
 *** spaceline package (spacemacs mode line)
 I *hate* the default modeline. This one is much less sucky.
