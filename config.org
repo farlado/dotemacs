@@ -1133,16 +1133,15 @@ However, I don't like line numbers in modes where it breaks the mode.
 *** pretty-mode package (prettify symbols)
 I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so much more to make things look nice, especially in functional programming languages. I enable /all/ of them.
 #+BEGIN_SRC emacs-lisp
-  (use-package pretty-mode
-    :ensure t
-    :defer t
-    :init
-    (global-pretty-mode 1)
-    (pretty-activate-groups
-     '(:ordering :equality :logic :sets :sub-and-superscripts
-		 :function :greek :punctuation :types :arrows
-		 :quantifiers :nil :arithmetic :undefined
-		 :parentheses :other)))
+    (use-package pretty-mode
+      :ensure t
+      :defer t
+      :init
+      (global-pretty-mode 1)
+      (pretty-activate-groups
+       '(:nil :ordering :equality :logic :sets :parentheses :function :greek
+	      :types :punctuation :arrows :quantifiers :arithmetic :undefined
+	      :other :sub-and-superscripts)))
 #+END_SRC
 *** Highlight matching parentheses et al. when hoving near one
 #+BEGIN_SRC emacs-lisp
