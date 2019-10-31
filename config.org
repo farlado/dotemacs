@@ -595,6 +595,15 @@ I love maim specifically for this reason. It's super easy to do this and it's ve
   (global-set-key (kbd "s-l") 'lock-screen)
   (define-key exwm-mode-map (kbd "s-l") 'lock-screen)
 #+END_SRC
+*** Suspending
+#+BEGIN_SRC emacs-lisp
+  (defun suspend-computer ()
+    (interactive)
+    (when (yes-or-no-p "Really suspend? ")
+      (shell-command "sudo zzz || sudo systemctl suspend")))
+
+  (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
+#+END_SRC
 *** Shutting down
 I copied the function for quitting emacs to handle shutting down.
 #+BEGIN_SRC emacs-lisp
@@ -652,8 +661,8 @@ I copied the function for quitting emacs to handle shutting down.
   (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
   (define-key exwm-mode-map (kbd "C-x C-M-c") 'save-buffers-shut-down)
 #+END_SRC
-*** Reboot
-I copied the function for quitting emacs to handle shutting down.
+*** Rebooting
+I copied the function for quitting emacs to handle reboot too.
 #+BEGIN_SRC emacs-lisp
   (defun save-buffers-reboot (&optional arg)
     "Offer to save each buffer, then shut down the computer.
@@ -951,21 +960,8 @@ This to me is preferable to the default behavior.
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c b") 'balance-windows)
 #+END_SRC
-** switch-window package (easier movement between windows)
-You know what sucks? Yeah, ~other-window~ sucks. It really sucks. So, I use ~switch-window~ instead so that I can more easily move between windows when I have more than two.
-#+BEGIN_SRC emacs-lisp
-  (use-package switch-window
-    :ensure t
-    :defer t
-    :config
-    (setq switch-window-input-style 'minibuffer
-	  switch-window-increase 4
-	  switch-window-threshold 2
-	  switch-window-shortcut-style 'qwerty
-	  switch-window-qwerty-shortcuts '("a" "s" "d" "f" "g" "z" "x" "c" "v" "b"))
-    :bind ([remap other-window] . switch-window))
-#+END_SRC
 ** move focus with C-M-w/a/s/d
+Previously I used ~switch-window~ but it's pretty garbo lol so here's something that works a little more intuitively for me. I also remove C-x o as a bind, since I don't like ~other-window~.
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-s-w") 'windmove-up)
   (global-set-key (kbd "C-s-a") 'windmove-left)
@@ -976,6 +972,8 @@ You know what sucks? Yeah, ~other-window~ sucks. It really sucks. So, I use ~swi
   (define-key exwm-mode-map (kbd "C-s-a") 'windmove-left)
   (define-key exwm-mode-map (kbd "C-s-s") 'windmove-down)
   (define-key exwm-mode-map (kbd "C-s-d") 'windmove-right)
+
+  (global-unset-key (kbd "C-x o"))
 #+END_SRC
 ** buffer-move package (move windows around)
 #+BEGIN_SRC emacs-lisp
