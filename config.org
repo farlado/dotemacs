@@ -931,10 +931,12 @@ I wanted a way to quickly and gracefully destroy all my open stuff at once.
   (global-set-key (kbd "C-x C-M-k") 'close-buffers-and-windows)
 #+END_SRC
 ** Use buffer-menu on C-x b so the buffer list doesn't open a new window
-Just another point of personal convenience. I don't like ~ibuffer~ just because aesthetic reasons.
+Just another point of personal convenience. I don't like ~ibuffer~ just because aesthetic reasons. I also set Q to close the window, for convenience.
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x b") 'buffer-menu)
   (global-unset-key (kbd "C-x C-b"))
+
+  (define-key Buffer-menu-mode-map (kbd "Q") 'kill-buffer-and-window)
 #+END_SRC
 ** Move focus and show buffer-menu when explicitly creating new windows
 This to me is preferable to the default behavior.
