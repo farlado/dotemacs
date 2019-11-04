@@ -14,9 +14,11 @@
 * Startup
 Since I use emacs as my window manager, there's a lot of extra stuff beyond only emacs-related things in here. You might want to clean them out if you don't intend to use EXWM.
 ** Start emacs server
-Although I technically don't /have/ to do this, it is very helpful when I use terminals.
+Although I technically don't /have/ to do this, it is very helpful.
 #+BEGIN_SRC emacs-lisp
-  (server-start)
+  (require 'server)
+  (unless (server-running-p)
+    (server-start))
 #+END_SRC
 ** UTF-8 encoding
 I probably don't have to do this but it makes things work a little smoother.
