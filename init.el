@@ -1,3 +1,6 @@
+;; get window fullscreen asap lol
+(set-frame-parameter nil 'fullscreen 'fullboth)
+
 ;; package manager init
 (require 'package)
 (setq package-enable-at-startup nil)
