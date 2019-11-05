@@ -1,9 +1,13 @@
 #+STARTUP: overview
+#+STARTUP:inlineimages
 #+TITLE: Farlado's .emacs
 #+DESCRIPTION: Farlado's personal emacs configuration
 #+CREATOR: Farlado
 #+LANGUAGE: en
 #+OPTIONS: num:nil
+
+#+NAME: fig:LOGO
+#+CAPTION: 'An excellent emacs'
 #+ATTR_HTML: :style margin-left: auto; margin-right: auto;
 [[./logo.png]]
 
@@ -406,6 +410,14 @@ Picking a service to use for this was a pain. I ended up settling for wttrin bec
       (delete-other-windows))
     :bind (("C-c w" . wttrin-local)
 	   ("C-c C-w" . wttrin-not-local)))
+#+END_SRC
+*** Sudoku
+I /love/ sudoku puzzles.
+#+BEGIN_SRC emacs-lisp
+  (use-package sudoku
+    :ensure t
+    :defer t
+    :bind ("C-c s" . sudoku))
 #+END_SRC
 ** X applications
 *** Firefox
@@ -1128,6 +1140,7 @@ However, I don't like line numbers in modes where it breaks the mode.
   (disable-line-numbers-for 'term-mode-hook)
   (disable-line-numbers-for 'tetris-mode-hook)
   (disable-line-numbers-for 'snake-mode-hook)
+  (disable-line-numbers-for 'sudoku-mode-hook)
   (disable-line-numbers-for 'ibuffer-hook)
   (disable-line-numbers-for 'dashboard-mode-hook)
   (disable-line-numbers-for 'shell-mode-hook)
