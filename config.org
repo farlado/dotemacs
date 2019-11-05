@@ -1,5 +1,4 @@
-#+STARTUP: overview
-#+STARTUP:inlineimages
+#+STARTUP: overview, inlineimages
 #+TITLE: Farlado's .emacs
 #+DESCRIPTION: Farlado's personal emacs configuration
 #+CREATOR: Farlado
@@ -254,6 +253,210 @@ Now that we've got all the variables nice and ready, let's start it up!
   (exwm-config-ido)
   (exwm-systemtray-enable)
 #+END_SRC
+* Making emacs a (sufficiently exhaustive) DE
+Since I use emacs as my window manager, obviously I want to make it a full-on desktop environment!
+** desktop-environment package
+Previously I had to define a lot of functions to do these things, now I just change settings within ~desktop-environment~.
+#+BEGIN_SRC emacs-lisp
+  (use-package desktop-environment
+    :ensure t
+    :defer t
+    :init
+    (require 'desktop-environment)
+    (desktop-environment-mode))
+#+END_SRC
+*** Volume adjustment
+The only things I really don't like here are how much output it gives when you mute or unmute the speakers or microphone, so I set up a basic script to give much more concise output.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-volume-toggle-command
+	(concat "[ \"$(amixer set Master toggle | grep off)\" ] "
+		"&& echo Volume is now muted. | tr '\n' ' ' "
+		"|| echo Volume is now unmuted. | tr '\n' ' '")
+	desktop-environment-volume-toggle-microphone-command
+	(concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
+		"&& echo Microphone is now muted. | tr '\n' ' ' "
+		"|| echo Microphone is now unmuted | tr '\n' ' '"))
+#+END_SRC
+*** Brightness adjustment
+This one all I needed to do was change the increment and decrement values.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-brightness-normal-increment "5%+"
+	desktop-environment-brightness-normal-decrement "5%-")
+#+END_SRC
+*** Screenshots
+This one was the least straightforward. First, I just use the current directory for this.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-screenshot-directory ".")
+#+END_SRC
+Then, I can set the command for a full-screen screenshot. The way the bind is supposed to be used is to store a screenshot in the directory we just defined, but I would rather put it in the clipboard.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-screenshot-command
+	"maim /dev/stdout | xclip -selection -clipboard -t image/png")
+#+END_SRC
+Lastly, I can set the command for a partial screenshot. Again, it gets stored in the clipboard.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-screenshot-partial-command
+	"maim -s /dev/stdout | xclip -selection -clipboard -t image/png")
+#+END_SRC
+*** Lockscreen
+I use a personal script for this one, see [[https://github.com/farlado/dotfiles][my dotfiles]] for .local/bin/i3l to understand.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-screenlock-command "i3l")
+#+END_SRC
+** Network Settings
+This one uses two windows: one to open the NetworkManager connection editor, and another to list wifi networks nearby.
+#+BEGIN_SRC emacs-lisp
+  (defun network-settings ()
+    "Open a NetworkManager connection editor."
+    (interactive)
+    (start-process-shell-command
+     "Connections" nil "sudo nm-connection-editor")
+    (async-shell-command "nmcli dev wifi list"))
+
+  (global-set-key (kbd "s-n") 'network-settings)
+  (define-key exwm-mode-map (kbd "s-n") 'network-settings)
+#+END_SRC
+** Keyboard layout selection
+#+BEGIN_SRC emacs-lisp
+  (defun cycle-kbd-layout ()
+    "Cycles the keyboard layout in reverse."
+    (interactive)
+    (shell-command "keyctl -c us epo de"))
+
+  (defun cycle-kbd-layout-reverse ()
+    "Cycles the keyboard layout in reverse."
+    (interactive)
+    (shell-command "keyctl -c de epo us"))
+
+  (global-set-key (kbd "s-SPC") 'cycle-kbd-layout)
+  (define-key exwm-mode-map (kbd "s-SPC") 'cycle-kbd-layout)
+
+  (global-set-key (kbd "<s-backspace>") 'cycle-kbd-layout-reverse)
+  (define-key exwm-mode-map (kbd "<s-backspace>") 'cycle-kbd-layout-reverse)
+#+END_SRC
+** Suspending
+#+BEGIN_SRC emacs-lisp
+  (defun suspend-computer ()
+    (interactive)
+    (when (yes-or-no-p "Really suspend? ")
+      (shell-command "sudo zzz || sudo systemctl suspend")))
+
+  (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
+#+END_SRC
+** Shutting down
+I copied the function for quitting emacs to handle shutting down.
+#+BEGIN_SRC emacs-lisp
+  (defun save-buffers-shut-down (&optional arg)
+    "Offer to save each buffer, then shut down the computer.
+  This function is literally just a copycat of `save-buffers-kill-emacs'.
+  With prefix ARG, silently save all file-visiting buffers without asking.
+  If there are active processes where `process-query-on-exit-flag'
+  returns non-nil and `confirm-kill-processes' is non-nil,
+  asks whether processes should be killed.
+  Runs the members of `kill-emacs-query-functions' in turn and stops
+  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
+  Instead of just killing Emacs, shuts down the system."
+    (interactive "P")
+    ;; Don't use save-some-buffers-default-predicate, because we want
+    ;; to ask about all the buffers before killing Emacs.
+    (save-some-buffers arg t)
+    (let ((confirm confirm-kill-emacs))
+      (and
+       (or (not (memq t (mapcar (function
+				 (lambda (buf) (and (buffer-file-name buf)
+						    (buffer-modified-p buf))))
+				(buffer-list))))
+	   (progn (setq confirm nil)
+		  (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
+       (or (not (fboundp 'process-list))
+	   ;; process-list is not defined on MSDOS.
+	   (not confirm-kill-processes)
+	   (let ((processes (process-list))
+		 active)
+	     (while processes
+	       (and (memq (process-status (car processes)) '(run stop open listen))
+		    (process-query-on-exit-flag (car processes))
+		    (setq active t))
+	       (setq processes (cdr processes)))
+	     (or (not active)
+		 (with-current-buffer-window
+		  (get-buffer-create "*Process List*") nil
+		  #'(lambda (window _value)
+		      (with-selected-window window
+			(unwind-protect
+			    (progn
+			      (setq confirm nil)
+			      (yes-or-no-p "Active processes exist; kill them and shut down anyway? "))
+			  (when (window-live-p window)
+			    (quit-restore-window window 'kill)))))
+		  (list-processes t)))))
+       ;; Query the user for other things, perhaps.
+       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
+       (or (null confirm)
+	   (funcall confirm "Really shut down? "))
+       (shell-command "sudo shutdown -h now")
+       (kill-emacs))))
+
+  (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
+  (define-key exwm-mode-map (kbd "C-x C-M-c") 'save-buffers-shut-down)
+#+END_SRC
+** Rebooting
+I copied the function for quitting emacs to handle reboot too.
+#+BEGIN_SRC emacs-lisp
+  (defun save-buffers-reboot (&optional arg)
+    "Offer to save each buffer, then shut down the computer.
+  This function is literally just a copycat of `save-buffers-kill-emacs'.
+  With prefix ARG, silently save all file-visiting buffers without asking.
+  If there are active processes where `process-query-on-exit-flag'
+  returns non-nil and `confirm-kill-processes' is non-nil,
+  asks whether processes should be killed.
+  Runs the members of `kill-emacs-query-functions' in turn and stops
+  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
+  Instead of just killing Emacs, shuts down the system."
+    (interactive "P")
+    ;; Don't use save-some-buffers-default-predicate, because we want
+    ;; to ask about all the buffers before killing Emacs.
+    (save-some-buffers arg t)
+    (let ((confirm confirm-kill-emacs))
+      (and
+       (or (not (memq t (mapcar (function
+				 (lambda (buf) (and (buffer-file-name buf)
+						    (buffer-modified-p buf))))
+				(buffer-list))))
+	   (progn (setq confirm nil)
+		  (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
+       (or (not (fboundp 'process-list))
+	   ;; process-list is not defined on MSDOS.
+	   (not confirm-kill-processes)
+	   (let ((processes (process-list))
+		 active)
+	     (while processes
+	       (and (memq (process-status (car processes)) '(run stop open listen))
+		    (process-query-on-exit-flag (car processes))
+		    (setq active t))
+	       (setq processes (cdr processes)))
+	     (or (not active)
+		 (with-current-buffer-window
+		  (get-buffer-create "*Process List*") nil
+		  #'(lambda (window _value)
+		      (with-selected-window window
+			(unwind-protect
+			    (progn
+			      (setq confirm nil)
+			      (yes-or-no-p "Active processes exist; kill them and reboot anyway? "))
+			  (when (window-live-p window)
+			    (quit-restore-window window 'kill)))))
+		  (list-processes t)))))
+       ;; Query the user for other things, perhaps.
+       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
+       (or (null confirm)
+	   (funcall confirm "Really reboot? "))
+       (shell-command "sudo reboot")
+       (kill-emacs))))
+
+  (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
+  (define-key exwm-mode-map (kbd "C-x C-M-r") 'save-buffers-reboot)
+#+END_SRC
 * EMMS (Emacs MultiMedia System)
 I am big on doing as much in emacs as possible. Having my music player moved to emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it.
 ** Install EMMS and bind main playback keys
@@ -364,7 +567,7 @@ I do a crapload here, but basically the two main things I do here is configure m
   (define-key exwm-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
 #+END_SRC
 * Other programs
-This is other stuff I use.
+This is other stuff I use, whether in emacs or in X windows.
 ** Within emacs
 *** Terminal
 I make sure we use the right shell and use super+return to open a terminal. Using emacs as my terminal has helped wean me off using the terminal for things.
@@ -491,246 +694,6 @@ Gaming is possible with EXWM, if you run games windowed.
 
   (global-set-key (kbd "s-s") 'run-steam)
   (define-key exwm-mode-map (kbd "s-s") 'run-steam)
-#+END_SRC
-** Other useful functions
-Most of these functions use commands from [[https://gitlab.com/farlado/dotfiles][my dotfiles]] to complete various tasks. Few don't.
-*** Network Settings
-This one uses two windows: one to open the NetworkManager connection editor, and another to list wifi networks nearby.
-#+BEGIN_SRC emacs-lisp
-  (defun network-settings ()
-    "Open a NetworkManager connection editor."
-    (interactive)
-    (start-process-shell-command
-     "Connections" nil "sudo nm-connection-editor")
-    (async-shell-command "nmcli dev wifi list"))
-
-  (global-set-key (kbd "s-n") 'network-settings)
-  (define-key exwm-mode-map (kbd "s-n") 'network-settings)
-#+END_SRC
-*** Volume control
-#+BEGIN_SRC emacs-lisp
-  (defun volume-mute ()
-    "Mute the volume."
-    (interactive)
-    (shell-command "volctl m"))
-  (global-set-key (kbd "<XF86AudioMute>") 'volume-mute)
-  (define-key exwm-mode-map (kbd "<XF86AudioMute>") 'volume-mute)
-
-  (defun volume-mic-mute ()
-    "Mute the microphone."
-    (interactive)
-    (shell-command "volctl t"))
-  (global-set-key (kbd "<XF86AudioMicMute>") 'volume-mic-mute)
-  (define-key exwm-mode-map (kbd "<XF86AudioMicMute>") 'volume-mic-mute)
-
-  (defun volume-up ()
-    "Turn the volume up."
-    (interactive)
-    (shell-command "volctl u"))
-  (global-set-key (kbd "<XF86AudioRaiseVolume>") 'volume-up)
-  (define-key exwm-mode-map (kbd "<XF86AudioRaiseVolume>") 'volume-up)
-
-  (defun volume-down ()
-    "Turn the volume down."
-    (interactive)
-    (shell-command "volctl d"))
-
-  (global-set-key (kbd "<XF86AudioLowerVolume>") 'volume-down)
-  (define-key exwm-mode-map (kbd "<XF86AudioLowerVolume>") 'volume-down)
-#+END_SRC
-*** Brightness control
-#+BEGIN_SRC emacs-lisp
-  (defun backlight-up ()
-    "Turn the backlight up."
-    (interactive)
-    (shell-command "blctl -u"))
-  (global-set-key (kbd "<XF86MonBrightnessUp>") 'backlight-up)
-  (define-key exwm-mode-map (kbd "<XF86MonBrightnessUp>") 'backlight-up)
-
-  (defun backlight-down ()
-    "Turn the backlight down."
-    (interactive)
-    (shell-command "blctl -d"))
-
-  (global-set-key (kbd "<XF86MonBrightnessDown>") 'backlight-down)
-  (define-key exwm-mode-map (kbd "<XF86MonBrightnessDown>") 'backlight-down)
-#+END_SRC
-*** Take screenshots
-I love maim specifically for this reason. It's super easy to do this and it's very good quality as a screen capture tool.
-#+BEGIN_SRC emacs-lisp
-  (defun screencap-section ()
-    "Capture a selection of the screen."
-    (interactive)
-    (shell-command
-     "maim -s /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null")
-    (message ""))
-  (global-set-key (kbd "<print>") 'screencap-section)
-  (define-key exwm-mode-map (kbd "<print>") 'screencap-section)
-
-  (defun screencap-full ()
-    "Capture the entire screen."
-    (interactive)
-    (shell-command
-     "maim /dev/stdout | xclip -selection clipboard -t image/png &> /dev/null")
-    (message ""))
-
-  (global-set-key (kbd "<C-print>") 'screencap-full)
-  (define-key exwm-mode-map (kbd "<C-print>") 'screencap-full)
-#+END_SRC
-*** Keyboard layout selection
-#+BEGIN_SRC emacs-lisp
-  (defun cycle-kbd-layout ()
-    "Cycles the keyboard layout in reverse."
-    (interactive)
-    (shell-command "keyctl -c us epo de"))
-
-  (defun cycle-kbd-layout-reverse ()
-    "Cycles the keyboard layout in reverse."
-    (interactive)
-    (shell-command "keyctl -c de epo us"))
-
-  (global-set-key (kbd "s-SPC") 'cycle-kbd-layout)
-  (define-key exwm-mode-map (kbd "s-SPC") 'cycle-kbd-layout)
-
-  (global-set-key (kbd "<s-backspace>") 'cycle-kbd-layout-reverse)
-  (define-key exwm-mode-map (kbd "<s-backspace>") 'cycle-kbd-layout-reverse)
-#+END_SRC
-*** Lockscreen
-#+BEGIN_SRC emacs-lisp
-  (defun lock-screen ()
-    "Lock the screen."
-    (interactive)
-    (start-process-shell-command
-     "Lockscreen" nil "i3l"))
-
-  (global-set-key (kbd "<XF86ScreenSaver>") 'lock-screen)
-  (define-key exwm-mode-map (kbd "<XF86ScreenSaver>") 'lock-screen)
-
-  (global-set-key (kbd "s-l") 'lock-screen)
-  (define-key exwm-mode-map (kbd "s-l") 'lock-screen)
-#+END_SRC
-*** Suspending
-#+BEGIN_SRC emacs-lisp
-  (defun suspend-computer ()
-    (interactive)
-    (when (yes-or-no-p "Really suspend? ")
-      (shell-command "sudo zzz || sudo systemctl suspend")))
-
-  (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
-#+END_SRC
-*** Shutting down
-I copied the function for quitting emacs to handle shutting down.
-#+BEGIN_SRC emacs-lisp
-  (defun save-buffers-shut-down (&optional arg)
-    "Offer to save each buffer, then shut down the computer.
-  This function is literally just a copycat of `save-buffers-kill-emacs'.
-  With prefix ARG, silently save all file-visiting buffers without asking.
-  If there are active processes where `process-query-on-exit-flag'
-  returns non-nil and `confirm-kill-processes' is non-nil,
-  asks whether processes should be killed.
-  Runs the members of `kill-emacs-query-functions' in turn and stops
-  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
-  Instead of just killing Emacs, shuts down the system."
-    (interactive "P")
-    ;; Don't use save-some-buffers-default-predicate, because we want
-    ;; to ask about all the buffers before killing Emacs.
-    (save-some-buffers arg t)
-    (let ((confirm confirm-kill-emacs))
-      (and
-       (or (not (memq t (mapcar (function
-				 (lambda (buf) (and (buffer-file-name buf)
-						    (buffer-modified-p buf))))
-				(buffer-list))))
-	   (progn (setq confirm nil)
-		  (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
-       (or (not (fboundp 'process-list))
-	   ;; process-list is not defined on MSDOS.
-	   (not confirm-kill-processes)
-	   (let ((processes (process-list))
-		 active)
-	     (while processes
-	       (and (memq (process-status (car processes)) '(run stop open listen))
-		    (process-query-on-exit-flag (car processes))
-		    (setq active t))
-	       (setq processes (cdr processes)))
-	     (or (not active)
-		 (with-current-buffer-window
-		  (get-buffer-create "*Process List*") nil
-		  #'(lambda (window _value)
-		      (with-selected-window window
-			(unwind-protect
-			    (progn
-			      (setq confirm nil)
-			      (yes-or-no-p "Active processes exist; kill them and shut down anyway? "))
-			  (when (window-live-p window)
-			    (quit-restore-window window 'kill)))))
-		  (list-processes t)))))
-       ;; Query the user for other things, perhaps.
-       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
-       (or (null confirm)
-	   (funcall confirm "Really shut down? "))
-       (shell-command "sudo shutdown -h now")
-       (kill-emacs))))
-
-  (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
-  (define-key exwm-mode-map (kbd "C-x C-M-c") 'save-buffers-shut-down)
-#+END_SRC
-*** Rebooting
-I copied the function for quitting emacs to handle reboot too.
-#+BEGIN_SRC emacs-lisp
-  (defun save-buffers-reboot (&optional arg)
-    "Offer to save each buffer, then shut down the computer.
-  This function is literally just a copycat of `save-buffers-kill-emacs'.
-  With prefix ARG, silently save all file-visiting buffers without asking.
-  If there are active processes where `process-query-on-exit-flag'
-  returns non-nil and `confirm-kill-processes' is non-nil,
-  asks whether processes should be killed.
-  Runs the members of `kill-emacs-query-functions' in turn and stops
-  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
-  Instead of just killing Emacs, shuts down the system."
-    (interactive "P")
-    ;; Don't use save-some-buffers-default-predicate, because we want
-    ;; to ask about all the buffers before killing Emacs.
-    (save-some-buffers arg t)
-    (let ((confirm confirm-kill-emacs))
-      (and
-       (or (not (memq t (mapcar (function
-				 (lambda (buf) (and (buffer-file-name buf)
-						    (buffer-modified-p buf))))
-				(buffer-list))))
-	   (progn (setq confirm nil)
-		  (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
-       (or (not (fboundp 'process-list))
-	   ;; process-list is not defined on MSDOS.
-	   (not confirm-kill-processes)
-	   (let ((processes (process-list))
-		 active)
-	     (while processes
-	       (and (memq (process-status (car processes)) '(run stop open listen))
-		    (process-query-on-exit-flag (car processes))
-		    (setq active t))
-	       (setq processes (cdr processes)))
-	     (or (not active)
-		 (with-current-buffer-window
-		  (get-buffer-create "*Process List*") nil
-		  #'(lambda (window _value)
-		      (with-selected-window window
-			(unwind-protect
-			    (progn
-			      (setq confirm nil)
-			      (yes-or-no-p "Active processes exist; kill them and reboot anyway? "))
-			  (when (window-live-p window)
-			    (quit-restore-window window 'kill)))))
-		  (list-processes t)))))
-       ;; Query the user for other things, perhaps.
-       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
-       (or (null confirm)
-	   (funcall confirm "Really reboot? "))
-       (shell-command "sudo reboot")
-       (kill-emacs))))
-
-  (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
-  (define-key exwm-mode-map (kbd "C-x C-M-r") 'save-buffers-reboot)
 #+END_SRC
 * General Functionality
 This is just stuff not pertaining to a specific task and/or not complex enough to warrant entire sections for them.
@@ -1200,6 +1163,11 @@ Just a point of /personal preference./
 #+BEGIN_SRC emacs-lisp
   (setq org-hide-emphasis-markers t)
 #+END_SRC
+*** Make ^L a nice-looking line
+This one is just a matter of personal preference really.
+#+BEGIN_SRC emacs-lisp
+  (global-page-break-lines-mode 1)
+#+END_SRC
 ** Mode line
 *** spaceline package (spacemacs mode line)
 I *hate* the default modeline. This one is much less sucky.
@@ -1243,5 +1211,6 @@ Supposedly ~use-package~ is going to have this feature soon, but till that rolls
     (diminish 'flycheck-mode)
     (diminish 'visual-line-mode)
     (diminish 'interactive-haskell-mode)
-    (diminish 'haskell-doc-mode))
+    (diminish 'haskell-doc-mode)
+    (diminish 'page-break-lines-mode))
 #+END_SRC
