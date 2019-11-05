@@ -11,9 +11,20 @@
 [[./logo.png]]
 
 * Installation
+** Summary
+0) Make sure you have all the right dependencies.
 1) Clone the repo into your home directory as ~.emacs.d~.
 2) Inside the repo, choose your font/border sizes using ~make~. The options are ~hires~ and ~lores~. The default is ~lores~.
 3) Make sure if you aren't going to use EXWM you remove everything in the ~EXWM~ section of ~config.org~
+** Dependencies
+Everything has different dependencies so make sure you have what you need.
+*** EXWM
+- Painfully obvious here: ~xorg~
+*** desktop-environment
+- For volume control: ~amixer~
+- For brightness control: ~brightnessctl~
+- For screenshots: ~maim~
+- For locking the screen: ~i3lock-color~
 * Startup
 Since I use emacs as my window manager, there's a lot of extra stuff beyond only emacs-related things in here. You might want to clean them out if you don't intend to use EXWM.
 ** Start emacs server
@@ -299,9 +310,20 @@ Lastly, I can set the command for a partial screenshot. Again, it gets stored in
 	"maim -s /dev/stdout | xclip -selection -clipboard -t image/png")
 #+END_SRC
 *** Lockscreen
-I use a personal script for this one, see [[https://github.com/farlado/dotfiles][my dotfiles]] for .local/bin/i3l to understand.
+Haha yes, this is very long and very very stupid.
 #+BEGIN_SRC emacs-lisp
-  (setq desktop-environment-screenlock-command "i3l")
+  (setq desktop-environment-screenlock-command
+	(concat "i3lock -nmk --color=000000 --timecolor=ffffffff --datecolor=ffffffff "
+		"--wrongcolor=ffffffff --ringcolor=00000000 --insidecolor=00000000 "
+		"--keyhlcolor=00000000 --bshlcolor=00000000 --separatorcolor=00000000 "
+		"--ringvercolor=00000000 --insidevercolor=00000000 --linecolor=00000000 "
+		"--ringwrongcolor=00000000 --insidewrongcolor=00000000 --timestr='%H:%M' "
+		"--datestr='%a %d %b' --time-font='Iosevka' --date-font='Iosevka' "
+		"--wrong-font='Iosevka' --timesize=128 --datesize=64 --wrongsize=32 "
+		"--time-align 0 --date-align 0 --wrong-align 0 --indpos=-10:-10 "
+		"--timepos=200:125 --datepos=200:215 --wrongpos=200:155 --locktext='' "
+		"--lockfailedtext='' --noinputtext='' --radius 1 --ring-width 1 "
+		" --veriftext='' --wrongtext='WRONG' --force-clock"))
 #+END_SRC
 ** Network Settings
 This one uses two windows: one to open the NetworkManager connection editor, and another to list wifi networks nearby.
