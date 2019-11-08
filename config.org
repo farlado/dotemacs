@@ -21,10 +21,36 @@ Everything has different dependencies so make sure you have what you need.
 *** EXWM
 - Painfully obvious here: ~xorg~
 *** desktop-environment
-- For volume control: ~amixer~
+- For volume control: ~alsa-utils~
 - For brightness control: ~brightnessctl~
 - For screenshots: ~maim~
 - For locking the screen: ~i3lock-color~
+*** EMMS
+- For playing music: ~mpd~
+- For playing video: ~mpv~
+*** vterm
+- Makefile parsing: ~cmake~
+- Compiling: I recommend ~gcc~
+- Make dependency: ~libtool~
+*** nov
+- To open epub files: ~ebook-tools~
+*** wttrin
+- To grab weather data: ~curl~
+*** sudo-edit
+- Obvious dependency: ~sudo~
+*** Other stuff
+- For Python: ~pylint~, ~jedi~
+- For Haskell: ~stack~
+*** Other items used in my setup
+- Compositor: ~xcompmgr~
+- Notification Daemon: ~dunst~
+- Network Configuration: ~nm-connection-editor~
+- Web Browser: ~firefox~
+- Editing Crappy Documents: ~libreoffice~
+- Crappy Image Editor: ~gimp~
+- Crappy Messenger: ~telegram~
+- Crappier Messenger: ~discord~
+- Games Platform: ~steam~
 * Startup
 Since I use emacs as my window manager, there's a lot of extra stuff beyond only emacs-related things in here. You might want to clean them out if you don't intend to use EXWM.
 ** Start emacs server
@@ -34,7 +60,7 @@ Although I technically don't /have/ to do this, it is very helpful.
   (unless (server-running-p)
     (server-start))
 #+END_SRC
-** UTF-8 encoding
+** Enable UTF-8 encoding
 I probably don't have to do this but it makes things work a little smoother.
 #+BEGIN_SRC emacs-lisp
   (set-language-environment "UTF-8")
@@ -1226,7 +1252,7 @@ Just a point of /personal preference./
   (setq org-hide-emphasis-markers t)
 #+END_SRC
 *** Make ^L a nice-looking line
-This one is just a matter of personal preference really.
+This one is also just a matter of personal preference really.
 #+BEGIN_SRC emacs-lisp
   (global-page-break-lines-mode 1)
 #+END_SRC
