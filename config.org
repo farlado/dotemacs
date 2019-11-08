@@ -277,7 +277,7 @@ Previously I had to define a lot of functions to do these things, now I just cha
     (desktop-environment-mode))
 #+END_SRC
 *** Volume adjustment
-The only things I really don't like here are how much output it gives when you mute or unmute the speakers or microphone, so I set up a basic script to give much more concise output.
+The only things I really don't like here are how much output it gives when you mute or unmute the speakers or microphone, so I set up basic scripts to give much more concise output.
 #+BEGIN_SRC emacs-lisp
   (setq desktop-environment-volume-toggle-command
 	(concat "[ \"$(amixer set Master toggle | grep off)\" ] "
@@ -295,19 +295,61 @@ This one all I needed to do was change the increment and decrement values.
 	desktop-environment-brightness-normal-decrement "5%-")
 #+END_SRC
 *** Screenshots
-This one was the least straightforward. First, I just use the current directory for this.
+This one was the least straightforward because the way it's implemented by ~desktop-environment~ is *SUPER* wonky. Here are the binds which will be relevant.
 #+BEGIN_SRC emacs-lisp
-  (setq desktop-environment-screenshot-directory ".")
+  ;; Storing to clipboard
+  (define-key desktop-environment-mode-map (kbd "<print>")
+    'farl-de/desktop-environment-screenshot-part-clip)
+  (define-key desktop-environment-mode-map (kbd "<S-print>")
+    'farl-de/desktop-environment-screenshot-clip)
+  ;; Storing to file
+  (define-key desktop-environment-mode-map (kbd "<C-print>")
+    'farl-de/desktop-environment-screenshot-part)
+  (define-key desktop-environment-mode-map (kbd "<C-S-print>")
+    'farl-de/desktop-environment-screenshot)
 #+END_SRC
-Then, I can set the command for a full-screen screenshot. The way the bind is supposed to be used is to store a screenshot in the directory we just defined, but I would rather put it in the clipboard.
+**** Variables
+First, I set what directory to store screenshots in.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-screenshot-directory "~/screenshots")
+#+END_SRC
+Then, I can set the commands for taking a full or partial screenshot and saving it to a file.
 #+BEGIN_SRC emacs-lisp
   (setq desktop-environment-screenshot-command
-	"maim /dev/stdout | xclip -selection -clipboard -t image/png")
+	"FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
+	desktop-environment-screenshot-partial-command
+	"FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
 #+END_SRC
-Lastly, I can set the command for a partial screenshot. Again, it gets stored in the clipboard.
+**** Functions
+The functions which ~desktop-environment~ comes with are kinda garbage, so I made my own.
 #+BEGIN_SRC emacs-lisp
-  (setq desktop-environment-screenshot-partial-command
-	"maim -s /dev/stdout | xclip -selection -clipboard -t image/png")
+  (defun farl-de/desktop-environment-screenshot ()
+    "Take a screenshot and store it in a file."
+    (interactive)
+    (desktop-environment-screenshot)
+    (message "Screenshot saved in ~/screenshots."))
+
+  (defun farl-de/desktop-environment-screenshot-part ()
+    "Take a capture of a portion of the screen and store it in a file."
+    (interactive)
+    (desktop-environment-screenshot-part)
+    (message "Screenshot saved in ~/screenshots."))
+
+  (defun farl-de/desktop-environment-screenshot-clip ()
+    "Take a screenshot and put it in the clipboard."
+    (interactive)
+    (shell-command (concat desktop-environment-screenshot-command
+			   " && xclip $FILENAME -selection clipboard "
+			   "-t image/png &> /dev/null && rm $FILENAME"))
+    (message "Screenshot copied to clipboard."))
+
+  (defun farl-de/desktop-environment-screenshot-part-clip ()
+    "Take a shot of a portion of the screen and put it in the clipboard."
+    (interactive)
+    (shell-command (concat desktop-environment-screenshot-partial-command
+			   " && xclip $FILENAME -selection clipboard "
+			   "-t image/png &> /dev/null && rm $FILENAME"))
+    (message "Screenshot copied to clipboard."))
 #+END_SRC
 *** Lockscreen
 Haha yes, this is very long and very very stupid.
@@ -341,7 +383,7 @@ This one uses two windows: one to open the NetworkManager connection editor, and
 ** Keyboard layout selection
 #+BEGIN_SRC emacs-lisp
   (defun cycle-kbd-layout ()
-    "Cycles the keyboard layout in reverse."
+    "Cycles the keyboard layout."
     (interactive)
     (shell-command "keyctl -c us epo de"))
 
@@ -594,12 +636,10 @@ This is other stuff I use, whether in emacs or in X windows.
 *** Terminal
 I make sure we use the right shell and use super+return to open a terminal. Using emacs as my terminal has helped wean me off using the terminal for things.
 #+BEGIN_SRC emacs-lisp
-  (defvar term-shell "/bin/zsh")
-  (defadvice ansi-term (before force-bash) (interactive (list term-shell)))
-  (ad-activate 'ansi-term)
-
-  (global-set-key (kbd "<s-return>") 'ansi-term)
-  (define-key exwm-mode-map (kbd "<s-return>") 'ansi-term)
+  (use-package vterm
+    :ensure t
+    :defer t
+    :bind ("<s-return>" . vterm))
 #+END_SRC
 *** Calculator
 I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and then use the numpad to close it as well.
@@ -898,7 +938,7 @@ I hate having to click to focus a different window, so I would rather just have 
 I had to adjust the function which kills both the current buffer and the current window, because it did not cooperate with EXWM buffers. That's why I have this weird chunk I don't actually have the expertise yet to fully parse.
 #+BEGIN_SRC emacs-lisp
   (defun kill-this-buffer-and-window ()
-    "Kill the current buffer and delete the selected window."
+    "Kill the current buffer and delete the selected window. (Adjusted for EXWM.)"
     (interactive)
     (let ((window-to-delete (selected-window))
 	  (buffer-to-kill (current-buffer))
@@ -1076,7 +1116,7 @@ I have no words for how convenient this has been and how much faster I get thing
   (electric-pair-mode t)
 #+END_SRC
 * Looks
-** leuven-theme package (theme)
+** Theme
 I used to hate light themes. I'm not in that camp anymore. I love this elegant theme.
 #+BEGIN_SRC emacs-lisp
   (use-package leuven-theme
@@ -1122,7 +1162,7 @@ However, I don't like line numbers in modes where it breaks the mode.
     (add-hook hook (lambda ()
 		     (display-line-numbers-mode 0))))
 
-  (disable-line-numbers-for 'term-mode-hook)
+  (disable-line-numbers-for 'vterm-mode-hook)
   (disable-line-numbers-for 'tetris-mode-hook)
   (disable-line-numbers-for 'snake-mode-hook)
   (disable-line-numbers-for 'sudoku-mode-hook)
@@ -1199,24 +1239,15 @@ I *hate* the default modeline. This one is much less sucky.
     :defer t
     :init
     (require 'spaceline-config)
-    (setq powerline-default-separator (quote butt))
+    (setq powerline-default-separator nil)
     (spaceline-spacemacs-theme))
 #+END_SRC
-*** Show clock on mode line
+*** Show clock and battery level on mode line
+I used to use ~fancy-battery~ but it constantly disappeared on my teeny tiny screens so I just decided not to bother with it. Plus it's one less package to configure lol.
 #+BEGIN_SRC emacs-lisp
   (setq display-time-24hr-format t)
   (display-time-mode 1)
-#+END_SRC
-*** fancy-battery package (battery on mode line)
-I used to just use the default battery modeline setting, but I decided I want something a little nicer.
-#+BEGIN_SRC emacs-lisp
-  (use-package fancy-battery
-    :ensure t
-    :defer t
-    :init
-    (setq fancy-battery-show-percentage t
-	  battery-update-interval 15)
-    (fancy-battery-mode 1))
+  (display-battery-mode 1)
 #+END_SRC
 *** diminish package (hide minor modes from mode line)
 Supposedly ~use-package~ is going to have this feature soon, but till that rolls out I'll be using this.
