@@ -665,7 +665,9 @@ I make sure we use the right shell and use super+return to open a terminal. Usin
   (use-package vterm
     :ensure t
     :defer t
-    :bind ("<s-return>" . vterm))
+    :bind (("<s-return>" . vterm)
+	   :map exwm-mode-map
+	   ("<s-return>" . vterm)))
 #+END_SRC
 *** Calculator
 I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and then use the numpad to close it as well.
