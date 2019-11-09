@@ -773,6 +773,15 @@ Yeah, I also use a light theme for Discord. It looks comfy, even if Discord is a
   (global-set-key (kbd "s-d") 'run-discord)
   (define-key exwm-mode-map (kbd "s-d") 'run-discord)
 #+END_SRC
+I also like to brag that I use emacs to my friends. There's a mode for that: ~elcord-mode~, which integrates Discord rich presence.
+#+BEGIN_SRC emacs-lisp
+  (use-package elcord
+    :ensure t
+    :defer t
+    :init
+    (require 'elcord)
+    (elcord-mode))
+#+END_SRC
 *** Steam
 Gaming is possible with EXWM, if you run games windowed.
 #+BEGIN_SRC emacs-lisp
