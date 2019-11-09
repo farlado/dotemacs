@@ -660,7 +660,7 @@ I do a crapload here, but basically the two main things I do here is configure m
 This is other stuff I use, whether in emacs or in X windows.
 ** Within emacs
 *** Terminal
-I make sure we use the right shell and use super+return to open a terminal. Using emacs as my terminal has helped wean me off using the terminal for things.
+I've been jumping between ~vterm~ and ~ansi-term~ but ~vterm~ seems to be generally faster and easier to use.
 #+BEGIN_SRC emacs-lisp
   (use-package vterm
     :ensure t
