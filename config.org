@@ -34,6 +34,8 @@ Everything has different dependencies so make sure you have what you need.
 - Make dependency: ~libtool~
 *** nov
 - To open epub files: ~ebook-tools~
+*** graphviz-dot-mode
+- To process dot files: ~graphviz~
 *** wttrin
 - To grab weather data: ~curl~
 *** sudo-edit
@@ -817,15 +819,6 @@ Why even is this a key that is bound?
   (global-unset-key (kbd "C-z"))
   (global-unset-key (kbd "C-x C-z"))
 #+END_SRC
-** nov package (epub reader)
-Not the best way to do epub reading, but at least it's in emacs.
-#+BEGIN_SRC emacs-lisp
-  (use-package nov
-    :ensure t
-    :defer t
-    :init
-    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
-#+END_SRC
 ** Restart and open dashboard with C-c d
 I constantly accidentally close dashboard, so I made a way to open it again if I accidentally kill it.
 #+BEGIN_SRC emacs-lisp
@@ -853,6 +846,25 @@ Since this thing is changing all the time, I really like having it available on 
     :ensure t
     :defer t
     :bind ("C-x C-M-f" . sudo-edit))
+#+END_SRC
+* Non-Programming Unique Modes
+** nov package (epub reader)
+Not the best way to do epub reading, but at least it's in emacs.
+#+BEGIN_SRC emacs-lisp
+  (use-package nov
+    :ensure t
+    :defer t
+    :init
+    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+#+END_SRC
+** graphviz-dot-mode package (graphs)
+A nice package for creating diagrams.
+#+BEGIN_SRC emacs-lisp
+  (use-package graphviz-dot-mode
+    :ensure t
+    :defer t
+    :init
+    (require 'graphviz-dot-mode))
 #+END_SRC
 * Menus/Commands
 Menus, commands, and commands which involve menus.
@@ -1076,18 +1088,34 @@ I use C-c a and C-c C-a to do things related to my agenda. Only one of my system
 	(global-set-key (kbd "C-c a") 'org-agenda)
 	(global-set-key (kbd "C-c C-a") 'open-agenda)))
 #+END_SRC
-** Shortcuts for various code snippets in org-mode
+** Shortcuts for various snippets in org-mode
 This will expand as I get into more and more languages and take more notes in classes with different snippets of different languages.
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'org-structure-template-alist
 	       '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
   (add-to-list 'org-structure-template-alist
 	       '("py" "#+BEGIN_SRC python\n?\n#+END_SRC"))
+  (add-to-list 'org-structure-template-alist
+	       '("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC"))
 #+END_SRC
 ** Use the current window when editing source code in org-mode
 This is just a convenience thing.
 #+BEGIN_SRC emacs-lisp
   (setq org-src-window-setup 'current-window)
+#+END_SRC
+** Automatically fix inline images generated for diagrams
+This is exactly what I was looking for lmao
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+#+END_SRC
+** Skip confirming whether to evaluate dot snippets
+Since obviously dot snippets are purely harmless, I just don't bother with having to confirm evaluation every time I try to update a graphic.
+#+BEGIN_SRC emacs-lisp
+  (setq org-confirm-babel-evaluate '(lambda (lang body) (not (string= lang "dot"))))
+#+END_SRC
+** Load various languages in org-babel
+#+BEGIN_SRC emacs-lisp
+  (org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
 #+END_SRC
 * Programming
 This is quite barren, but mostly because my needs are not currently particularly that big.
