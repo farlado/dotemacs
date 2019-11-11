@@ -404,42 +404,84 @@ This one uses two windows: one to open the NetworkManager connection editor, and
   (define-key exwm-mode-map (kbd "s-n") 'network-settings)
 #+END_SRC
 ** Keyboard layout selection
+This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
 #+BEGIN_SRC emacs-lisp
-  (defun cycle-kbd-layout ()
-    "Cycle between keyboard layouts."
+  (defgroup keyboard-layout nil
+    "Keyboard layouts for `cycle-keyboard-layout' and `cycle-keyboard-layout-reverse'")
+
+  (defcustom keyboard-layout-1 nil
+    "The first of three keyboard layouts to cycle through.
+
+  Set to nil to have one less keyboard layout."
+    :group 'keyboard-layout
+    :type 'string)
+
+  (defcustom keyboard-layout-2 nil
+    "The second of three keyboard layouts to cycle through.
+
+  Set to nil to have one less keyboard layout."
+    :group 'keyboard-layout
+    :type 'string)
+
+  (defcustom keyboard-layout-3 nil
+    "The third of three keyboard layouts to cycle through.
+
+  Set to nil to have one less keyboard layout."
+    :group 'keyboard-layout
+    :type 'string)
+#+END_SRC
+Then, I use these functions to control setting and cycling the keyboard layout.
+#+BEGIN_SRC emacs-lisp
+  (defun set-keyboard-layout (&optional layout)
+    "Set the keyboard layout to LAYOUT."
+    (interactive)
+    (let ((layout (or layout (read-string "Enter keyboard layout: "))))
+      (shell-command (concat "setxkbmap " layout " -option ctrl:nocaps"))
+      (message "Keyboard layout is now: %s" layout)))
+
+  (defun cycle-keyboard-layout ()
+    "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3'."
     (interactive)
     (let* ((current-layout (shell-command-to-string
 			    (concat "setxkbmap -query | "
 				    "grep -oP 'layout:\\s*\\K(\\w+)' | "
 				    "tr '\n' ' ' | sed 's/ //'")))
-	   (new-layout (if (string= current-layout "us")
-			   "epo"
-			 (if (string= current-layout "epo")
-			     "de"
-			   "us"))))
-      (shell-command (concat "setxkbmap " new-layout " -option ctrl:nocaps"))
-      (message "Keyboard layout is now: %s" new-layout)))
+	   (new-layout (if (string= current-layout keyboard-layout-1)
+			   (or keyboard-layout-2 keyboard-layout-3)
+			 (if (string= current-layout keyboard-layout-2)
+			     (or keyboard-layout-3 keyboard-layout-1)
+			   (or keyboard-layout-1 keyboard-layout-2)))))
+      (if new-layout
+	  (set-keyboard-layout new-layout)
+	(message "No keyboard layouts selected."))))
 
-  (defun cycle-kbd-layout-reverse ()
-    "Cycle between keyboard layouts in reverse."
+  (defun cycle-keyboard-layout-reverse ()
+    "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3' in reverse."
     (interactive)
     (let* ((current-layout (shell-command-to-string
 			    (concat "setxkbmap -query | "
 				    "grep -oP 'layout:\\s*\\K(\\w+)' | "
 				    "tr '\n' ' ' | sed 's/ //'")))
-	   (new-layout (if (string= current-layout "us")
-			   "de"
-			 (if (string= current-layout "epo")
-			     "us"
-			   "epo"))))
-      (shell-command (concat "setxkbmap " new-layout " -option ctrl:nocaps"))
-      (message "Keyboard layout is now: %s" new-layout)))
+	   (new-layout (if (string= current-layout keyboard-layout-3)
+			   (or keyboard-layout-2 keyboard-layout-1)
+			 (if (string= current-layout keyboard-layout-2)
+			     (or keyboard-layout-1 keyboard-layout-3)
+			   (or keyboard-layout-3 keyboard-layout-2)))))
+      (if new-layout
+	  (set-keyboard-layout new-layout)
+	(message "No keyboard layouts selected."))))
+#+END_SRC
+Lastly, I set my preferred keyboard layouts and bind the functions to keys.
+#+BEGIN_SRC emacs-lisp
+  (setq keyboard-layout-1 "us"
+	keyboard-layout-2 "epo"
+	keyboard-layout-3 "de")
 
-  (global-set-key (kbd "s-SPC") 'cycle-kbd-layout)
-  (define-key exwm-mode-map (kbd "s-SPC") 'cycle-kbd-layout)
+  (global-set-key (kbd "s-SPC") 'cycle-keyboard-layout)
+  (define-key exwm-mode-map (kbd "s-SPC") 'cycle-keyboard-layout)
 
-  (global-set-key (kbd "<s-backspace>") 'cycle-kbd-layout-reverse)
-  (define-key exwm-mode-map (kbd "<s-backspace>") 'cycle-kbd-layout-reverse)
+  (global-set-key (kbd "<s-backspace>") 'cycle-keyboard-layout-reverse)
+  (define-key exwm-mode-map (kbd "<s-backspace>") 'cycle-keyboard-layout-reverse)
 #+END_SRC
 ** Suspending
 #+BEGIN_SRC emacs-lisp
