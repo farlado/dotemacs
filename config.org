@@ -138,7 +138,8 @@ This isn't actually where we do all the configuration, it's just where we instal
 #+BEGIN_SRC emacs-lisp
   (use-package exwm
     :ensure t
-    :config
+    :defer t
+    :init
     (require 'exwm)
     (require 'exwm-randr)
     (require 'exwm-config)
@@ -1199,7 +1200,7 @@ I will probably be adding company autocompletion for more languages as I start w
   (use-package company-jedi
     :ensure t
     :defer t
-    :config
+    :init
     (add-to-list 'company-backends 'company-jedi))
 #+END_SRC
 ** haskell-mode package (self-explanatory)
@@ -1212,12 +1213,11 @@ I have started to mess around with Haskell, so I needed to grab a mode for that.
     (require 'haskell-mode)
     (require 'haskell-process)
     (require 'haskell-interactive-mode)
+    (setq haskell-stylish-on-save t)
     :hook ((haskell-mode-hook . interactive-haskell-mode)
 	   (haskell-mode-hook . turn-on-haskell-doc-mode)
 	   (haskell-mode-hook . turn-on-haskell-indentation)
-	   (haskell-mode-hook . haskell-auto-insert-module-template))
-    :config
-    (setq haskell-stylish-on-save t))
+	   (haskell-mode-hook . haskell-auto-insert-module-template)))
 #+END_SRC
 ** electric-pair-mode (OH MY GOD THIS IS SO GREAT)
 I have no words for how convenient this has been and how much faster I get things done thanks to these five lines of elisp.
