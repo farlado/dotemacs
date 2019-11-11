@@ -411,14 +411,34 @@ This one uses two windows: one to open the NetworkManager connection editor, and
 ** Keyboard layout selection
 #+BEGIN_SRC emacs-lisp
   (defun cycle-kbd-layout ()
-    "Cycles the keyboard layout."
+    "Cycle between keyboard layouts."
     (interactive)
-    (shell-command "keyctl -c us epo de"))
+    (let* ((current-layout (shell-command-to-string
+			    (concat "setxkbmap -query | "
+				    "grep -oP 'layout:\\s*\\K(\\w+)' | "
+				    "tr '\n' ' ' | sed 's/ //'")))
+	   (new-layout (if (string= current-layout "us")
+			   "epo"
+			 (if (string= current-layout "epo")
+			     "de"
+			   "us"))))
+      (shell-command (concat "setxkbmap " new-layout " -option ctrl:nocaps"))
+      (message "Keyboard layout is now: %s" new-layout)))
 
   (defun cycle-kbd-layout-reverse ()
-    "Cycles the keyboard layout in reverse."
+    "Cycle between keyboard layouts in reverse."
     (interactive)
-    (shell-command "keyctl -c de epo us"))
+    (let* ((current-layout (shell-command-to-string
+			    (concat "setxkbmap -query | "
+				    "grep -oP 'layout:\\s*\\K(\\w+)' | "
+				    "tr '\n' ' ' | sed 's/ //'")))
+	   (new-layout (if (string= current-layout "us")
+			   "de"
+			 (if (string= current-layout "epo")
+			     "us"
+			   "epo"))))
+      (shell-command (concat "setxkbmap " new-layout " -option ctrl:nocaps"))
+      (message "Keyboard layout is now: %s" new-layout)))
 
   (global-set-key (kbd "s-SPC") 'cycle-kbd-layout)
   (define-key exwm-mode-map (kbd "s-SPC") 'cycle-kbd-layout)
