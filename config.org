@@ -764,6 +764,15 @@ Picking a service to use for this was a pain. I ended up settling for wttrin bec
     :bind (("C-c w" . wttrin-local)
 	   ("C-c C-w" . wttrin-not-local)))
 #+END_SRC
+*** Reading ebooks
+Not the best way to do epub reading, but at least it's in emacs.
+#+BEGIN_SRC emacs-lisp
+  (use-package nov
+    :ensure t
+    :defer t
+    :init
+    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+#+END_SRC
 *** Sudoku
 I /love/ sudoku puzzles.
 #+BEGIN_SRC emacs-lisp
@@ -771,6 +780,27 @@ I /love/ sudoku puzzles.
     :ensure t
     :defer t
     :bind ("C-c s" . sudoku))
+#+END_SRC
+*** Tetris
+God I love playing Tetris
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c t") 'tetris)
+
+  (define-key tetris-mode-map "a"     'tetris-move-left)
+  (define-key tetris-mode-map "s"     'tetris-move-down)
+  (define-key tetris-mode-map "w"     'tetris-move-bottom)
+  (define-key tetris-mode-map "d"     'tetris-move-right)
+
+  (define-key tetris-mode-map [left]  'tetris-rotate-prev)
+  (define-key tetris-mode-map [right] 'tetris-rotate-next)
+
+  (define-key tetris-mode-map [?\t]   'tetris-pause-game)
+
+  (define-key tetris-mode-map "q"     'kill-this-buffer)
+  (define-key tetris-mode-map "Q"     'kill-this-buffer-and-window)
+
+  (define-key tetris-mode-map "r"     'tetris-start-game)
+  (define-key tetris-mode-map "e"     'tetris-end-game)
 #+END_SRC
 ** X applications
 *** Firefox
@@ -905,18 +935,8 @@ Since this thing is changing all the time, I really like having it available on 
     :defer t
     :bind ("C-x C-M-f" . sudo-edit))
 #+END_SRC
-* Non-Programming Unique Modes
-** nov package (epub reader)
-Not the best way to do epub reading, but at least it's in emacs.
-#+BEGIN_SRC emacs-lisp
-  (use-package nov
-    :ensure t
-    :defer t
-    :init
-    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
-#+END_SRC
-** graphviz-dot-mode package (graphs)
-A nice package for creating diagrams.
+** graphviz-dot-mode package (diagrams creation)
+A nice way to make diagrams.
 #+BEGIN_SRC emacs-lisp
   (use-package graphviz-dot-mode
     :ensure t
@@ -948,7 +968,8 @@ Default M-x behavior doesn't use ~ido-mode~, so we install a package which gives
   (use-package smex
     :ensure t
     :defer t
-    :bind ("M-x" . smex))
+    :bind (("M-x" . smex)
+	   ("<menu>" . smex)))
 #+END_SRC
 ** Replace "yes or no" prompts with "y or n"
 Beauty in brevity.
