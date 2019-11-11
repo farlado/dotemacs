@@ -113,15 +113,10 @@ I don't need my laptop's screen shutting off just because I'm sitting and watchi
 #+BEGIN_SRC emacs-lisp
   (shell-command "xset s off -dpms")
 #+END_SRC
-** Set keyboard layout to US
-This is a script from [[https://gitlab.com/farlado/dotfiles][my dotfiles]].
-#+BEGIN_SRC emacs-lisp
-  (shell-command "keyctl -s us")
-#+END_SRC
-** Give capslock the functionality of control
+** Set keymap to US and give capslock the functionality of control
 I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
 #+BEGIN_SRC emacs-lisp
-  (shell-command "setxkbmap -option ctrl:nocaps")
+  (shell-command "setxkbmap us -option ctrl:nocaps")
 #+END_SRC
 ** Compositor
 I don't need it, but having basic compositing is very nice.
