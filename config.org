@@ -1,6 +1,6 @@
 #+STARTUP: overview, inlineimages
-#+TITLE: Farlado's .emacs
-#+DESCRIPTION: Farlado's personal emacs configuration
+#+TITLE: Farlado's .emacs.d
+#+DESCRIPTION: Farlado's personal Emacs configuration
 #+CREATOR: Farlado
 #+LANGUAGE: en
 #+OPTIONS: num:nil
@@ -36,6 +36,8 @@ Everything has different dependencies so make sure you have what you need.
 - To open epub files: ~ebook-tools~
 *** graphviz-dot-mode
 - To process dot files: ~graphviz~
+*** flyspell-mode
+- Spell checking: ~aspell~
 *** wttrin
 - To grab weather data: ~curl~
 *** sudo-edit
@@ -54,8 +56,8 @@ Everything has different dependencies so make sure you have what you need.
 - Crappier Messenger: ~discord~
 - Games Platform: ~steam~
 * Startup
-Since I use emacs as my window manager, there's a lot of extra stuff beyond only emacs-related things in here. You might want to clean them out if you don't intend to use EXWM.
-** Start emacs server
+Since I use Emacs as my window manager, there's a lot of extra stuff beyond only Emacs-related things in here. You might want to clean them out if you don't intend to use EXWM.
+** Start Emacs server
 Although I technically don't /have/ to do this, it is very helpful.
 #+BEGIN_SRC emacs-lisp
   (require 'server)
@@ -74,7 +76,7 @@ I probably don't have to do this but it makes things work a little smoother.
   (prefer-coding-system 'utf-8)
 #+END_SRC
 ** dashboard package (replacement start screen)
-I love the default start screen, but it just doesn't cut it for me. I just use this to have a nice screen when I start emacs or close all my buffers.
+I love the default start screen, but it just doesn't cut it for me. I just use this to have a nice screen when I start Emacs or close all my buffers.
 #+BEGIN_SRC emacs-lisp
   (use-package dashboard
     :ensure t
@@ -125,13 +127,13 @@ I don't need it, but having basic compositing is very nice.
    "Compositor" nil "xcompmgr")
 #+END_SRC
 ** Notification manager
-I haven't integrated notifications into emacs just yet, sadly.
+I haven't integrated notifications into Emacs just yet, sadly.
 #+BEGIN_SRC emacs-lisp
   (start-process-shell-command
    "Notifications" nil "dunst")
 #+END_SRC
 * EXWM (Emacs X Window Manager)
-Yes, emacs is my window manager. You should probably remove this stuff if you don't plan to use emacs as your window manager. It's loaded right after the startup commands so that I can bind keys more easily later on.
+Yes, Emacs is my window manager. You should probably remove this stuff if you don't plan to use Emacs as your window manager. It's loaded right after the startup commands so that I can bind keys more easily later on.
 ** Configuration
 *** exwm package (base window manager)
 This isn't actually where we do all the configuration, it's just where we install EXWM and grab what we need to configure it.
@@ -145,8 +147,8 @@ This isn't actually where we do all the configuration, it's just where we instal
     (require 'exwm-config)
     (require 'exwm-systemtray))
 #+END_SRC
-*** dmenu package (dmenu but for emacs)
-Since I'm using emacs as a window manager, I need dmenu so I can open X windows I haven't bound to keys.
+*** dmenu package (dmenu but for Emacs)
+Since I'm using Emacs as a window manager, I need dmenu so I can open X windows I haven't bound to keys.
 #+BEGIN_SRC emacs-lisp
   (use-package dmenu
     :ensure t
@@ -288,8 +290,8 @@ Now that we've got all the variables nice and ready, let's start it up!
   (exwm-config-ido)
   (exwm-systemtray-enable)
 #+END_SRC
-* Making emacs a (sufficiently exhaustive) DE
-Since I use emacs as my window manager, obviously I want to make it a full-on desktop environment!
+* Making Emacs a (sufficiently exhaustive) DE
+Since I use Emacs as my window manager, obviously I want to make it a full-on desktop environment!
 ** desktop-environment package
 Previously I had to define a lot of functions to do these things, now I just change settings within ~desktop-environment~.
 #+BEGIN_SRC emacs-lisp
@@ -494,7 +496,7 @@ Lastly, I set my preferred keyboard layouts and bind the functions to keys.
   (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
 #+END_SRC
 ** Shutting down
-I copied the function for quitting emacs to handle shutting down.
+I copied the function for quitting Emacs to handle shutting down.
 #+BEGIN_SRC emacs-lisp
   (defun save-buffers-shut-down (&optional arg)
     "Offer to save each buffer, then shut down the computer.
@@ -551,7 +553,7 @@ I copied the function for quitting emacs to handle shutting down.
   (define-key exwm-mode-map (kbd "C-x C-M-c") 'save-buffers-shut-down)
 #+END_SRC
 ** Rebooting
-I copied the function for quitting emacs to handle reboot too.
+I copied the function for quitting Emacs to handle reboot too.
 #+BEGIN_SRC emacs-lisp
   (defun save-buffers-reboot (&optional arg)
     "Offer to save each buffer, then shut down the computer.
@@ -608,7 +610,7 @@ I copied the function for quitting emacs to handle reboot too.
   (define-key exwm-mode-map (kbd "C-x C-M-r") 'save-buffers-reboot)
 #+END_SRC
 * EMMS (Emacs MultiMedia System)
-I am big on doing as much in emacs as possible. Having my music player moved to emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it.
+I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it.
 ** Install EMMS and bind main playback keys
 I do a crapload here, but basically the two main things I do here is configure mpd information and bind some keys for emms controls and music controls.
 #+BEGIN_SRC emacs-lisp
@@ -717,8 +719,8 @@ I do a crapload here, but basically the two main things I do here is configure m
   (define-key exwm-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
 #+END_SRC
 * Other programs
-This is other stuff I use, whether in emacs or in X windows.
-** Within emacs
+This is other stuff I use, whether in Emacs or in X windows.
+** Within Emacs
 *** Terminal
 I've been jumping between ~vterm~ and ~ansi-term~ but ~vterm~ seems to be generally faster and easier to use.
 #+BEGIN_SRC emacs-lisp
@@ -765,7 +767,7 @@ Picking a service to use for this was a pain. I ended up settling for wttrin bec
 	   ("C-c C-w" . wttrin-not-local)))
 #+END_SRC
 *** Reading ebooks
-Not the best way to do epub reading, but at least it's in emacs.
+Not the best way to do epub reading, but at least it's in Emacs.
 #+BEGIN_SRC emacs-lisp
   (use-package nov
     :ensure t
@@ -784,6 +786,8 @@ I /love/ sudoku puzzles.
 *** Tetris
 God I love playing Tetris
 #+BEGIN_SRC emacs-lisp
+  (require 'tetris)
+
   (global-set-key (kbd "C-c t") 'tetris)
 
   (define-key tetris-mode-map "a"     'tetris-move-left)
@@ -828,7 +832,7 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
   (define-key exwm-mode-map (kbd "s-b") 'run-libreoffice)
 #+END_SRC
 *** GIMP
-Until GIMP's functionality gets merged into emacs, guess I'm stuck having it.
+Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
 #+BEGIN_SRC emacs-lisp
   (defun run-gimp ()
     "Start GIMP."
@@ -878,7 +882,7 @@ Gaming is possible with EXWM, if you run games windowed.
 * General Functionality
 This is just stuff not pertaining to a specific task and/or not complex enough to warrant entire sections for them.
 ** Don't make extra files on the filesystem
-I don't use autosaves and backups. I love living on the edge.
+I don't use auto-saves and backups. I love living on the edge.
 #+BEGIN_SRC emacs-lisp
   (setq make-backup-files nil
 	auto-save-default nil)
@@ -901,7 +905,7 @@ It's literally never not annoying when words don't wrap.
 #+BEGIN_SRC emacs-lisp
   (global-subword-mode 1)
 #+END_SRC
-** Disable suspending emacs
+** Disable suspending Emacs
 Why even is this a key that is bound?
 #+BEGIN_SRC emacs-lisp
   (global-unset-key (kbd "C-z"))
@@ -928,7 +932,7 @@ Since this thing is changing all the time, I really like having it available on 
 
   (global-set-key (kbd "C-c e") 'config-visit)
 #+END_SRC
-** Edit with superuser privs via C-x C-M-f
+** Edit with superuser privileges via C-x C-M-f
 #+BEGIN_SRC emacs-lisp
   (use-package sudo-edit
     :ensure t
@@ -943,6 +947,16 @@ A nice way to make diagrams.
     :defer t
     :init
     (require 'graphviz-dot-mode))
+#+END_SRC
+** Spell-checking
+Just a useful little tool to keep spelling in check.
+#+BEGIN_SRC emacs-lisp
+  (setq ispell-program-name "aspell"
+	ispell-dictionary "american")
+
+  (add-hook 'flyspell-mode-hook '(lambda () (flyspell-buffer)))
+  (add-hook 'prog-mode-hook '(lambda () (flyspell-prog-mode 1)))
+  (add-hook 'text-mode-hook '(lambda () (flyspell-mode 1)))
 #+END_SRC
 * Menus/Commands
 Menus, commands, and commands which involve menus.
@@ -977,7 +991,7 @@ Beauty in brevity.
   (defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 ** which-key package (small menus to help with commands)
-Even as I've gotten used to emacs key bindings, it is always nice to have this around so that if I want to know, I can easily see what's what.
+Even as I've gotten used to Emacs key bindings, it is always nice to have this around so that if I want to know, I can easily see what's what.
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
     :ensure t
@@ -1263,7 +1277,7 @@ I used to hate light themes. I'm not in that camp anymore. I love this elegant t
     (load-theme 'leuven t))
 #+END_SRC
 ** Hide useless things
-Who even uses the toolbar in emacs?
+Who even uses the toolbar in Emacs?
 #+BEGIN_SRC emacs-lisp
   (menu-bar-mode -1)
   (tooltip-mode -1)
@@ -1319,7 +1333,7 @@ I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so mu
 	      :types :punctuation :arrows :quantifiers :arithmetic :undefined
 	      :other :sub-and-superscripts)))
 #+END_SRC
-*** Highlight matching parentheses et al. when hoving near one
+*** Highlight matching parentheses et al. when hovering near one
 #+BEGIN_SRC emacs-lisp
   (show-paren-mode 1)
 #+END_SRC
@@ -1365,7 +1379,7 @@ This one is also just a matter of personal preference really.
   (global-page-break-lines-mode 1)
 #+END_SRC
 ** Mode line
-*** spaceline package (spacemacs mode line)
+*** spaceline package (Spacemacs mode line)
 I *hate* the default modeline. This one is much less sucky.
 #+BEGIN_SRC emacs-lisp
   (use-package spaceline
@@ -1396,6 +1410,8 @@ Supposedly ~use-package~ is going to have this feature soon, but till that rolls
     (diminish 'rainbow-mode)
     (diminish 'eldoc-mode)
     (diminish 'flycheck-mode)
+    (diminish 'flyspell-mode)
+    (diminish 'flyspell-prog-mode)
     (diminish 'visual-line-mode)
     (diminish 'interactive-haskell-mode)
     (diminish 'haskell-doc-mode)
