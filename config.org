@@ -162,8 +162,7 @@ Since I'm using Emacs as a window manager, I need dmenu so I can open X windows 
   (use-package dmenu
     :ensure t
     :defer t
-    :bind (("s-x" . dmenu)
-	   :map exwm-mode-map
+    :bind (:map desktop-environment-mode-map
 	   ("s-x" . dmenu)))
 #+END_SRC
 *** Configure multi-head
@@ -412,8 +411,7 @@ This one uses two windows: one to open the NetworkManager connection editor, and
      "Connections" nil "sudo nm-connection-editor")
     (async-shell-command "nmcli dev wifi list"))
 
-  (global-set-key (kbd "s-n") 'network-settings)
-  (define-key exwm-mode-map (kbd "s-n") 'network-settings)
+  (define-key desktop-environment-mode-map (kbd "s-n") 'network-settings)
 #+END_SRC
 ** Keyboard layout selection
 This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
@@ -489,11 +487,11 @@ Lastly, I set my preferred keyboard layouts and bind the functions to keys.
 	keyboard-layout-2 "epo"
 	keyboard-layout-3 "de")
 
-  (global-set-key (kbd "s-SPC") 'cycle-keyboard-layout)
-  (define-key exwm-mode-map (kbd "s-SPC") 'cycle-keyboard-layout)
+  (define-key desktop-environment-mode-map
+    (kbd "s-SPC") 'cycle-keyboard-layout)
 
-  (global-set-key (kbd "<s-backspace>") 'cycle-keyboard-layout-reverse)
-  (define-key exwm-mode-map (kbd "<s-backspace>") 'cycle-keyboard-layout-reverse)
+  (define-key desktop-environment-mode-map
+    (kbd "<s-backspace>") 'cycle-keyboard-layout-reverse)
 #+END_SRC
 ** Suspending
 #+BEGIN_SRC emacs-lisp
@@ -559,7 +557,6 @@ I copied the function for quitting Emacs to handle shutting down.
        (kill-emacs))))
 
   (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
-  (define-key exwm-mode-map (kbd "C-x C-M-c") 'save-buffers-shut-down)
 #+END_SRC
 ** Rebooting
 I copied the function for quitting Emacs to handle reboot too.
@@ -616,7 +613,6 @@ I copied the function for quitting Emacs to handle reboot too.
        (kill-emacs))))
 
   (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
-  (define-key exwm-mode-map (kbd "C-x C-M-r") 'save-buffers-reboot)
 #+END_SRC
 * EMMS (Emacs MultiMedia System)
 I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it.
@@ -636,18 +632,7 @@ I do a crapload here, but basically the two main things I do here is configure m
 	  emms-player-mpd-server-name "localhost"
 	  emms-player-mpd-server-port "6601"
 	  mpc-host "localhost:6601")
-    :bind (("s-a v" . emms)
-	   ("s-a b" . emms-smart-browse)
-	   ("s-a r c" . emms-player-mpd-update-all-reset-cache)
-	   ("<XF86AudioPrev>" . emms-previous)
-	   ("<XF86AudioNext>" . emms-next)
-	   ("<XF86AudioPlay>" . emms-pause)
-	   ("<XF86AudioStop>" . emms-stop)
-	   ("<s-left>" . emms-previous)
-	   ("<s-right>" . emms-next)
-	   ("<s-down>" . emms-pause)
-	   ("<s-up>" . emms-stop)
-	   :map exwm-mode-map
+    :bind (:map desktop-environment-mode-map
 	   ("s-a v" . emms)
 	   ("s-a b" . emms-smart-browse)
 	   ("s-a r c" . emms-player-mpd-update-all-reset-cache)
@@ -672,8 +657,7 @@ I do a crapload here, but basically the two main things I do here is configure m
     (emms-cache-set-from-mpd-all)
     (message "MPD started!"))
 
-  (global-set-key (kbd "s-a x") 'mpd/start-music-daemon)
-  (define-key exwm-mode-map (kbd "s-a x") 'mpd/start-music-daemon)
+  (define-key desktop-environment-mode-map (kbd "s-a x") 'mpd/start-music-daemon)
 #+END_SRC
 *** Stopping the daemon
 #+BEGIN_SRC emacs-lisp
@@ -684,8 +668,7 @@ I do a crapload here, but basically the two main things I do here is configure m
     (call-process "killall" nil nil nil "mpd")
     (message "MPD killed!"))
 
-  (global-set-key (kbd "s-a q") 'mpd/kill-music-daemon)
-  (define-key exwm-mode-map (kbd "s-a q") 'mpd/kill-music-daemon)
+  (define-key desktop-environment-mode-map (kbd "s-a q") 'mpd/kill-music-daemon)
 #+END_SRC
 *** Updating the database
 #+BEGIN_SRC emacs-lisp
@@ -695,8 +678,7 @@ I do a crapload here, but basically the two main things I do here is configure m
     (call-process "mpc" nil nil nil "update")
     (message "MPD database updated!"))
 
-  (global-set-key (kbd "s-a r d") 'mpd/update-database)
-  (define-key exwm-mode-map (kbd "s-a r d") 'mpd/update-database)
+  (define-key desktop-environment-mode-map (kbd "s-a r d") 'mpd/update-database)
 #+END_SRC
 *** Showing playback status
 #+BEGIN_SRC emacs-lisp
@@ -705,8 +687,7 @@ I do a crapload here, but basically the two main things I do here is configure m
     (interactive)
     (shell-command "mpc"))
 
-  (global-set-key (kbd "s-a a") 'mpc-status)
-  (define-key exwm-mode-map (kbd "s-a a") 'mpc-status)
+  (define-key desktop-environment-mode-map (kbd "s-a a") 'mpc-status)
 #+END_SRC
 *** Shuffling the playlist
 #+BEGIN_SRC emacs-lisp
@@ -716,16 +697,12 @@ I do a crapload here, but basically the two main things I do here is configure m
     (emms-shuffle)
     (message "Playlist has been shuffled."))
 
-  (global-set-key (kbd "s-a s") 'emms-shuffle-message)
-  (define-key exwm-mode-map (kbd "s-a s") 'emms-shuffle-message)
+  (define-key desktop-environment-mode-map (kbd "s-a s") 'emms-shuffle-message)
 #+END_SRC
 *** Setting repeat mode
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
-  (define-key exwm-mode-map (kbd "s-a r a") 'emms-toggle-repeat-playlist)
-
-  (global-set-key (kbd "s-a r t") 'emms-toggle-repeat-track)
-  (define-key exwm-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
+  (define-key desktop-environment-mode-map (kbd "s-a r a") 'emms-toggle-repeat-playlist)
+  (define-key desktop-environment-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
 #+END_SRC
 * Other programs
 This is other stuff I use, whether in Emacs or in X windows.
@@ -736,18 +713,16 @@ I've been jumping between ~vterm~ and ~ansi-term~ but ~vterm~ seems to be genera
   (use-package vterm
     :ensure t
     :defer t
-    :bind (("<s-return>" . vterm)
-	   :map exwm-mode-map
+    :bind (:map desktop-environment-mode-map
 	   ("<s-return>" . vterm)))
 #+END_SRC
 *** Calculator
-I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and then use the numpad to close it as well.
+I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and then use the number pad to close it as well.
 #+BEGIN_SRC emacs-lisp
   (require 'calc)
 
   (global-set-key (kbd "C-c c") 'calc)
-  (global-set-key (kbd "<XF86Calculator>") 'calc)
-  (define-key exwm-mode-map (kbd "<XF86Calculator>") 'calc)
+  (define-key desktop-environment-mode-map (kbd "<XF86Calculator>") 'calc)
 
   (define-key calc-mode-map (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
 #+END_SRC
@@ -825,8 +800,7 @@ Firefox has some unique abilities when it comes to how to make windows behave wh
     (start-process-shell-command
      "Firefox" nil "firefox"))
 
-  (global-set-key (kbd "s-f") 'run-firefox)
-  (define-key exwm-mode-map (kbd "s-f") 'run-firefox)
+  (define-key desktop-environment-mode-map (kbd "s-f") 'run-firefox)
 #+END_SRC
 *** LibreOffice
 Shame me all you want. I'm still in introductory courses and haven't learned enough Org-mode to use it more meaningfully.
@@ -837,8 +811,7 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
     (start-process-shell-command
      "LibreOffice" nil "libreoffice"))
 
-  (global-set-key (kbd "s-b") 'run-libreoffice)
-  (define-key exwm-mode-map (kbd "s-b") 'run-libreoffice)
+  (define-key desktop-environment-mode-map (kbd "s-b") 'run-libreoffice)
 #+END_SRC
 *** GIMP
 Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
@@ -849,8 +822,7 @@ Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
     (start-process-shell-command
      "GIMP" nil "gimp"))
 
-  (global-set-key (kbd "s-g") 'run-gimp)
-  (define-key exwm-mode-map (kbd "s-g") 'run-gimp)
+  (define-key desktop-environment-mode-map (kbd "s-g") 'run-gimp)
 #+END_SRC
 *** Telegram
 I have a painfully white theme which fits perfectly with my setup.
@@ -861,8 +833,7 @@ I have a painfully white theme which fits perfectly with my setup.
     (start-process-shell-command
      "Telegram" nil "telegram"))
 
-  (global-set-key (kbd "s-t") 'run-tg)
-  (define-key exwm-mode-map (kbd "s-t") 'run-tg)
+  (define-key desktop-environment-mode-map (kbd "s-t") 'run-tg)
 #+END_SRC
 *** Discord
 Yeah, I also use a light theme for Discord. It looks comfy, even if Discord is a garbage application.
@@ -873,8 +844,7 @@ Yeah, I also use a light theme for Discord. It looks comfy, even if Discord is a
     (start-process-shell-command
      "Discord" nil "discord"))
 
-  (global-set-key (kbd "s-d") 'run-discord)
-  (define-key exwm-mode-map (kbd "s-d") 'run-discord)
+  (define-key desktop-environment-mode-map (kbd "s-d") 'run-discord)
 #+END_SRC
 *** Steam
 Gaming is possible with EXWM, if you run games windowed.
@@ -885,8 +855,7 @@ Gaming is possible with EXWM, if you run games windowed.
     (start-process-shell-command
      "Steam" nil "steam"))
 
-  (global-set-key (kbd "s-s") 'run-steam)
-  (define-key exwm-mode-map (kbd "s-s") 'run-steam)
+  (define-key desktop-environment-mode-map (kbd "s-s") 'run-steam)
 #+END_SRC
 * General Functionality
 This is just stuff not pertaining to a specific task and/or not complex enough to warrant entire sections for them.
@@ -1148,15 +1117,10 @@ This to me is preferable to the default behavior.
 ** move focus with C-M-w/a/s/d
 Previously I used ~switch-window~ but it's pretty garbo lol so here's something that works a little more intuitively for me. I also remove C-x o as a bind, since I don't like ~other-window~.
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-s-w") 'windmove-up)
-  (global-set-key (kbd "C-s-a") 'windmove-left)
-  (global-set-key (kbd "C-s-s") 'windmove-down)
-  (global-set-key (kbd "C-s-d") 'windmove-right)
-
-  (define-key exwm-mode-map (kbd "C-s-w") 'windmove-up)
-  (define-key exwm-mode-map (kbd "C-s-a") 'windmove-left)
-  (define-key exwm-mode-map (kbd "C-s-s") 'windmove-down)
-  (define-key exwm-mode-map (kbd "C-s-d") 'windmove-right)
+  (define-key desktop-environment-mode-map (kbd "C-s-w") 'windmove-up)
+  (define-key desktop-environment-mode-map (kbd "C-s-a") 'windmove-left)
+  (define-key desktop-environment-mode-map (kbd "C-s-s") 'windmove-down)
+  (define-key desktop-environment-mode-map (kbd "C-s-d") 'windmove-right)
 
   (global-unset-key (kbd "C-x o"))
 #+END_SRC
@@ -1165,11 +1129,7 @@ Previously I used ~switch-window~ but it's pretty garbo lol so here's something 
   (use-package buffer-move
     :ensure t
     :defer t
-    :bind (("<C-s-up>" . buf-move-up)
-	   ("<C-s-down>" . buf-move-down)
-	   ("<C-s-left>" . buf-move-left)
-	   ("<C-s-right>" . buf-move-right)
-	   :map exwm-mode-map
+    :bind (:map desktop-environment-mode-map
 	   ("<C-s-up>" . buf-move-up)
 	   ("<C-s-down>" . buf-move-down)
 	   ("<C-s-left>" . buf-move-left)
