@@ -156,15 +156,6 @@ This isn't actually where we do all the configuration, it's just where we instal
     (require 'exwm-config)
     (require 'exwm-systemtray))
 #+END_SRC
-*** dmenu package (dmenu but for Emacs)
-Since I'm using Emacs as a window manager, I need dmenu so I can open X windows I haven't bound to keys.
-#+BEGIN_SRC emacs-lisp
-  (use-package dmenu
-    :ensure t
-    :defer t
-    :bind (:map desktop-environment-mode-map
-	   ("s-x" . dmenu)))
-#+END_SRC
 *** Configure multi-head
 I use this configuration for two different machines, so there's a lot of outputs listed here.
 #+BEGIN_SRC emacs-lisp
@@ -215,6 +206,13 @@ Uses the same color as my modeline, uses the same width as window divider width.
 	exwm-floating-border-color "#335ea8")
 #+END_SRC
 ** Keybindings
+*** Set a bind for both global and EXWM usage
+Save lines, save time.
+#+BEGIN_SRC emacs-lisp
+  (defun exwm-bind-key (key function)
+    (global-set-key key function)
+    (define-key exwm-mode-map key function))
+#+END_SRC
 *** General workspace commands
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-global-keys
@@ -308,10 +306,10 @@ Previously I had to define a lot of functions to do these things, now I just cha
     :defer t
     :init
     (require 'desktop-environment)
-    (desktop-environment-mode))
+    (desktop-environment-mode 1))
 #+END_SRC
 *** Volume adjustment
-The only things I really don't like here are how much output it gives when you mute or unmute the speakers or microphone, so I set up basic scripts to give much more concise output.
+The only things I really don't like here are how much output it gives when you mute or un-mute the speakers or microphone, so I set up basic scripts to give much more concise output.
 #+BEGIN_SRC emacs-lisp
   (setq desktop-environment-volume-toggle-command
 	(concat "[ \"$(amixer set Master toggle | grep off)\" ] "
@@ -385,7 +383,7 @@ The functions which ~desktop-environment~ comes with are kinda garbage, so I mad
 			   "-t image/png &> /dev/null && rm $FILENAME"))
     (message "Screenshot copied to clipboard."))
 #+END_SRC
-*** Lockscreen
+*** Lock screen
 Haha yes, this is very long and very very stupid.
 #+BEGIN_SRC emacs-lisp
   (setq desktop-environment-screenlock-command
@@ -393,9 +391,9 @@ Haha yes, this is very long and very very stupid.
 		"--wrongcolor=ffffffff --ringcolor=00000000 --insidecolor=00000000 "
 		"--keyhlcolor=00000000 --bshlcolor=00000000 --separatorcolor=00000000 "
 		"--ringvercolor=00000000 --insidevercolor=00000000 --linecolor=00000000 "
-		"--ringwrongcolor=00000000 --insidewrongcolor=00000000 --timestr='%H:%M' "
-		"--datestr='%a %d %b' --time-font='Iosevka' --date-font='Iosevka' "
-		"--wrong-font='Iosevka' --timesize=128 --datesize=64 --wrongsize=32 "
+		"--ringwrongcolor=00000000 --insidewrongcolor=00000000 --timestr=%H:%M "
+		"--datestr='%a %d %b' --time-font=Iosevka --date-font=Iosevka "
+		"--wrong-font=Iosevka --timesize=128 --datesize=64 --wrongsize=32 "
 		"--time-align 0 --date-align 0 --wrong-align 0 --indpos=-10:-10 "
 		"--timepos=200:125 --datepos=200:215 --wrongpos=200:155 --locktext='' "
 		"--lockfailedtext='' --noinputtext='' --radius 1 --ring-width 1 "
@@ -411,7 +409,7 @@ This one uses two windows: one to open the NetworkManager connection editor, and
      "Connections" nil "sudo nm-connection-editor")
     (async-shell-command "nmcli dev wifi list"))
 
-  (define-key desktop-environment-mode-map (kbd "s-n") 'network-settings)
+  (exwm-bind-key (kbd "s-n") 'network-settings)
 #+END_SRC
 ** Keyboard layout selection
 This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
@@ -487,11 +485,9 @@ Lastly, I set my preferred keyboard layouts and bind the functions to keys.
 	keyboard-layout-2 "epo"
 	keyboard-layout-3 "de")
 
-  (define-key desktop-environment-mode-map
-    (kbd "s-SPC") 'cycle-keyboard-layout)
+  (exwm-bind-key (kbd "s-SPC") 'cycle-keyboard-layout)
 
-  (define-key desktop-environment-mode-map
-    (kbd "<s-backspace>") 'cycle-keyboard-layout-reverse)
+  (exwm-bind-key (kbd "<s-backspace>") 'cycle-keyboard-layout-reverse)
 #+END_SRC
 ** Suspending
 #+BEGIN_SRC emacs-lisp
@@ -617,7 +613,7 @@ I copied the function for quitting Emacs to handle reboot too.
 * EMMS (Emacs MultiMedia System)
 I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it.
 ** Install EMMS and bind main playback keys
-I do a crapload here, but basically the two main things I do here is configure mpd information and bind some keys for emms controls and music controls.
+I do a crapload here, but basically the two main things I do here is configure mpd information and bind some keys for EMMS controls and music controls.
 #+BEGIN_SRC emacs-lisp
   (use-package emms
     :ensure t
@@ -632,18 +628,17 @@ I do a crapload here, but basically the two main things I do here is configure m
 	  emms-player-mpd-server-name "localhost"
 	  emms-player-mpd-server-port "6601"
 	  mpc-host "localhost:6601")
-    :bind (:map desktop-environment-mode-map
-	   ("s-a v" . emms)
-	   ("s-a b" . emms-smart-browse)
-	   ("s-a r c" . emms-player-mpd-update-all-reset-cache)
-	   ("<XF86AudioPrev>" . emms-previous)
-	   ("<XF86AudioNext>" . emms-next)
-	   ("<XF86AudioPlay>" . emms-pause)
-	   ("<XF86AudioStop>" . emms-stop)
-	   ("<s-left>" . emms-previous)
-	   ("<s-right>" . emms-next)
-	   ("<s-down>" . emms-pause)
-	   ("<s-up>" . emms-stop)))
+    (exwm-bind-key (kbd "s-a v") 'emms)
+    (exwm-bind-key (kbd "s-a b") 'emms-smart-browse)
+    (exwm-bind-key (kbd "s-a r c") 'emms-player-mpd-update-all-reset-cache)
+    (exwm-bind-key (kbd "<s-left>") 'emms-previous)
+    (exwm-bind-key (kbd "<s-right>") 'emms-next)
+    (exwm-bind-key (kbd "<s-up>") 'emms-stop)
+    (exwm-bind-key (kbd "<s-down>") 'emms-pause)
+    (exwm-bind-key (kbd "<XF86AudioPrev>") 'emms-previous)
+    (exwm-bind-key (kbd "<XF86AudioNext>") 'emms-next)
+    (exwm-bind-key (kbd "<XF86AudioStop>") 'emms-stop)
+    (exwm-bind-key (kbd "<XF86AudioPlay>") 'emms-pause))
 #+END_SRC
 ** Other useful bindings
 *** Starting the daemon
@@ -657,7 +652,7 @@ I do a crapload here, but basically the two main things I do here is configure m
     (emms-cache-set-from-mpd-all)
     (message "MPD started!"))
 
-  (define-key desktop-environment-mode-map (kbd "s-a x") 'mpd/start-music-daemon)
+  (exwm-bind-key (kbd "s-a x") 'mpd/start-music-daemon)
 #+END_SRC
 *** Stopping the daemon
 #+BEGIN_SRC emacs-lisp
@@ -668,7 +663,7 @@ I do a crapload here, but basically the two main things I do here is configure m
     (call-process "killall" nil nil nil "mpd")
     (message "MPD killed!"))
 
-  (define-key desktop-environment-mode-map (kbd "s-a q") 'mpd/kill-music-daemon)
+  (exwm-bind-key (kbd "s-a q") 'mpd/kill-music-daemon)
 #+END_SRC
 *** Updating the database
 #+BEGIN_SRC emacs-lisp
@@ -678,7 +673,7 @@ I do a crapload here, but basically the two main things I do here is configure m
     (call-process "mpc" nil nil nil "update")
     (message "MPD database updated!"))
 
-  (define-key desktop-environment-mode-map (kbd "s-a r d") 'mpd/update-database)
+  (exwm-bind-key (kbd "s-a r d") 'mpd/update-database)
 #+END_SRC
 *** Showing playback status
 #+BEGIN_SRC emacs-lisp
@@ -687,7 +682,7 @@ I do a crapload here, but basically the two main things I do here is configure m
     (interactive)
     (shell-command "mpc"))
 
-  (define-key desktop-environment-mode-map (kbd "s-a a") 'mpc-status)
+  (exwm-bind-key (kbd "s-a a") 'mpc-status)
 #+END_SRC
 *** Shuffling the playlist
 #+BEGIN_SRC emacs-lisp
@@ -697,12 +692,12 @@ I do a crapload here, but basically the two main things I do here is configure m
     (emms-shuffle)
     (message "Playlist has been shuffled."))
 
-  (define-key desktop-environment-mode-map (kbd "s-a s") 'emms-shuffle-message)
+  (exwm-bind-key (kbd "s-a s") 'emms-shuffle-message)
 #+END_SRC
 *** Setting repeat mode
 #+BEGIN_SRC emacs-lisp
-  (define-key desktop-environment-mode-map (kbd "s-a r a") 'emms-toggle-repeat-playlist)
-  (define-key desktop-environment-mode-map (kbd "s-a r t") 'emms-toggle-repeat-track)
+  (exwm-bind-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
+  (exwm-bind-key (kbd "s-a r t") 'emms-toggle-repeat-track)
 #+END_SRC
 * Other programs
 This is other stuff I use, whether in Emacs or in X windows.
@@ -713,8 +708,8 @@ I've been jumping between ~vterm~ and ~ansi-term~ but ~vterm~ seems to be genera
   (use-package vterm
     :ensure t
     :defer t
-    :bind (:map desktop-environment-mode-map
-	   ("<s-return>" . vterm)))
+    :init
+    (exwm-bind-key (kbd "<s-return>") 'vterm))
 #+END_SRC
 *** Calculator
 I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and then use the number pad to close it as well.
@@ -722,7 +717,7 @@ I love this. I really really really *really* love this. I can use my number pad 
   (require 'calc)
 
   (global-set-key (kbd "C-c c") 'calc)
-  (define-key desktop-environment-mode-map (kbd "<XF86Calculator>") 'calc)
+  (exwm-bind-key (kbd "<XF86Calculator>") 'calc)
 
   (define-key calc-mode-map (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
 #+END_SRC
@@ -791,6 +786,15 @@ God I love playing Tetris
   (define-key tetris-mode-map "e"     'tetris-end-game)
 #+END_SRC
 ** X applications
+*** dmenu package (dmenu but for Emacs)
+Since I'm using Emacs as a window manager, I need dmenu so I can open X windows I haven't bound to keys.
+#+BEGIN_SRC emacs-lisp
+  (use-package dmenu
+    :ensure t
+    :defer t
+    :init
+    (exwm-bind-key (kbd "s-x") 'dmenu))
+#+END_SRC
 *** Firefox
 Firefox has some unique abilities when it comes to how to make windows behave which work better for me. I don't use tabs, and I don't want anything to do with them, and Firefox lets me hide the tab bar and force all tabs to actually open as new windows.
 #+BEGIN_SRC emacs-lisp
@@ -800,7 +804,7 @@ Firefox has some unique abilities when it comes to how to make windows behave wh
     (start-process-shell-command
      "Firefox" nil "firefox"))
 
-  (define-key desktop-environment-mode-map (kbd "s-f") 'run-firefox)
+  (exwm-bind-key (kbd "s-f") 'run-firefox)
 #+END_SRC
 *** LibreOffice
 Shame me all you want. I'm still in introductory courses and haven't learned enough Org-mode to use it more meaningfully.
@@ -811,7 +815,7 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
     (start-process-shell-command
      "LibreOffice" nil "libreoffice"))
 
-  (define-key desktop-environment-mode-map (kbd "s-b") 'run-libreoffice)
+  (exwm-bind-key (kbd "s-b") 'run-libreoffice)
 #+END_SRC
 *** GIMP
 Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
@@ -822,7 +826,7 @@ Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
     (start-process-shell-command
      "GIMP" nil "gimp"))
 
-  (define-key desktop-environment-mode-map (kbd "s-g") 'run-gimp)
+  (exwm-bind-key (kbd "s-g") 'run-gimp)
 #+END_SRC
 *** Telegram
 I have a painfully white theme which fits perfectly with my setup.
@@ -833,7 +837,7 @@ I have a painfully white theme which fits perfectly with my setup.
     (start-process-shell-command
      "Telegram" nil "telegram"))
 
-  (define-key desktop-environment-mode-map (kbd "s-t") 'run-tg)
+  (exwm-bind-key (kbd "s-t") 'run-tg)
 #+END_SRC
 *** Discord
 Yeah, I also use a light theme for Discord. It looks comfy, even if Discord is a garbage application.
@@ -844,7 +848,7 @@ Yeah, I also use a light theme for Discord. It looks comfy, even if Discord is a
     (start-process-shell-command
      "Discord" nil "discord"))
 
-  (define-key desktop-environment-mode-map (kbd "s-d") 'run-discord)
+  (exwm-bind-key (kbd "s-d") 'run-discord)
 #+END_SRC
 *** Steam
 Gaming is possible with EXWM, if you run games windowed.
@@ -855,7 +859,7 @@ Gaming is possible with EXWM, if you run games windowed.
     (start-process-shell-command
      "Steam" nil "steam"))
 
-  (define-key desktop-environment-mode-map (kbd "s-s") 'run-steam)
+  (exwm-bind-key (kbd "s-s") 'run-steam)
 #+END_SRC
 * General Functionality
 This is just stuff not pertaining to a specific task and/or not complex enough to warrant entire sections for them.
@@ -873,7 +877,7 @@ One of those things I just don't know how specifically it works but it makes thi
 ** Enable word wrapping for all buffers
 It's literally never not annoying when words don't wrap.
 #+BEGIN_SRC emacs-lisp
-  (global-visual-line-mode)
+  (global-visual-line-mode 1)
 #+END_SRC
 ** If on a system with a bell, shut it up
 #+BEGIN_SRC emacs-lisp
@@ -881,7 +885,7 @@ It's literally never not annoying when words don't wrap.
 #+END_SRC
 ** Move between SubWords as well as between words
 #+BEGIN_SRC emacs-lisp
-  (global-subword-mode)
+  (global-subword-mode 1)
 #+END_SRC
 ** Disable suspending Emacs
 Why even is this a key that is bound?
@@ -946,7 +950,7 @@ I /love/ ~ido-mode~. God I *love* ~ido-mode~.
   (setq ido-mode-flex-matching nil
 	ido-create-new-buffer 'always
 	ido-everywhere t)
-  (ido-mode)
+  (ido-mode 1)
 #+END_SRC
 However, I /HATE/ ~ido-mode~ right out of the box. A vertical list looks craptons nicer.
 #+BEGIN_SRC emacs-lisp
@@ -955,7 +959,7 @@ However, I /HATE/ ~ido-mode~ right out of the box. A vertical list looks crapton
     :defer t
     :init
     (setq ido-vertical-define-keys 'C-n-and-C-p-only)
-    (ido-vertical-mode))
+    (ido-vertical-mode 1))
 #+END_SRC
 Default M-x behavior doesn't use ~ido-mode~, so we install a package which gives it ~ido-mode~.
 #+BEGIN_SRC emacs-lisp
@@ -977,7 +981,7 @@ Even as I've gotten used to Emacs key bindings, it is always nice to have this a
     :ensure t
     :defer t
     :init
-    (which-key-mode))
+    (which-key-mode 1))
 #+END_SRC
 ** popup-kill-ring package (easier time managing the kill ring)
 Having the whole kill ring easy to scroll through is much less hassle than default behavior.
@@ -1021,7 +1025,7 @@ This saves me tons of time when it comes to managing whitespace.
     :ensure t
     :defer t
     :init
-    (global-hungry-delete-mode))
+    (global-hungry-delete-mode 1))
 #+END_SRC
 ** company package (autocomplete backend)
 This is the base package. I changed some keybinds to make it more pleasant to use.
@@ -1038,7 +1042,7 @@ This is the base package. I changed some keybinds to make it more pleasant to us
 	(define-key company-active-map (kbd "C-n") 'company-select-next)
 	(define-key company-active-map (kbd "C-p") 'company-select-previous)
 	(define-key company-active-map (kbd "SPC") 'company-abort))
-      (global-company-mode))
+      (global-company-mode 1))
 #+END_SRC
 * Buffers/Windows
 ** Sloppy focus
@@ -1115,12 +1119,12 @@ This to me is preferable to the default behavior.
   (global-set-key (kbd "C-c b") 'balance-windows)
 #+END_SRC
 ** move focus with C-M-w/a/s/d
-Previously I used ~switch-window~ but it's pretty garbo lol so here's something that works a little more intuitively for me. I also remove C-x o as a bind, since I don't like ~other-window~.
+Previously I used ~switch-window~ but it's not very intuitive, so here's something that works a little more intuitively for me. I also remove C-x o as a bind, since I don't like ~other-window~ either.
 #+BEGIN_SRC emacs-lisp
-  (define-key desktop-environment-mode-map (kbd "C-s-w") 'windmove-up)
-  (define-key desktop-environment-mode-map (kbd "C-s-a") 'windmove-left)
-  (define-key desktop-environment-mode-map (kbd "C-s-s") 'windmove-down)
-  (define-key desktop-environment-mode-map (kbd "C-s-d") 'windmove-right)
+  (exwm-bind-key (kbd "C-s-w") 'windmove-up)
+  (exwm-bind-key (kbd "C-s-a") 'windmove-left)
+  (exwm-bind-key (kbd "C-s-s") 'windmove-down)
+  (exwm-bind-key (kbd "C-s-d") 'windmove-right)
 
   (global-unset-key (kbd "C-x o"))
 #+END_SRC
@@ -1129,11 +1133,11 @@ Previously I used ~switch-window~ but it's pretty garbo lol so here's something 
   (use-package buffer-move
     :ensure t
     :defer t
-    :bind (:map desktop-environment-mode-map
-	   ("<C-s-up>" . buf-move-up)
-	   ("<C-s-down>" . buf-move-down)
-	   ("<C-s-left>" . buf-move-left)
-	   ("<C-s-right>" . buf-move-right)))
+    :init
+    (exwm-bind-key (kbd "<C-s-up>")    'buf-mode-up)
+    (exwm-bind-key (kbd "<C-s-down>")  'buf-mode-down)
+    (exwm-bind-key (kbd "<C-s-left>")  'buf-move-left)
+    (exwm-bind-key (kbd "<C-s-right>") 'buf-move-right))
 #+END_SRC
 * Org-mode
 I don't need much extending for org-mode.
@@ -1198,7 +1202,7 @@ This is nice to have so I can be told right away when I'm doing something wrong.
     :ensure t
     :defer t
     :init
-    (global-flycheck-mode))
+    (global-flycheck-mode 1))
 #+END_SRC
 ** company-jedi package (Python autocompletion)
 I will probably be adding company autocompletion for more languages as I start working in more languages.
@@ -1264,16 +1268,16 @@ Since I use EXWM, X windows will remove the thin divider which is present by def
   (set-face-foreground 'window-divider-first-pixel "#335ea8")
   (set-face-foreground 'window-divider "#335ea8")
   (set-face-foreground 'window-divider-last-pixel "#335ea8")
-  (window-divider-mode)
+  (window-divider-mode 1)
   (fringe-mode 10)
 #+END_SRC
 ** Line/column numbers
 I like having line numbers and the current cursor position and a highlighted current line.
 #+BEGIN_SRC emacs-lisp
-  (line-number-mode)
-  (column-number-mode)
-  (global-hl-line-mode)
-  (global-display-line-numbers-mode)
+  (line-number-mode 1)
+  (column-number-mode 1)
+  (global-hl-line-mode 1)
+  (global-display-line-numbers-mode 1)
 #+END_SRC
 However, I don't like line numbers in modes where it breaks the mode.
 #+BEGIN_SRC emacs-lisp
@@ -1298,7 +1302,7 @@ I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so mu
       :ensure t
       :defer t
       :init
-      (global-pretty-mode)
+      (global-pretty-mode 1)
       (pretty-activate-groups
        '(:nil :ordering :equality :logic :sets :parentheses :function :greek
 	      :types :punctuation :arrows :quantifiers :arithmetic :undefined
@@ -1306,7 +1310,7 @@ I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so mu
 #+END_SRC
 *** Highlight matching parentheses et al. when hovering near one
 #+BEGIN_SRC emacs-lisp
-  (show-paren-mode)
+  (show-paren-mode 1)
 #+END_SRC
 *** rainbow package (show colors when typed as hex codes)
 I don't use it too much, but it's nice to have it around.
@@ -1316,7 +1320,7 @@ I don't use it too much, but it's nice to have it around.
     :defer t
     :init
     (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode))
-    (global-rainbow-mode)
+    (global-rainbow-mode 1)
 #+END_SRC
 *** rainbow-delimiters package (better quotes/parentheses/brackets)
 It's subtle on my theme, but it still helps me keep track of my brackets and parentheses.
@@ -1372,17 +1376,17 @@ Supposedly ~use-package~ is going to have this feature soon, but till that rolls
   (use-package diminish
     :ensure t
     :init
-    (diminish 'hungry-delete-mode)
-    (diminish 'which-key-mode)
-    (diminish 'subword-mode)
-    (diminish 'company-mode)
-    (diminish 'rainbow-mode)
-    (diminish 'eldoc-mode)
-    (diminish 'flycheck-mode)
-    (diminish 'flyspell-mode)
-    (diminish 'flyspell-prog-mode)
-    (diminish 'visual-line-mode)
-    (diminish 'interactive-haskell-mode)
-    (diminish 'haskell-doc-mode)
-    (diminish 'page-break-lines-mode))
+    :diminish (eldoc-mode
+	       hungry-delete-mode
+	       which-key-mode
+	       subword-mode
+	       company-mode
+	       rainbow-mode
+	       flycheck-mode
+	       flyspell-mode
+	       flyspell-prog-mode
+	       visual-line-mode
+	       interactive-haskell-mode
+	       haskell-doc-mode
+	       page-break-lines-mode))
 #+END_SRC
