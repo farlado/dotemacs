@@ -1,5 +1,5 @@
 #+STARTUP: overview, inlineimages
-#+TITLE: Farlado's .emacs.d
+#+TITLE: Farlado's Emacs
 #+DESCRIPTION: Farlado's personal Emacs configuration
 #+CREATOR: Farlado
 #+LANGUAGE: en
@@ -24,9 +24,10 @@ Everything has different dependencies so make sure you have what you need.
 - For volume control: ~alsa-utils~
 - For brightness control: ~brightnessctl~
 - For screenshots: ~maim~
+- For copying screenshots: ~xclip~
 - For locking the screen: ~i3lock-color~
 *** EMMS
-- For playing music: ~mpd~
+- For playing music: ~mpd~, ~mpc~
 - For playing video: ~mpv~
 *** vterm
 - Makefile parsing: ~cmake~
@@ -47,6 +48,7 @@ Everything has different dependencies so make sure you have what you need.
 - For Python: ~pylint~, ~jedi~
 - For Haskell: ~stack~
 *** Other items used in my setup
+- Always hiding the cursor while typing: ~xbanish~
 - Compositor: ~xcompmgr~
 - Notification Daemon: ~dunst~
 - Network Configuration: ~nm-connection-editor~
@@ -116,7 +118,7 @@ I don't need my laptop's screen shutting off just because I'm sitting and watchi
 #+BEGIN_SRC emacs-lisp
   (shell-command "xset s off -dpms")
 #+END_SRC
-** Set keymap to US and give capslock the functionality of control
+** Set the keyboard layout to US and give caps lock the functionality of control
 I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
 #+BEGIN_SRC emacs-lisp
   (shell-command "setxkbmap us -option ctrl:nocaps")
@@ -132,6 +134,12 @@ I haven't integrated notifications into Emacs just yet, sadly.
 #+BEGIN_SRC emacs-lisp
   (start-process-shell-command
    "Notifications" nil "dunst")
+#+END_SRC
+** Always hide the cursor when typing
+Just a personal preference, I don't like seeing the cursor when I'm pressing keys.
+#+BEGIN_SRC emacs-lisp
+  (start-process-shell-command
+   "Cursor Hiding" nil "xbanish")
 #+END_SRC
 * EXWM (Emacs X Window Manager)
 Yes, Emacs is my window manager. You should probably remove this stuff if you don't plan to use Emacs as your window manager. It's loaded right after the startup commands so that I can bind keys more easily later on.
