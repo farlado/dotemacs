@@ -188,8 +188,8 @@ I use this configuration for two different machines, so there's a lot of outputs
 *** Name EXWM buffers after the window title
 This was annoying when I first installed EXWM. Thankfully this is a very easy fix.
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'exwm-update-title-hook (lambda ()
-				      (exwm-workspace-rename-buffer exwm-title)))
+  (add-hook 'exwm-update-title-hook
+	    (lambda () (exwm-workspace-rename-buffer exwm-title)))
 #+END_SRC
 *** Assign workspaces and floating to various windows
 This is the part of the window manager configuration which is just how to control X windows as they spawn.
@@ -873,7 +873,7 @@ One of those things I just don't know how specifically it works but it makes thi
 ** Enable word wrapping for all buffers
 It's literally never not annoying when words don't wrap.
 #+BEGIN_SRC emacs-lisp
-  (global-visual-line-mode 1)
+  (global-visual-line-mode)
 #+END_SRC
 ** If on a system with a bell, shut it up
 #+BEGIN_SRC emacs-lisp
@@ -881,7 +881,7 @@ It's literally never not annoying when words don't wrap.
 #+END_SRC
 ** Move between SubWords as well as between words
 #+BEGIN_SRC emacs-lisp
-  (global-subword-mode 1)
+  (global-subword-mode)
 #+END_SRC
 ** Disable suspending Emacs
 Why even is this a key that is bound?
@@ -934,9 +934,9 @@ Just a useful little tool to keep spelling in check.
   (setq ispell-program-name "aspell"
 	ispell-dictionary "american")
 
-  (add-hook 'flyspell-mode-hook '(lambda () (flyspell-buffer)))
-  (add-hook 'prog-mode-hook '(lambda () (flyspell-prog-mode 1)))
-  (add-hook 'text-mode-hook '(lambda () (flyspell-mode 1)))
+  (add-hook 'flyspell-mode-hook 'flyspell-buffer)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+  (add-hook 'text-mode-hook 'flyspell-mode)
 #+END_SRC
 * Menus/Commands
 Menus, commands, and commands which involve menus.
@@ -946,7 +946,7 @@ I /love/ ~ido-mode~. God I *love* ~ido-mode~.
   (setq ido-mode-flex-matching nil
 	ido-create-new-buffer 'always
 	ido-everywhere t)
-  (ido-mode 1)
+  (ido-mode)
 #+END_SRC
 However, I /HATE/ ~ido-mode~ right out of the box. A vertical list looks craptons nicer.
 #+BEGIN_SRC emacs-lisp
@@ -955,7 +955,7 @@ However, I /HATE/ ~ido-mode~ right out of the box. A vertical list looks crapton
     :defer t
     :init
     (setq ido-vertical-define-keys 'C-n-and-C-p-only)
-    (ido-vertical-mode 1))
+    (ido-vertical-mode))
 #+END_SRC
 Default M-x behavior doesn't use ~ido-mode~, so we install a package which gives it ~ido-mode~.
 #+BEGIN_SRC emacs-lisp
@@ -977,7 +977,7 @@ Even as I've gotten used to Emacs key bindings, it is always nice to have this a
     :ensure t
     :defer t
     :init
-    (which-key-mode 1))
+    (which-key-mode))
 #+END_SRC
 ** popup-kill-ring package (easier time managing the kill ring)
 Having the whole kill ring easy to scroll through is much less hassle than default behavior.
@@ -1021,7 +1021,7 @@ This saves me tons of time when it comes to managing whitespace.
     :ensure t
     :defer t
     :init
-    (global-hungry-delete-mode 1))
+    (global-hungry-delete-mode))
 #+END_SRC
 ** company package (autocomplete backend)
 This is the base package. I changed some keybinds to make it more pleasant to use.
@@ -1035,10 +1035,10 @@ This is the base package. I changed some keybinds to make it more pleasant to us
       (with-eval-after-load 'company
 	(define-key company-active-map (kbd "M-n") nil)
 	(define-key company-active-map (kbd "M-p") nil)
-	(define-key company-active-map (kbd "C-n") #'company-select-next)
-	(define-key company-active-map (kbd "C-p") #'company-select-previous)
-	(define-key company-active-map (kbd "SPC") #'company-abort))
-      (global-company-mode 1))
+	(define-key company-active-map (kbd "C-n") 'company-select-next)
+	(define-key company-active-map (kbd "C-p") 'company-select-previous)
+	(define-key company-active-map (kbd "SPC") 'company-abort))
+      (global-company-mode))
 #+END_SRC
 * Buffers/Windows
 ** Sloppy focus
@@ -1198,7 +1198,7 @@ This is nice to have so I can be told right away when I'm doing something wrong.
     :ensure t
     :defer t
     :init
-    (global-flycheck-mode 1))
+    (global-flycheck-mode))
 #+END_SRC
 ** company-jedi package (Python autocompletion)
 I will probably be adding company autocompletion for more languages as I start working in more languages.
@@ -1220,10 +1220,11 @@ I have started to mess around with Haskell, so I needed to grab a mode for that.
     (require 'haskell-process)
     (require 'haskell-interactive-mode)
     (setq haskell-stylish-on-save t)
-    :hook ((haskell-mode-hook . interactive-haskell-mode)
-	   (haskell-mode-hook . turn-on-haskell-doc-mode)
-	   (haskell-mode-hook . turn-on-haskell-indentation)
-	   (haskell-mode-hook . haskell-auto-insert-module-template)))
+    (dolist (func '(interactive-haskell-mode
+		    turn-on-haskell-doc-mode
+		    turn-on-haskell-indentation
+		    haskell-auto-insert-module-template))
+      (add-hook 'haskell-mode-hook func)))
 #+END_SRC
 ** electric-pair-mode (OH MY GOD THIS IS SO GREAT)
 I have no words for how convenient this has been and how much faster I get things done thanks to these five lines of elisp.
@@ -1263,23 +1264,22 @@ Since I use EXWM, X windows will remove the thin divider which is present by def
   (set-face-foreground 'window-divider-first-pixel "#335ea8")
   (set-face-foreground 'window-divider "#335ea8")
   (set-face-foreground 'window-divider-last-pixel "#335ea8")
-  (window-divider-mode 1)
+  (window-divider-mode)
   (fringe-mode 10)
 #+END_SRC
 ** Line/column numbers
 I like having line numbers and the current cursor position and a highlighted current line.
 #+BEGIN_SRC emacs-lisp
-  (line-number-mode 1)
-  (column-number-mode 1)
-  (global-hl-line-mode 1)
-  (global-display-line-numbers-mode 1)
+  (line-number-mode)
+  (column-number-mode)
+  (global-hl-line-mode)
+  (global-display-line-numbers-mode)
 #+END_SRC
 However, I don't like line numbers in modes where it breaks the mode.
 #+BEGIN_SRC emacs-lisp
   (defun disable-line-numbers-for (hook)
     "Disable `display-line-numbers-mode` for HOOK."
-    (add-hook hook (lambda ()
-		     (display-line-numbers-mode 0))))
+    (add-hook hook (lambda () (display-line-numbers-mode -1))))
 
   (disable-line-numbers-for 'vterm-mode-hook)
   (disable-line-numbers-for 'tetris-mode-hook)
@@ -1298,7 +1298,7 @@ I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so mu
       :ensure t
       :defer t
       :init
-      (global-pretty-mode 1)
+      (global-pretty-mode)
       (pretty-activate-groups
        '(:nil :ordering :equality :logic :sets :parentheses :function :greek
 	      :types :punctuation :arrows :quantifiers :arithmetic :undefined
@@ -1306,7 +1306,7 @@ I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so mu
 #+END_SRC
 *** Highlight matching parentheses et al. when hovering near one
 #+BEGIN_SRC emacs-lisp
-  (show-paren-mode 1)
+  (show-paren-mode)
 #+END_SRC
 *** rainbow package (show colors when typed as hex codes)
 I don't use it too much, but it's nice to have it around.
@@ -1315,9 +1315,8 @@ I don't use it too much, but it's nice to have it around.
     :ensure t
     :defer t
     :init
-    (define-globalized-minor-mode global-rainbow-mode rainbow-mode (lambda ()
-								     (rainbow-mode 1)))
-    (global-rainbow-mode 1))
+    (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode))
+    (global-rainbow-mode)
 #+END_SRC
 *** rainbow-delimiters package (better quotes/parentheses/brackets)
 It's subtle on my theme, but it still helps me keep track of my brackets and parentheses.
@@ -1326,7 +1325,7 @@ It's subtle on my theme, but it still helps me keep track of my brackets and par
     :ensure t
     :defer t
     :init
-    (add-hook 'prog-mode-hook #'rainbow-delimiters-mode 1))
+    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 #+END_SRC
 *** org-bullets package (nicer bullet points in org-mode)
 It's kinda slow, but bullet points are very very nice, much better than asterisks.
@@ -1335,8 +1334,7 @@ It's kinda slow, but bullet points are very very nice, much better than asterisk
     :ensure t
     :defer t
     :init
-    (add-hook 'org-mode-hook (lambda ()
-			       (org-bullets-mode 1)))
+    (add-hook 'org-mode-hook 'org-bullets-mode)
     (setq inhibit-compacting-font-caches t))
 #+END_SRC
 *** Hide emphasis markers in org-mode
