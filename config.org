@@ -38,6 +38,7 @@ Everything has different dependencies so make sure you have what you need.
 - To process dot files: ~graphviz~
 *** flyspell-mode
 - Spell checking: ~aspell~
+- Dictionaries I use: ~aspell-en~
 *** wttrin
 - To grab weather data: ~curl~
 *** sudo-edit
@@ -951,6 +952,8 @@ A nice way to make diagrams.
 ** Spell-checking
 Just a useful little tool to keep spelling in check.
 #+BEGIN_SRC emacs-lisp
+  (require 'flyspell)
+
   (setq ispell-program-name "aspell"
 	ispell-dictionary "american")
 
