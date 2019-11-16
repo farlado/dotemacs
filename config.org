@@ -4,6 +4,7 @@
 #+CREATOR: Farlado
 #+LANGUAGE: en
 #+OPTIONS: num:nil
+#+EXPORT_EXCLUDE_TAGS: noexport
 
 #+NAME: fig:LOGO
 #+CAPTION: 'An excellent emacs'
@@ -708,7 +709,7 @@ Just a personal preference, I don't like seeing the cursor when I'm pressing key
 #+END_SRC
 * EMMS (Emacs MultiMedia System)
 I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it.
-** Install EMMS and bind main playback keys
+** Install EMMS
 I do a crapload here, but basically the two main things I do here is configure mpd information and bind some keys for EMMS controls and music controls.
 #+BEGIN_SRC emacs-lisp
   (use-package emms
@@ -723,20 +724,9 @@ I do a crapload here, but basically the two main things I do here is configure m
 	  emms-info-functions '(emms-info mpd)
 	  emms-player-mpd-server-name "localhost"
 	  emms-player-mpd-server-port "6601"
-	  mpc-host "localhost:6601")
-    (exwm-bind-key (kbd "s-a v") 'emms)
-    (exwm-bind-key (kbd "s-a b") 'emms-smart-browse)
-    (exwm-bind-key (kbd "s-a r c") 'emms-player-mpd-update-all-reset-cache)
-    (exwm-bind-key (kbd "<s-left>") 'emms-previous)
-    (exwm-bind-key (kbd "<s-right>") 'emms-next)
-    (exwm-bind-key (kbd "<s-up>") 'emms-stop)
-    (exwm-bind-key (kbd "<s-down>") 'emms-pause)
-    (exwm-bind-key (kbd "<XF86AudioPrev>") 'emms-previous)
-    (exwm-bind-key (kbd "<XF86AudioNext>") 'emms-next)
-    (exwm-bind-key (kbd "<XF86AudioStop>") 'emms-stop)
-    (exwm-bind-key (kbd "<XF86AudioPlay>") 'emms-pause))
+	  mpc-host "localhost:6601"))
 #+END_SRC
-** Other useful bindings
+** Useful daemon functions
 *** Starting the daemon
 #+BEGIN_SRC emacs-lisp
   (defun mpd/start-music-daemon ()
@@ -747,8 +737,6 @@ I do a crapload here, but basically the two main things I do here is configure m
     (emms-player-mpd-connect)
     (emms-cache-set-from-mpd-all)
     (message "MPD started!"))
-
-  (exwm-bind-key (kbd "s-a x") 'mpd/start-music-daemon)
 #+END_SRC
 *** Stopping the daemon
 #+BEGIN_SRC emacs-lisp
@@ -758,8 +746,6 @@ I do a crapload here, but basically the two main things I do here is configure m
     (emms-stop)
     (call-process "killall" nil nil nil "mpd")
     (message "MPD killed!"))
-
-  (exwm-bind-key (kbd "s-a q") 'mpd/kill-music-daemon)
 #+END_SRC
 *** Updating the database
 #+BEGIN_SRC emacs-lisp
@@ -768,8 +754,6 @@ I do a crapload here, but basically the two main things I do here is configure m
     (interactive)
     (call-process "mpc" nil nil nil "update")
     (message "MPD database updated!"))
-
-  (exwm-bind-key (kbd "s-a r d") 'mpd/update-database)
 #+END_SRC
 *** Showing playback status
 #+BEGIN_SRC emacs-lisp
@@ -777,8 +761,6 @@ I do a crapload here, but basically the two main things I do here is configure m
     "Display the mpc status in the echo area."
     (interactive)
     (shell-command "mpc"))
-
-  (exwm-bind-key (kbd "s-a a") 'mpc-status)
 #+END_SRC
 *** Shuffling the playlist
 #+BEGIN_SRC emacs-lisp
@@ -787,13 +769,37 @@ I do a crapload here, but basically the two main things I do here is configure m
     (interactive)
     (emms-shuffle)
     (message "Playlist has been shuffled."))
-
-  (exwm-bind-key (kbd "s-a s") 'emms-shuffle-message)
 #+END_SRC
-*** Setting repeat mode
+** Binding all the keys
 #+BEGIN_SRC emacs-lisp
-  (exwm-bind-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
-  (exwm-bind-key (kbd "s-a r t") 'emms-toggle-repeat-track)
+  (when (window-system)
+    ;; Base functions
+    (exwm-bind-key (kbd "s-a v") 'emms)
+    (exwm-bind-key (kbd "s-a b") 'emms-smart-browse)
+    (exwm-bind-key (kbd "s-a r c") 'emms-player-mpd-update-all-reset-cache)
+
+    ;; Track navigation
+    (exwm-bind-key (kbd "<s-leexwm-bind-keyt>") 'emms-previous)
+    (exwm-bind-key (kbd "<s-right>") 'emms-next)
+    (exwm-bind-key (kbd "<s-up>") 'emms-stop)
+    (exwm-bind-key (kbd "<s-down>") 'emms-pause)
+
+    ;; Media keys
+    (exwm-bind-key (kbd "<XF86AudioPrev>") 'emms-previous)
+    (exwm-bind-key (kbd "<XF86AudioNext>") 'emms-next)
+    (exwm-bind-key (kbd "<XF86AudioStop>") 'emms-stop)
+    (exwm-bind-key (kbd "<XF86AudioPlay>") 'emms-pause)
+
+    ;; Repeat/shuffle
+    (exwm-bind-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
+    (exwm-bind-key (kbd "s-a r t") 'emms-toggle-repeat-track)
+    (exwm-bind-key (kbd "s-a s") 'emms-shuffle-message)
+
+    ;; mpd-specific
+    (exwm-bind-key (kbd "s-a x") 'mpd/start-music-daemon)
+    (exwm-bind-key (kbd "s-a q") 'mpd/kill-music-daemon)
+    (exwm-bind-key (kbd "s-a r d") 'mpd/update-database)
+    (exwm-bind-key (kbd "s-a a") 'mpc-status))
 #+END_SRC
 * Other Emacs goodies
 This is other stuff I use in Emacs.
@@ -810,7 +816,8 @@ I love this. I really really really *really* love this. I can use my number pad 
   (require 'calc)
 
   (global-set-key (kbd "C-c c") 'calc)
-  (exwm-bind-key (kbd "<XF86Calculator>") 'calc)
+  (when (window-system)
+    (exwm-bind-key (kbd "<XF86Calculator>") 'calc))
 
   (define-key calc-mode-map (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
 #+END_SRC
