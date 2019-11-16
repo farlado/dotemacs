@@ -122,6 +122,9 @@ I don't want to have to manually update my stuff. This solution is literally plo
 #+END_SRC
 * Making Emacs a (sufficiently exhaustive) DE
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on.
+#+BEGIN_SRC emacs-lisp :noexport:
+  (when (window-system)
+#+END_SRC
 ** Configuration
 *** exwm package (base window manager)
 This isn't actually where we do all the configuration, it's just where we install EXWM and grab what we need to configure it.
@@ -700,6 +703,9 @@ Just a personal preference, I don't like seeing the cursor when I'm pressing key
   (start-process-shell-command
    "Cursor Hiding" nil "xbanish")
 #+END_SRC
+#+BEGIN_SRC emacs-lisp :noexport:
+  )
+#+END_SRC
 * EMMS (Emacs MultiMedia System)
 I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it.
 ** Install EMMS and bind main playback keys
@@ -790,7 +796,7 @@ I do a crapload here, but basically the two main things I do here is configure m
   (exwm-bind-key (kbd "s-a r t") 'emms-toggle-repeat-track)
 #+END_SRC
 * Other Emacs goodies
-This is other stuff I use, whether in Emacs or in X windows.
+This is other stuff I use in Emacs.
 ** Terminal
 I've been jumping between ~vterm~ and ~ansi-term~ but ~vterm~ seems to be generally faster and easier to use.
 #+BEGIN_SRC emacs-lisp
