@@ -15,7 +15,7 @@
 0) Make sure you have all the right dependencies.
 1) Clone the repo into your home directory as ~.emacs.d~.
 2) Inside the repo, choose your font/border sizes using ~make~. The options are ~hires~ and ~lores~. The default is ~lores~.
-3) Make sure if you aren't going to use EXWM you remove everything in the ~EXWM~ section of ~config.org~
+3) Make sure if you aren't going to use EXWM you remove everything in the ~EXWM~ section of ~config.org~.
 ** Dependencies
 Everything has different dependencies so make sure you have what you need.
 *** EXWM
@@ -91,8 +91,7 @@ I love the default start screen, but it just doesn't cut it for me. I just use t
 	  show-week-agenda-p t
 	  dashboard-banner-logo-title "Welcome to GNU Emacs"
 	  dashboard-set-footer nil
-	  initial-buffer-choice (lambda ()
-				  (get-buffer "*dashboard*")))
+	  initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
     (dashboard-setup-startup-hook))
 #+END_SRC
 ** auto-package-update package (self-explanatory)
@@ -216,15 +215,12 @@ Save lines, save time.
 *** General workspace commands
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-global-keys
-	`(([?\s-q] . exwm-workspace-delete)
-	  ([?\s-w] . exwm-workspace-switch)
+	`(([?\s-w] . exwm-workspace-switch)
 	  ([?\s-e] . exwm-workspace-swap)
-	  ([?\s-r] . exwm-reset)
-	  ,@(mapcar (lambda (i)
-		      `(,(kbd (format "s-%d" i)) .
-			(lambda ()
-			  (interactive)
-			  (exwm-workspace-switch-create ,i))))
+	  ([?\s-q] . exwm-reset)
+	  ,@(mapcar
+	     (lambda (i) `(,(kbd (format "s-%d" i)) .
+		      (lambda () (interactive) (exwm-workspace-switch-create ,i))))
 		    (number-sequence 0 9))))
 #+END_SRC
 *** EXWM-mode functions
@@ -309,7 +305,7 @@ Previously I had to define a lot of functions to do these things, now I just cha
     (desktop-environment-mode 1))
 #+END_SRC
 *** Volume adjustment
-The only things I really don't like here are how much output it gives when you mute or un-mute the speakers or microphone, so I set up basic scripts to give much more concise output.
+The only things I really don't like here are how much output it gives when you mute or unmute the speakers or microphone, so I set up basic scripts to give much more concise output.
 #+BEGIN_SRC emacs-lisp
   (setq desktop-environment-volume-toggle-command
 	(concat "[ \"$(amixer set Master toggle | grep off)\" ] "
@@ -400,7 +396,7 @@ Haha yes, this is very long and very very stupid.
 		" --veriftext='' --wrongtext='WRONG' --force-clock"))
 #+END_SRC
 ** Network Settings
-This one uses two windows: one to open the NetworkManager connection editor, and another to list wifi networks nearby.
+This one uses two windows: one to open the NetworkManager connection editor, and another to list WiFi networks nearby.
 #+BEGIN_SRC emacs-lisp
   (defun network-settings ()
     "Open a NetworkManager connection editor."
@@ -440,6 +436,11 @@ This will eventually be its own package, but for now, it's just in my config. Fi
 #+END_SRC
 Then, I use these functions to control setting and cycling the keyboard layout.
 #+BEGIN_SRC emacs-lisp
+  (defun get-keyboard-layout ()
+    "Get the current keyboard layout."
+    (shell-command-to-string
+     "setxkbmap -query | grep -oP 'layout:\\s*\\K(\\w+)' | tr '\n' ' ' | sed 's/ //'"))
+
   (defun set-keyboard-layout (&optional layout)
     "Set the keyboard layout to LAYOUT."
     (interactive)
@@ -450,10 +451,7 @@ Then, I use these functions to control setting and cycling the keyboard layout.
   (defun cycle-keyboard-layout ()
     "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3'."
     (interactive)
-    (let* ((current-layout (shell-command-to-string
-			    (concat "setxkbmap -query | "
-				    "grep -oP 'layout:\\s*\\K(\\w+)' | "
-				    "tr '\n' ' ' | sed 's/ //'")))
+    (let* ((current-layout (get-keyboard-layout))
 	   (new-layout (if (string= current-layout keyboard-layout-1)
 			   (or keyboard-layout-2 keyboard-layout-3)
 			 (if (string= current-layout keyboard-layout-2)
@@ -466,10 +464,7 @@ Then, I use these functions to control setting and cycling the keyboard layout.
   (defun cycle-keyboard-layout-reverse ()
     "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3' in reverse."
     (interactive)
-    (let* ((current-layout (shell-command-to-string
-			    (concat "setxkbmap -query | "
-				    "grep -oP 'layout:\\s*\\K(\\w+)' | "
-				    "tr '\n' ' ' | sed 's/ //'")))
+    (let* ((current-layout (get-keyboard-layout))
 	   (new-layout (if (string= current-layout keyboard-layout-3)
 			   (or keyboard-layout-2 keyboard-layout-1)
 			 (if (string= current-layout keyboard-layout-2)
@@ -486,7 +481,6 @@ Lastly, I set my preferred keyboard layouts and bind the functions to keys.
 	keyboard-layout-3 "de")
 
   (exwm-bind-key (kbd "s-SPC") 'cycle-keyboard-layout)
-
   (exwm-bind-key (kbd "<s-backspace>") 'cycle-keyboard-layout-reverse)
 #+END_SRC
 ** Suspending
@@ -1028,7 +1022,7 @@ This saves me tons of time when it comes to managing whitespace.
     (global-hungry-delete-mode 1))
 #+END_SRC
 ** company package (autocomplete backend)
-This is the base package. I changed some keybinds to make it more pleasant to use.
+This is the base package. I changed some key bindings to make it more pleasant to use.
 #+BEGIN_SRC emacs-lisp
     (use-package company
       :ensure t
@@ -1298,15 +1292,15 @@ However, I don't like line numbers in modes where it breaks the mode.
 *** pretty-mode package (prettify symbols)
 I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so much more to make things look nice, especially in functional programming languages. I enable /all/ of them.
 #+BEGIN_SRC emacs-lisp
-    (use-package pretty-mode
-      :ensure t
-      :defer t
-      :init
-      (global-pretty-mode 1)
-      (pretty-activate-groups
-       '(:nil :ordering :equality :logic :sets :parentheses :function :greek
-	      :types :punctuation :arrows :quantifiers :arithmetic :undefined
-	      :other :sub-and-superscripts)))
+  (use-package pretty-mode
+    :ensure t
+    :defer t
+    :init
+    (global-pretty-mode 1)
+    (pretty-activate-groups
+     '(:nil :ordering :equality :logic :sets :parentheses :function :greek
+	    :types :punctuation :arrows :quantifiers :arithmetic :undefined
+	    :other :sub-and-superscripts)))
 #+END_SRC
 *** Highlight matching parentheses et al. when hovering near one
 #+BEGIN_SRC emacs-lisp
@@ -1388,5 +1382,6 @@ Supposedly ~use-package~ is going to have this feature soon, but till that rolls
 	       visual-line-mode
 	       interactive-haskell-mode
 	       haskell-doc-mode
-	       page-break-lines-mode))
+	       page-break-lines-mode
+	       compilation-shell-minor-mode))
 #+END_SRC
