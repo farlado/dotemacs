@@ -4,7 +4,6 @@
 #+CREATOR: Farlado
 #+LANGUAGE: en
 #+OPTIONS: num:nil
-#+EXPORT_EXCLUDE_TAGS: noexport
 
 #+NAME: fig:LOGO
 #+CAPTION: 'An excellent emacs'
@@ -123,7 +122,7 @@ I don't want to have to manually update my stuff. This solution is literally plo
 #+END_SRC
 * Making Emacs a (sufficiently exhaustive) DE
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on.
-#+BEGIN_SRC emacs-lisp :noexport:
+#+BEGIN_SRC emacs-lisp :exports none
   (when (window-system)
 #+END_SRC
 ** Configuration
@@ -704,7 +703,7 @@ Just a personal preference, I don't like seeing the cursor when I'm pressing key
   (start-process-shell-command
    "Cursor Hiding" nil "xbanish")
 #+END_SRC
-#+BEGIN_SRC emacs-lisp :noexport:
+#+BEGIN_SRC emacs-lisp :exports none
   )
 #+END_SRC
 * EMMS (Emacs MultiMedia System)
