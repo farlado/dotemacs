@@ -59,7 +59,20 @@ Everything has different dependencies so make sure you have what you need.
 - Crappier Messenger: ~discord~
 - Games Platform: ~steam~
 * Startup
-Since I use Emacs as my window manager, there's a lot of extra stuff beyond only Emacs-related things in here. You might want to clean them out if you don't intend to use EXWM.
+** Hide dumb stuff
+Who even uses the toolbar in Emacs?
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
+  (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq use-dialog-box nil)
+#+END_SRC
+** Go full-screen
+I really hate how Emacs looks when it is first starting.
+#+BEGIN_SRC emacs-lisp
+  (set-frame-parameter nil 'fullscreen 'fullboth)
+#+END_SRC
 ** Start Emacs server
 Although I technically don't /have/ to do this, it is very helpful.
 #+BEGIN_SRC emacs-lisp
@@ -106,39 +119,6 @@ I don't want to have to manually update my stuff. This solution is literally plo
 	  auto-package-update-delete-old-versions t
 	  auto-package-update-hide-results t)
     (auto-package-update-maybe))
-#+END_SRC
-** Set fallback cursor
-Some X windows will have weird cursors if this isn't done.
-#+BEGIN_SRC emacs-lisp
-  (shell-command "xsetroot -cursor_name left_ptr")
-#+END_SRC
-** Disable screen blanking
-I don't need my laptop's screen shutting off just because I'm sitting and watching a video too long.
-#+BEGIN_SRC emacs-lisp
-  (shell-command "xset s off -dpms")
-#+END_SRC
-** Set the keyboard layout to US and give caps lock the functionality of control
-I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
-#+BEGIN_SRC emacs-lisp
-  (shell-command "setxkbmap us -option ctrl:nocaps")
-#+END_SRC
-** Compositor
-I don't need it, but having basic compositing is very nice.
-#+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Compositor" nil "xcompmgr")
-#+END_SRC
-** Notification manager
-I haven't integrated notifications into Emacs just yet, sadly.
-#+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Notifications" nil "dunst")
-#+END_SRC
-** Always hide the cursor when typing
-Just a personal preference, I don't like seeing the cursor when I'm pressing keys.
-#+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Cursor Hiding" nil "xbanish")
 #+END_SRC
 * Making Emacs a (sufficiently exhaustive) DE
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on.
@@ -594,8 +574,8 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 
 	  ;; Moving focus between windows
 	  ([C-s-up] . windmove-up)
-	  ([C-s-down] . windmove-left)
-	  ([C-s-left] . windmove-down)
+	  ([C-s-down] . windmove-down)
+	  ([C-s-left] . windmove-left)
 	  ([C-s-right] . windmove-right)
 
 	  ;; Rearranging windows
@@ -680,12 +660,45 @@ This is super nice, because I love these key bindings and they are just intuitiv
 
   (define-key exwm-mode-map (kbd "C-x C-s") 'exwm-C-s)
 #+END_SRC
-** Initialize EXWM
-Now that we've got all the variables nice and ready, let's start it up!
+** On startup
+*** Start EXWM
 #+BEGIN_SRC emacs-lisp
   (exwm-enable)
   (exwm-config-ido)
   (exwm-systemtray-enable)
+#+END_SRC
+*** Set fallback cursor
+Some X windows will have weird cursors if this isn't done.
+#+BEGIN_SRC emacs-lisp
+  (shell-command "xsetroot -cursor_name left_ptr")
+#+END_SRC
+*** Disable screen blanking
+I don't need my laptop's screen shutting off just because I'm sitting and watching a video too long.
+#+BEGIN_SRC emacs-lisp
+  (shell-command "xset s off -dpms")
+#+END_SRC
+*** Set the keyboard layout to US and give caps lock the functionality of control
+I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
+#+BEGIN_SRC emacs-lisp
+  (shell-command "setxkbmap us -option ctrl:nocaps")
+#+END_SRC
+*** Compositor
+I don't need it, but having basic compositing is very nice.
+#+BEGIN_SRC emacs-lisp
+  (start-process-shell-command
+   "Compositor" nil "xcompmgr")
+#+END_SRC
+*** Notification manager
+I haven't integrated notifications into Emacs just yet, sadly.
+#+BEGIN_SRC emacs-lisp
+  (start-process-shell-command
+   "Notifications" nil "dunst")
+#+END_SRC
+*** Always hide the cursor when typing
+Just a personal preference, I don't like seeing the cursor when I'm pressing keys.
+#+BEGIN_SRC emacs-lisp
+  (start-process-shell-command
+   "Cursor Hiding" nil "xbanish")
 #+END_SRC
 * EMMS (Emacs MultiMedia System)
 I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it.
@@ -1235,15 +1248,6 @@ I used to hate light themes. I'm not in that camp anymore. I love this elegant t
 	  leuven-scale-org-agenda-structure t
 	  leuven-scale-outline-headlines t)
     (load-theme 'leuven t))
-#+END_SRC
-** Hide useless things
-Who even uses the toolbar in Emacs?
-#+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
-  (tooltip-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  (setq use-dialog-box nil)
 #+END_SRC
 ** Window dividers/fringes
 Since I use EXWM, X windows will remove the thin divider which is present by default. To remedy this, I use a different method. I set it to a solid color. I like the fringes at ten pixels, so I just keep it there.
