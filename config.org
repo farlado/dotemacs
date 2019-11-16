@@ -140,8 +140,8 @@ Just a personal preference, I don't like seeing the cursor when I'm pressing key
   (start-process-shell-command
    "Cursor Hiding" nil "xbanish")
 #+END_SRC
-* EXWM (Emacs X Window Manager)
-Yes, Emacs is my window manager. You should probably remove this stuff if you don't plan to use Emacs as your window manager. It's loaded right after the startup commands so that I can bind keys more easily later on.
+* Making Emacs a (sufficiently exhaustive) DE
+Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on.
 ** Configuration
 *** exwm package (base window manager)
 This isn't actually where we do all the configuration, it's just where we install EXWM and grab what we need to configure it.
@@ -155,7 +155,114 @@ This isn't actually where we do all the configuration, it's just where we instal
     (require 'exwm-config)
     (require 'exwm-systemtray))
 #+END_SRC
-*** Configure multi-head
+*** dmenu package (dmenu but for Emacs)
+Since I'm using Emacs as a window manager, I need dmenu so I can open X windows I haven't bound to keys. It will be bound later.
+#+BEGIN_SRC emacs-lisp
+  (use-package dmenu
+    :ensure t
+    :defer t)
+#+END_SRC
+*** desktop-environment package (take a guess what it does)
+Previously I had to define a lot of functions to do these things, now I just change settings within ~desktop-environment~.
+#+BEGIN_SRC emacs-lisp
+  (use-package desktop-environment
+    :ensure t
+    :defer t
+    :init
+    (require 'desktop-environment)
+    (desktop-environment-mode 1))
+#+END_SRC
+**** Volume adjustment
+The only things I really don't like here are how much output it gives when you mute or unmute the speakers or microphone, so I set up basic scripts to give much more concise output.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-volume-toggle-command
+	(concat "[ \"$(amixer set Master toggle | grep off)\" ] "
+		"&& echo Volume is now muted. | tr '\n' ' ' "
+		"|| echo Volume is now unmuted. | tr '\n' ' '")
+	desktop-environment-volume-toggle-microphone-command
+	(concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
+		"&& echo Microphone is now muted. | tr '\n' ' ' "
+		"|| echo Microphone is now unmuted | tr '\n' ' '"))
+#+END_SRC
+**** Brightness adjustment
+This one all I needed to do was change the increment and decrement values.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-brightness-normal-increment "5%+"
+	desktop-environment-brightness-normal-decrement "5%-")
+#+END_SRC
+**** Screenshots
+This one was the least straightforward because the way it's implemented by ~desktop-environment~ is *SUPER* wonky. Here are the binds which will be relevant.
+#+BEGIN_SRC emacs-lisp
+  ;; Storing to clipboard
+  (define-key desktop-environment-mode-map (kbd "<print>")
+    'farl-de/desktop-environment-screenshot-part-clip)
+  (define-key desktop-environment-mode-map (kbd "<S-print>")
+    'farl-de/desktop-environment-screenshot-clip)
+
+  ;; Storing to file
+  (define-key desktop-environment-mode-map (kbd "<C-print>")
+    'farl-de/desktop-environment-screenshot-part)
+  (define-key desktop-environment-mode-map (kbd "<C-S-print>")
+    'farl-de/desktop-environment-screenshot)
+#+END_SRC
+First, I set what directory to store screenshots in.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-screenshot-directory "~/screenshots")
+#+END_SRC
+Then, I can set the commands for taking a full or partial screenshot and saving it to a file.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-screenshot-command
+	"FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
+	desktop-environment-screenshot-partial-command
+	"FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
+#+END_SRC
+The functions which ~desktop-environment~ comes with are kinda garbage, so I made my own.
+#+BEGIN_SRC emacs-lisp
+  (defun farl-de/desktop-environment-screenshot ()
+    "Take a screenshot and store it in a file."
+    (interactive)
+    (desktop-environment-screenshot)
+    (message "Screenshot saved in ~/screenshots."))
+
+  (defun farl-de/desktop-environment-screenshot-part ()
+    "Take a capture of a portion of the screen and store it in a file."
+    (interactive)
+    (desktop-environment-screenshot-part)
+    (message "Screenshot saved in ~/screenshots."))
+
+  (defun farl-de/desktop-environment-screenshot-clip ()
+    "Take a screenshot and put it in the clipboard."
+    (interactive)
+    (shell-command (concat desktop-environment-screenshot-command
+			   " && xclip $FILENAME -selection clipboard "
+			   "-t image/png &> /dev/null && rm $FILENAME"))
+    (message "Screenshot copied to clipboard."))
+
+  (defun farl-de/desktop-environment-screenshot-part-clip ()
+    "Take a shot of a portion of the screen and put it in the clipboard."
+    (interactive)
+    (shell-command (concat desktop-environment-screenshot-partial-command
+			   " && xclip $FILENAME -selection clipboard "
+			   "-t image/png &> /dev/null && rm $FILENAME"))
+    (message "Screenshot copied to clipboard."))
+#+END_SRC
+**** Lock screen
+Haha yes, this is very long and very very stupid.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-screenlock-command
+	(concat "i3lock -nmk --color=000000 --timecolor=ffffffff --datecolor=ffffffff "
+		"--wrongcolor=ffffffff --ringcolor=00000000 --insidecolor=00000000 "
+		"--keyhlcolor=00000000 --bshlcolor=00000000 --separatorcolor=00000000 "
+		"--ringvercolor=00000000 --insidevercolor=00000000 --linecolor=00000000 "
+		"--ringwrongcolor=00000000 --insidewrongcolor=00000000 --timestr=%H:%M "
+		"--datestr='%a %d %b' --time-font=Iosevka --date-font=Iosevka "
+		"--wrong-font=Iosevka --timesize=128 --datesize=64 --wrongsize=32 "
+		"--time-align 0 --date-align 0 --wrong-align 0 --indpos=-10:-10 "
+		"--timepos=200:125 --datepos=200:215 --wrongpos=200:155 --locktext='' "
+		"--lockfailedtext='' --noinputtext='' --radius 1 --ring-width 1 "
+		" --veriftext='' --wrongtext='WRONG' --force-clock"))
+#+END_SRC
+*** Multi-head
 I use this configuration for two different machines, so there's a lot of outputs listed here.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-randr-workspace-output-plist '(0 "LVDS1"
@@ -204,6 +311,267 @@ Uses the same color as my modeline, uses the same width as window divider width.
   (setq exwm-floating-border-width 3
 	exwm-floating-border-color "#335ea8")
 #+END_SRC
+*** X applications
+**** Firefox
+Firefox has some unique abilities when it comes to how to make windows behave which work better for me. I don't use tabs, and I don't want anything to do with them, and Firefox lets me hide the tab bar and force all tabs to actually open as new windows.
+#+BEGIN_SRC emacs-lisp
+  (defun run-firefox ()
+    "Start Firefox."
+    (interactive)
+    (start-process-shell-command
+     "Firefox" nil "firefox"))
+#+END_SRC
+**** LibreOffice
+Shame me all you want. I'm still in introductory courses and haven't learned enough Org-mode to use it more meaningfully.
+#+BEGIN_SRC emacs-lisp
+  (defun run-libreoffice ()
+    "Start LibreOffice."
+    (interactive)
+    (start-process-shell-command
+     "LibreOffice" nil "libreoffice"))
+#+END_SRC
+**** GIMP
+Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
+#+BEGIN_SRC emacs-lisp
+  (defun run-gimp ()
+    "Start GIMP."
+    (interactive)
+    (start-process-shell-command
+     "GIMP" nil "gimp"))
+#+END_SRC
+**** Telegram
+I have a painfully white theme which fits perfectly with my setup.
+#+BEGIN_SRC emacs-lisp
+  (defun run-telegram ()
+    "Start Telegram."
+    (interactive)
+    (start-process-shell-command
+     "Telegram" nil "telegram"))
+#+END_SRC
+**** Discord
+Yeah, I also use a light theme for Discord. It looks comfy, even if Discord is a garbage application.
+#+BEGIN_SRC emacs-lisp
+  (defun run-discord ()
+    "Start Discord."
+    (interactive)
+    (start-process-shell-command
+     "Discord" nil "discord"))
+#+END_SRC
+**** Steam
+Gaming is possible with EXWM, if you run games windowed.
+#+BEGIN_SRC emacs-lisp
+  (defun run-steam ()
+    "Start Steam."
+    (interactive)
+    (start-process-shell-command
+     "Steam" nil "steam"))
+#+END_SRC
+*** Other things a DE should probably have
+**** Network Settings
+This one uses two windows: one to open the NetworkManager connection editor, and another to list WiFi networks nearby.
+#+BEGIN_SRC emacs-lisp
+  (defun network-settings ()
+    "Open a NetworkManager connection editor."
+    (interactive)
+    (start-process-shell-command
+     "Connections" nil "sudo nm-connection-editor")
+    (async-shell-command "nmcli dev wifi list"))
+#+END_SRC
+**** Keyboard layout selection
+This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
+#+BEGIN_SRC emacs-lisp
+  (defgroup keyboard-layout nil
+    "Keyboard layouts for `cycle-keyboard-layout' and `cycle-keyboard-layout-reverse'")
+
+  (defcustom keyboard-layout-1 nil
+    "The first of three keyboard layouts to cycle through.
+
+  Set to nil to have one less keyboard layout."
+    :group 'keyboard-layout
+    :type 'string)
+
+  (defcustom keyboard-layout-2 nil
+    "The second of three keyboard layouts to cycle through.
+
+  Set to nil to have one less keyboard layout."
+    :group 'keyboard-layout
+    :type 'string)
+
+  (defcustom keyboard-layout-3 nil
+    "The third of three keyboard layouts to cycle through.
+
+  Set to nil to have one less keyboard layout."
+    :group 'keyboard-layout
+    :type 'string)
+#+END_SRC
+Then, I use these functions to control setting and cycling the keyboard layout.
+#+BEGIN_SRC emacs-lisp
+  (defun get-keyboard-layout ()
+    "Get the current keyboard layout."
+    (shell-command-to-string
+     "setxkbmap -query | grep -oP 'layout:\\s*\\K(\\w+)' | tr '\n' ' ' | sed 's/ //'"))
+
+  (defun set-keyboard-layout (&optional layout)
+    "Set the keyboard layout to LAYOUT."
+    (interactive)
+    (let ((layout (or layout (read-string "Enter keyboard layout: "))))
+      (shell-command (concat "setxkbmap " layout " -option ctrl:nocaps"))
+      (message "Keyboard layout is now: %s" layout)))
+
+  (defun cycle-keyboard-layout ()
+    "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3'."
+    (interactive)
+    (let* ((current-layout (get-keyboard-layout))
+	   (new-layout (if (string= current-layout keyboard-layout-1)
+			   (or keyboard-layout-2 keyboard-layout-3)
+			 (if (string= current-layout keyboard-layout-2)
+			     (or keyboard-layout-3 keyboard-layout-1)
+			   (or keyboard-layout-1 keyboard-layout-2)))))
+      (if new-layout
+	  (set-keyboard-layout new-layout)
+	(message "No keyboard layouts selected."))))
+
+  (defun cycle-keyboard-layout-reverse ()
+    "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3' in reverse."
+    (interactive)
+    (let* ((current-layout (get-keyboard-layout))
+	   (new-layout (if (string= current-layout keyboard-layout-3)
+			   (or keyboard-layout-2 keyboard-layout-1)
+			 (if (string= current-layout keyboard-layout-2)
+			     (or keyboard-layout-1 keyboard-layout-3)
+			   (or keyboard-layout-3 keyboard-layout-2)))))
+      (if new-layout
+	  (set-keyboard-layout new-layout)
+	(message "No keyboard layouts selected."))))
+#+END_SRC
+Lastly, I set my preferred keyboard layouts.
+#+BEGIN_SRC emacs-lisp
+  (setq keyboard-layout-1 "us"
+	keyboard-layout-2 "epo"
+	keyboard-layout-3 "de")
+#+END_SRC
+**** Suspending
+#+BEGIN_SRC emacs-lisp
+  (defun suspend-computer ()
+    (interactive)
+    (when (yes-or-no-p "Really suspend? ")
+      (shell-command "sudo zzz || sudo systemctl suspend")))
+
+  (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
+#+END_SRC
+**** Shutting down
+I copied the function for quitting Emacs to handle shutting down.
+#+BEGIN_SRC emacs-lisp
+  (defun save-buffers-shut-down (&optional arg)
+    "Offer to save each buffer, then shut down the computer.
+  This function is literally just a copycat of `save-buffers-kill-emacs'.
+  With prefix ARG, silently save all file-visiting buffers without asking.
+  If there are active processes where `process-query-on-exit-flag'
+  returns non-nil and `confirm-kill-processes' is non-nil,
+  asks whether processes should be killed.
+  Runs the members of `kill-emacs-query-functions' in turn and stops
+  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
+  Instead of just killing Emacs, shuts down the system."
+    (interactive "P")
+    ;; Don't use save-some-buffers-default-predicate, because we want
+    ;; to ask about all the buffers before killing Emacs.
+    (save-some-buffers arg t)
+    (let ((confirm confirm-kill-emacs))
+      (and
+       (or (not (memq t (mapcar (function
+				 (lambda (buf) (and (buffer-file-name buf)
+						    (buffer-modified-p buf))))
+				(buffer-list))))
+	   (progn (setq confirm nil)
+		  (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
+       (or (not (fboundp 'process-list))
+	   ;; process-list is not defined on MSDOS.
+	   (not confirm-kill-processes)
+	   (let ((processes (process-list))
+		 active)
+	     (while processes
+	       (and (memq (process-status (car processes)) '(run stop open listen))
+		    (process-query-on-exit-flag (car processes))
+		    (setq active t))
+	       (setq processes (cdr processes)))
+	     (or (not active)
+		 (with-current-buffer-window
+		  (get-buffer-create "*Process List*") nil
+		  #'(lambda (window _value)
+		      (with-selected-window window
+			(unwind-protect
+			    (progn
+			      (setq confirm nil)
+			      (yes-or-no-p "Active processes exist; kill them and shut down anyway? "))
+			  (when (window-live-p window)
+			    (quit-restore-window window 'kill)))))
+		  (list-processes t)))))
+       ;; Query the user for other things, perhaps.
+       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
+       (or (null confirm)
+	   (funcall confirm "Really shut down? "))
+       (shell-command "sudo shutdown -h now")
+       (kill-emacs))))
+
+  (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
+#+END_SRC
+**** Rebooting
+I copied the function for quitting Emacs to handle reboot too.
+#+BEGIN_SRC emacs-lisp
+  (defun save-buffers-reboot (&optional arg)
+    "Offer to save each buffer, then shut down the computer.
+  This function is literally just a copycat of `save-buffers-kill-emacs'.
+  With prefix ARG, silently save all file-visiting buffers without asking.
+  If there are active processes where `process-query-on-exit-flag'
+  returns non-nil and `confirm-kill-processes' is non-nil,
+  asks whether processes should be killed.
+  Runs the members of `kill-emacs-query-functions' in turn and stops
+  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
+  Instead of just killing Emacs, shuts down the system."
+    (interactive "P")
+    ;; Don't use save-some-buffers-default-predicate, because we want
+    ;; to ask about all the buffers before killing Emacs.
+    (save-some-buffers arg t)
+    (let ((confirm confirm-kill-emacs))
+      (and
+       (or (not (memq t (mapcar (function
+				 (lambda (buf) (and (buffer-file-name buf)
+						    (buffer-modified-p buf))))
+				(buffer-list))))
+	   (progn (setq confirm nil)
+		  (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
+       (or (not (fboundp 'process-list))
+	   ;; process-list is not defined on MSDOS.
+	   (not confirm-kill-processes)
+	   (let ((processes (process-list))
+		 active)
+	     (while processes
+	       (and (memq (process-status (car processes)) '(run stop open listen))
+		    (process-query-on-exit-flag (car processes))
+		    (setq active t))
+	       (setq processes (cdr processes)))
+	     (or (not active)
+		 (with-current-buffer-window
+		  (get-buffer-create "*Process List*") nil
+		  #'(lambda (window _value)
+		      (with-selected-window window
+			(unwind-protect
+			    (progn
+			      (setq confirm nil)
+			      (yes-or-no-p "Active processes exist; kill them and reboot anyway? "))
+			  (when (window-live-p window)
+			    (quit-restore-window window 'kill)))))
+		  (list-processes t)))))
+       ;; Query the user for other things, perhaps.
+       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
+       (or (null confirm)
+	   (funcall confirm "Really reboot? "))
+       (shell-command "sudo reboot")
+       (kill-emacs))))
+
+  (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
+#+END_SRC
+
 ** Keybindings
 *** Set a bind for both global and EXWM usage
 Save lines, save time.
@@ -212,16 +580,43 @@ Save lines, save time.
     (global-set-key key function)
     (define-key exwm-mode-map key function))
 #+END_SRC
-*** General workspace commands
+*** Global binds to use across everything
+Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into this area.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-global-keys
-	`(([?\s-w] . exwm-workspace-switch)
+	`(;; Workspaces
+	  ([?\s-w] . exwm-workspace-switch)
 	  ([?\s-e] . exwm-workspace-swap)
-	  ([?\s-q] . exwm-reset)
 	  ,@(mapcar
 	     (lambda (i) `(,(kbd (format "s-%d" i)) .
 		      (lambda () (interactive) (exwm-workspace-switch-create ,i))))
-		    (number-sequence 0 9))))
+	     (number-sequence 0 9))
+
+	  ;; Moving focus between windows
+	  ([C-s-up] . windmove-up)
+	  ([C-s-down] . windmove-left)
+	  ([C-s-left] . windmove-down)
+	  ([C-s-right] . windmove-right)
+
+	  ;; Rearranging windows
+	  ([M-s-up]    . buf-move-up)
+	  ([M-s-down]  . buf-move-down)
+	  ([M-s-left]  . buf-move-left)
+	  ([M-s-right] . buf-move-right)
+
+	  ;; Opening X applications
+	  ([?\s-f]    . run-firefox)
+	  ([?\s-b]    . run-libreoffice)
+	  ([?\s-g]    . run-gimp)
+	  ([?\s-t]    . run-telegram)
+	  ([?\s-d]    . run-discord)
+	  ([?\s-s]    . run-steam)
+	  ([s-return] . vterm)
+
+	  ;; Other desktop environment things
+	  ([?\s-x]       . dmenu)
+	  ([?\s- ]       . cycle-keyboard-layout)
+	  ([s-backspace] . cycle-keyboard-layout-reverse)))
 #+END_SRC
 *** EXWM-mode functions
 **** Send a key verbatim to the program more easily
@@ -291,318 +686,6 @@ Now that we've got all the variables nice and ready, let's start it up!
   (exwm-enable)
   (exwm-config-ido)
   (exwm-systemtray-enable)
-#+END_SRC
-* Making Emacs a (sufficiently exhaustive) DE
-Since I use Emacs as my window manager, obviously I want to make it a full-on desktop environment!
-** desktop-environment package
-Previously I had to define a lot of functions to do these things, now I just change settings within ~desktop-environment~.
-#+BEGIN_SRC emacs-lisp
-  (use-package desktop-environment
-    :ensure t
-    :defer t
-    :init
-    (require 'desktop-environment)
-    (desktop-environment-mode 1))
-#+END_SRC
-*** Volume adjustment
-The only things I really don't like here are how much output it gives when you mute or unmute the speakers or microphone, so I set up basic scripts to give much more concise output.
-#+BEGIN_SRC emacs-lisp
-  (setq desktop-environment-volume-toggle-command
-	(concat "[ \"$(amixer set Master toggle | grep off)\" ] "
-		"&& echo Volume is now muted. | tr '\n' ' ' "
-		"|| echo Volume is now unmuted. | tr '\n' ' '")
-	desktop-environment-volume-toggle-microphone-command
-	(concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
-		"&& echo Microphone is now muted. | tr '\n' ' ' "
-		"|| echo Microphone is now unmuted | tr '\n' ' '"))
-#+END_SRC
-*** Brightness adjustment
-This one all I needed to do was change the increment and decrement values.
-#+BEGIN_SRC emacs-lisp
-  (setq desktop-environment-brightness-normal-increment "5%+"
-	desktop-environment-brightness-normal-decrement "5%-")
-#+END_SRC
-*** Screenshots
-This one was the least straightforward because the way it's implemented by ~desktop-environment~ is *SUPER* wonky. Here are the binds which will be relevant.
-#+BEGIN_SRC emacs-lisp
-  ;; Storing to clipboard
-  (define-key desktop-environment-mode-map (kbd "<print>")
-    'farl-de/desktop-environment-screenshot-part-clip)
-  (define-key desktop-environment-mode-map (kbd "<S-print>")
-    'farl-de/desktop-environment-screenshot-clip)
-  ;; Storing to file
-  (define-key desktop-environment-mode-map (kbd "<C-print>")
-    'farl-de/desktop-environment-screenshot-part)
-  (define-key desktop-environment-mode-map (kbd "<C-S-print>")
-    'farl-de/desktop-environment-screenshot)
-#+END_SRC
-**** Variables
-First, I set what directory to store screenshots in.
-#+BEGIN_SRC emacs-lisp
-  (setq desktop-environment-screenshot-directory "~/screenshots")
-#+END_SRC
-Then, I can set the commands for taking a full or partial screenshot and saving it to a file.
-#+BEGIN_SRC emacs-lisp
-  (setq desktop-environment-screenshot-command
-	"FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
-	desktop-environment-screenshot-partial-command
-	"FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
-#+END_SRC
-**** Functions
-The functions which ~desktop-environment~ comes with are kinda garbage, so I made my own.
-#+BEGIN_SRC emacs-lisp
-  (defun farl-de/desktop-environment-screenshot ()
-    "Take a screenshot and store it in a file."
-    (interactive)
-    (desktop-environment-screenshot)
-    (message "Screenshot saved in ~/screenshots."))
-
-  (defun farl-de/desktop-environment-screenshot-part ()
-    "Take a capture of a portion of the screen and store it in a file."
-    (interactive)
-    (desktop-environment-screenshot-part)
-    (message "Screenshot saved in ~/screenshots."))
-
-  (defun farl-de/desktop-environment-screenshot-clip ()
-    "Take a screenshot and put it in the clipboard."
-    (interactive)
-    (shell-command (concat desktop-environment-screenshot-command
-			   " && xclip $FILENAME -selection clipboard "
-			   "-t image/png &> /dev/null && rm $FILENAME"))
-    (message "Screenshot copied to clipboard."))
-
-  (defun farl-de/desktop-environment-screenshot-part-clip ()
-    "Take a shot of a portion of the screen and put it in the clipboard."
-    (interactive)
-    (shell-command (concat desktop-environment-screenshot-partial-command
-			   " && xclip $FILENAME -selection clipboard "
-			   "-t image/png &> /dev/null && rm $FILENAME"))
-    (message "Screenshot copied to clipboard."))
-#+END_SRC
-*** Lock screen
-Haha yes, this is very long and very very stupid.
-#+BEGIN_SRC emacs-lisp
-  (setq desktop-environment-screenlock-command
-	(concat "i3lock -nmk --color=000000 --timecolor=ffffffff --datecolor=ffffffff "
-		"--wrongcolor=ffffffff --ringcolor=00000000 --insidecolor=00000000 "
-		"--keyhlcolor=00000000 --bshlcolor=00000000 --separatorcolor=00000000 "
-		"--ringvercolor=00000000 --insidevercolor=00000000 --linecolor=00000000 "
-		"--ringwrongcolor=00000000 --insidewrongcolor=00000000 --timestr=%H:%M "
-		"--datestr='%a %d %b' --time-font=Iosevka --date-font=Iosevka "
-		"--wrong-font=Iosevka --timesize=128 --datesize=64 --wrongsize=32 "
-		"--time-align 0 --date-align 0 --wrong-align 0 --indpos=-10:-10 "
-		"--timepos=200:125 --datepos=200:215 --wrongpos=200:155 --locktext='' "
-		"--lockfailedtext='' --noinputtext='' --radius 1 --ring-width 1 "
-		" --veriftext='' --wrongtext='WRONG' --force-clock"))
-#+END_SRC
-** Network Settings
-This one uses two windows: one to open the NetworkManager connection editor, and another to list WiFi networks nearby.
-#+BEGIN_SRC emacs-lisp
-  (defun network-settings ()
-    "Open a NetworkManager connection editor."
-    (interactive)
-    (start-process-shell-command
-     "Connections" nil "sudo nm-connection-editor")
-    (async-shell-command "nmcli dev wifi list"))
-
-  (exwm-bind-key (kbd "s-n") 'network-settings)
-#+END_SRC
-** Keyboard layout selection
-This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
-#+BEGIN_SRC emacs-lisp
-  (defgroup keyboard-layout nil
-    "Keyboard layouts for `cycle-keyboard-layout' and `cycle-keyboard-layout-reverse'")
-
-  (defcustom keyboard-layout-1 nil
-    "The first of three keyboard layouts to cycle through.
-
-  Set to nil to have one less keyboard layout."
-    :group 'keyboard-layout
-    :type 'string)
-
-  (defcustom keyboard-layout-2 nil
-    "The second of three keyboard layouts to cycle through.
-
-  Set to nil to have one less keyboard layout."
-    :group 'keyboard-layout
-    :type 'string)
-
-  (defcustom keyboard-layout-3 nil
-    "The third of three keyboard layouts to cycle through.
-
-  Set to nil to have one less keyboard layout."
-    :group 'keyboard-layout
-    :type 'string)
-#+END_SRC
-Then, I use these functions to control setting and cycling the keyboard layout.
-#+BEGIN_SRC emacs-lisp
-  (defun get-keyboard-layout ()
-    "Get the current keyboard layout."
-    (shell-command-to-string
-     "setxkbmap -query | grep -oP 'layout:\\s*\\K(\\w+)' | tr '\n' ' ' | sed 's/ //'"))
-
-  (defun set-keyboard-layout (&optional layout)
-    "Set the keyboard layout to LAYOUT."
-    (interactive)
-    (let ((layout (or layout (read-string "Enter keyboard layout: "))))
-      (shell-command (concat "setxkbmap " layout " -option ctrl:nocaps"))
-      (message "Keyboard layout is now: %s" layout)))
-
-  (defun cycle-keyboard-layout ()
-    "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3'."
-    (interactive)
-    (let* ((current-layout (get-keyboard-layout))
-	   (new-layout (if (string= current-layout keyboard-layout-1)
-			   (or keyboard-layout-2 keyboard-layout-3)
-			 (if (string= current-layout keyboard-layout-2)
-			     (or keyboard-layout-3 keyboard-layout-1)
-			   (or keyboard-layout-1 keyboard-layout-2)))))
-      (if new-layout
-	  (set-keyboard-layout new-layout)
-	(message "No keyboard layouts selected."))))
-
-  (defun cycle-keyboard-layout-reverse ()
-    "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3' in reverse."
-    (interactive)
-    (let* ((current-layout (get-keyboard-layout))
-	   (new-layout (if (string= current-layout keyboard-layout-3)
-			   (or keyboard-layout-2 keyboard-layout-1)
-			 (if (string= current-layout keyboard-layout-2)
-			     (or keyboard-layout-1 keyboard-layout-3)
-			   (or keyboard-layout-3 keyboard-layout-2)))))
-      (if new-layout
-	  (set-keyboard-layout new-layout)
-	(message "No keyboard layouts selected."))))
-#+END_SRC
-Lastly, I set my preferred keyboard layouts and bind the functions to keys.
-#+BEGIN_SRC emacs-lisp
-  (setq keyboard-layout-1 "us"
-	keyboard-layout-2 "epo"
-	keyboard-layout-3 "de")
-
-  (exwm-bind-key (kbd "s-SPC") 'cycle-keyboard-layout)
-  (exwm-bind-key (kbd "<s-backspace>") 'cycle-keyboard-layout-reverse)
-#+END_SRC
-** Suspending
-#+BEGIN_SRC emacs-lisp
-  (defun suspend-computer ()
-    (interactive)
-    (when (yes-or-no-p "Really suspend? ")
-      (shell-command "sudo zzz || sudo systemctl suspend")))
-
-  (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
-#+END_SRC
-** Shutting down
-I copied the function for quitting Emacs to handle shutting down.
-#+BEGIN_SRC emacs-lisp
-  (defun save-buffers-shut-down (&optional arg)
-    "Offer to save each buffer, then shut down the computer.
-  This function is literally just a copycat of `save-buffers-kill-emacs'.
-  With prefix ARG, silently save all file-visiting buffers without asking.
-  If there are active processes where `process-query-on-exit-flag'
-  returns non-nil and `confirm-kill-processes' is non-nil,
-  asks whether processes should be killed.
-  Runs the members of `kill-emacs-query-functions' in turn and stops
-  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
-  Instead of just killing Emacs, shuts down the system."
-    (interactive "P")
-    ;; Don't use save-some-buffers-default-predicate, because we want
-    ;; to ask about all the buffers before killing Emacs.
-    (save-some-buffers arg t)
-    (let ((confirm confirm-kill-emacs))
-      (and
-       (or (not (memq t (mapcar (function
-				 (lambda (buf) (and (buffer-file-name buf)
-						    (buffer-modified-p buf))))
-				(buffer-list))))
-	   (progn (setq confirm nil)
-		  (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
-       (or (not (fboundp 'process-list))
-	   ;; process-list is not defined on MSDOS.
-	   (not confirm-kill-processes)
-	   (let ((processes (process-list))
-		 active)
-	     (while processes
-	       (and (memq (process-status (car processes)) '(run stop open listen))
-		    (process-query-on-exit-flag (car processes))
-		    (setq active t))
-	       (setq processes (cdr processes)))
-	     (or (not active)
-		 (with-current-buffer-window
-		  (get-buffer-create "*Process List*") nil
-		  #'(lambda (window _value)
-		      (with-selected-window window
-			(unwind-protect
-			    (progn
-			      (setq confirm nil)
-			      (yes-or-no-p "Active processes exist; kill them and shut down anyway? "))
-			  (when (window-live-p window)
-			    (quit-restore-window window 'kill)))))
-		  (list-processes t)))))
-       ;; Query the user for other things, perhaps.
-       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
-       (or (null confirm)
-	   (funcall confirm "Really shut down? "))
-       (shell-command "sudo shutdown -h now")
-       (kill-emacs))))
-
-  (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
-#+END_SRC
-** Rebooting
-I copied the function for quitting Emacs to handle reboot too.
-#+BEGIN_SRC emacs-lisp
-  (defun save-buffers-reboot (&optional arg)
-    "Offer to save each buffer, then shut down the computer.
-  This function is literally just a copycat of `save-buffers-kill-emacs'.
-  With prefix ARG, silently save all file-visiting buffers without asking.
-  If there are active processes where `process-query-on-exit-flag'
-  returns non-nil and `confirm-kill-processes' is non-nil,
-  asks whether processes should be killed.
-  Runs the members of `kill-emacs-query-functions' in turn and stops
-  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
-  Instead of just killing Emacs, shuts down the system."
-    (interactive "P")
-    ;; Don't use save-some-buffers-default-predicate, because we want
-    ;; to ask about all the buffers before killing Emacs.
-    (save-some-buffers arg t)
-    (let ((confirm confirm-kill-emacs))
-      (and
-       (or (not (memq t (mapcar (function
-				 (lambda (buf) (and (buffer-file-name buf)
-						    (buffer-modified-p buf))))
-				(buffer-list))))
-	   (progn (setq confirm nil)
-		  (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
-       (or (not (fboundp 'process-list))
-	   ;; process-list is not defined on MSDOS.
-	   (not confirm-kill-processes)
-	   (let ((processes (process-list))
-		 active)
-	     (while processes
-	       (and (memq (process-status (car processes)) '(run stop open listen))
-		    (process-query-on-exit-flag (car processes))
-		    (setq active t))
-	       (setq processes (cdr processes)))
-	     (or (not active)
-		 (with-current-buffer-window
-		  (get-buffer-create "*Process List*") nil
-		  #'(lambda (window _value)
-		      (with-selected-window window
-			(unwind-protect
-			    (progn
-			      (setq confirm nil)
-			      (yes-or-no-p "Active processes exist; kill them and reboot anyway? "))
-			  (when (window-live-p window)
-			    (quit-restore-window window 'kill)))))
-		  (list-processes t)))))
-       ;; Query the user for other things, perhaps.
-       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
-       (or (null confirm)
-	   (funcall confirm "Really reboot? "))
-       (shell-command "sudo reboot")
-       (kill-emacs))))
-
-  (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
 #+END_SRC
 * EMMS (Emacs MultiMedia System)
 I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it.
@@ -693,19 +776,16 @@ I do a crapload here, but basically the two main things I do here is configure m
   (exwm-bind-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
   (exwm-bind-key (kbd "s-a r t") 'emms-toggle-repeat-track)
 #+END_SRC
-* Other programs
+* Other Emacs goodies
 This is other stuff I use, whether in Emacs or in X windows.
-** Within Emacs
-*** Terminal
+** Terminal
 I've been jumping between ~vterm~ and ~ansi-term~ but ~vterm~ seems to be generally faster and easier to use.
 #+BEGIN_SRC emacs-lisp
   (use-package vterm
     :ensure t
-    :defer t
-    :init
-    (exwm-bind-key (kbd "<s-return>") 'vterm))
+    :defer t)
 #+END_SRC
-*** Calculator
+** Calculator
 I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and then use the number pad to close it as well.
 #+BEGIN_SRC emacs-lisp
   (require 'calc)
@@ -715,11 +795,11 @@ I love this. I really really really *really* love this. I can use my number pad 
 
   (define-key calc-mode-map (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
 #+END_SRC
-*** Calendar
+** Calendar
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c C-c") 'calendar)
 #+END_SRC
-*** Weather forecasts
+** Weather forecasts
 Picking a service to use for this was a pain. I ended up settling for wttrin because it is the fastest and easiest to use, and plays nice with my setup.
 #+BEGIN_SRC emacs-lisp
   (use-package wttrin
@@ -739,7 +819,7 @@ Picking a service to use for this was a pain. I ended up settling for wttrin bec
     :bind (("C-c w" . wttrin-local)
 	   ("C-c C-w" . wttrin-not-local)))
 #+END_SRC
-*** Reading ebooks
+** Reading ebooks
 Not the best way to do epub reading, but at least it's in Emacs.
 #+BEGIN_SRC emacs-lisp
   (use-package nov
@@ -748,7 +828,7 @@ Not the best way to do epub reading, but at least it's in Emacs.
     :init
     (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 #+END_SRC
-*** Sudoku
+** Sudoku
 I /love/ sudoku puzzles.
 #+BEGIN_SRC emacs-lisp
   (use-package sudoku
@@ -756,7 +836,7 @@ I /love/ sudoku puzzles.
     :defer t
     :bind ("C-c s" . sudoku))
 #+END_SRC
-*** Tetris
+** Tetris
 God I love playing Tetris
 #+BEGIN_SRC emacs-lisp
   (require 'tetris)
@@ -778,82 +858,6 @@ God I love playing Tetris
 
   (define-key tetris-mode-map "r"     'tetris-start-game)
   (define-key tetris-mode-map "e"     'tetris-end-game)
-#+END_SRC
-** X applications
-*** dmenu package (dmenu but for Emacs)
-Since I'm using Emacs as a window manager, I need dmenu so I can open X windows I haven't bound to keys.
-#+BEGIN_SRC emacs-lisp
-  (use-package dmenu
-    :ensure t
-    :defer t
-    :init
-    (exwm-bind-key (kbd "s-x") 'dmenu))
-#+END_SRC
-*** Firefox
-Firefox has some unique abilities when it comes to how to make windows behave which work better for me. I don't use tabs, and I don't want anything to do with them, and Firefox lets me hide the tab bar and force all tabs to actually open as new windows.
-#+BEGIN_SRC emacs-lisp
-  (defun run-firefox ()
-    "Start Firefox."
-    (interactive)
-    (start-process-shell-command
-     "Firefox" nil "firefox"))
-
-  (exwm-bind-key (kbd "s-f") 'run-firefox)
-#+END_SRC
-*** LibreOffice
-Shame me all you want. I'm still in introductory courses and haven't learned enough Org-mode to use it more meaningfully.
-#+BEGIN_SRC emacs-lisp
-  (defun run-libreoffice ()
-    "Start LibreOffice."
-    (interactive)
-    (start-process-shell-command
-     "LibreOffice" nil "libreoffice"))
-
-  (exwm-bind-key (kbd "s-b") 'run-libreoffice)
-#+END_SRC
-*** GIMP
-Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
-#+BEGIN_SRC emacs-lisp
-  (defun run-gimp ()
-    "Start GIMP."
-    (interactive)
-    (start-process-shell-command
-     "GIMP" nil "gimp"))
-
-  (exwm-bind-key (kbd "s-g") 'run-gimp)
-#+END_SRC
-*** Telegram
-I have a painfully white theme which fits perfectly with my setup.
-#+BEGIN_SRC emacs-lisp
-  (defun run-tg ()
-    "Start Telegram."
-    (interactive)
-    (start-process-shell-command
-     "Telegram" nil "telegram"))
-
-  (exwm-bind-key (kbd "s-t") 'run-tg)
-#+END_SRC
-*** Discord
-Yeah, I also use a light theme for Discord. It looks comfy, even if Discord is a garbage application.
-#+BEGIN_SRC emacs-lisp
-  (defun run-discord ()
-    "Start Discord."
-    (interactive)
-    (start-process-shell-command
-     "Discord" nil "discord"))
-
-  (exwm-bind-key (kbd "s-d") 'run-discord)
-#+END_SRC
-*** Steam
-Gaming is possible with EXWM, if you run games windowed.
-#+BEGIN_SRC emacs-lisp
-  (defun run-steam ()
-    "Start Steam."
-    (interactive)
-    (start-process-shell-command
-     "Steam" nil "steam"))
-
-  (exwm-bind-key (kbd "s-s") 'run-steam)
 #+END_SRC
 * General Functionality
 This is just stuff not pertaining to a specific task and/or not complex enough to warrant entire sections for them.
@@ -1112,26 +1116,12 @@ This to me is preferable to the default behavior.
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c b") 'balance-windows)
 #+END_SRC
-** move focus with C-M-w/a/s/d
-Previously I used ~switch-window~ but it's not very intuitive, so here's something that works a little more intuitively for me. I also remove C-x o as a bind, since I don't like ~other-window~ either.
-#+BEGIN_SRC emacs-lisp
-  (exwm-bind-key (kbd "C-s-w") 'windmove-up)
-  (exwm-bind-key (kbd "C-s-a") 'windmove-left)
-  (exwm-bind-key (kbd "C-s-s") 'windmove-down)
-  (exwm-bind-key (kbd "C-s-d") 'windmove-right)
-
-  (global-unset-key (kbd "C-x o"))
-#+END_SRC
 ** buffer-move package (move windows around)
+Bindings are done in EXWM, so if you get rid of that keep it in mind down here.
 #+BEGIN_SRC emacs-lisp
   (use-package buffer-move
     :ensure t
-    :defer t
-    :init
-    (exwm-bind-key (kbd "<C-s-up>")    'buf-mode-up)
-    (exwm-bind-key (kbd "<C-s-down>")  'buf-mode-down)
-    (exwm-bind-key (kbd "<C-s-left>")  'buf-move-left)
-    (exwm-bind-key (kbd "<C-s-right>") 'buf-move-right))
+    :defer t)
 #+END_SRC
 * Org-mode
 I don't need much extending for org-mode.
