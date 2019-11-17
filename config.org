@@ -106,7 +106,7 @@ I don't want to have to manually update my stuff. This solution is literally plo
 	  auto-package-update-hide-results t)
     (auto-package-update-maybe))
 #+END_SRC
-* Making Emacs a (sufficiently exhaustive) DE
+* Making Emacs a desktop environment
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness.
 #+BEGIN_SRC emacs-lisp :exports none
   (when (and (string= (window-system) 'x)
@@ -666,8 +666,8 @@ I don't need my laptop's screen shutting off just because I'm sitting and watchi
 #+BEGIN_SRC emacs-lisp
   (shell-command "xset s off -dpms")
 #+END_SRC
-*** Set the keyboard layout to US and give caps lock the functionality of control
-I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
+*** Keyboard configuration
+This block sets the keyboard layout to US and give Caps Lock the functionality of Control. I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
 #+BEGIN_SRC emacs-lisp
   (shell-command "setxkbmap us -option ctrl:nocaps")
 #+END_SRC
@@ -789,8 +789,7 @@ To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make
     (funcall func (kbd "s-a q") 'mpd/kill-music-daemon)
     (funcall func (kbd "s-a r d") 'mpd/update-database)
     (funcall func (kbd "s-a a") 'mpc-status))
-   (if (and (string= (window-system) 'x)
-	  (= (shell-command "wmctrl -m | grep EXWM") 0))
+   (if (= (shell-command "wmctrl -m | grep EXWM") 0)
        'exwm-bind-key
      'global-set-key))
 #+END_SRC
@@ -813,8 +812,7 @@ I love this. I really really really *really* love this. I can use my number pad 
 
   (global-set-key (kbd "C-c c") 'calc)
   ((lambda (func) (funcall func (kbd "<XF86Calculator>") 'calc))
-   (if (and (string= (window-system) 'x)
-	  (= (shell-command "wmctrl -m | grep EXWM") 0))
+   (if (= (shell-command "wmctrl -m | grep EXWM") 0)
        'exwm-bind-key
      'global-set-key))
 
@@ -1249,18 +1247,6 @@ I have no words for how convenient this has been and how much faster I get thing
   (electric-pair-mode t)
 #+END_SRC
 * Looks
-** Theme
-I used to hate light themes. I'm not in that camp anymore. I love this elegant theme.
-#+BEGIN_SRC emacs-lisp
-  (use-package leuven-theme
-    :ensure t
-    :defer t
-    :init
-    (setq org-fontify-whole-heading-line t
-	  leuven-scale-org-agenda-structure t
-	  leuven-scale-outline-headlines t)
-    (load-theme 'leuven t))
-#+END_SRC
 ** General
 *** Line numbers
 I like having line numbers alongside the current cursor position in the mode line.
@@ -1316,6 +1302,18 @@ Since I use EXWM, X windows will remove the thin divider which is present by def
 This stuff really only helps when you're in a graphical environment. Running Emacs from a terminal means these things might not work, so I don't load them when not in a graphical environment.
 #+BEGIN_SRC emacs-lisp :exports none
   (when (window-system)
+#+END_SRC
+*** Theme
+I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/.
+#+BEGIN_SRC emacs-lisp
+  (use-package leuven-theme
+    :ensure t
+    :defer t
+    :init
+    (setq org-fontify-whole-heading-line t
+	  leuven-scale-org-agenda-structure t
+	  leuven-scale-outline-headlines t)
+    (load-theme 'leuven t))
 #+END_SRC
 *** Highlight the current line
 This is to help me keep track of where the cursor is. It looks really weird outside a window system though, so I disable it.
