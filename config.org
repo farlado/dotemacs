@@ -276,7 +276,7 @@ This is the part of the window manager configuration which is just how to contro
 	   floating t)))
 #+END_SRC
 *** Configure floating window borders
-Uses the same color as my modeline, uses the same width as window divider width. See below.
+Uses the same color as my mode line, uses the same width as window divider width. See below.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-floating-border-width 3
 	exwm-floating-border-color "#335ea8")
@@ -587,27 +587,20 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 	  ([?\s- ]       . cycle-keyboard-layout)
 	  ([s-backspace] . cycle-keyboard-layout-reverse)))
 #+END_SRC
-*** EXWM-mode functions
-**** Send a key verbatim to the program more easily
+*** Send a key verbatim more easily
 #+BEGIN_SRC emacs-lisp
        (define-key exwm-mode-map (kbd "C-c C-q") nil)
        (define-key exwm-mode-map (kbd "C-q") 'exwm-input-send-next-key)
 #+END_SRC
-**** Inhibit toggling fullscreen
-This was suuuuper broken when I tried to use it.
+*** Inhibit things I don't use
+This includes:
+- Toggling fullscreen
+- Toggling floating
+- Toggling hiding
+- Toggling the mode line
 #+BEGIN_SRC emacs-lisp
-  (define-key exwm-mode-map (kbd "C-c C-f") nil)
-#+END_SRC
-**** Inhibit floating and hiding
-This was wonky too, I don't think I need to be able to toggle floating for windows
-#+BEGIN_SRC emacs-lisp
-  (define-key exwm-mode-map (kbd "C-c C-t C-f") nil)
-  (define-key exwm-mode-map (kbd "C-c C-t C-v") nil)
-#+END_SRC
-**** Disable toggling the mode line
-This is just a matter of personal comfort. It makes no sense to me on an aesthetic basis to hide the modeline on some buffers while keeping it on others. It's weird.
-#+BEGIN_SRC emacs-lisp
-  (define-key exwm-mode-map (kbd "C-c C-t C-m") nil)
+  (dolist (key '("C-c C-f" "C-c C-t C-f" "C-c C-t C-v" "C-c C-t C-m"))
+    (define-key exwm-mode-map (kbd key) nil))
 #+END_SRC
 *** Emacs key bindings in X windows
 This is super nice, because I love these key bindings and they are just intuitive to me, and now they can carry over safely to other programs.
@@ -674,20 +667,17 @@ This block sets the keyboard layout to US and give Caps Lock the functionality o
 *** Compositor
 I don't need it, but having basic compositing is very nice.
 #+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Compositor" nil "xcompmgr")
+  (start-process-shell-command "Compositor" nil "xcompmgr")
 #+END_SRC
 *** Notification manager
 I haven't integrated notifications into Emacs just yet, sadly.
 #+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Notifications" nil "dunst")
+  (start-process-shell-command "Notifications" nil "dunst")
 #+END_SRC
 *** Always hide the cursor when typing
 Just a personal preference, I don't like seeing the cursor when I'm pressing keys.
 #+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Cursor Hiding" nil "xbanish")
+  (start-process-shell-command "Cursor Hiding" nil "xbanish")
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :exports none
   )
@@ -1372,7 +1362,7 @@ Just a point of /personal preference./ I was considering keeping this in for non
 #+END_SRC
 ** Mode line
 *** spaceline package (Spacemacs mode line)
-I *hate* the default modeline. This one is much less sucky.
+I *hate* the default mode line. This one is much less sucky.
 #+BEGIN_SRC emacs-lisp
   (use-package spaceline
     :ensure t
