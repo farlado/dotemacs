@@ -59,20 +59,6 @@ Everything has different dependencies so make sure you have what you need.
 - Crappier Messenger: ~discord~
 - Games Platform: ~steam~
 * Startup
-** Hide dumb stuff
-Who even uses the toolbar in Emacs?
-#+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
-  (tooltip-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  (setq use-dialog-box nil)
-#+END_SRC
-** Go full-screen
-I really hate how Emacs looks when it is first starting.
-#+BEGIN_SRC emacs-lisp
-  (set-frame-parameter nil 'fullscreen 'fullboth)
-#+END_SRC
 ** Start Emacs server
 Although I technically don't /have/ to do this, it is very helpful.
 #+BEGIN_SRC emacs-lisp
@@ -121,9 +107,9 @@ I don't want to have to manually update my stuff. This solution is literally plo
     (auto-package-update-maybe))
 #+END_SRC
 * Making Emacs a (sufficiently exhaustive) DE
-Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on.
+Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness.
 #+BEGIN_SRC emacs-lisp :exports none
-  (when (window-system)
+  (when (and (string= (window-system) 'x))
 #+END_SRC
 ** Configuration
 *** exwm package (base window manager)
@@ -1261,17 +1247,8 @@ I used to hate light themes. I'm not in that camp anymore. I love this elegant t
 	  leuven-scale-outline-headlines t)
     (load-theme 'leuven t))
 #+END_SRC
-** Window dividers/fringes
-Since I use EXWM, X windows will remove the thin divider which is present by default. To remedy this, I use a different method. I set it to a solid color. I like the fringes at ten pixels, so I just keep it there.
-#+BEGIN_SRC emacs-lisp
-  (setq window-divider-default-right-width 3)
-  (set-face-foreground 'window-divider-first-pixel "#335ea8")
-  (set-face-foreground 'window-divider "#335ea8")
-  (set-face-foreground 'window-divider-last-pixel "#335ea8")
-  (window-divider-mode 1)
-  (fringe-mode 10)
-#+END_SRC
-** Line/column numbers
+** General
+*** Line numbers
 I like having line numbers and the current cursor position and a highlighted current line.
 #+BEGIN_SRC emacs-lisp
   (line-number-mode 1)
@@ -1294,7 +1271,39 @@ However, I don't like line numbers in modes where it breaks the mode.
   (disable-line-numbers-for 'shell-mode-hook)
   (disable-line-numbers-for 'nov-mode-hook)
 #+END_SRC
-** Pretty symbols/text
+*** Highlight matching parentheses et al. when hovering near one
+#+BEGIN_SRC emacs-lisp
+  (show-paren-mode 1)
+#+END_SRC
+*** Make ^L a nice-looking line
+This one is also just a matter of personal preference really.
+#+BEGIN_SRC emacs-lisp
+  (global-page-break-lines-mode 1)
+#+END_SRC
+** Hide dumb stuff
+Who even uses the toolbar in Emacs?
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
+  (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq use-dialog-box nil)
+#+END_SRC
+** Window dividers/fringes
+Since I use EXWM, X windows will remove the thin divider which is present by default. To remedy this, I use a different method. I set it to a solid color. I like the fringes at ten pixels, so I just keep it there.
+#+BEGIN_SRC emacs-lisp
+  (setq window-divider-default-right-width 3)
+  (set-face-foreground 'window-divider-first-pixel "#335ea8")
+  (set-face-foreground 'window-divider "#335ea8")
+  (set-face-foreground 'window-divider-last-pixel "#335ea8")
+  (window-divider-mode 1)
+  (fringe-mode 10)
+#+END_SRC
+** In graphical environments
+This stuff really only helps when you're in a graphical environment. Running Emacs from a terminal means these things might not work, so I don't load them when not in a graphical environment.
+#+BEGIN_SRC emacs-lisp :exports none
+  (when (window-system)
+#+END_SRC
 *** pretty-mode package (prettify symbols)
 I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so much more to make things look nice, especially in functional programming languages. I enable /all/ of them.
 #+BEGIN_SRC emacs-lisp
@@ -1307,10 +1316,6 @@ I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so mu
      '(:nil :ordering :equality :logic :sets :parentheses :function :greek
 	    :types :punctuation :arrows :quantifiers :arithmetic :undefined
 	    :other :sub-and-superscripts)))
-#+END_SRC
-*** Highlight matching parentheses et al. when hovering near one
-#+BEGIN_SRC emacs-lisp
-  (show-paren-mode 1)
 #+END_SRC
 *** rainbow package (show colors when typed as hex codes)
 I don't use it too much, but it's nice to have it around.
@@ -1342,14 +1347,12 @@ It's kinda slow, but bullet points are very very nice, much better than asterisk
     (setq inhibit-compacting-font-caches t))
 #+END_SRC
 *** Hide emphasis markers in org-mode
-Just a point of /personal preference./
+Just a point of /personal preference./ I was considering keeping this in for non-graphical environments, but I can't always trust that there will be support for the different representations of text.
 #+BEGIN_SRC emacs-lisp
   (setq org-hide-emphasis-markers t)
 #+END_SRC
-*** Make ^L a nice-looking line
-This one is also just a matter of personal preference really.
-#+BEGIN_SRC emacs-lisp
-  (global-page-break-lines-mode 1)
+#+BEGIN_SRC emacs-lisp :exports none
+  )
 #+END_SRC
 ** Mode line
 *** spaceline package (Spacemacs mode line)
