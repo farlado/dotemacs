@@ -570,18 +570,6 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 		   (exwm-workspace-switch-create ,i))))
 	     (number-sequence 0 9))
 
-	  ;; Moving focus between windows
-	  ([C-s-up] . windmove-up)
-	  ([C-s-down] . windmove-down)
-	  ([C-s-left] . windmove-left)
-	  ([C-s-right] . windmove-right)
-
-	  ;; Rearranging windows
-	  ([M-s-up]    . buf-move-up)
-	  ([M-s-down]  . buf-move-down)
-	  ([M-s-left]  . buf-move-left)
-	  ([M-s-right] . buf-move-right)
-
 	  ;; Opening X applications
 	  ([?\s-f]    . run-firefox)
 	  ([?\s-b]    . run-libreoffice)
@@ -1148,12 +1136,32 @@ This to me is preferable to the default behavior.
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c b") 'balance-windows)
 #+END_SRC
+** Use windmove in place of other-window
+#+BEGIN_SRC emacs-lisp
+  (defvar windmove-map
+    (let ((map (make-sparse-keymap)))
+      (define-key map (kbd "w") 'windmove-up)
+      (define-key map (kbd "a") 'windmove-left)
+      (define-key map (kbd "s") 'windmove-down)
+      (define-key map (kbd "d") 'windmove-right)
+      map))
+
+  (global-set-key (kbd "C-x o") windmove-map)
+#+END_SRC
 ** buffer-move package (move windows around)
-Bindings are done in EXWM, so if you get rid of that keep it in mind down here.
 #+BEGIN_SRC emacs-lisp
   (use-package buffer-move
     :ensure t
-    :defer t)
+    :defer t
+    :init
+    (defvar buf-move-map
+      (let ((map (make-sparse-keymap)))
+	(define-key map (kbd "w") 'buf-move-up)
+	(define-key map (kbd "a") 'buf-move-left)
+	(define-key map (kbd "s") 'buf-move-down)
+	(define-key map (kbd "d") 'buf-move-right)
+	map))
+    (global-set-key (kbd "C-x C-o") buf-move-map))
 #+END_SRC
 * Org-mode
 I don't need much extending for org-mode.
