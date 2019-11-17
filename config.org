@@ -799,13 +799,15 @@ I've been jumping between ~vterm~ and ~ansi-term~ but ~vterm~ seems to be genera
     :defer t)
 #+END_SRC
 ** Calculator
-I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and then use the number pad to close it as well.
+I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and then use the number pad to close it as well. Same prevention of the use of ~exwm-bind-key~ as seen prior.
 #+BEGIN_SRC emacs-lisp
   (require 'calc)
 
   (global-set-key (kbd "C-c c") 'calc)
-  (when (window-system)
-    (exwm-bind-key (kbd "<XF86Calculator>") 'calc))
+  ((lambda (func) (funcall func (kbd "<XF86Calculator>") 'calc))
+   (if (and (string= (window-system) 'x))
+       'exwm-bind-key
+     'global-set-key))
 
   (define-key calc-mode-map (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
 #+END_SRC
