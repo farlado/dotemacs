@@ -578,6 +578,7 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 	  ([?\s-d]    . run-discord)
 	  ([?\s-s]    . run-steam)
 	  ([s-return] . vterm)
+	  ([XF86Calculator] . calc)
 
 	  ;; Other desktop environment things
 	  ([?\s-x]       . dmenu)
@@ -687,9 +688,9 @@ Just a personal preference, I don't like seeing the cursor when I'm pressing key
   )
 #+END_SRC
 * EMMS (Emacs MultiMedia System)
-I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it. This too only is loaded if we're in an X window system, but will load regardless of whether a window manager is found.
+I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it. This is only loaded if ~mpd~ is found.
 #+BEGIN_SRC emacs-lisp :exports none
-  (when (string= (window-system) 'x)
+  (when (= (shell-command "whence mpd") 0)
 #+END_SRC
 ** Install EMMS
 I do a crapload here, but basically the two main things I do here is configure mpd information and bind some keys for EMMS controls and music controls.
@@ -762,7 +763,7 @@ To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make
     (funcall func (kbd "s-a r c") 'emms-player-mpd-update-all-reset-cache)
 
     ;; Track navigation
-    (funcall func (kbd "<s-lefuncall funct>") 'emms-previous)
+    (funcall func (kbd "<s-left>") 'emms-previous)
     (funcall func (kbd "<s-right>") 'emms-next)
     (funcall func (kbd "<s-up>") 'emms-stop)
     (funcall func (kbd "<s-down>") 'emms-pause)
@@ -805,11 +806,6 @@ I love this. I really really really *really* love this. I can use my number pad 
   (require 'calc)
 
   (global-set-key (kbd "C-c c") 'calc)
-
-  ((lambda (func) (funcall func (kbd "<XF86Calculator>") 'calc))
-   (if (= (shell-command "wmctrl -m | grep EXWM") 0)
-       'exwm-bind-key
-     'global-set-key))
 
   (define-key calc-mode-map (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
 #+END_SRC
