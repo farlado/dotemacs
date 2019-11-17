@@ -1,7 +1,7 @@
 #+STARTUP: overview, inlineimages
 #+TITLE: Farlado's Emacs
+#+AUTHOR: Farlado
 #+DESCRIPTION: Farlado's personal Emacs configuration
-#+CREATOR: Farlado
 #+LANGUAGE: en
 #+OPTIONS: num:nil
 
