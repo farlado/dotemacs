@@ -540,7 +540,6 @@ I copied the function for quitting Emacs to handle reboot too.
 
   (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
 #+END_SRC
-
 ** Keybindings
 *** Set a bind for both global and EXWM usage
 Save lines, save time.
@@ -756,35 +755,39 @@ I do a crapload here, but basically the two main things I do here is configure m
     (message "Playlist has been shuffled."))
 #+END_SRC
 ** Binding all the keys
+To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make sure the conditions for EXWM are met.
 #+BEGIN_SRC emacs-lisp
-  (when (window-system)
+  ((lambda (func)
     ;; Base functions
-    (exwm-bind-key (kbd "s-a v") 'emms)
-    (exwm-bind-key (kbd "s-a b") 'emms-smart-browse)
-    (exwm-bind-key (kbd "s-a r c") 'emms-player-mpd-update-all-reset-cache)
+    (funcall func (kbd "s-a v") 'emms)
+    (funcall func (kbd "s-a b") 'emms-smart-browse)
+    (funcall func (kbd "s-a r c") 'emms-player-mpd-update-all-reset-cache)
 
     ;; Track navigation
-    (exwm-bind-key (kbd "<s-leexwm-bind-keyt>") 'emms-previous)
-    (exwm-bind-key (kbd "<s-right>") 'emms-next)
-    (exwm-bind-key (kbd "<s-up>") 'emms-stop)
-    (exwm-bind-key (kbd "<s-down>") 'emms-pause)
+    (funcall func (kbd "<s-lefuncall funct>") 'emms-previous)
+    (funcall func (kbd "<s-right>") 'emms-next)
+    (funcall func (kbd "<s-up>") 'emms-stop)
+    (funcall func (kbd "<s-down>") 'emms-pause)
 
     ;; Media keys
-    (exwm-bind-key (kbd "<XF86AudioPrev>") 'emms-previous)
-    (exwm-bind-key (kbd "<XF86AudioNext>") 'emms-next)
-    (exwm-bind-key (kbd "<XF86AudioStop>") 'emms-stop)
-    (exwm-bind-key (kbd "<XF86AudioPlay>") 'emms-pause)
+    (funcall func (kbd "<XF86AudioPrev>") 'emms-previous)
+    (funcall func (kbd "<XF86AudioNext>") 'emms-next)
+    (funcall func (kbd "<XF86AudioStop>") 'emms-stop)
+    (funcall func (kbd "<XF86AudioPlay>") 'emms-pause)
 
     ;; Repeat/shuffle
-    (exwm-bind-key (kbd "s-a r a") 'emms-toggle-repeat-playlist)
-    (exwm-bind-key (kbd "s-a r t") 'emms-toggle-repeat-track)
-    (exwm-bind-key (kbd "s-a s") 'emms-shuffle-message)
+    (funcall func (kbd "s-a r a") 'emms-toggle-repeat-playlist)
+    (funcall func (kbd "s-a r t") 'emms-toggle-repeat-track)
+    (funcall func (kbd "s-a s") 'emms-shuffle-message)
 
     ;; mpd-specific
-    (exwm-bind-key (kbd "s-a x") 'mpd/start-music-daemon)
-    (exwm-bind-key (kbd "s-a q") 'mpd/kill-music-daemon)
-    (exwm-bind-key (kbd "s-a r d") 'mpd/update-database)
-    (exwm-bind-key (kbd "s-a a") 'mpc-status))
+    (funcall func (kbd "s-a x") 'mpd/start-music-daemon)
+    (funcall func (kbd "s-a q") 'mpd/kill-music-daemon)
+    (funcall func (kbd "s-a r d") 'mpd/update-database)
+    (funcall func (kbd "s-a a") 'mpc-status))
+   (if (and (string= (window-system) 'x))
+       'exwm-bind-key
+     'global-set-key))
 #+END_SRC
 * Other Emacs goodies
 This is other stuff I use in Emacs.
