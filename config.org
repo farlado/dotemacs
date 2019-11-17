@@ -20,6 +20,16 @@
 Everything has different dependencies so make sure you have what you need.
 *** EXWM
 - Painfully obvious here: ~xorg~
+- Always hiding the cursor while typing: ~xbanish~
+- Compositor: ~xcompmgr~
+- Notification Daemon: ~dunst~
+- Network Configuration: ~nm-connection-editor~
+- Web Browser: ~firefox~
+- Editing Crappy Documents: ~libreoffice~
+- Crappy Image Editor: ~gimp~
+- Crappy Messenger: ~telegram~
+- Crappier Messenger: ~discord~
+- Games Platform: ~steam~
 *** desktop-environment
 - For volume control: ~alsa-utils~
 - For brightness control: ~brightnessctl~
@@ -45,19 +55,9 @@ Everything has different dependencies so make sure you have what you need.
 *** sudo-edit
 - Obvious dependency: ~sudo~
 *** Other stuff
+- Checking for a window manager: ~wmctrl~
 - For Python: ~pylint~, ~jedi~
 - For Haskell: ~stack~
-*** Other items used in my setup
-- Always hiding the cursor while typing: ~xbanish~
-- Compositor: ~xcompmgr~
-- Notification Daemon: ~dunst~
-- Network Configuration: ~nm-connection-editor~
-- Web Browser: ~firefox~
-- Editing Crappy Documents: ~libreoffice~
-- Crappy Image Editor: ~gimp~
-- Crappy Messenger: ~telegram~
-- Crappier Messenger: ~discord~
-- Games Platform: ~steam~
 * Startup
 ** Start Emacs server
 Although I technically don't /have/ to do this, it is very helpful.
@@ -90,7 +90,8 @@ I love the default start screen, but it just doesn't cut it for me. I just use t
 	  show-week-agenda-p t
 	  dashboard-banner-logo-title "Welcome to GNU Emacs"
 	  dashboard-set-footer nil
-	  initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+	  initial-buffer-choice (lambda ()
+				  (get-buffer "*dashboard*")))
     (dashboard-setup-startup-hook))
 #+END_SRC
 ** auto-package-update package (self-explanatory)
@@ -249,14 +250,17 @@ I use this configuration for two different machines, so there's a lot of outputs
 					    9 "DP-1-2-2"))
   (setq exwm-workspace-number 10)
   (add-hook 'exwm-randr-screen-change-hook
-	    (lambda () (start-process-shell-command "xrandr" nil "ds")))
+	    (lambda ()
+	      (start-process-shell-command
+	       "xrandr" nil "ds")))
   (exwm-randr-enable)
 #+END_SRC
 *** Name EXWM buffers after the window title
 This was annoying when I first installed EXWM. Thankfully this is a very easy fix.
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'exwm-update-title-hook
-	    (lambda () (exwm-workspace-rename-buffer exwm-title)))
+    (add-hook 'exwm-update-title-hook
+	      (lambda ()
+		(exwm-workspace-rename-buffer exwm-title)))
 #+END_SRC
 *** Assign workspaces and floating to various windows
 This is the part of the window manager configuration which is just how to control X windows as they spawn.
@@ -379,7 +383,9 @@ Then, I use these functions to control setting and cycling the keyboard layout.
   (defun get-keyboard-layout ()
     "Get the current keyboard layout."
     (shell-command-to-string
-     "setxkbmap -query | grep -oP 'layout:\\s*\\K(\\w+)' | tr '\n' ' ' | sed 's/ //'"))
+     (concat "setxkbmap -query | "
+	     "grep -oP 'layout:\\s*\\K(\\w+)' | "
+	     "tr '\n' ' ' | sed 's/ //'")))
 
   (defun set-keyboard-layout (&optional layout)
     "Set the keyboard layout to LAYOUT."
@@ -557,8 +563,11 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 	  ([?\s-w] . exwm-workspace-switch)
 	  ([?\s-e] . exwm-workspace-swap)
 	  ,@(mapcar
-	     (lambda (i) `(,(kbd (format "s-%d" i)) .
-		      (lambda () (interactive) (exwm-workspace-switch-create ,i))))
+	     (lambda (i)
+	       `(,(kbd (format "s-%d" i)) .
+		 (lambda ()
+		   (interactive)
+		   (exwm-workspace-switch-create ,i))))
 	     (number-sequence 0 9))
 
 	  ;; Moving focus between windows
@@ -584,23 +593,9 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 
 	  ;; Other desktop environment things
 	  ([?\s-x]       . dmenu)
+	  ([menu]        . smex)
 	  ([?\s- ]       . cycle-keyboard-layout)
 	  ([s-backspace] . cycle-keyboard-layout-reverse)))
-#+END_SRC
-*** Send a key verbatim more easily
-#+BEGIN_SRC emacs-lisp
-       (define-key exwm-mode-map (kbd "C-c C-q") nil)
-       (define-key exwm-mode-map (kbd "C-q") 'exwm-input-send-next-key)
-#+END_SRC
-*** Inhibit things I don't use
-This includes:
-- Toggling fullscreen
-- Toggling floating
-- Toggling hiding
-- Toggling the mode line
-#+BEGIN_SRC emacs-lisp
-  (dolist (key '("C-c C-f" "C-c C-t C-f" "C-c C-t C-v" "C-c C-t C-m"))
-    (define-key exwm-mode-map (kbd key) nil))
 #+END_SRC
 *** Emacs key bindings in X windows
 This is super nice, because I love these key bindings and they are just intuitive to me, and now they can carry over safely to other programs.
@@ -642,6 +637,24 @@ This is super nice, because I love these key bindings and they are just intuitiv
 
   (define-key exwm-mode-map (kbd "C-x C-s") 'exwm-C-s)
 #+END_SRC
+*** Send a key verbatim more easily
+#+BEGIN_SRC emacs-lisp
+       (define-key exwm-mode-map (kbd "C-c C-q") nil)
+       (define-key exwm-mode-map (kbd "C-q") 'exwm-input-send-next-key)
+#+END_SRC
+*** Inhibit things I don't use
+This includes:
+- Toggling fullscreen
+- Toggling floating
+- Toggling hiding
+- Toggling the mode line
+#+BEGIN_SRC emacs-lisp
+  (dolist (key '("C-c C-f"
+		 "C-c C-t C-f"
+		 "C-c C-t C-v"
+		 "C-c C-t C-m"))
+    (define-key exwm-mode-map (kbd key) nil))
+#+END_SRC
 ** On startup
 *** Start EXWM
 #+BEGIN_SRC emacs-lisp
@@ -667,17 +680,20 @@ This block sets the keyboard layout to US and give Caps Lock the functionality o
 *** Compositor
 I don't need it, but having basic compositing is very nice.
 #+BEGIN_SRC emacs-lisp
-  (start-process-shell-command "Compositor" nil "xcompmgr")
+    (start-process-shell-command
+     "Compositor" nil "xcompmgr")
 #+END_SRC
 *** Notification manager
 I haven't integrated notifications into Emacs just yet, sadly.
 #+BEGIN_SRC emacs-lisp
-  (start-process-shell-command "Notifications" nil "dunst")
+  (start-process-shell-command
+   "Notifications" nil "dunst")
 #+END_SRC
 *** Always hide the cursor when typing
 Just a personal preference, I don't like seeing the cursor when I'm pressing keys.
 #+BEGIN_SRC emacs-lisp
-  (start-process-shell-command "Cursor Hiding" nil "xbanish")
+  (start-process-shell-command
+   "Cursor Hiding" nil "xbanish")
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :exports none
   )
@@ -735,14 +751,14 @@ I do a crapload here, but basically the two main things I do here is configure m
 #+END_SRC
 *** Showing playback status
 #+BEGIN_SRC emacs-lisp
-  (defun mpc-status ()
+  (defun mpd/status ()
     "Display the mpc status in the echo area."
     (interactive)
     (shell-command "mpc"))
 #+END_SRC
 *** Shuffling the playlist
 #+BEGIN_SRC emacs-lisp
-  (defun emms-shuffle-message ()
+  (defun farl-emms/shuffle-with-message ()
     "Shuffle the playlist and say so in the echo area."
     (interactive)
     (emms-shuffle)
@@ -772,13 +788,13 @@ To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make
     ;; Repeat/shuffle
     (funcall func (kbd "s-a r a") 'emms-toggle-repeat-playlist)
     (funcall func (kbd "s-a r t") 'emms-toggle-repeat-track)
-    (funcall func (kbd "s-a s") 'emms-shuffle-message)
+    (funcall func (kbd "s-a s") 'farl-emms/shuffle-with-message)
 
     ;; mpd-specific
     (funcall func (kbd "s-a x") 'mpd/start-music-daemon)
     (funcall func (kbd "s-a q") 'mpd/kill-music-daemon)
     (funcall func (kbd "s-a r d") 'mpd/update-database)
-    (funcall func (kbd "s-a a") 'mpc-status))
+    (funcall func (kbd "s-a a") 'mpd/status))
    (if (= (shell-command "wmctrl -m | grep EXWM") 0)
        'exwm-bind-key
      'global-set-key))
@@ -801,6 +817,7 @@ I love this. I really really really *really* love this. I can use my number pad 
   (require 'calc)
 
   (global-set-key (kbd "C-c c") 'calc)
+
   ((lambda (func) (funcall func (kbd "<XF86Calculator>") 'calc))
    (if (= (shell-command "wmctrl -m | grep EXWM") 0)
        'exwm-bind-key
@@ -899,10 +916,11 @@ It's literally never not annoying when words don't wrap.
   (global-subword-mode 1)
 #+END_SRC
 ** Disable suspending Emacs
-Why even is this a key that is bound?
+Why even is this a key that is bound to begin with?
 #+BEGIN_SRC emacs-lisp
-  (global-unset-key (kbd "C-z"))
-  (global-unset-key (kbd "C-x C-z"))
+  (dolist (key '("C-z"
+		 "C-x C-z"))
+    (global-unset-key (kbd key)))
 #+END_SRC
 ** Restart and open dashboard with C-c d
 I constantly accidentally close dashboard, so I made a way to open it again if I accidentally kill it.
@@ -977,7 +995,7 @@ Default M-x behavior doesn't use ~ido-mode~, so we install a package which gives
   (use-package smex
     :ensure t
     :defer t
-    :bind (("M-x" . smex)
+    :bind (("M-x"    . smex)
 	   ("<menu>" . smex)))
 #+END_SRC
 ** Replace "yes or no" prompts with "y or n"
@@ -1091,9 +1109,10 @@ I wanted a way to quickly and gracefully destroy all my open stuff at once.
     "Close every buffer and close all windows, then restart dashboard."
     (interactive)
     (save-some-buffers)
-    (mapc 'kill-buffer (buffer-list))
-    (delete-other-windows)
-    (dashboard-restart))
+    (when (yes-or-no-p "Really kill all buffers? ")
+      (mapc 'kill-buffer (buffer-list))
+      (delete-other-windows)
+      (dashboard-restart)))
 
   (global-set-key (kbd "C-x C-M-k") 'close-buffers-and-windows)
 #+END_SRC
@@ -1249,7 +1268,8 @@ However, I don't like line numbers in modes where it breaks the mode.
 #+BEGIN_SRC emacs-lisp
   (defun disable-line-numbers-for (hook)
     "Disable `display-line-numbers-mode` for HOOK."
-    (add-hook hook (lambda () (display-line-numbers-mode -1))))
+    (add-hook hook (lambda ()
+		     (display-line-numbers-mode -1))))
 
   (disable-line-numbers-for 'vterm-mode-hook)
   (disable-line-numbers-for 'tetris-mode-hook)
@@ -1282,9 +1302,10 @@ Who even uses the toolbar in Emacs?
 Since I use EXWM, X windows will remove the thin divider which is present by default. To remedy this, I use a different method. I set it to a solid color. I like the fringes at ten pixels, so I just keep it there.
 #+BEGIN_SRC emacs-lisp
   (setq window-divider-default-right-width 3)
-  (set-face-foreground 'window-divider-first-pixel "#335ea8")
-  (set-face-foreground 'window-divider "#335ea8")
-  (set-face-foreground 'window-divider-last-pixel "#335ea8")
+  (dolist (face '(window-divider-first-pixel
+		  window-divider
+		  window-divider-last-pixel))
+    (set-face-foreground face "#335ea8"))
   (window-divider-mode 1)
   (fringe-mode 10)
 #+END_SRC
