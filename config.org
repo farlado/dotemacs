@@ -109,7 +109,8 @@ I don't want to have to manually update my stuff. This solution is literally plo
 * Making Emacs a (sufficiently exhaustive) DE
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness.
 #+BEGIN_SRC emacs-lisp :exports none
-  (when (and (string= (window-system) 'x))
+  (when (and (string= (window-system) 'x)
+	     (not (= (shell-command "wmctrl -m") 0)))
 #+END_SRC
 ** Configuration
 *** exwm package (base window manager)
@@ -692,7 +693,10 @@ Just a personal preference, I don't like seeing the cursor when I'm pressing key
   )
 #+END_SRC
 * EMMS (Emacs MultiMedia System)
-I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it.
+I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it. This too only is loaded if we're in an X window system, but will load regardless of whether a window manager is found.
+#+BEGIN_SRC emacs-lisp :exports none
+  (when (string= (window-system) 'x)
+#+END_SRC
 ** Install EMMS
 I do a crapload here, but basically the two main things I do here is configure mpd information and bind some keys for EMMS controls and music controls.
 #+BEGIN_SRC emacs-lisp
@@ -785,9 +789,13 @@ To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make
     (funcall func (kbd "s-a q") 'mpd/kill-music-daemon)
     (funcall func (kbd "s-a r d") 'mpd/update-database)
     (funcall func (kbd "s-a a") 'mpc-status))
-   (if (and (string= (window-system) 'x))
+   (if (and (string= (window-system) 'x)
+	  (= (shell-command "wmctrl -m | grep EXWM") 0))
        'exwm-bind-key
      'global-set-key))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :exports none
+  )
 #+END_SRC
 * Other Emacs goodies
 This is other stuff I use in Emacs.
@@ -805,7 +813,8 @@ I love this. I really really really *really* love this. I can use my number pad 
 
   (global-set-key (kbd "C-c c") 'calc)
   ((lambda (func) (funcall func (kbd "<XF86Calculator>") 'calc))
-   (if (and (string= (window-system) 'x))
+   (if (and (string= (window-system) 'x)
+	  (= (shell-command "wmctrl -m | grep EXWM") 0))
        'exwm-bind-key
      'global-set-key))
 
@@ -1254,11 +1263,10 @@ I used to hate light themes. I'm not in that camp anymore. I love this elegant t
 #+END_SRC
 ** General
 *** Line numbers
-I like having line numbers and the current cursor position and a highlighted current line.
+I like having line numbers alongside the current cursor position in the mode line.
 #+BEGIN_SRC emacs-lisp
   (line-number-mode 1)
   (column-number-mode 1)
-  (global-hl-line-mode 1)
   (global-display-line-numbers-mode 1)
 #+END_SRC
 However, I don't like line numbers in modes where it breaks the mode.
@@ -1308,6 +1316,11 @@ Since I use EXWM, X windows will remove the thin divider which is present by def
 This stuff really only helps when you're in a graphical environment. Running Emacs from a terminal means these things might not work, so I don't load them when not in a graphical environment.
 #+BEGIN_SRC emacs-lisp :exports none
   (when (window-system)
+#+END_SRC
+*** Highlight the current line
+This is to help me keep track of where the cursor is. It looks really weird outside a window system though, so I disable it.
+#+BEGIN_SRC emacs-lisp
+    (global-hl-line-mode 1)
 #+END_SRC
 *** pretty-mode package (prettify symbols)
 I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so much more to make things look nice, especially in functional programming languages. I enable /all/ of them.
