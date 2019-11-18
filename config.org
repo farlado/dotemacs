@@ -906,7 +906,7 @@ Why even is this a key that is bound to begin with?
 		 "C-x C-z"))
     (global-unset-key (kbd key)))
 #+END_SRC
-** Restart and open dashboard with C-c d
+** Restart and open dashboard with =C-c d=
 I constantly accidentally close dashboard, so I made a way to open it again if I accidentally kill it.
 #+BEGIN_SRC emacs-lisp
   (defun dashboard-restart ()
@@ -917,7 +917,7 @@ I constantly accidentally close dashboard, so I made a way to open it again if I
 
   (global-set-key (kbd "C-c d") 'dashboard-restart)
 #+END_SRC
-** Open configuration with C-c e
+** Open configuration with =C-c e=
 Since this thing is changing all the time, I really like having it available on a shortcut.
 #+BEGIN_SRC emacs-lisp
   (defun config-visit ()
@@ -927,14 +927,14 @@ Since this thing is changing all the time, I really like having it available on 
 
   (global-set-key (kbd "C-c e") 'config-visit)
 #+END_SRC
-** Edit with superuser privileges via C-x C-M-f
+** Edit with superuser privileges via =C-x C-M-f=
 #+BEGIN_SRC emacs-lisp
   (use-package sudo-edit
     :ensure t
     :defer t
     :bind ("C-x C-M-f" . sudo-edit))
 #+END_SRC
-** graphviz-dot-mode package (diagrams creation)
+** graphviz-dot-mode package (diagram creation)
 A nice way to make diagrams.
 #+BEGIN_SRC emacs-lisp
   (use-package graphviz-dot-mode
@@ -1064,7 +1064,7 @@ I hate having to click to focus a different window, so I would rather just have 
   (setq focus-follows-mouse t
 	mouse-autoselect-window t)
 #+END_SRC
-** Kill current buffer with C-x k, use C-x C-k to kill the window too
+** Kill current buffer with =C-x k=, use =C-x C-k= to kill the window too
 I had to adjust the function which kills both the current buffer and the current window, because it did not cooperate with EXWM buffers. That's why I have this weird chunk I don't actually have the expertise yet to fully parse.
 #+BEGIN_SRC emacs-lisp
   (defun kill-this-buffer-and-window ()
@@ -1086,7 +1086,7 @@ I had to adjust the function which kills both the current buffer and the current
   (global-set-key (kbd "C-x k") 'kill-this-buffer)
   (global-set-key (kbd "C-x C-k") 'kill-this-buffer-and-window)
 #+END_SRC
-** Close all buffers and kill all windows with C-x C-M-k
+** Close all buffers and kill all windows with =C-x C-M-k=
 I wanted a way to quickly and gracefully destroy all my open stuff at once.
 #+BEGIN_SRC emacs-lisp
   (defun close-buffers-and-windows ()
@@ -1133,6 +1133,7 @@ This to me is preferable to the default behavior.
   (global-set-key (kbd "C-c b") 'balance-windows)
 #+END_SRC
 ** Use windmove in place of other-window
+To make this easier, I just make a keymap for ~windmove~ and bind the keymap to =C-x o=.
 #+BEGIN_SRC emacs-lisp
   (defvar windmove-map
     (let ((map (make-sparse-keymap)))
@@ -1145,6 +1146,7 @@ This to me is preferable to the default behavior.
   (global-set-key (kbd "C-x o") windmove-map)
 #+END_SRC
 ** buffer-move package (move windows around)
+Just like for ~windmove~, I define a keymap and this time bind it to =C-x C-o=.
 #+BEGIN_SRC emacs-lisp
   (use-package buffer-move
     :ensure t
@@ -1162,7 +1164,7 @@ This to me is preferable to the default behavior.
 * Org-mode
 I don't need much extending for org-mode.
 ** Agenda (only enabled if an agenda is found)
-I use C-c a and C-c C-a to do things related to my agenda. Only one of my systems actually has my agenda, so this only runs on that machine so I don't try any funny business on other machines.
+I use =C-c a= and =C-c C-a= to do things related to my agenda. Only one of my systems actually has my agenda, so this only runs on that machine so I don't try any funny business on other machines.
 #+BEGIN_SRC emacs-lisp
   (if (file-exists-p "~/agenda.org")
       (progn
@@ -1283,6 +1285,7 @@ However, I don't like line numbers in modes where it breaks the mode.
   (disable-line-numbers-for 'dashboard-mode-hook)
   (disable-line-numbers-for 'shell-mode-hook)
   (disable-line-numbers-for 'nov-mode-hook)
+  (disable-line-numbers-for 'epresent-mode-hook)
 #+END_SRC
 *** Highlight matching parentheses et al. when hovering near one
 #+BEGIN_SRC emacs-lisp
