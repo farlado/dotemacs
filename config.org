@@ -1285,7 +1285,6 @@ However, I don't like line numbers in modes where it breaks the mode.
   (disable-line-numbers-for 'dashboard-mode-hook)
   (disable-line-numbers-for 'shell-mode-hook)
   (disable-line-numbers-for 'nov-mode-hook)
-  (disable-line-numbers-for 'epresent-mode-hook)
 #+END_SRC
 *** Highlight matching parentheses et al. when hovering near one
 #+BEGIN_SRC emacs-lisp
