@@ -233,6 +233,16 @@ Haha yes, this is very long and very very stupid.
 		"--lockfailedtext='' --noinputtext='' --radius 1 --ring-width 1 "
 		" --veriftext='' --wrongtext='WRONG' --force-clock"))
 #+END_SRC
+*** Workspace configuration
+No clue why you have to do so much just to give workspaces names, but at least you can do it.
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-workspace-number 3
+	exwm-workspace-index-map (lambda (index)
+				   (let ((named-workspaces ["1" "2" "3"]))
+				     (if (< index (length named-workspaces))
+					 (elt named-workspaces index)
+				       (number-to-string index)))))
+#+END_SRC
 *** Multi-head
 I use this configuration for two different machines, so there's a lot of outputs listed here.
 #+BEGIN_SRC emacs-lisp
@@ -240,15 +250,7 @@ I use this configuration for two different machines, so there's a lot of outputs
 					    0 "eDP-1-1"
 					    0 "DP-1-2-2"
 					    1 "DP-1-2-1"
-					    2 "DP-1-2-3"
-					    3 "DP-1-2-2"
-					    4 "DP-1-2-1"
-					    5 "DP-1-2-3"
-					    6 "DP-1-2-2"
-					    7 "DP-1-2-1"
-					    8 "DP-1-2-3"
-					    9 "DP-1-2-2"))
-  (setq exwm-workspace-number 10)
+					    2 "DP-1-2-3"))
   (add-hook 'exwm-randr-screen-change-hook
 	    (lambda ()
 	      (start-process-shell-command
@@ -267,15 +269,11 @@ This is the part of the window manager configuration which is just how to contro
 #+BEGIN_SRC emacs-lisp
   (setq exwm-manage-configurations
 	'(((string= exwm-class-name "Steam")
-	   workspace 9 floating t floating-mode-line nil)
+	   workspace 0 floating t floating-mode-line nil)
 	  ((string= exwm-instance-name "telegram")
-	   workspace 8)
+	   workspace 1)
 	  ((string= exwm-class-name "discord")
-	   workspace 7)
-	  ((string= exwm-instance-name "libreoffice")
-	   workspace 6)
-	  ((string= exwm-instance-name "gimp")
-	   workspace 6)
+	   workspace 2)
 	  ((string= exwm-title "Event Tester")
 	   floating t)))
 #+END_SRC
@@ -559,16 +557,16 @@ Save lines, save time.
 Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into this area.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-global-keys
-	`(;; Workspaces
-	  ([?\s-w] . exwm-workspace-switch)
-	  ([?\s-e] . exwm-workspace-swap)
-	  ,@(mapcar
-	     (lambda (i)
-	       `(,(kbd (format "s-%d" i)) .
-		 (lambda ()
-		   (interactive)
-		   (exwm-workspace-switch-create ,i))))
-	     (number-sequence 0 9))
+	`(;; Switching Workspaces
+	  ([?\s-w] . (lambda ()
+		       (interactive)
+		       (exwm-workspace-switch-create 0)))
+	  ([?\s-q] . (lambda ()
+		       (interactive)
+		       (exwm-workspace-switch-create 1)))
+	  ([?\s-e] . (lambda ()
+		       (interactive)
+		       (exwm-workspace-switch-create 2)))
 
 	  ;; Opening X applications
 	  ([?\s-f]    . run-firefox)
@@ -578,7 +576,6 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 	  ([?\s-d]    . run-discord)
 	  ([?\s-s]    . run-steam)
 	  ([s-return] . vterm)
-	  ([XF86Calculator] . calc)
 
 	  ;; Other desktop environment things
 	  ([?\s-x]       . dmenu)
@@ -756,7 +753,9 @@ I do a crapload here, but basically the two main things I do here is configure m
 ** Binding all the keys
 To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make sure the conditions for EXWM are met.
 #+BEGIN_SRC emacs-lisp
-  ((lambda (func)
+  (let ((func  (if (= (shell-command "wmctrl -m | grep EXWM") 0)
+		   'exwm-bind-key
+		 'global-set-key)))
     ;; Base functions
     (funcall func (kbd "s-a v") 'emms)
     (funcall func (kbd "s-a b") 'emms-smart-browse)
@@ -784,9 +783,6 @@ To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make
     (funcall func (kbd "s-a q") 'mpd/kill-music-daemon)
     (funcall func (kbd "s-a r d") 'mpd/update-database)
     (funcall func (kbd "s-a a") 'mpd/status))
-   (if (= (shell-command "wmctrl -m | grep EXWM") 0)
-       'exwm-bind-key
-     'global-set-key))
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :exports none
   )
@@ -801,7 +797,7 @@ I've been jumping between ~vterm~ and ~ansi-term~ but ~vterm~ seems to be genera
     :defer t)
 #+END_SRC
 ** Calculator
-I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and then use the number pad to close it as well. Same prevention of the use of ~exwm-bind-key~ as seen prior.
+I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and then use the number pad to close it as well.
 #+BEGIN_SRC emacs-lisp
   (require 'calc)
 
