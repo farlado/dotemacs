@@ -85,6 +85,7 @@ I love the default start screen, but it just doesn't cut it for me. I just use t
     :defer t
     :init
     (setq inhibit-start-menu t
+	  inhibit-startup-message t
 	  dashboard-startup-banner "~/.emacs.d/logo.png"
 	  dashboard-items '((recents . 10))
 	  show-week-agenda-p t
@@ -1322,17 +1323,6 @@ Who even uses the toolbar in Emacs?
   (scroll-bar-mode -1)
   (setq use-dialog-box nil)
 #+END_SRC
-** Window dividers/fringes
-Since I use EXWM, X windows will remove the thin divider which is present by default. To remedy this, I use a different method. I set it to a solid color. I like the fringes at ten pixels, so I just keep it there.
-#+BEGIN_SRC emacs-lisp
-  (setq window-divider-default-right-width 3)
-  (dolist (face '(window-divider-first-pixel
-		  window-divider
-		  window-divider-last-pixel))
-    (set-face-foreground face "#335ea8"))
-  (window-divider-mode 1)
-  (fringe-mode 10)
-#+END_SRC
 ** In graphical environments
 This stuff really only helps when you're in a graphical environment. Running Emacs from a terminal means these things might not work, so I don't load them when not in a graphical environment.
 #+BEGIN_SRC emacs-lisp :exports none
@@ -1349,6 +1339,17 @@ I used to hate light themes. I'm not in that camp anymore. This theme is /elegan
 	  leuven-scale-org-agenda-structure t
 	  leuven-scale-outline-headlines t)
     (load-theme 'leuven t))
+#+END_SRC
+*** Window dividers/fringes
+Fringes and dividers look far fancier than the alternatives.
+#+BEGIN_SRC emacs-lisp
+  (setq window-divider-default-right-width 3)
+  (dolist (face '(window-divider-first-pixel
+		  window-divider
+		  window-divider-last-pixel))
+    (set-face-foreground face "#335ea8"))
+  (window-divider-mode 1)
+  (fringe-mode 10)
 #+END_SRC
 *** Highlight the current line
 This is to help me keep track of where the cursor is. It looks really weird outside a window system though, so I disable it.
@@ -1414,8 +1415,9 @@ I *hate* the default mode line. This one is much less sucky.
     :defer t
     :init
     (require 'spaceline-config)
-    (setq powerline-default-separator nil)
-    (spaceline-spacemacs-theme))
+    (setq powerline-default-separator 'alternate)
+    (spaceline-spacemacs-theme)
+    (spaceline-toggle-buffer-size-off))
 #+END_SRC
 *** Show clock and battery level on mode line
 I used to use ~fancy-battery~ but it constantly disappeared on my teeny tiny screens so I just decided not to bother with it. Plus it's one less package to configure lol.
