@@ -1174,6 +1174,23 @@ I use =C-c a= and =C-c C-a= to do things related to my agenda. Only one of my sy
 	(global-set-key (kbd "C-c a") 'org-agenda)
 	(global-set-key (kbd "C-c C-a") 'open-agenda)))
 #+END_SRC
+** Quality of life settings
+These are just quick things that make ~org-mode~ much easier to use.
+#+BEGIN_SRC emacs-lisp
+    (setq org-pretty-entities t
+	  org-src-fontify-natively t
+	  org-src-tab-acts-natively t
+	  org-src-window-setup 'current-window
+	  org-fontify-whole-heading-line t
+	  org-fontify-done-headline t
+	  org-fontify-quote-and-verse-blocks t
+	  org-highlight-latex-and-related '(latex)
+	  org-enforce-todo-dependencies t
+	  org-agenda-use-time-grid nil
+	  org-agenda-skip-deadline-if-done t
+	  org-agenda-skip-scheduled-if-done t
+	  org-ellipsis "⤵")
+#+END_SRC
 ** Shortcuts for various snippets in org-mode
 This will expand as I get into more and more languages and take more notes in classes with different snippets of different languages.
 #+BEGIN_SRC emacs-lisp
@@ -1211,7 +1228,10 @@ I used to use a terminal for this, but holy crap this is a lot easier, a lot fas
   (use-package magit
     :ensure t
     :defer t
-    :bind ("C-c g" . magit-status))
+    :bind ("C-c g" . magit-status)
+    :init
+    (setq magit-bury-buffer-function (lambda (con)
+				       (kill-this-buffer-and-window))))
 #+END_SRC
 ** flycheck package (on-the-fly syntax checker)
 This is nice to have so I can be told right away when I'm doing something wrong.
@@ -1220,7 +1240,8 @@ This is nice to have so I can be told right away when I'm doing something wrong.
     :ensure t
     :defer t
     :init
-    (global-flycheck-mode 1))
+    (global-flycheck-mode 1)
+    (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 #+END_SRC
 ** company-jedi package (Python autocompletion)
 I will probably be adding company autocompletion for more languages as I start working in more languages.
