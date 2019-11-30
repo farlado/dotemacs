@@ -108,10 +108,11 @@ I don't want to have to manually update my stuff. This solution is literally plo
     (auto-package-update-maybe))
 #+END_SRC
 * Making Emacs a desktop environment
-Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness.
+Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness. Also not included in exports is a function used to make Emacs fullscreen ASAP.
 #+BEGIN_SRC emacs-lisp :exports none
   (when (and (string= (window-system) 'x)
-	     (not (= (shell-command "wmctrl -m") 0)))
+	   (not (= (shell-command "wmctrl -m") 0)))
+    (set-frame-parameter nil 'fullscreen 'fullboth)
 #+END_SRC
 ** Configuration
 *** exwm package (base window manager)
@@ -271,9 +272,9 @@ This is the part of the window manager configuration which is just how to contro
 	'(((string= exwm-class-name "Steam")
 	   workspace 0 floating t floating-mode-line nil)
 	  ((string= exwm-instance-name "telegram")
-	   workspace 1)
-	  ((string= exwm-class-name "discord")
 	   workspace 2)
+	  ((string= exwm-class-name "discord")
+	   workspace 1)
 	  ((string= exwm-title "Event Tester")
 	   floating t)))
 #+END_SRC
@@ -1229,9 +1230,9 @@ I used to use a terminal for this, but holy crap this is a lot easier, a lot fas
     :ensure t
     :defer t
     :bind ("C-c g" . magit-status)
-    :init
-    (setq magit-bury-buffer-function (lambda (con)
-				       (kill-this-buffer-and-window))))
+    :bind (:map magit-mode-map
+	       ("q" . kill-this-buffer)
+	       ("Q" . kill-this-buffer-and-window)))
 #+END_SRC
 ** flycheck package (on-the-fly syntax checker)
 This is nice to have so I can be told right away when I'm doing something wrong.
