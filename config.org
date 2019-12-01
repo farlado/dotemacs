@@ -1,9 +1,9 @@
-#+STARTUP: overview, inlineimages
 #+TITLE: Farlado's Emacs
+#+SUBTITLE: Farlado's personal Emacs configuration
 #+AUTHOR: Farlado
-#+DESCRIPTION: Farlado's personal Emacs configuration
 #+LANGUAGE: en
 #+OPTIONS: num:nil
+#+STARTUP: overview, inlineimages
 
 #+NAME: fig:LOGO
 #+CAPTION: 'An excellent emacs'
@@ -113,6 +113,11 @@ Yes, Emacs is my *entire desktop environment*. You should probably remove this s
 #+BEGIN_SRC emacs-lisp :exports none
   (when (and (string= (window-system) 'x)
 	   (not (= (shell-command "wmctrl -m") 0)))
+    (menu-bar-mode -1)
+    (tooltip-mode -1)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+    (setq use-dialog-box nil)
     (set-frame-parameter nil 'fullscreen 'fullboth)
 #+END_SRC
 ** Configuration
