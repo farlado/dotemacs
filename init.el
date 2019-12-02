@@ -28,4 +28,4 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (vterm graphviz-dot-mode sudoku desktop-environment sudo-edit buffer-move wttrin haskell-mode company-jedi pretty-mode flycheck leuven-theme magit org-bullets auto-package-update nov swiper use-package company emms diminish popup-kill-ring dmenu exwm spaceline dash dashboard rainbow-delimiters hungry-delete smart-hungry-delete rainbow-mode avy smex ido-vertical-mode which-key))))
+    (graphviz-dot-mode sudoku desktop-environment sudo-edit buffer-move wttrin haskell-mode company-jedi pretty-mode flycheck leuven-theme magit org-bullets auto-package-update nov swiper use-package company emms diminish popup-kill-ring dmenu exwm spaceline dash dashboard rainbow-delimiters hungry-delete smart-hungry-delete rainbow-mode avy smex ido-vertical-mode which-key))))

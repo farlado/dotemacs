@@ -582,7 +582,7 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 	  ([?\s-t]    . run-telegram)
 	  ([?\s-d]    . run-discord)
 	  ([?\s-s]    . run-steam)
-	  ([s-return] . vterm)
+	  ([s-return] . ansi-term)
 
 	  ;; Other desktop environment things
 	  ([?\s-x]       . dmenu)
@@ -797,11 +797,13 @@ To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make
 * Other Emacs goodies
 This is other stuff I use in Emacs.
 ** Terminal
-I've been jumping between ~vterm~ and ~ansi-term~ but ~vterm~ seems to be generally faster and easier to use.
+I've been jumping between ~vterm~ and ~ansi-term~ but ~ansi-term~ seems to support more of the fancy stuff I like about Emacs. This ensures ~ansi-term~ always starts with my default shell.
 #+BEGIN_SRC emacs-lisp
-  (use-package vterm
-    :ensure t
-    :defer t)
+  (defvar my-term-shell "/bin/zsh"
+    "The shell to start `term' and `ansi-term' with.")
+  (defadvice ansi-term (before force-bash)
+    (interactive (list my-term-shell)))
+  (ad-activate 'ansi-term)
 #+END_SRC
 ** Calculator
 I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and then use the number pad to close it as well.
@@ -1301,7 +1303,7 @@ However, I don't like line numbers in modes where it breaks the mode.
     (add-hook hook (lambda ()
 		     (display-line-numbers-mode -1))))
 
-  (disable-line-numbers-for 'vterm-mode-hook)
+  (disable-line-numbers-for 'term-mode-hook)
   (disable-line-numbers-for 'tetris-mode-hook)
   (disable-line-numbers-for 'snake-mode-hook)
   (disable-line-numbers-for 'sudoku-mode-hook)
