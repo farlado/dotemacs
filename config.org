@@ -5,9 +5,6 @@
 #+OPTIONS: num:nil
 #+STARTUP: overview, inlineimages
 
-#+NAME: fig:LOGO
-#+CAPTION: 'An excellent emacs'
-#+ATTR_HTML: :style margin-left: auto; margin-right: auto;
 [[./logo.png]]
 
 * Installation
@@ -283,6 +280,11 @@ This is the part of the window manager configuration which is just how to contro
 	   workspace 1)
 	  ((string= exwm-title "Event Tester")
 	   floating t)))
+#+END_SRC
+*** Ensure Java applications know the WM is non-reparenting
+Stolen from the ~.xinitrc~ included with ~EXWM~.
+#+BEGIN_SRC emacs-lisp
+  (shell-command "export _JAVA_AWT_WM_NONREPARENTING=1")
 #+END_SRC
 *** Configure floating window borders
 Uses the same color as my mode line, uses the same width as window divider width. See below.
@@ -670,6 +672,18 @@ This block sets the keyboard layout to US and give Caps Lock the functionality o
 #+BEGIN_SRC emacs-lisp
   (shell-command "setxkbmap us -option ctrl:nocaps")
 #+END_SRC
+*** Audio
+Make sure ~pulseaudio~ is running if it is installed.
+#+BEGIN_SRC emacs-lisp
+  (if (executable-find "pulseaudio")
+      (shell-command "pulseaudio --start"))
+#+END_SRC
+*** Load .Xresources
+...if it exists, of course.
+#+BEGIN_SRC emacs-lisp
+  (if (file-exists-p "~/.Xresources")
+      (shell-command "xrdb $HOME/.Xresources"))
+#+END_SRC
 *** Compositor
 I don't need it, but having basic compositing is very nice.
 #+BEGIN_SRC emacs-lisp
@@ -804,6 +818,11 @@ I've been jumping between ~vterm~ and ~ansi-term~ but ~ansi-term~ seems to suppo
   (defadvice ansi-term (before force-bash)
     (interactive (list my-term-shell)))
   (ad-activate 'ansi-term)
+#+END_SRC
+** Reading the manpages
+Wow, there's actually an Emacs mode for this!
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c m") 'man)
 #+END_SRC
 ** Calculator
 I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and then use the number pad to close it as well.
@@ -1290,14 +1309,10 @@ I have no words for how convenient this has been and how much faster I get thing
 * Looks
 ** General
 *** Line numbers
-I like having line numbers alongside the current cursor position in the mode line.
+I like having line numbers. However, I don't like line numbers in modes where it breaks the mode.
 #+BEGIN_SRC emacs-lisp
-  (line-number-mode 1)
-  (column-number-mode 1)
   (global-display-line-numbers-mode 1)
-#+END_SRC
-However, I don't like line numbers in modes where it breaks the mode.
-#+BEGIN_SRC emacs-lisp
+
   (defun disable-line-numbers-for (hook)
     "Disable `display-line-numbers-mode` for HOOK."
     (add-hook hook (lambda ()
@@ -1415,16 +1430,18 @@ Just a point of /personal preference./ I was considering keeping this in for non
 #+END_SRC
 ** Mode line
 *** spaceline package (Spacemacs mode line)
-I *hate* the default mode line. This one is much less sucky.
+I *hate* the default mode line. This one is much less sucky. I also show and hide specific useful things when setting it up.
 #+BEGIN_SRC emacs-lisp
   (use-package spaceline
     :ensure t
     :defer t
     :init
     (require 'spaceline-config)
-    (setq powerline-default-separator 'contour)
-    (spaceline-emacs-theme)
-    (spaceline-toggle-buffer-size-off))
+    (setq powerline-default-separator 'contour
+	  spaceline-buffer-encoding-abbrev-p nil
+	  spaceline-buffer-size-p nil
+	  spaceline-line-column-p t)
+    (spaceline-emacs-theme))
 #+END_SRC
 *** Show clock and battery level on mode line
 I used to use ~fancy-battery~ but it constantly disappeared on my teeny tiny screens so I just decided not to bother with it. Plus it's one less package to configure lol.
