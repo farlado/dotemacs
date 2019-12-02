@@ -1420,8 +1420,8 @@ I *hate* the default mode line. This one is much less sucky.
     :defer t
     :init
     (require 'spaceline-config)
-    (setq powerline-default-separator 'alternate)
-    (spaceline-spacemacs-theme)
+    (setq powerline-default-separator 'contour)
+    (spaceline-emacs-theme)
     (spaceline-toggle-buffer-size-off))
 #+END_SRC
 *** Show clock and battery level on mode line
