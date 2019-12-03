@@ -5,8 +5,6 @@
 #+OPTIONS: num:nil
 #+STARTUP: overview, inlineimages
 
-[[./logo.png]]
-
 * Installation
 ** Summary
 0) Make sure you have all the right dependencies.
@@ -83,7 +81,6 @@ I love the default start screen, but it just doesn't cut it for me. I just use t
     :init
     (setq inhibit-start-menu t
 	  inhibit-startup-message t
-	  dashboard-startup-banner "~/.emacs.d/logo.png"
 	  dashboard-items '((recents . 10))
 	  show-week-agenda-p t
 	  dashboard-banner-logo-title "Welcome to GNU Emacs"
