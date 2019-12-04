@@ -1359,14 +1359,18 @@ Originally I had this set up by means of ~custom-set-faces~, but frankly that is
 #+END_SRC
 Then, we need to determine what size to make the text. This is based on the width of the screens I regularly use.
 #+BEGIN_SRC emacs-lisp
-  (let* ((res (/ (display-pixel-width) (if (string= (window-system) 'x)
-					   (string-to-number
-					    (shell-command-to-string
-					     "xrandr | grep \\* | wc -l"))
-					 (display-screens))))
-	 (size (if (< res 1920)
-		   100
-		 150)))
+  (let* ((res (if (string= (window-system) 'x)
+		  (string-to-number
+		   (shell-command-to-string
+		    (concat "xrandr | grep \\* | "
+			    "cut -d x -f 1 | "
+			    "sort -n | head -n 1")))
+		(/ (display-pixel-width) (display-screens))))
+	   (size (if (<= res 1366) 110
+		   (if (<= res 1920) 150
+		     (if (<= res 2560) 180
+		       (if (<= res 3840) 220
+			 240))))))
     (set-face-attribute 'default nil :height size))
 #+END_SRC
 *** Window dividers/fringes
