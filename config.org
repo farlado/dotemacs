@@ -697,7 +697,7 @@ Just a personal preference, I don't like seeing the cursor when I'm pressing key
 * EMMS (Emacs MultiMedia System)
 I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it. This is only loaded if ~mpd~ is found.
 #+BEGIN_SRC emacs-lisp :exports none
-  (when (= (shell-command "whence mpd") 0)
+  (when (executable-find "mpd")
 #+END_SRC
 ** Install EMMS
 I do a crapload here, but basically the two main things I do here is configure mpd information and bind some keys for EMMS controls and music controls.
@@ -1359,12 +1359,11 @@ Originally I had this set up by means of ~custom-set-faces~, but frankly that is
 #+END_SRC
 Then, we need to determine what size to make the text. This is based on the width of the screens I regularly use.
 #+BEGIN_SRC emacs-lisp
-  (let* ((res (if (string= (window-system) 'x)
-		  (string-to-number (shell-command-to-string
-				     (concat "xrandr | grep \\* | awk '{print $1}' | "
-					     "cut -d x -f 1 | sort -nr | head -n 1 | "
-					     "tr '\n' ' ' | sed 's/ //'")))
-		(display-pixel-width)))
+  (let* ((res (/ (display-pixel-width) (if (string= (window-system) 'x)
+					   (string-to-number
+					    (shell-command-to-string
+					     "xrandr | grep \\* | wc -l"))
+					 (display-screens))))
 	 (size (if (< res 1920)
 		   100
 		 150)))
