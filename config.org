@@ -7,10 +7,8 @@
 
 * Installation
 ** Summary
-0) Make sure you have all the right dependencies.
-1) Clone the repo into your home directory as ~.emacs.d~.
-2) Inside the repo, choose your font/border sizes using ~make~. The options are ~hires~ and ~lores~. The default is ~lores~.
-3) Make sure if you aren't going to use EXWM you remove everything in the ~EXWM~ section of ~config.org~.
+1) Make sure you have all the right dependencies.
+2) Clone the repo into your home directory as ~.emacs.d~.
 ** Dependencies
 Everything has different dependencies so make sure you have what you need.
 *** EXWM
@@ -1359,6 +1357,27 @@ I used to hate light themes. I'm not in that camp anymore. This theme is /elegan
 	  leuven-scale-outline-headlines t)
     (load-theme 'leuven t))
 #+END_SRC
+*** Font
+Originally I had this set up by means of ~custom-set-faces~, but frankly that is less easily configured than this method. First, we determine whether my preferred font is present on the system and set it if present. Otherwise, keep the default that Emacs chooses.
+#+BEGIN_SRC emacs-lisp
+  (when (member "Iosevka" (font-family-list))
+      (set-face-attribute 'default nil :font "Iosevka"))
+#+END_SRC
+Then, we need to determine what size to make the text. This is based on the width of the screens I regularly use.
+#+BEGIN_SRC emacs-lisp
+  (let* ((monitor-count (if (string= (window-system) 'x)
+			    (string-to-number
+			     (shell-command-to-string
+			      "xrandr | grep \\* | wc -l"))
+			  1))
+	 (res (/ (display-pixel-width) monitor-count))
+	 (size (if (< res 1920)
+		   100
+		 (if (< res 2880)
+		     150
+		   220))))
+    (set-face-attribute 'default nil :height size))
+#+END_SRC
 *** Window dividers/fringes
 Fringes and dividers look far fancier than the alternatives.
 #+BEGIN_SRC emacs-lisp
@@ -1466,5 +1485,6 @@ Supposedly ~use-package~ is going to have this feature soon, but till that rolls
 	       interactive-haskell-mode
 	       haskell-doc-mode
 	       page-break-lines-mode
-	       compilation-shell-minor-mode))
+	       compilation-shell-minor-mode
+	       desktop-environment-mode))
 #+END_SRC
