@@ -343,6 +343,15 @@ Gaming is possible with EXWM, if you run games windowed.
      "Steam" nil "steam"))
 #+END_SRC
 *** Other things a DE should probably have
+**** Display setup
+Calling ~arandr~ to adjust monitors is useful when I am preparing to present something using my computer or need to adjust how monitors are set up in a unique way that isn't a preset from my dotfiles.
+#+BEGIN_SRC emacs-lisp
+  (defun monitor-settings ()
+    "Open arandr to configure monitors."
+    (interactive)
+    (start-process-shell-command
+     "Monitor Settings" nil "arandr"))
+#+END_SRC
 **** Network Settings
 This one uses two windows: one to open the NetworkManager connection editor, and another to list WiFi networks nearby.
 #+BEGIN_SRC emacs-lisp
@@ -574,6 +583,8 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 	  ([?\s-d]    . run-discord)
 	  ([?\s-s]    . run-steam)
 	  ([s-return] . ansi-term)
+	  ([?\s-r]    . monitor-settings)
+	  ([?\s-n]    . network-settings)
 
 	  ;; Other desktop environment things
 	  ([?\s-x]       . dmenu)
