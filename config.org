@@ -359,21 +359,21 @@ This will eventually be its own package, but for now, it's just in my config. Fi
   (defgroup keyboard-layout nil
     "Keyboard layouts for `cycle-keyboard-layout' and `cycle-keyboard-layout-reverse'")
 
-  (defcustom keyboard-layout-1 nil
+  (defcustom keyboard-layout-1 "us"
     "The first of three keyboard layouts to cycle through.
 
   Set to nil to have one less keyboard layout."
     :group 'keyboard-layout
     :type 'string)
 
-  (defcustom keyboard-layout-2 nil
+  (defcustom keyboard-layout-2 "epo"
     "The second of three keyboard layouts to cycle through.
 
   Set to nil to have one less keyboard layout."
     :group 'keyboard-layout
     :type 'string)
 
-  (defcustom keyboard-layout-3 nil
+  (defcustom keyboard-layout-3 "de"
     "The third of three keyboard layouts to cycle through.
 
   Set to nil to have one less keyboard layout."
@@ -421,12 +421,6 @@ Then, I use these functions to control setting and cycling the keyboard layout.
       (if new-layout
 	  (set-keyboard-layout new-layout)
 	(message "No keyboard layouts selected."))))
-#+END_SRC
-Lastly, I set my preferred keyboard layouts.
-#+BEGIN_SRC emacs-lisp
-  (setq keyboard-layout-1 "us"
-	keyboard-layout-2 "epo"
-	keyboard-layout-3 "de")
 #+END_SRC
 **** Suspending
 #+BEGIN_SRC emacs-lisp
@@ -1365,17 +1359,15 @@ Originally I had this set up by means of ~custom-set-faces~, but frankly that is
 #+END_SRC
 Then, we need to determine what size to make the text. This is based on the width of the screens I regularly use.
 #+BEGIN_SRC emacs-lisp
-  (let* ((monitor-count (if (string= (window-system) 'x)
-			    (string-to-number
-			     (shell-command-to-string
-			      "xrandr | grep \\* | wc -l"))
-			  1))
-	 (res (/ (display-pixel-width) monitor-count))
+  (let* ((res (if (string= (window-system) 'x)
+		  (string-to-number (shell-command-to-string
+				     (concat "xrandr | grep \\* | awk '{print $1}' | "
+					     "cut -d x -f 1 | sort -nr | head -n 1 | "
+					     "tr '\n' ' ' | sed 's/ //'")))
+		(display-pixel-width)))
 	 (size (if (< res 1920)
 		   100
-		 (if (< res 2880)
-		     150
-		   220))))
+		 150)))
     (set-face-attribute 'default nil :height size))
 #+END_SRC
 *** Window dividers/fringes
