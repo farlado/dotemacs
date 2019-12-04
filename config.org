@@ -1366,7 +1366,7 @@ Then, we need to determine what size to make the text. This is based on the widt
 					     "tr '\n' ' ' | sed 's/ //'")))
 		(display-pixel-width)))
 	 (size (if (< res 1920)
-		   100
+		   80
 		 150)))
     (set-face-attribute 'default nil :height size))
 #+END_SRC
