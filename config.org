@@ -1414,7 +1414,7 @@ Then, we need to determine what size to make the text. This is based on the widt
 			    "cut -d x -f 1 | "
 			    "sort -n | head -n 1")))
 		(/ (display-pixel-width) (display-screens))))
-	   (size (if (<= res 1366) 110
+	   (size (if (<= res 1366) 100
 		   (if (<= res 1920) 150
 		     (if (<= res 2560) 180
 		       (if (<= res 3840) 220
