@@ -1,6 +1,4 @@
 #+TITLE: Farlado's Emacs
-#+SUBTITLE: Farlado's personal Emacs configuration
-#+AUTHOR: Farlado
 #+LANGUAGE: en
 #+OPTIONS: num:nil
 #+STARTUP: overview, inlineimages
@@ -362,6 +360,15 @@ This one uses two windows: one to open the NetworkManager connection editor, and
      "Connections" nil "sudo nm-connection-editor")
     (async-shell-command "nmcli dev wifi list"))
 #+END_SRC
+**** Volume mixer
+For when you need to do volume mixing.
+#+BEGIN_SRC emacs-lisp
+  (defun volume-settings ()
+    "Open pavucontrol to adjust volume."
+    (interactive)
+    (start-process-shell-command
+     "Volume Mixer" nil "pavucontrol"))
+#+END_SRC
 **** Keyboard layout selection
 This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
 #+BEGIN_SRC emacs-lisp
@@ -585,6 +592,7 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 	  ([s-return] . ansi-term)
 	  ([?\s-r]    . monitor-settings)
 	  ([?\s-n]    . network-settings)
+	  ([?\s-v]    . volume-settings)
 
 	  ;; Other desktop environment things
 	  ([?\s-x]       . dmenu)
@@ -1205,19 +1213,21 @@ I use =C-c a= and =C-c C-a= to do things related to my agenda. Only one of my sy
 ** Quality of life settings
 These are just quick things that make ~org-mode~ much easier to use.
 #+BEGIN_SRC emacs-lisp
-    (setq org-pretty-entities t
-	  org-src-fontify-natively t
-	  org-src-tab-acts-natively t
-	  org-src-window-setup 'current-window
-	  org-fontify-whole-heading-line t
-	  org-fontify-done-headline t
-	  org-fontify-quote-and-verse-blocks t
-	  org-highlight-latex-and-related '(latex)
-	  org-enforce-todo-dependencies t
-	  org-agenda-use-time-grid nil
-	  org-agenda-skip-deadline-if-done t
-	  org-agenda-skip-scheduled-if-done t
-	  org-ellipsis "⤵")
+  (setq org-pretty-entities t
+	org-src-fontify-natively t
+	org-src-tab-acts-natively t
+	org-src-window-setup 'current-window
+	org-fontify-whole-heading-line t
+	org-fontify-done-headline t
+	org-fontify-quote-and-verse-blocks t
+	org-highlight-latex-and-related '(latex)
+	org-enforce-todo-dependencies t
+	org-agenda-use-time-grid nil
+	org-agenda-skip-deadline-if-done t
+	org-agenda-skip-scheduled-if-done t
+	org-ellipsis (if (string= (window-system) 'x)
+			 "⤵"
+		       "..."))
 #+END_SRC
 ** Shortcuts for various snippets in org-mode
 This will expand as I get into more and more languages and take more notes in classes with different snippets of different languages.
@@ -1247,6 +1257,33 @@ Since obviously dot snippets are purely harmless, I just don't bother with havin
 ** Load various languages in org-babel
 #+BEGIN_SRC emacs-lisp
   (org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
+#+END_SRC
+** In graphical environments
+#+BEGIN_SRC emacs-lisp :exports none
+  (when (window-system)
+#+END_SRC
+*** Fancy symbol for collapsed items
+Just makes ~org-mode~ look a little fancier, no distinct changes.
+#+BEGIN_SRC emacs-lisp
+  (setq org-ellipsis "⤵")
+#+END_SRC
+*** org-bullets package (nicer bullet points in org-mode)
+It's kinda slow, but bullet points are very very nice, much better than asterisks.
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :defer t
+    :init
+    (add-hook 'org-mode-hook 'org-bullets-mode)
+    (setq inhibit-compacting-font-caches t))
+#+END_SRC
+*** Hide emphasis markers in org-mode
+Just a point of /personal preference./ I was considering keeping this in for non-graphical environments, but I can't always trust that there will be support for the different representations of text.
+#+BEGIN_SRC emacs-lisp
+  (setq org-hide-emphasis-markers t)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :exports none
+  )
 #+END_SRC
 * Programming
 This is quite barren, but mostly because my needs are not currently particularly that big.
@@ -1432,22 +1469,7 @@ It's subtle on my theme, but it still helps me keep track of my brackets and par
     :init
     (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 #+END_SRC
-*** org-bullets package (nicer bullet points in org-mode)
-It's kinda slow, but bullet points are very very nice, much better than asterisks.
 #+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :ensure t
-    :defer t
-    :init
-    (add-hook 'org-mode-hook 'org-bullets-mode)
-    (setq inhibit-compacting-font-caches t))
-#+END_SRC
-*** Hide emphasis markers in org-mode
-Just a point of /personal preference./ I was considering keeping this in for non-graphical environments, but I can't always trust that there will be support for the different representations of text.
-#+BEGIN_SRC emacs-lisp
-  (setq org-hide-emphasis-markers t)
-#+END_SRC
-#+BEGIN_SRC emacs-lisp :exports none
   )
 #+END_SRC
 ** Mode line
