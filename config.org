@@ -1,4 +1,6 @@
 #+TITLE: Farlado's Emacs
+#+SUBTITLE: A less-than-sane Emacs configuration
+#+AUTHOR: Farlado
 #+LANGUAGE: en
 #+OPTIONS: num:nil
 #+STARTUP: overview, inlineimages
@@ -1282,6 +1284,15 @@ Just a point of /personal preference./ I was considering keeping this in for non
 #+BEGIN_SRC emacs-lisp
   (setq org-hide-emphasis-markers t)
 #+END_SRC
+*** epresent package
+It's gonna need more polish, but it works.
+#+BEGIN_SRC emacs-lisp
+  (use-package epresent
+    :ensure t
+    :defer t
+    :bind (:map org-mode-map
+		("C-c p" . epresent-run)))
+#+END_SRC
 #+BEGIN_SRC emacs-lisp :exports none
   )
 #+END_SRC
@@ -1362,6 +1373,7 @@ I like having line numbers. However, I don't like line numbers in modes where it
   (disable-line-numbers-for 'ibuffer-hook)
   (disable-line-numbers-for 'dashboard-mode-hook)
   (disable-line-numbers-for 'shell-mode-hook)
+  (disable-line-numbers-for 'epresent-mode-hook)
   (disable-line-numbers-for 'nov-mode-hook)
 #+END_SRC
 *** Highlight matching parentheses et al. when hovering near one
