@@ -591,7 +591,7 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 	  ([?\s-t]    . run-telegram)
 	  ([?\s-d]    . run-discord)
 	  ([?\s-s]    . run-steam)
-	  ([s-return] . ansi-term)
+	  ([s-return] . run-terminal)
 	  ([?\s-r]    . monitor-settings)
 	  ([?\s-n]    . network-settings)
 	  ([?\s-v]    . volume-settings)
@@ -821,13 +821,13 @@ To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make
 * Other Emacs goodies
 This is other stuff I use in Emacs.
 ** Terminal
-I've been jumping between ~vterm~ and ~ansi-term~ but ~ansi-term~ seems to support more of the fancy stuff I like about Emacs. This ensures ~ansi-term~ always starts with my default shell.
+I've been jumping between ~vterm~ and ~ansi-term~. I guess ~vterm~ wins out for being so much simpler to configure. Regardless, I use an alias ~run-terminal~ so that I only have to change this single block, instead of other blocks as well.
 #+BEGIN_SRC emacs-lisp
-  (defvar my-term-shell "/bin/zsh"
-    "The shell to start `term' and `ansi-term' with.")
-  (defadvice ansi-term (before force-bash)
-    (interactive (list my-term-shell)))
-  (ad-activate 'ansi-term)
+  (use-package vterm
+    :ensure t
+    :defer t)
+
+  (defalias 'run-terminal 'vterm)
 #+END_SRC
 ** Reading the manpages
 Wow, there's actually an Emacs mode for this!
@@ -1366,7 +1366,7 @@ I like having line numbers. However, I don't like line numbers in modes where it
     (add-hook hook (lambda ()
 		     (display-line-numbers-mode -1))))
 
-  (disable-line-numbers-for 'term-mode-hook)
+  (disable-line-numbers-for 'vterm-mode-hook)
   (disable-line-numbers-for 'tetris-mode-hook)
   (disable-line-numbers-for 'snake-mode-hook)
   (disable-line-numbers-for 'sudoku-mode-hook)
