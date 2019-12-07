@@ -1361,20 +1361,17 @@ I like having line numbers. However, I don't like line numbers in modes where it
 #+BEGIN_SRC emacs-lisp
   (global-display-line-numbers-mode 1)
 
-  (defun disable-line-numbers-for (hook)
-    "Disable `display-line-numbers-mode` for HOOK."
-    (add-hook hook (lambda ()
-		     (display-line-numbers-mode -1))))
-
-  (disable-line-numbers-for 'vterm-mode-hook)
-  (disable-line-numbers-for 'tetris-mode-hook)
-  (disable-line-numbers-for 'snake-mode-hook)
-  (disable-line-numbers-for 'sudoku-mode-hook)
-  (disable-line-numbers-for 'ibuffer-hook)
-  (disable-line-numbers-for 'dashboard-mode-hook)
-  (disable-line-numbers-for 'shell-mode-hook)
-  (disable-line-numbers-for 'epresent-mode-hook)
-  (disable-line-numbers-for 'nov-mode-hook)
+  (dolist (hook '(nov-mode-hook
+		  tetris-mode-hook
+		  snake-mode-hook
+		  sudoku-mode-hook
+		  shell-mode-hook
+		  Buffer-menu-mode-hook
+		  dashboard-mode-hook
+		  vterm-mode-hook
+		  shell-mode-hook
+		  epresent-mode-hook))
+    (add-hook 'hook (lambda () (display-line-numbers-mode -1))))
 #+END_SRC
 *** Highlight matching parentheses et al. when hovering near one
 #+BEGIN_SRC emacs-lisp
