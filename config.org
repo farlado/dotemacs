@@ -1134,13 +1134,14 @@ I wanted a way to quickly and gracefully destroy all my open stuff at once.
 
   (global-set-key (kbd "C-x C-M-k") 'close-buffers-and-windows)
 #+END_SRC
-** Use buffer-menu on C-x b so the buffer list doesn't open a new window
+** Use buffer-menu on =C-x b= so the buffer list doesn't open a new window
 Just another point of personal convenience. I don't like ~ibuffer~ just because aesthetic reasons. I also set Q to close the window, for convenience.
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x b") 'buffer-menu)
   (global-unset-key (kbd "C-x C-b"))
 
-  (define-key Buffer-menu-mode-map (kbd "Q") 'kill-buffer-and-window)
+  (define-key Buffer-menu-mode-map (kbd "q") 'kill-this-buffer)
+  (define-key Buffer-menu-mode-map (kbd "Q") 'kill-this-buffer-and-window)
 #+END_SRC
 ** Move focus and show buffer-menu when explicitly creating new windows
 This to me is preferable to the default behavior.
@@ -1162,7 +1163,7 @@ This to me is preferable to the default behavior.
   (global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
   (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
 #+END_SRC
-** Balance windows with C-c b
+** Balance windows with =C-c b=
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c b") 'balance-windows)
 #+END_SRC
@@ -1175,7 +1176,8 @@ To make this easier, I just make a keymap for ~windmove~ and bind the keymap to 
       (define-key map (kbd "a") 'windmove-left)
       (define-key map (kbd "s") 'windmove-down)
       (define-key map (kbd "d") 'windmove-right)
-      map))
+      map)
+    "A keymap for `windmove' functions.")
 
   (global-set-key (kbd "C-x o") windmove-map)
 #+END_SRC
@@ -1192,7 +1194,8 @@ Just like for ~windmove~, I define a keymap and this time bind it to =C-x C-o=.
 	(define-key map (kbd "a") 'buf-move-left)
 	(define-key map (kbd "s") 'buf-move-down)
 	(define-key map (kbd "d") 'buf-move-right)
-	map))
+	map)
+      "A keymap for `buffer-move' functions.")
     (global-set-key (kbd "C-x C-o") buf-move-map))
 #+END_SRC
 * Org-mode
@@ -1252,7 +1255,7 @@ This is exactly what I was looking for lmao
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
 #+END_SRC
 ** Skip confirming whether to evaluate dot snippets
-Since obviously dot snippets are purely harmless, I just don't bother with having to confirm evaluation every time I try to update a graphic.
+Since obviously dot snippets are purely harmless +as far as I know+, I just don't bother with having to confirm evaluation every time I try to update a graphic.
 #+BEGIN_SRC emacs-lisp
   (setq org-confirm-babel-evaluate '(lambda (lang body) (not (string= lang "dot"))))
 #+END_SRC
@@ -1310,7 +1313,7 @@ I used to use a terminal for this, but holy crap this is a lot easier, a lot fas
 	       ("Q" . kill-this-buffer-and-window)))
 #+END_SRC
 ** flycheck package (on-the-fly syntax checker)
-This is nice to have so I can be told right away when I'm doing something wrong.
+This is nice to have so I can be told right away when I'm doing something wrong. However, I /DON'T/ want to see all the stuff about documentation for elisp.
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :ensure t
@@ -1414,7 +1417,7 @@ Originally I had this set up by means of ~custom-set-faces~, but frankly that is
   (when (member "Iosevka" (font-family-list))
       (set-face-attribute 'default nil :font "Iosevka"))
 #+END_SRC
-Then, we need to determine what size to make the text. This is based on the width of the screens I regularly use.
+Then, we need to determine what size to make the text. This is based on the width of the screens I regularly use. It uses shell commands for X window systems and built-in functions for Windows.
 #+BEGIN_SRC emacs-lisp
   (let* ((res (if (string= (window-system) 'x)
 		  (string-to-number
