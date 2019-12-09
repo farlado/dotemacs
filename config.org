@@ -1,4 +1,4 @@
-#+STARTUP: inlineimages
+p#+STARTUP: inlineimages
 #+OPTIONS: num:nil
 #+LANGUAGE: en
 #+TITLE: Farlado's Emacs
@@ -835,7 +835,6 @@ Wow, there's actually an Emacs mode for this!
   (global-set-key (kbd "C-c m") 'man)
 #+END_SRC
 ** Calculator
-I love this. I really really really *really* love this. I can use my number pad exclusively to call a calculator and then use the number pad to close it as well.
 #+BEGIN_SRC emacs-lisp
   (require 'calc)
 
@@ -876,20 +875,29 @@ Not the best way to do epub reading, but at least it's in Emacs.
     :init
     (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 #+END_SRC
-** Sudoku
+** Games
+*** Chess
+Just for fun. I suck but it's nice.
+#+BEGIN_SRC emacs-lisp
+  (use-package chess
+    :ensure t
+    :defer t
+    :bind ("C-c M-c" . chess))
+#+END_SRC
+*** Sudoku
 I /love/ sudoku puzzles.
 #+BEGIN_SRC emacs-lisp
   (use-package sudoku
     :ensure t
     :defer t
-    :bind ("C-c s" . sudoku))
+    :bind ("C-c M-s" . sudoku))
 #+END_SRC
-** Tetris
+*** Tetris
 God I love playing Tetris
 #+BEGIN_SRC emacs-lisp
   (require 'tetris)
 
-  (global-set-key (kbd "C-c t") 'tetris)
+  (global-set-key (kbd "C-c M-t") 'tetris)
 
   (define-key tetris-mode-map "a"     'tetris-move-left)
   (define-key tetris-mode-map "s"     'tetris-move-down)
@@ -906,6 +914,14 @@ God I love playing Tetris
 
   (define-key tetris-mode-map "r"     'tetris-start-game)
   (define-key tetris-mode-map "e"     'tetris-end-game)
+#+END_SRC
+*** 2048
+A simple and fun game
+#+BEGIN_SRC emacs-lisp
+  (use-package 2048-game
+    :ensure t
+    :defer t
+    :bind ("C-c M-2" . 2048-game))
 #+END_SRC
 * General Functionality
 This is just stuff not pertaining to a specific task and/or not complex enough to warrant entire sections for them.
@@ -1322,6 +1338,15 @@ This is nice to have so I can be told right away when I'm doing something wrong.
     (global-flycheck-mode 1)
     (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 #+END_SRC
+** avy-flycheck package (avy but also flycheck)
+This one is SUPER COOL.
+#+BEGIN_SRC emacs-lisp
+  (use-package avy-flycheck
+    :ensure t
+    :defer t
+    :bind (:map prog-mode-map
+		("C-c '" . avy-flycheck-goto-error)))
+#+END_SRC
 ** company-jedi package (Python autocompletion)
 I will probably be adding company autocompletion for more languages as I start working in more languages.
 #+BEGIN_SRC emacs-lisp
@@ -1374,7 +1399,7 @@ I like having line numbers. However, I don't like line numbers in modes where it
 		  vterm-mode-hook
 		  shell-mode-hook
 		  epresent-mode-hook))
-    (add-hook 'hook (lambda () (display-line-numbers-mode -1))))
+    (add-hook hook (lambda () (display-line-numbers-mode -1))))
 #+END_SRC
 *** Highlight matching parentheses et al. when hovering near one
 #+BEGIN_SRC emacs-lisp
@@ -1406,9 +1431,6 @@ I used to hate light themes. I'm not in that camp anymore. This theme is /elegan
     :ensure t
     :defer t
     :init
-    (setq org-fontify-whole-heading-line t
-	  leuven-scale-org-agenda-structure t
-	  leuven-scale-outline-headlines t)
     (load-theme 'leuven t))
 #+END_SRC
 *** Font
