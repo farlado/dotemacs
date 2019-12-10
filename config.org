@@ -1,4 +1,3 @@
-p#+STARTUP: inlineimages
 #+OPTIONS: num:nil
 #+LANGUAGE: en
 #+TITLE: Farlado's Emacs
