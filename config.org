@@ -14,7 +14,6 @@ Everything has different dependencies so make sure you have what you need.
 - Painfully obvious here: ~xorg~
 - Always hiding the cursor while typing: ~xbanish~
 - Compositor: ~xcompmgr~
-- Notification Daemon: ~dunst~
 - Network Configuration: ~nm-connection-editor~
 - Web Browser: ~firefox~
 - Editing Crappy Documents: ~libreoffice~
@@ -68,6 +67,11 @@ I probably don't have to do this but it makes things work a little smoother.
   (set-keyboard-coding-system 'utf-8)
   (set-selection-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
+#+END_SRC
+** Always load newest byte code
+Ensures everything works as intended.
+#+BEGIN_SRC emacs-lisp
+  (setq load-prefer-newer t)
 #+END_SRC
 ** dashboard package (replacement start screen)
 I love the default start screen, but it just doesn't cut it for me. I just use this to have a nice screen when I start Emacs or close all my buffers.
@@ -681,12 +685,6 @@ This block sets the keyboard layout to US and give Caps Lock the functionality o
 #+BEGIN_SRC emacs-lisp
   (shell-command "setxkbmap us -option ctrl:nocaps")
 #+END_SRC
-*** Audio
-Make sure ~pulseaudio~ is running if it is installed.
-#+BEGIN_SRC emacs-lisp
-  (if (executable-find "pulseaudio")
-      (shell-command "pulseaudio --start"))
-#+END_SRC
 *** Load .Xresources
 ...if it exists, of course.
 #+BEGIN_SRC emacs-lisp
@@ -698,12 +696,6 @@ I don't need it, but having basic compositing is very nice.
 #+BEGIN_SRC emacs-lisp
     (start-process-shell-command
      "Compositor" nil "xcompmgr")
-#+END_SRC
-*** Notification manager
-I haven't integrated notifications into Emacs just yet, sadly.
-#+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Notifications" nil "dunst")
 #+END_SRC
 *** Always hide the cursor when typing
 Just a personal preference, I don't like seeing the cursor when I'm pressing keys.
@@ -931,9 +923,11 @@ I don't use auto-saves and backups. I love living on the edge.
 	auto-save-default nil)
 #+END_SRC
 ** Make scrolling a little less crazy
-One of those things I just don't know how specifically it works but it makes things comfortable.
+Now even more comfy.
 #+BEGIN_SRC emacs-lisp
-  (setq scroll-conservatively 100)
+  (setq scroll-margin 0
+	scroll-conservatively 100000
+	scroll-preserve-screen-position 1)
 #+END_SRC
 ** Enable word wrapping for all buffers
 It's literally never not annoying when words don't wrap.
