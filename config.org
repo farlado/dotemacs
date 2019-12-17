@@ -78,7 +78,6 @@ I love the default start screen, but it just doesn't cut it for me. I just use t
     :defer t
     :init
     (setq inhibit-start-menu t
-	  inhibit-startup-message t
 	  dashboard-items '((recents . 10))
 	  show-week-agenda-p t
 	  dashboard-banner-logo-title "Welcome to GNU Emacs"
@@ -101,11 +100,9 @@ I don't want to have to manually update my stuff. This solution is literally plo
     (auto-package-update-maybe))
 #+END_SRC
 * Making Emacs a desktop environment
-Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness. Also not included in exports is a function used to make Emacs fullscreen ASAP.
+Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness.
 #+BEGIN_SRC emacs-lisp :exports none
-  (when (and (string= (window-system) 'x)
-	   (not (= (shell-command "wmctrl -m") 0)))
-    (set-frame-parameter nil 'fullscreen 'fullboth)
+  (when run-emacs-as-desktop-environment?
 #+END_SRC
 ** Configuration
 *** exwm package (base window manager)
@@ -241,7 +238,7 @@ Haha yes, this is very long and very very stupid.
 		" --veriftext='' --wrongtext='WRONG' --force-clock"))
 #+END_SRC
 *** Workspace configuration
-No clue why you have to do so much just to give workspaces names, but at least you can do it. I also put which monitors to try to put workspaces onto here.
+No clue why you have to do so much just to give workspaces names, but at least you can do it. I also put which monitors to try to put workspaces onto here, alongside a few other useful settings for which windows should float and which workspaces they should be on.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-workspace-number 3
 	exwm-workspace-index-map (lambda (index)
@@ -253,7 +250,15 @@ No clue why you have to do so much just to give workspaces names, but at least y
 					    0 "eDP-1-1"
 					    0 "DP-1-2-2"
 					    1 "DP-1-2-1"
-					    2 "DP-1-2-3"))
+					    2 "DP-1-2-3")
+	exwm-manage-configurations '(((string= exwm-class-name "Steam")
+				      workspace 0 floating t floating-mode-line nil)
+				     ((string= exwm-instance-name "telegram")
+				      workspace 2)
+				     ((string= exwm-class-name "discord")
+				      workspace 1)
+				     ((string= exwm-title "Event Tester")
+				      floating t)))
 #+END_SRC
 *** Multi-head
 I have been trying to make this into an elisp function, but for now I'm still stuck with a shell script.
@@ -267,27 +272,14 @@ I have been trying to make this into an elisp function, but for now I'm still st
 *** Name EXWM buffers after the window title
 This was annoying when I first installed EXWM. Thankfully this is a very easy fix.
 #+BEGIN_SRC emacs-lisp
-    (add-hook 'exwm-update-title-hook
-	      (lambda ()
-		(exwm-workspace-rename-buffer exwm-title)))
-#+END_SRC
-*** Assign workspaces and floating to various windows
-This is the part of the window manager configuration which is just how to control X windows as they spawn.
-#+BEGIN_SRC emacs-lisp
-  (setq exwm-manage-configurations
-	'(((string= exwm-class-name "Steam")
-	   workspace 0 floating t floating-mode-line nil)
-	  ((string= exwm-instance-name "telegram")
-	   workspace 2)
-	  ((string= exwm-class-name "discord")
-	   workspace 1)
-	  ((string= exwm-title "Event Tester")
-	   floating t)))
+  (add-hook 'exwm-update-title-hook
+	    (lambda ()
+	      (exwm-workspace-rename-buffer exwm-title)))
 #+END_SRC
 *** Ensure Java applications know the WM is non-reparenting
 Stolen from the ~.xinitrc~ included with ~EXWM~.
 #+BEGIN_SRC emacs-lisp
-  (shell-command "export _JAVA_AWT_WM_NONREPARENTING=1")
+  (setenv "_JAVA_AWT_WM_NONREPARENTING" "1")
 #+END_SRC
 *** Configure floating window borders
 Uses the same color as my mode line, uses the same width as window divider width. See below.
@@ -367,7 +359,7 @@ This one uses two windows: one to open the NetworkManager connection editor, and
     "Open a NetworkManager connection editor."
     (interactive)
     (start-process-shell-command
-     "Connections" nil "sudo nm-connection-editor")
+     "Connections" nil "nm-connection-editor")
     (async-shell-command "nmcli dev wifi list"))
 #+END_SRC
 **** Volume mixer
@@ -383,7 +375,8 @@ For when you need to do volume mixing.
 This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
 #+BEGIN_SRC emacs-lisp
   (defgroup keyboard-layout nil
-    "Keyboard layouts for `cycle-keyboard-layout' and `cycle-keyboard-layout-reverse'")
+    "Keyboard layouts to cycle through."
+    :group 'environment)
 
   (defcustom keyboard-layout-1 "us"
     "The first of three keyboard layouts to cycle through.
@@ -453,7 +446,7 @@ Then, I use these functions to control setting and cycling the keyboard layout.
   (defun suspend-computer ()
     (interactive)
     (when (yes-or-no-p "Really suspend? ")
-      (shell-command "sudo zzz || sudo systemctl suspend")))
+      (shell-command "suspend")))
 
   (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
 #+END_SRC
@@ -508,7 +501,7 @@ I copied the function for quitting Emacs to handle shutting down.
        (run-hook-with-args-until-failure 'kill-emacs-query-functions)
        (or (null confirm)
 	   (funcall confirm "Really shut down? "))
-       (shell-command "sudo shutdown -h now")
+       (shell-command "shutdown now")
        (kill-emacs))))
 
   (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
@@ -564,7 +557,7 @@ I copied the function for quitting Emacs to handle reboot too.
        (run-hook-with-args-until-failure 'kill-emacs-query-functions)
        (or (null confirm)
 	   (funcall confirm "Really reboot? "))
-       (shell-command "sudo reboot")
+       (shell-command "reboot")
        (kill-emacs))))
 
   (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
@@ -678,17 +671,17 @@ Just a personal preference, I don't like seeing the cursor when I'm pressing key
 *** Disable screen blanking
 I don't need my laptop's screen shutting off just because I'm sitting and watching a video too long.
 #+BEGIN_SRC emacs-lisp
-  (shell-command "xset s off -dpms")
+  (shell-command "xset s off -dpms 1> /dev/null 2> /dev/null")
 #+END_SRC
 *** Keyboard configuration
 This block sets the keyboard layout to US and give Caps Lock the functionality of Control. I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
 #+BEGIN_SRC emacs-lisp
-  (shell-command "setxkbmap us -option ctrl:nocaps")
+  (shell-command "setxkbmap us -option ctrl:nocaps 1> /dev/null 2> /dev/null")
 #+END_SRC
 *** Set fallback cursor
 Some X windows will have weird cursors if this isn't done.
 #+BEGIN_SRC emacs-lisp
-  (shell-command "xsetroot -cursor_name left_ptr")
+  (shell-command "xsetroot -cursor_name left_ptr 1> /dev/null 2> /dev/null")
 #+END_SRC
 *** Compositor
 I don't need it, but having basic compositing is very nice.
@@ -774,7 +767,7 @@ I do a crapload here, but basically the two main things I do here is configure m
 ** Binding all the keys
 To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make sure the conditions for EXWM are met.
 #+BEGIN_SRC emacs-lisp
-  (let ((func  (if (= (shell-command "wmctrl -m | grep EXWM") 0)
+  (let ((func  (if run-emacs-as-desktop-environment?
 		   'exwm-bind-key
 		 'global-set-key)))
     ;; Base functions
@@ -964,7 +957,12 @@ Why even is this a key that is bound to begin with?
 		 "C-x C-z"))
     (global-unset-key (kbd key)))
 #+END_SRC
-** Restart and open dashboard with =C-c d=
+** Change current directory with =C-c d=
+Useful when things get especially annoying!
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c d") 'cd)
+#+END_SRC
+** Restart and open dashboard with =C-c C-d=
 I constantly accidentally close dashboard, so I made a way to open it again if I accidentally kill it.
 #+BEGIN_SRC emacs-lisp
   (defun dashboard-restart ()
@@ -973,7 +971,7 @@ I constantly accidentally close dashboard, so I made a way to open it again if I
     (dashboard-insert-startupify-lists)
     (switch-to-buffer "*dashboard*"))
 
-  (global-set-key (kbd "C-c d") 'dashboard-restart)
+  (global-set-key (kbd "C-c C-d") 'dashboard-restart)
 #+END_SRC
 ** Open configuration with =C-c e=
 Since this thing is changing all the time, I really like having it available on a shortcut.

@@ -1,11 +1,20 @@
-;; hide dumb things immediately
+;; Hide dumb things immediately
 (menu-bar-mode -1)
 (tooltip-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (setq use-dialog-box nil)
 
-;; package manager init
+;; Determine whether to run Emacs as a desktop environment
+(defvar run-emacs-as-desktop-environment?
+  (not (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 0))
+  "Determine whether or not to load Emacs as a desktop environment.")
+
+;; If so, go fullscreen
+(when run-emacs-as-desktop-environment?
+  (set-frame-parameter nil 'fullscreen 'fullboth))
+
+;; Package manager
 (require 'package)
 (setq package-enable-at-startup nil
       package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
