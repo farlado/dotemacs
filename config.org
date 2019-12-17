@@ -31,10 +31,6 @@ Everything has different dependencies so make sure you have what you need. The e
 *** EMMS
 - For playing music: ~mpd~, ~mpc~
 - For playing video: ~mpv~
-*** vterm
-- Makefile parsing: ~cmake~
-- Compiling: I recommend ~gcc~
-- Make dependency: ~libtool~
 *** nov
 - To open epub files: ~ebook-tools~
 *** graphviz-dot-mode
@@ -135,6 +131,19 @@ Since I'm using Emacs as a window manager, I need dmenu so I can open X windows 
   (use-package dmenu
     :ensure t
     :defer t)
+#+END_SRC
+*** system-packages package (manage system packages in Emacs)
+This one is a pleasant surprise to have honestly. Having Emacs handle system packages as well as its own is a very pleasant surprise.
+#+BEGIN_SRC emacs-lisp
+  (use-package system-packages
+    :ensure t
+    :defer t
+    :bind (("C-c p i"   . system-packages-install)
+	   ("C-c p u"   . system-packages-update)
+	   ("C-c p r"   . system-packages-uninstall)
+	   ("C-c p C-r" . system-packages-remove-orphans)
+	   ("C-c p s"   . system-packages-search)
+	   ("C-c p n"   . system-packages-get-info)))
 #+END_SRC
 *** desktop-environment package (take a guess what it does)
 Previously I had to define a lot of functions to do these things, now I just change settings within ~desktop-environment~.
@@ -807,13 +816,17 @@ To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make
 * Other Emacs goodies
 This is other stuff I use in Emacs.
 ** Terminal
-I've been jumping between ~vterm~ and ~ansi-term~. I guess ~vterm~ wins out for being so much simpler to configure. Regardless, I use an alias ~run-terminal~ so that I only have to change this single block, instead of other blocks as well.
+I've been jumping between ~vterm~ and ~ansi-term~. I guess ~ansi-term~ wins out because ~vterm~ does not actually provide much benefit in comparison. Regardless, I use an alias ~run-terminal~ so that I only have to change this single block, instead of other blocks as well.
 #+BEGIN_SRC emacs-lisp
-  (use-package vterm
-    :ensure t
-    :defer t)
+  (defvar ansi-term-shell "/bin/zsh"
+    "The default shell for `ansi-term' if the environment variable SHELL is not set.")
 
-  (defalias 'run-terminal 'vterm)
+  (defadvice ansi-term (before force-bash)
+    (interactive (list (or (getenv "SHELL")
+			  ansi-term-shell))))
+  (ad-activate 'ansi-term)
+
+  (defalias 'run-terminal 'ansi-term)
 #+END_SRC
 ** Reading the manpages
 Wow, there's actually an Emacs mode for this!
@@ -839,16 +852,28 @@ Picking a service to use for this was a pain. I ended up settling for wttrin bec
     :ensure t
     :defer t
     :init
+    (defvar wttrin-default-location "Indianapolis, IN"
+      "A default location for `wttrin-local'.")
     (defun wttrin-local ()
-      "Show a weather report for a given locality."
+      "Show a weather report for `wttrin-default-location'."
       (interactive)
-      (wttrin "Indianapolis, IN")
-      (delete-other-windows))
+      (save-window-excursion
+	(unwind-protect
+	    (progn (wttrin wttrin-default-city)
+		   (delete-other-windows)
+		   (while (not (string= (read-key-sequence "") 'q)) (message ""))
+		   (message ""))
+	 (kill-buffer))))
     (defun wttrin-not-local ()
       "Show a weather report for a user-defined locality."
       (interactive)
-      (wttrin)
-      (delete-other-windows))
+      (save-window-excursion
+	(unwind-protect
+	    (progn (wttrin (read-string "Get weather for: "))
+		   (delete-other-windows)
+		   (while (not (string= (read-key-sequence "") 'q)) (message ""))
+		   (message ""))
+	 (kill-buffer))))
     :bind (("C-c w" . wttrin-local)
 	   ("C-c C-w" . wttrin-not-local)))
 #+END_SRC
@@ -1298,7 +1323,7 @@ It's gonna need more polish, but it works.
     :ensure t
     :defer t
     :bind (:map org-mode-map
-		("C-c p" . epresent-run)))
+		("C-c r" . epresent-run)))
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :exports none
   )
@@ -1384,7 +1409,7 @@ I like having line numbers. However, I don't like line numbers in modes where it
 		  shell-mode-hook
 		  Buffer-menu-mode-hook
 		  dashboard-mode-hook
-		  vterm-mode-hook
+		  term-mode-hook
 		  shell-mode-hook
 		  epresent-mode-hook))
     (add-hook hook (lambda () (display-line-numbers-mode -1))))
