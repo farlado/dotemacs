@@ -1,8 +1,6 @@
 #+OPTIONS: num:nil
 #+LANGUAGE: en
 #+TITLE: Farlado's Emacs
-#+SUBTITLE: A less-than-sane Emacs configuration
-#+AUTHOR: Farlado
 
 * Installation
 ** Summary
