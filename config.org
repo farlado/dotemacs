@@ -78,7 +78,6 @@ I love the default start screen, but it just doesn't cut it for me. I just use t
     :defer t
     :init
     (setq inhibit-start-menu t
-	  inhibit-startup-message t
 	  dashboard-items '((recents . 10))
 	  show-week-agenda-p t
 	  dashboard-banner-logo-title "Welcome to GNU Emacs"
@@ -303,14 +302,16 @@ It's an Elisp function now, woo! It's very spaghetti, but it /kinda/ works so it
 	    (setq command (concat command output primary rate res rotate pos)))))
       (start-process-shell-command
        "Display Setup" nil command))
-    (let ((trackball (when (= (shell-command "xinput list | grep ELECOM > /dev/null") 0)
-		       (shell-command-to-string
-			(concat "xinput list | grep ELECOM | head -n 1 | "
-				"sed -r 's/.*id=([0-9]+).*/\\1/' | tr '\n' ' '"))))
-	  (trackpad (when (= (shell-command "xinput list | grep Synaptics > /dev/null") 0)
-		      (shell-command-to-string
-		       (concat "xinput list | grep Synaptics | head -n 1 | "
-			       "sed -r 's/.*id=([0-9]+).*/\\1/' | tr '\n' ' '"))))
+    (let ((trackball (if (= (shell-command "xinput list | grep ELECOM > /dev/null") 0)
+			 (shell-command-to-string
+			  (concat "xinput list | grep ELECOM | head -n 1 | "
+				  "sed -r 's/.*id=([0-9]+).*/\\1/' | tr '\n' ' '"))
+		       nil))
+	  (trackpad (if (= (shell-command "xinput list | grep Synaptics > /dev/null") 0)
+			(shell-command-to-string
+			 (concat "xinput list | grep Synaptics | head -n 1 | "
+				 "sed -r 's/.*id=([0-9]+).*/\\1/' | tr '\n' ' '"))
+		      nil)))
       (when trackball
 	(start-process-shell-command
 	 "Trackball Setup" nil (concat "sleep 2 && xinput set-prop " trackball
@@ -751,8 +752,8 @@ Some X windows will have weird cursors if this isn't done.
 *** Compositor
 I don't need it, but having basic compositing is very nice.
 #+BEGIN_SRC emacs-lisp
-    (start-process-shell-command
-     "Compositor" nil "xcompmgr")
+  (start-process-shell-command
+   "Compositor" nil "xcompmgr")
 #+END_SRC
 *** Start EXWM
 #+BEGIN_SRC emacs-lisp
