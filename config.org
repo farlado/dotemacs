@@ -47,15 +47,6 @@ Everything has different dependencies so make sure you have what you need. The e
 - For Python: ~pylint~, ~jedi~
 - For Haskell: ~stack~
 * Startup
-** Hide things ASAP
-I hate having to look at these every time my system starts up. Who even uses the toolbar in Emacs?
-#+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
-  (tooltip-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  (setq use-dialog-box nil)
-#+END_SRC
 ** Start Emacs server
 Although I technically don't /have/ to do this, it is very helpful.
 #+BEGIN_SRC emacs-lisp

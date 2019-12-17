@@ -1,3 +1,10 @@
+;; hide dumb things immediately
+(menu-bar-mode -1)
+(tooltip-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(setq use-dialog-box nil)
+
 ;; package manager init
 (require 'package)
 (setq package-enable-at-startup nil
