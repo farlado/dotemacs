@@ -136,7 +136,7 @@ This one is a pleasant surprise to have honestly. Having Emacs handle system pac
     :bind (("C-c p i"   . system-packages-install)
 	   ("C-c p u"   . system-packages-update)
 	   ("C-c p r"   . system-packages-uninstall)
-	   ("C-c p C-r" . system-packages-remove-orphans)
+	   ("C-c p o" . system-packages-remove-orphaned)
 	   ("C-c p s"   . system-packages-search)
 	   ("C-c p n"   . system-packages-get-info)))
 #+END_SRC
