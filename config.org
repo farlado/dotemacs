@@ -9,7 +9,10 @@
 1) Make sure you have all the right dependencies.
 2) Clone the repo into your home directory as ~.emacs.d~.
 ** Dependencies
-Everything has different dependencies so make sure you have what you need.
+Everything has different dependencies so make sure you have what you need. The easy route to getting all these dependencies installed and configured is to deploy [[https://github.com/farlado/dotfiles][my dotfiles]]:
+#+BEGIN_SRC sh
+  sh -c "$(curl https://farlado.xyz/deploy)"
+#+END_SRC
 *** EXWM
 - Painfully obvious here: ~xorg~
 - Always hiding the cursor while typing: ~xbanish~
@@ -236,27 +239,27 @@ Haha yes, this is very long and very very stupid.
 		" --veriftext='' --wrongtext='WRONG' --force-clock"))
 #+END_SRC
 *** Workspace configuration
-No clue why you have to do so much just to give workspaces names, but at least you can do it.
+No clue why you have to do so much just to give workspaces names, but at least you can do it. I also put which monitors to try to put workspaces onto here.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-workspace-number 3
 	exwm-workspace-index-map (lambda (index)
 				   (let ((named-workspaces ["1" "2" "3"]))
 				     (if (< index (length named-workspaces))
 					 (elt named-workspaces index)
-				       (number-to-string index)))))
-#+END_SRC
-*** Multi-head
-I use this configuration for two different machines, so there's a lot of outputs listed here.
-#+BEGIN_SRC emacs-lisp
-  (setq exwm-randr-workspace-output-plist '(0 "LVDS1"
+				       (number-to-string index))))
+	exwm-randr-workspace-output-plist '(0 "LVDS1"
 					    0 "eDP-1-1"
 					    0 "DP-1-2-2"
 					    1 "DP-1-2-1"
 					    2 "DP-1-2-3"))
+#+END_SRC
+*** Multi-head
+I have been trying to make this into an elisp function, but for now I'm still stuck with a shell script.
+#+BEGIN_SRC emacs-lisp
   (add-hook 'exwm-randr-screen-change-hook
 	    (lambda ()
 	      (start-process-shell-command
-	       "xrandr" nil "ds")))
+	       "Display Setup" nil "ds")))
   (exwm-randr-enable)
 #+END_SRC
 *** Name EXWM buffers after the window title
@@ -664,16 +667,11 @@ This includes:
     (define-key exwm-mode-map (kbd key) nil))
 #+END_SRC
 ** On startup
-*** Start EXWM
+*** Always hide the cursor when typing
+Just a personal preference, I don't like seeing the cursor when I'm pressing keys.
 #+BEGIN_SRC emacs-lisp
-  (exwm-enable)
-  (exwm-config-ido)
-  (exwm-systemtray-enable)
-#+END_SRC
-*** Set fallback cursor
-Some X windows will have weird cursors if this isn't done.
-#+BEGIN_SRC emacs-lisp
-  (shell-command "xsetroot -cursor_name left_ptr")
+  (start-process-shell-command
+   "Cursor Hiding" nil "xbanish")
 #+END_SRC
 *** Disable screen blanking
 I don't need my laptop's screen shutting off just because I'm sitting and watching a video too long.
@@ -685,11 +683,10 @@ This block sets the keyboard layout to US and give Caps Lock the functionality o
 #+BEGIN_SRC emacs-lisp
   (shell-command "setxkbmap us -option ctrl:nocaps")
 #+END_SRC
-*** Load .Xresources
-...if it exists, of course.
+*** Set fallback cursor
+Some X windows will have weird cursors if this isn't done.
 #+BEGIN_SRC emacs-lisp
-  (if (file-exists-p "~/.Xresources")
-      (shell-command "xrdb $HOME/.Xresources"))
+  (shell-command "xsetroot -cursor_name left_ptr")
 #+END_SRC
 *** Compositor
 I don't need it, but having basic compositing is very nice.
@@ -697,11 +694,11 @@ I don't need it, but having basic compositing is very nice.
     (start-process-shell-command
      "Compositor" nil "xcompmgr")
 #+END_SRC
-*** Always hide the cursor when typing
-Just a personal preference, I don't like seeing the cursor when I'm pressing keys.
+*** Start EXWM
 #+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Cursor Hiding" nil "xbanish")
+  (exwm-enable)
+  (exwm-config-ido)
+  (exwm-systemtray-enable)
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :exports none
   )
