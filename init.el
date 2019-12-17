@@ -22,12 +22,12 @@
 			 ("org"   . "https://orgmode.org/elpa/")))
 (package-initialize)
 
-;; install use-package if not installed
+;; Install use-package if not installed
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
-;; most of the actual config is in here
+;; Most of the actual config is in here
 (org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))
 
 (custom-set-faces

@@ -671,17 +671,20 @@ Just a personal preference, I don't like seeing the cursor when I'm pressing key
 *** Disable screen blanking
 I don't need my laptop's screen shutting off just because I'm sitting and watching a video too long.
 #+BEGIN_SRC emacs-lisp
-  (shell-command "xset s off -dpms 1> /dev/null 2> /dev/null")
+  (start-process-shell-command
+   "" nil "xset s off -dpms")
 #+END_SRC
 *** Keyboard configuration
 This block sets the keyboard layout to US and give Caps Lock the functionality of Control. I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
 #+BEGIN_SRC emacs-lisp
-  (shell-command "setxkbmap us -option ctrl:nocaps 1> /dev/null 2> /dev/null")
+  (start-process-shell-command
+   "" nil "setxkbmap us -option ctrl:nocaps")
 #+END_SRC
 *** Set fallback cursor
 Some X windows will have weird cursors if this isn't done.
 #+BEGIN_SRC emacs-lisp
-  (shell-command "xsetroot -cursor_name left_ptr 1> /dev/null 2> /dev/null")
+  (start-process-shell-command
+   "" nil "xsetroot -cursor_name left_ptr")
 #+END_SRC
 *** Compositor
 I don't need it, but having basic compositing is very nice.
