@@ -854,7 +854,7 @@ Picking a service to use for this was a pain. I ended up settling for wttrin bec
       (interactive)
       (save-window-excursion
 	(unwind-protect
-	    (progn (wttrin wttrin-default-city)
+	    (progn (wttrin wttrin-default-location)
 		   (delete-other-windows)
 		   (while (not (string= (read-key-sequence "") 'q)) (message ""))
 		   (message ""))
