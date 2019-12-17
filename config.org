@@ -78,6 +78,7 @@ I love the default start screen, but it just doesn't cut it for me. I just use t
     :defer t
     :init
     (setq inhibit-start-menu t
+	  inhibit-startup-message t
 	  dashboard-items '((recents . 10))
 	  show-week-agenda-p t
 	  dashboard-banner-logo-title "Welcome to GNU Emacs"
@@ -103,6 +104,7 @@ I don't want to have to manually update my stuff. This solution is literally plo
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness.
 #+BEGIN_SRC emacs-lisp :exports none
   (when run-emacs-as-desktop-environment?
+    (set-frame-parameter nil 'fullscreen 'fullboth)
 #+END_SRC
 ** Configuration
 *** exwm package (base window manager)
@@ -265,10 +267,10 @@ It's an Elisp function now, woo! It's very spaghetti, but it /kinda/ works so it
 #+BEGIN_SRC emacs-lisp
   (defun display-and-dock-setup ()
     "Configure displays and some peripherals without the need for an external shell script."
+    (interactive)
     (let ((monitors (split-string (shell-command-to-string
-				    "xrandr | grep ' connected ' | awk '{print $1}'")))
-	   (command "xrandr "))
-      ;; This section specifically prepares the xrandr command
+				   "xrandr | grep ' connected ' | awk '{print $1}'")))
+	  (command "xrandr "))
       (dolist (monitor monitors)
 	(let* ((output (concat "--output " monitor " "))
 	       (primary (when (or (string= monitor "LVDS1")
@@ -282,6 +284,12 @@ It's an Elisp function now, woo! It's very spaghetti, but it /kinda/ works so it
 				   (string= monitor "VGA1"))
 				"1366x768 "
 			      "1920x1080 ")))
+	       (rotate (when (or (string= monitor "DP-1-2-1")
+				(string= monitor "DP-1-2-3"))
+			 (concat "--rotate "
+				 (if (string= monitor "DP-1-2-1")
+				     "left "
+				   "right "))))
 	       (pos (concat "--pos "
 			    (if (not (or (string= monitor "DP-1-2-2")
 				      (string= monitor "DP-1-2-3")))
@@ -289,47 +297,39 @@ It's an Elisp function now, woo! It's very spaghetti, but it /kinda/ works so it
 			      (if (string= monitor "DP-1-2-2")
 				  "1080x0 "
 				"3000x0 ")))))
-	  ;; Disable eDP-1-1 if we're docked (e.g. DP-1-2-1 is connected)
-	  ;; Otherwise, add the monitor and its characteristics to the command string
 	  (if (and (string= monitor "eDP-1-1")
 		 (member "DP-1-2-1" monitors))
 	      (setq command (concat command output "--off "))
-	  (setq command (concat command output primary rate res pos)))))
-      ;; Finally, run the command we just created as a process.
+	    (setq command (concat command output primary rate res rotate pos)))))
       (start-process-shell-command
        "Display Setup" nil command))
-    ;; Now, we can configure some peripherals.
-    (let ((trackball (if (= (shell-command "xinput list | grep ELECOM") 0)
-			 (shell-command-to-string (concat "xinput list | "
-							  "grep ELECOM | "
-							  "awk '{print $8}' | "
-							  "sed 's/id=//' | "
-							  "tr '\n' ' '"))
-		       nil))
-	  (trackpad (if (= (shell-command "xinput list | grep Synaptics") 0)
-			(shell-command-to-string (concat "xinput list | "
-							 "grep Synaptics | "
-							 "awk '{print $6}' | "
-							 "sed 's/id=//' | "
-							 "tr '\n' ' '"))
-		      nil)))
+    (let ((trackball (when (= (shell-command "xinput list | grep ELECOM > /dev/null") 0)
+		       (shell-command-to-string
+			(concat "xinput list | grep ELECOM | head -n 1 | "
+				"sed -r 's/.*id=([0-9]+).*/\\1/' | tr '\n' ' '"))))
+	  (trackpad (when (= (shell-command "xinput list | grep Synaptics > /dev/null") 0)
+		      (shell-command-to-string
+		       (concat "xinput list | grep Synaptics | head -n 1 | "
+			       "sed -r 's/.*id=([0-9]+).*/\\1/' | tr '\n' ' '"))))
       (when trackball
-	(dolist (cmd '((concat "xinput set-prop " trackball
-			       "'libinput Button Scrolling Button' 10")
-		       (concat "xinput set-prop " trackball
-			       "'libinput Scroll Method Enabled' 0 0 1")
-		       (concat "xinput set-button-map " trackball
-			       "1 2 3 4 5 6 7 8 9 2 1 2"))
-		     (start-process-shell-command
-		      "Trackball Setup" nil cmd))))
+	(start-process-shell-command
+	 "Trackball Setup" nil (concat "sleep 2 && xinput set-prop " trackball
+				     "'libinput Button Scrolling Button' 10"))
+	(start-process-shell-command
+	 "Trackball Setup" nil (concat "sleep 2 && xinput set-prop " trackball
+				     "'libinput Scroll Method Enabled' 0 0 1"))
+	(start-process-shell-command
+	 "Trackball Setup" nil (concat "sleep 2 && xinput set-button-map "
+				     trackball "1 2 3 4 5 6 7 8 9 2 1 2")))
       (when trackpad
 	(start-process-shell-command
 	 "Disable Trackpad" nil (concat "xinput disable " trackpad)))
-      (start-process-shell-command
-       "Keyboard Setup" nil "setxkbmap -option ctrl:nocaps")))
+      (shell-command "setxkbmap -option ctrl:nocaps"))
+    (message ""))
 
   (display-and-dock-setup)
   (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
+  (exwm-randr-enable)
 #+END_SRC
 *** Name EXWM buffers after the window title
 This was annoying when I first installed EXWM. Thankfully this is a very easy fix.
@@ -758,7 +758,6 @@ I don't need it, but having basic compositing is very nice.
 #+BEGIN_SRC emacs-lisp
   (exwm-enable)
   (exwm-config-ido)
-  (exwm-randr-enable)
   (exwm-systemtray-enable)
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :exports none

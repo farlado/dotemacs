@@ -10,10 +10,6 @@
   (not (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 0))
   "Determine whether or not to load Emacs as a desktop environment.")
 
-;; If so, go fullscreen
-(when run-emacs-as-desktop-environment?
-  (set-frame-parameter nil 'fullscreen 'fullboth))
-
 ;; Package manager
 (require 'package)
 (setq package-enable-at-startup nil
