@@ -47,6 +47,15 @@ Everything has different dependencies so make sure you have what you need. The e
 - For Python: ~pylint~, ~jedi~
 - For Haskell: ~stack~
 * Startup
+** Hide things ASAP
+I hate having to look at these every time my system starts up. Who even uses the toolbar in Emacs?
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
+  (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq use-dialog-box nil)
+#+END_SRC
 ** Start Emacs server
 Although I technically don't /have/ to do this, it is very helpful.
 #+BEGIN_SRC emacs-lisp
@@ -105,11 +114,6 @@ Yes, Emacs is my *entire desktop environment*. You should probably remove this s
 #+BEGIN_SRC emacs-lisp :exports none
   (when (and (string= (window-system) 'x)
 	   (not (= (shell-command "wmctrl -m") 0)))
-    (menu-bar-mode -1)
-    (tooltip-mode -1)
-    (tool-bar-mode -1)
-    (scroll-bar-mode -1)
-    (setq use-dialog-box nil)
     (set-frame-parameter nil 'fullscreen 'fullboth)
 #+END_SRC
 ** Configuration
@@ -1422,15 +1426,6 @@ I like having line numbers. However, I don't like line numbers in modes where it
 This one is also just a matter of personal preference really.
 #+BEGIN_SRC emacs-lisp
   (global-page-break-lines-mode 1)
-#+END_SRC
-** Hide dumb stuff
-Who even uses the toolbar in Emacs?
-#+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
-  (tooltip-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  (setq use-dialog-box nil)
 #+END_SRC
 ** In graphical environments
 This stuff really only helps when you're in a graphical environment. Running Emacs from a terminal means these things might not work, so I don't load them when not in a graphical environment.
