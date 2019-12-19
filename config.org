@@ -264,8 +264,9 @@ No clue why you have to do so much just to give workspaces names, but at least y
 *** Multi-head
 There was a point where I tried to make this into an Elisp function. Not trying that insanity again.
 #+BEGIN_SRC emacs-lisp
-  (defun display-setup ()
-    "something something displays"
+  (defun display-and-dock-setup ()
+    "Configure monitors and peripherals."
+    ;; Monitors (works on both my X230 and my W541)
     (let* ((connected-monitors (split-string
 		      (shell-command-to-string
 		       "xrandr | grep ' connected' | awk '{print $1}'")))
@@ -277,8 +278,8 @@ There was a point where I tried to make this into an Elisp function. Not trying 
 	   (command "xrandr "))
       (dolist (monitor possible-monitors)
 	(if (member monitor connected-monitors)
-	    (if (not (and (string= monitor "eDP-1-1")
-		      (member "DP-1-2-1" connected-monitors)))
+	    (if (and (string= monitor "eDP-1-1")
+		   (not (member "DP-1-2-1" connected-monitors)))
 		(let* ((output (concat "--output " monitor " "))
 		       (primary (when (or (string= monitor "LVDS1")
 					 (string= monitor "eDP-1-1")
@@ -294,7 +295,7 @@ There was a point where I tried to make this into an Elisp function. Not trying 
 		       (rotate (when (or (string= monitor "DP-1-2-1")
 					(string= monitor "DP-1-2-3"))
 				 (concat "--rotate "
-					 (if (string= "DP-1-2-1")
+					 (if (string= monitor "DP-1-2-1")
 					     "left "
 					   "right "))))
 		       (pos (concat "--pos "
@@ -304,14 +305,33 @@ There was a point where I tried to make this into an Elisp function. Not trying 
 				      (if (string= monitor "DP-1-2-2")
 					  "1080x0 "
 					"3000x0 ")))))
-		  (setq command (concat command output primary rate res rotate pos))))
+		  (setq command (concat command output primary rate res rotate pos)))
+	      (setq command (concat command "--output " monitor " --off ")))
 	  (setq command (concat command "--output " monitor " --off "))))
-      command))
+      (start-process-shell-command
+       "Display Setup" nil command))
+    ;; Disable trackpad
+    (start-process-shell-command
+     "Disable trackpad" nil (concat "xinput disable $(xinput list | "
+				  "grep Synaptics | head -n 1 | "
+				  "sed -r 's/.*id=([0-9]+).*/\\1/')"))
+    ;; Configure trackball
+    (let* ((trackball-id (shell-command-to-string
+			  (concat "xinput | grep ELECOM | head -n 1 | sed -r "
+				  "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
+      (dolist (command '(" 'libinput Button Scrolling Button' 10"
+			 " 'libinput Scroll Method Enabled' 0 0 1"))
+	(start-process-shell-command
+	 "Trackball Setup" nil (concat "sleep 2 && xinput set-prop "
+				     trackball-id command)))
+      (start-process-shell-command
+       "Trackball Setup" nil (concat "sleep 2 && xinput set-button-map " trackball-id
+				   " 1 2 3 4 5 6 7 8 9 2 1 2")))
+    ;; Keyboard
+    (start-process-shell-command
+     "Keyboard Setup" nil "setxkbmap -option ctrl:nocaps"))
 
-  (add-hook 'exwm-randr-screen-change-hook
-	    (lambda ()
-	      (start-process-shell-command
-	       "Display Setup" nil "ds")))
+  (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
   (exwm-randr-enable)
 #+END_SRC
 *** Name EXWM buffers after the window title
