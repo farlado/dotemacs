@@ -310,8 +310,8 @@ There was a point where I tried to make this into an Elisp function. Not trying 
 	   (command "xrandr "))
       (dolist (monitor possible-monitors)
 	(if (member monitor connected-monitors)
-	    (if (and (string= monitor "eDP-1-1")
-		   (not (member "DP-1-2-1" connected-monitors)))
+	    (if (not (and (string= monitor "eDP-1-1")
+		      (member "DP-1-2-1" connected-monitors)))
 		(let* ((output (concat "--output " monitor " "))
 		       (primary (when (or (string= monitor "LVDS1")
 					 (string= monitor "eDP-1-1")
@@ -1469,9 +1469,6 @@ I have started to mess around with Haskell, so I needed to grab a mode for that.
     :ensure t
     :defer t
     :init
-    (require 'haskell-mode)
-    (require 'haskell-process)
-    (require 'haskell-interactive-mode)
     (setq haskell-stylish-on-save t)
     (dolist (func '(interactive-haskell-mode
 		    turn-on-haskell-doc-mode
@@ -1616,7 +1613,9 @@ I *hate* the default mode line. This one is much less sucky. I also show and hid
 	  spaceline-buffer-encoding-abbrev-p nil
 	  spaceline-buffer-size-p nil
 	  spaceline-line-column-p t)
-    (spaceline-emacs-theme))
+    (if (window-system)
+	(spaceline-emacs-theme)
+      (spaceline-spacemacs-theme)))
 #+END_SRC
 *** Show clock and battery level on mode line
 I used to use ~fancy-battery~ but it constantly disappeared on my teeny tiny screens so I just decided not to bother with it. Plus it's one less package to configure lol.
