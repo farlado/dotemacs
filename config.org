@@ -1,3 +1,4 @@
+#+STARTUP: hideblocks
 #+OPTIONS: num:nil
 #+LANGUAGE: en
 #+TITLE: Farlado's Emacs
@@ -904,7 +905,7 @@ To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make
 * Other Emacs goodies
 This is other stuff I use in Emacs.
 ** Terminal
-I've been jumping between ~vterm~ and ~ansi-term~. I guess ~ansi-term~ wins out because ~vterm~ does not actually provide much benefit in comparison. Regardless, I use an alias ~run-terminal~ so that I only have to change this single block, instead of other blocks as well.
+I've been jumping between ~vterm~ and ~ansi-term~. I guess ~ansi-term~ wins out because ~vterm~ does not actually provide much benefit in comparison. Regardless, I use an alias ~run-terminal~ so that I only have to change this single block, instead of other blocks as well. In the off-chance I'm running Emacs in the terminal, =C-c t= works too.
 #+BEGIN_SRC emacs-lisp
   (defvar ansi-term-shell "/bin/zsh"
     "The default shell for `ansi-term' if the environment variable SHELL is not set.")
@@ -915,6 +916,7 @@ I've been jumping between ~vterm~ and ~ansi-term~. I guess ~ansi-term~ wins out 
   (ad-activate 'ansi-term)
 
   (defalias 'run-terminal 'ansi-term)
+  (global-set-key (kbd "C-c t") 'run-terminal)
 #+END_SRC
 ** Reading the manpages
 Wow, there's actually an Emacs mode for this!
