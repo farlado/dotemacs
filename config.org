@@ -1306,30 +1306,26 @@ This to me is preferable to the default behavior.
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c b") 'balance-windows)
 #+END_SRC
-** Use windmove in place of other-window
-To make this easier, I just make a keymap for ~windmove~ and bind the keymap to =C-x o=.
-#+BEGIN_SRC emacs-lisp
-  (defvar windmove-map
-    (let ((map (make-sparse-keymap)))
-      (define-key map (kbd "w") 'windmove-up)
-      (define-key map (kbd "a") 'windmove-left)
-      (define-key map (kbd "s") 'windmove-down)
-      (define-key map (kbd "d") 'windmove-right)
-      map)
-    "A keymap for `windmove' functions.")
-
-  (global-set-key (kbd "C-x o") windmove-map)
-#+END_SRC
-** buffer-move package (move windows around)
-Binding keys using ~use-package~ is far easier than defining a keymap.
+** buffer-move package and windmove (moving focus and moving windows)
+Since apparently =C-x C-o= is actually something useful by default, I decided to squash ~windmove~ and ~buffer-move~ into a single keymap.
 #+BEGIN_SRC emacs-lisp
   (use-package buffer-move
     :ensure t
     :defer t
-    :bind (("C-x C-o w" . buf-move-up)
-	   ("C-x C-o a" . buf-move-left)
-	   ("C-x C-o s" . buf-move-down)
-	   ("C-x C-o d" . buf-move-right)))
+    :init
+    (defvar buffer-move-and-windmove-map
+      (let ((map (make-sparse-keymap)))
+	(define-key map (kbd "w") 'windmove-up)
+	(define-key map (kbd "a") 'windmove-left)
+	(define-key map (kbd "s") 'windmove-down)
+	(define-key map (kbd "d") 'windmove-right)
+	(define-key map (kbd "C-w") 'buf-move-up)
+	(define-key map (kbd "C-a") 'buf-move-left)
+	(define-key map (kbd "C-s") 'buf-move-down)
+	(define-key map (kbd "C-d") 'buf-move-right)
+	map)
+      "A keymap for `buffer-move' and `windmove' functions.")
+    (global-set-key (kbd "C-x o") buffer-move-and-windmove-map))
 #+END_SRC
 * Org-mode
 I don't need much extending for org-mode.
