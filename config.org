@@ -438,7 +438,7 @@ I have a painfully white theme which fits perfectly with my setup.
        "Telegram" nil telegram)))
 #+END_SRC
 **** Discord
-Yeah, I also use a light theme for Discord. It looks comfy and consistent with the rest of my system, even if Discord is a garbage application.
+Yeah, I also use a light theme for Discord. It looks comfy, even if Discord is a garbage application.
 #+BEGIN_SRC emacs-lisp
   (defun run-discord ()
     "Start Discord."
@@ -1569,6 +1569,11 @@ Fringes and dividers look far fancier than the alternatives.
     (set-face-foreground face "#335ea8"))
   (window-divider-mode 1)
   (fringe-mode 10)
+#+END_SRC
+*** Highlight the current line
+This is to help me keep track of where the cursor is. It looks really weird outside a window system though, so I disable it.
+#+BEGIN_SRC emacs-lisp
+    (global-hl-line-mode 1)
 #+END_SRC
 *** pretty-mode package (prettify symbols)
 I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so much more to make things look nice, especially in functional programming languages. I enable /all/ of them.
