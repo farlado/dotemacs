@@ -71,6 +71,17 @@ Ensures everything works as intended.
 #+BEGIN_SRC emacs-lisp
   (setq load-prefer-newer t)
 #+END_SRC
+** async package (asynchronous stuff)
+This should make a few different things a little faster when packages are being handled.
+#+BEGIN_SRC emacs-lisp
+  (use-package async
+    :ensure t
+    :defer t
+    :init
+    (dired-async-mode 1)
+    (async-bytecomp-package-mode 1)
+    (setq async-bytecomp-allowed-packages '(all)))
+#+END_SRC
 ** dashboard package (replacement start screen)
 I love the default start screen, but it just doesn't cut it for me. I just use this to have a nice screen when I start Emacs or close all my buffers.
 #+BEGIN_SRC emacs-lisp
@@ -303,8 +314,6 @@ There was a point where I tried to make this into an Elisp function. Not trying 
     (let* ((connected-monitors (split-string
 		      (shell-command-to-string
 		       "xrandr | grep ' connected' | awk '{print $1}'")))
-	   (x230-monitors )
-	   (w541-monitors )
 	   (possible-monitors (if (member "LVDS1" connected-monitors)
 				  '("LVDS1" "VGA1")
 				'("eDP-1-1" "DP-1-2-1" "DP-1-2-2" "DP-1-2-3" "VGA-1-1")))
@@ -346,20 +355,20 @@ There was a point where I tried to make this into an Elisp function. Not trying 
     ;; Disable trackpad
     (start-process-shell-command
      "Disable trackpad" nil (concat "xinput disable $(xinput list | "
-				  "grep Synaptics | head -n 1 | "
-				  "sed -r 's/.*id=([0-9]+).*/\\1/')"))
+				    "grep Synaptics | head -n 1 | "
+				    "sed -r 's/.*id=([0-9]+).*/\\1/')"))
     ;; Configure trackball
     (let* ((trackball-id (shell-command-to-string
 			  (concat "xinput | grep ELECOM | head -n 1 | sed -r "
 				  "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
-      (dolist (command '(" 'libinput Button Scrolling Button' 10"
-			 " 'libinput Scroll Method Enabled' 0 0 1"))
+      (dolist (command '("'libinput Button Scrolling Button' 10"
+			 "'libinput Scroll Method Enabled' 0 0 1"))
 	(start-process-shell-command
 	 "Trackball Setup" nil (concat "sleep 2 && xinput set-prop "
-				     trackball-id command)))
+				       trackball-id command)))
       (start-process-shell-command
        "Trackball Setup" nil (concat "sleep 2 && xinput set-button-map " trackball-id
-				   " 1 2 3 4 5 6 7 8 9 2 1 2")))
+				     "1 2 3 4 5 6 7 8 9 2 1 2")))
     ;; Keyboard
     (start-process-shell-command
      "Keyboard Setup" nil "setxkbmap -option ctrl:nocaps"))
@@ -1472,11 +1481,10 @@ I have started to mess around with Haskell, so I needed to grab a mode for that.
     :defer t
     :init
     (setq haskell-stylish-on-save t)
-    (dolist (func '(interactive-haskell-mode
-		    turn-on-haskell-doc-mode
-		    turn-on-haskell-indentation
-		    haskell-auto-insert-module-template))
-      (add-hook 'haskell-mode-hook func)))
+    :hook ((haskell-mode . interactive-haskell-mode)
+	   (haskell-mode . turn-on-haskell-doc-mode)
+	   (haskell-mode . haskell-indentation-mode)
+	   (haskell-mode . haskell-auto-insert-module-template)))
 #+END_SRC
 ** electric-pair-mode (OH MY GOD THIS IS SO GREAT)
 I have no words for how convenient this has been and how much faster I get things done thanks to these five lines of elisp.
@@ -1627,7 +1635,7 @@ I used to use ~fancy-battery~ but it constantly disappeared on my teeny tiny scr
   (display-battery-mode 1)
 #+END_SRC
 *** diminish package (hide minor modes from mode line)
-Supposedly ~use-package~ is going to have this feature soon, but till that rolls out I'll be using this.
+Works very nicely, makes the mode line far comfier.
 #+BEGIN_SRC emacs-lisp
   (use-package diminish
     :ensure t
@@ -1643,6 +1651,7 @@ Supposedly ~use-package~ is going to have this feature soon, but till that rolls
 	       flyspell-prog-mode
 	       visual-line-mode
 	       interactive-haskell-mode
+	       haskell-indentation-mode
 	       haskell-doc-mode
 	       page-break-lines-mode
 	       compilation-shell-minor-mode
