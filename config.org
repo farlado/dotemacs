@@ -1566,11 +1566,6 @@ Fringes and dividers look far fancier than the alternatives.
   (window-divider-mode 1)
   (fringe-mode 10)
 #+END_SRC
-*** Highlight the current line
-This is to help me keep track of where the cursor is. It looks really weird outside a window system though, so I disable it.
-#+BEGIN_SRC emacs-lisp
-    (global-hl-line-mode 1)
-#+END_SRC
 *** pretty-mode package (prettify symbols)
 I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so much more to make things look nice, especially in functional programming languages. I enable /all/ of them.
 #+BEGIN_SRC emacs-lisp
