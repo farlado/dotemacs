@@ -111,7 +111,7 @@ I don't want to have to manually update my stuff. This solution is literally plo
 	  auto-package-update-hide-results t)
     (auto-package-update-maybe))
 #+END_SRC
-* Making Emacs a desktop environment
+* Making Emacs a Desktop Environment
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness.
 #+BEGIN_SRC emacs-lisp :exports none
   (when run-emacs-as-desktop-environment?
@@ -428,8 +428,14 @@ I have a painfully white theme which fits perfectly with my setup.
   (defun run-telegram ()
     "Start Telegram."
     (interactive)
-    (start-process-shell-command
-     "Telegram" nil "telegram"))
+    (let ((telegram (if (executable-find "telegram")
+			"telegram"
+		      (if (executable-find "Telegram")
+			  "Telegram"
+			(if (executable-find "telegram-desktop")
+			    "telegram-desktop")))))
+      (start-process-shell-command
+       "Telegram" nil telegram)))
 #+END_SRC
 **** Discord
 Yeah, I also use a light theme for Discord. It looks comfy, even if Discord is a garbage application.
@@ -911,7 +917,7 @@ To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make
 #+BEGIN_SRC emacs-lisp :exports none
   )
 #+END_SRC
-* Other Emacs goodies
+* Other Emacs Goodies
 This is other stuff I use in Emacs.
 ** Terminal
 I've been jumping between ~vterm~ and ~ansi-term~. I guess ~ansi-term~ wins out because ~vterm~ does not actually provide much benefit in comparison. Regardless, I use an alias ~run-terminal~ so that I only have to change this single block, instead of other blocks as well. In the off-chance I'm running Emacs in the terminal, =C-c t= works too.
@@ -1315,21 +1321,15 @@ To make this easier, I just make a keymap for ~windmove~ and bind the keymap to 
   (global-set-key (kbd "C-x o") windmove-map)
 #+END_SRC
 ** buffer-move package (move windows around)
-Just like for ~windmove~, I define a keymap and this time bind it to =C-x C-o=.
+Binding keys using ~use-package~ is far easier than defining a keymap.
 #+BEGIN_SRC emacs-lisp
   (use-package buffer-move
     :ensure t
     :defer t
-    :init
-    (defvar buf-move-map
-      (let ((map (make-sparse-keymap)))
-	(define-key map (kbd "w") 'buf-move-up)
-	(define-key map (kbd "a") 'buf-move-left)
-	(define-key map (kbd "s") 'buf-move-down)
-	(define-key map (kbd "d") 'buf-move-right)
-	map)
-      "A keymap for `buffer-move' functions.")
-    (global-set-key (kbd "C-x C-o") buf-move-map))
+    :bind (("C-x C-o w" . buf-move-up)
+	   ("C-x C-o a" . buf-move-left)
+	   ("C-x C-o s" . buf-move-down)
+	   ("C-x C-o d" . buf-move-right)))
 #+END_SRC
 * Org-mode
 I don't need much extending for org-mode.
@@ -1607,12 +1607,12 @@ It's subtle on my theme, but it still helps me keep track of my brackets and par
     :init
     (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 #+END_SRC
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :exports none
   )
 #+END_SRC
 ** Mode line
 *** spaceline package (Spacemacs mode line)
-I *hate* the default mode line. This one is much less sucky. I also show and hide specific useful things when setting it up.
+I *hate* the default mode line. This one is much less sucky. I also show and hide specific useful things when setting it up. In terminals, ~spaceline-emacs-theme~ just looks wrong, so I don't use it unless I'm in a graphical environment.
 #+BEGIN_SRC emacs-lisp
   (use-package spaceline
     :ensure t
