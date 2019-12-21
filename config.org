@@ -14,13 +14,15 @@ Everything has different dependencies so make sure you have what you need. The e
 #+END_SRC
 *** EXWM
 - Painfully obvious here: ~xorg~
+- Checking for a window manager: ~wmctrl~
 - Always hiding the cursor while typing: ~xbanish~
 - Compositor: ~xcompmgr~
+- Monitor Configuration: ~arandr~
 - Network Configuration: ~nm-connection-editor~
 - Web Browser: ~firefox~
 - Editing Crappy Documents: ~libreoffice~
 - Crappy Image Editor: ~gimp~
-- Crappy Messenger: ~telegram~
+- Crappy Messenger: ~telegram-desktop~
 - Crappier Messenger: ~discord~
 - Games Platform: ~steam~
 *** desktop-environment
@@ -32,6 +34,10 @@ Everything has different dependencies so make sure you have what you need. The e
 *** EMMS
 - For playing music: ~mpd~, ~mpc~
 - For playing video: ~mpv~
+*** vterm
+- Makefile parsing: ~cmake~
+- Compiling: I recommend ~gcc~
+- Make dependency: ~libtool~
 *** nov
 - To open epub files: ~ebook-tools~
 *** graphviz-dot-mode
@@ -44,7 +50,6 @@ Everything has different dependencies so make sure you have what you need. The e
 *** sudo-edit
 - Obvious dependency: ~sudo~
 *** Other stuff
-- Checking for a window manager: ~wmctrl~
 - For Python: ~pylint~, ~jedi~
 - For Haskell: ~stack~
 * Startup
@@ -484,6 +489,25 @@ For when you need to do volume mixing.
     (start-process-shell-command
      "Volume Mixer" nil "pavucontrol"))
 #+END_SRC
+**** Audio loop-back
+Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucontrol~ to set up which programs to pass through to Discord.
+#+BEGIN_SRC emacs-lisp
+  (defun audio-loopback ()
+    (interactive)
+    ;; Create two modules: `loop' and `out'
+    (dolist (sink '("loop" "out"))
+      (shell-command (concat "pacmd load-module module-null-sink=" sink)))
+    ;; Loop `loop' to primary output, pipe it to `out', loop primary into to `out'
+    (dolist (command '(" source=loop.monitor"
+		       " source=loop.monitor sink=out"
+		       " sink=out"))
+      (shell-command (concat "pacmd load-module module-loopback" command)))
+    ;; Run `pavucontrol' and then unload the modules after it completes
+    (start-process-shell-command
+     "Audio Loop" nil (concat "pavucontrol && "
+			    "pacmd unload-module module-null-sink && "
+			    "pacmd unload-module module-loopback")))
+#+END_SRC
 **** Keyboard layout selection
 This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
 #+BEGIN_SRC emacs-lisp
@@ -714,7 +738,8 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 	  ([?\s-x]       . dmenu)
 	  ([menu]        . smex)
 	  ([?\s- ]       . cycle-keyboard-layout)
-	  ([s-backspace] . cycle-keyboard-layout-reverse)))
+	  ([s-backspace] . cycle-keyboard-layout-reverse)
+	  ([s-tab]       . audio-loopback)))
 #+END_SRC
 *** Emacs key bindings in X windows
 This is super nice, because I love these key bindings and they are just intuitive to me, and now they can carry over safely to other programs.
