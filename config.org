@@ -920,18 +920,14 @@ To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make
 * Other Emacs Goodies
 This is other stuff I use in Emacs.
 ** Terminal
-I've been jumping between ~vterm~ and ~ansi-term~. I guess ~ansi-term~ wins out because ~vterm~ does not actually provide much benefit in comparison. Regardless, I use an alias ~run-terminal~ so that I only have to change this single block, instead of other blocks as well. In the off-chance I'm running Emacs in the terminal, =C-c t= works too.
+I've been jumping between ~vterm~ and ~ansi-term~. I guess ~vterm~ is just easier to use. In the off-chance I'm running Emacs in the terminal, =C-c t= is usable to open the terminal.
 #+BEGIN_SRC emacs-lisp
-  (defvar ansi-term-shell "/bin/zsh"
-    "The default shell for `ansi-term' if the environment variable SHELL is not set.")
-
-  (defadvice ansi-term (before force-bash)
-    (interactive (list (or (getenv "SHELL")
-			  ansi-term-shell))))
-  (ad-activate 'ansi-term)
-
-  (defalias 'run-terminal 'ansi-term)
-  (global-set-key (kbd "C-c t") 'run-terminal)
+  (use-package vterm
+    :ensure t
+    :defer t
+    :init
+    (defalias 'run-terminal 'vterm)
+    :bind ("C-c t" . vterm))
 #+END_SRC
 ** Reading the manpages
 Wow, there's actually an Emacs mode for this!
@@ -1505,7 +1501,7 @@ I like having line numbers. However, I don't like line numbers in modes where it
 		  shell-mode-hook
 		  Buffer-menu-mode-hook
 		  dashboard-mode-hook
-		  term-mode-hook
+		  vterm-mode-hook
 		  shell-mode-hook
 		  epresent-mode-hook))
     (add-hook hook (lambda () (display-line-numbers-mode -1))))
