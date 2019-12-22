@@ -497,7 +497,7 @@ Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucon
     ;; Create two modules: `loop' and `out'
     (dolist (sink '("loop" "out"))
       (shell-command (concat "pacmd load-module module-null-sink=" sink)))
-    ;; Loop `loop' to primary output, pipe it to `out', loop primary into to `out'
+    ;; Loop `loop' back to the speaker, pipe it to `out', loop the mic into to `out'
     (dolist (command '(" source=loop.monitor"
 		       " source=loop.monitor sink=out"
 		       " sink=out"))
