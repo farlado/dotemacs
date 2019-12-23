@@ -482,23 +482,23 @@ For when you need to do volume mixing.
 **** Audio loop-back
 Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucontrol~ to set up which programs to pass through to Discord.
 #+BEGIN_SRC emacs-lisp
-    (defun audio-loopback ()
-      "Loop desktop audio into a null sink alongside the primary input."
-      (interactive)
-      ;; Create two modules: `loop' and `out'
-      (dolist (sink '("loop" "out"))
-	(shell-command (concat "pacmd load-module module-null-sink sink_name=" sink))
-	(shell-command (concat "pacmd update-sink-proplist " sink " device.description=" sink)))
-      ;; Loop `loop' to primary output, pipe it to `out', loop primary into to `out'
-      (dolist (command '("source=loop.monitor"
-			 "source=loop.monitor sink=out"
-			 "sink=out"))
-	(shell-command (concat "pacmd load-module module-loopback " command)))
-      ;; Run `pavucontrol' and then unload the modules after it completes
-      (start-process-shell-command
-       "Audio Loop" nil (concat "pavucontrol && "
-			      "pacmd unload-module module-null-sink && "
-			      "pacmd unload-module module-loopback")))
+  (defun audio-loopback ()
+    "Loop desktop audio into a null sink alongside the primary input."
+    (interactive)
+    ;; Create two modules: `loop' and `out'
+    (dolist (sink '("loop" "out"))
+      (shell-command (concat "pacmd load-module module-null-sink sink_name=" sink))
+      (shell-command (concat "pacmd update-sink-proplist " sink " device.description=" sink)))
+    ;; Loop `loop' to primary output, pipe it to `out', loop primary into to `out'
+    (dolist (command '("source=loop.monitor"
+		       "source=loop.monitor sink=out"
+		       "sink=out"))
+      (shell-command (concat "pacmd load-module module-loopback " command)))
+    ;; Run `pavucontrol' and then unload the modules after it completes
+    (start-process-shell-command
+     "Audio Loop" nil (concat "pavucontrol && "
+			    "pacmd unload-module module-null-sink && "
+			    "pacmd unload-module module-loopback")))
 #+END_SRC
 **** Keyboard layout selection
 This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
