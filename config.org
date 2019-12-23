@@ -303,7 +303,7 @@ No clue why you have to do so much just to give workspaces names, but at least y
 					    2 "DP-1-2-3")
 	exwm-manage-configurations '(((string= exwm-class-name "Steam")
 				      workspace 0 floating t floating-mode-line nil)
-				     ((string= exwm-instance-name "telegram")
+				     ((string= exwm-instance-name "telegram-desktop")
 				      workspace 2)
 				     ((string= exwm-class-name "discord")
 				      workspace 1)
@@ -433,14 +433,8 @@ I have a painfully white theme which fits perfectly with my setup.
   (defun run-telegram ()
     "Start Telegram."
     (interactive)
-    (let ((telegram (if (executable-find "telegram")
-			"telegram"
-		      (if (executable-find "Telegram")
-			  "Telegram"
-			(if (executable-find "telegram-desktop")
-			    "telegram-desktop")))))
-      (start-process-shell-command
-       "Telegram" nil telegram)))
+    (start-process-shell-command
+     "Telegram" nil "telegram-desktop"))
 #+END_SRC
 **** Discord
 Yeah, I also use a light theme for Discord. It looks comfy, even if Discord is a garbage application.
@@ -496,12 +490,13 @@ Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucon
     (interactive)
     ;; Create two modules: `loop' and `out'
     (dolist (sink '("loop" "out"))
-      (shell-command (concat "pacmd load-module module-null-sink=" sink)))
+      (shell-command (concat "pacmd load-module module-null-sink sink_name=" sink))
+      (shell-command (concat "pacmd update-sink-proplist " sink " device.description=" sink)))
     ;; Loop `loop' to primary output, pipe it to `out', loop primary into to `out'
-    (dolist (command '(" source=loop.monitor"
-		       " source=loop.monitor sink=out"
-		       " sink=out"))
-      (shell-command (concat "pacmd load-module module-loopback" command)))
+    (dolist (command '("source=loop.monitor"
+		       "source=loop.monitor sink=out"
+		       "sink=out"))
+      (shell-command (concat "pacmd load-module module-loopback " command)))
     ;; Run `pavucontrol' and then unload the modules after it completes
     (start-process-shell-command
      "Audio Loop" nil (concat "pavucontrol && "
