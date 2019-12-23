@@ -1267,6 +1267,8 @@ I wanted a way to quickly and gracefully destroy all my open stuff at once.
 ** Use buffer-menu on =C-x b= so the buffer list doesn't open a new window
 Just another point of personal convenience. I don't like ~ibuffer~ just because aesthetic reasons. I also set Q to close the window, for convenience.
 #+BEGIN_SRC emacs-lisp
+  (require 'ibuffer)
+
   (global-set-key (kbd "C-x b") 'ibuffer)
   (global-unset-key (kbd "C-x C-b"))
 
