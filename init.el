@@ -7,7 +7,8 @@
 
 ;; Determine whether to run Emacs as a desktop environment
 (defvar run-emacs-as-desktop-environment?
-  (not (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 0))
+  (and (window-system)
+       (not (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 0)))
   "Determine whether or not to load Emacs as a desktop environment.")
 
 ;; Package manager
