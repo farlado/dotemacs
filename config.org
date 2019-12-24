@@ -731,7 +731,13 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 	  ([menu]        . smex)
 	  ([?\s- ]       . cycle-keyboard-layout)
 	  ([s-backspace] . cycle-keyboard-layout-reverse)
-	  ([s-tab]       . audio-loopback)))
+	  ([s-tab]       . audio-loopback)
+
+	  ;; Controlling EMMS
+	  ([XF86AudioNext] . emms-next)
+	  ([XF86AudioPrev] . emms-previous)
+	  ([XF86AudioPlay] . emms-pause)
+	  ([XF86AudioStop] . emms-stop)))
 #+END_SRC
 *** Emacs key bindings in X windows
 This is super nice, because I love these key bindings and they are just intuitive to me, and now they can carry over safely to other programs.
@@ -837,7 +843,7 @@ I am big on doing as much in Emacs as possible. Having my music player moved to 
   (when (executable-find "mpd")
 #+END_SRC
 ** Install EMMS
-I do a crapload here, but basically the two main things I do here is configure mpd information and bind some keys for EMMS controls and music controls.
+I do a crapload here, but basically the two main things I do here is configure ~mpd~ information and bind some keys for EMMS controls and music controls.
 #+BEGIN_SRC emacs-lisp
   (use-package emms
     :ensure t
@@ -898,38 +904,33 @@ I do a crapload here, but basically the two main things I do here is configure m
     (message "Playlist has been shuffled."))
 #+END_SRC
 ** Binding all the keys
-To ensure we don't try to call ~exwm-bind-key~ if it isn't set, we check to make sure the conditions for EXWM are met.
+Now using a keymap in place of that wonky as crap binding system. The new binds let me use ~emms~ in a terminal.
 #+BEGIN_SRC emacs-lisp
-  (let ((func  (if run-emacs-as-desktop-environment?
-		   'exwm-bind-key
-		 'global-set-key)))
-    ;; Base functions
-    (funcall func (kbd "s-a v") 'emms)
-    (funcall func (kbd "s-a b") 'emms-smart-browse)
-    (funcall func (kbd "s-a r c") 'emms-player-mpd-update-all-reset-cache)
-
-    ;; Track navigation
-    (funcall func (kbd "<s-left>") 'emms-previous)
-    (funcall func (kbd "<s-right>") 'emms-next)
-    (funcall func (kbd "<s-up>") 'emms-stop)
-    (funcall func (kbd "<s-down>") 'emms-pause)
-
-    ;; Media keys
-    (funcall func (kbd "<XF86AudioPrev>") 'emms-previous)
-    (funcall func (kbd "<XF86AudioNext>") 'emms-next)
-    (funcall func (kbd "<XF86AudioStop>") 'emms-stop)
-    (funcall func (kbd "<XF86AudioPlay>") 'emms-pause)
-
-    ;; Repeat/shuffle
-    (funcall func (kbd "s-a r a") 'emms-toggle-repeat-playlist)
-    (funcall func (kbd "s-a r t") 'emms-toggle-repeat-track)
-    (funcall func (kbd "s-a s") 'farl-emms/shuffle-with-message)
-
-    ;; mpd-specific
-    (funcall func (kbd "s-a x") 'mpd/start-music-daemon)
-    (funcall func (kbd "s-a q") 'mpd/kill-music-daemon)
-    (funcall func (kbd "s-a r d") 'mpd/update-database)
-    (funcall func (kbd "s-a a") 'mpd/status))
+  (defvar emms-map
+    (let ((map (make-sparse-keymap)))
+      ;; Opening playlist and music browser
+      (define-key map (kbd "v") 'emms)
+      (define-key map (kbd "b") 'emms-smart-browse)
+      ;; Track navigation
+      (define-key map (kbd "n n") 'emms-next)
+      (define-key map (kbd "n p") 'emms-previous)
+      (define-key map (kbd "p") 'emms-pause)
+      (define-key map (kbd "s") 'emms-stop)
+      ;; Repeat/shuffle
+      (define-key map (kbd "t C-r") 'emms-toggle-repeat-track)
+      (define-key map (kbd "t r") 'emms-toggle-repeat-playlist)
+      (define-key map (kbd "t s") 'farl-emms/shuffle-with-message)
+      ;; Refreshing various things
+      (define-key map (kbd "r c") 'emms-player-mpd-update-all-reset-cache)
+      (define-key map (kbd "r d") 'mpd/update-database)
+      ;; mpd specific functions
+      (define-key map (kbd "d s") 'mpd/start-music-daemon)
+      (define-key map (kbd "d q") 'mpd/kill-music-daemon)
+      (define-key map (kbd "d u") 'mpd/update-database)
+      (define-key map (kbd "d s") 'mpd/status)
+      map)
+    "A keymap for controlling `emms'.")
+  (global-set-key (kbd "C-c a") emms-map)
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :exports none
   )
