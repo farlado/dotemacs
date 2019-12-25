@@ -90,18 +90,17 @@ This should make a few different things a little faster when packages are being 
 ** dashboard package (replacement start screen)
 I love the default start screen, but it just doesn't cut it for me. I just use this to have a nice screen when I start Emacs or close all my buffers.
 #+BEGIN_SRC emacs-lisp
-  (use-package dashboard
-    :ensure t
-    :defer t
-    :init
-    (setq inhibit-start-menu t
-	  dashboard-items '((recents . 10))
-	  show-week-agenda-p t
-	  dashboard-banner-logo-title "Welcome to GNU Emacs"
-	  dashboard-set-footer nil
-	  initial-buffer-choice (lambda ()
-				  (get-buffer "*dashboard*")))
-    (dashboard-setup-startup-hook))
+    (use-package dashboard
+      :ensure t
+      :defer t
+      :init
+      (setq inhibit-start-menu t
+	    dashboard-items '((recents . 10))
+	    show-week-agenda-p t
+	    dashboard-banner-logo-title "Welcome to GNU Emacs"
+	    dashboard-set-footer nil
+	    initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+      (dashboard-setup-startup-hook))
 #+END_SRC
 ** auto-package-update package (self-explanatory)
 I don't want to have to manually update my stuff. This solution is literally plop-and-forget.
@@ -381,8 +380,7 @@ There was a point where I tried to make this into an Elisp function. Not trying 
 This was annoying when I first installed EXWM. Thankfully this is a very easy fix.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'exwm-update-title-hook
-	    (lambda ()
-	      (exwm-workspace-rename-buffer exwm-title)))
+	    (lambda () (exwm-workspace-rename-buffer exwm-title)))
 #+END_SRC
 *** Ensure Java applications know the WM is non-reparenting
 Stolen from the ~.xinitrc~ included with ~EXWM~.
@@ -575,7 +573,7 @@ Then, I use these functions to control setting and cycling the keyboard layout.
   (defun suspend-computer ()
     (interactive)
     (when (yes-or-no-p "Really suspend? ")
-      (shell-command "suspend")))
+      (shell-command "systemctl suspend -i")))
 
   (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
 #+END_SRC
@@ -1025,6 +1023,11 @@ A simple and fun game
 #+END_SRC
 * General Functionality
 This is just stuff not pertaining to a specific task and/or not complex enough to warrant entire sections for them.
+** Always confirm killing Emacs
+I constantly accidentally kill Emacs when running it in terminals, so this prevents me from doing that.
+#+BEGIN_SRC emacs-lisp
+  (setq confirm-kill-emacs 'yes-or-no-p)
+#+END_SRC
 ** Don't make extra files on the filesystem
 I don't use auto-saves and backups. I love living on the edge.
 #+BEGIN_SRC emacs-lisp
@@ -1200,19 +1203,19 @@ This saves me tons of time when it comes to managing whitespace.
 ** company package (autocomplete backend)
 This is the base package. I changed some key bindings to make it more pleasant to use.
 #+BEGIN_SRC emacs-lisp
-    (use-package company
-      :ensure t
-      :defer t
-      :init
-      (setq company-idle-delay 0.75
-	    company-minimum-prefix-length 3)
-      (with-eval-after-load 'company
-	(define-key company-active-map (kbd "M-n") nil)
-	(define-key company-active-map (kbd "M-p") nil)
-	(define-key company-active-map (kbd "C-n") 'company-select-next)
-	(define-key company-active-map (kbd "C-p") 'company-select-previous)
-	(define-key company-active-map (kbd "SPC") 'company-abort))
-      (global-company-mode 1))
+  (use-package company
+    :ensure t
+    :defer t
+    :init
+    (setq company-idle-delay 0.75
+	  company-minimum-prefix-length 3)
+    (with-eval-after-load 'company
+      (define-key company-active-map (kbd "M-n") nil)
+      (define-key company-active-map (kbd "M-p") nil)
+      (define-key company-active-map (kbd "C-n") 'company-select-next)
+      (define-key company-active-map (kbd "C-p") 'company-select-previous)
+      (define-key company-active-map (kbd "SPC") 'company-abort))
+    (global-company-mode 1))
 #+END_SRC
 * Buffers/Windows
 ** Sloppy focus
@@ -1434,8 +1437,7 @@ This is nice to have so I can be told right away when I'm doing something wrong.
     :ensure t
     :defer t
     :init
-    (global-flycheck-mode 1)
-    (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+    (global-flycheck-mode 1))
 #+END_SRC
 ** avy-flycheck package (avy but also flycheck)
 This one is SUPER COOL.
@@ -1475,7 +1477,7 @@ I have no words for how convenient this has been and how much faster I get thing
 			      (?\( . ?\))
 			      (?\[ . ?\])
 			      (?\" . ?\")))
-  (electric-pair-mode t)
+  (electric-pair-mode 1)
 #+END_SRC
 * Looks
 ** General
