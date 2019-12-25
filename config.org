@@ -888,13 +888,6 @@ I do a crapload here, but basically the two main things I do here is configure ~
     (call-process "mpc" nil nil nil "update")
     (message "MPD database updated!"))
 #+END_SRC
-*** Showing playback status
-#+BEGIN_SRC emacs-lisp
-  (defun mpd/status ()
-    "Display the mpc status in the echo area."
-    (interactive)
-    (shell-command "mpc"))
-#+END_SRC
 *** Shuffling the playlist
 #+BEGIN_SRC emacs-lisp
   (defun farl-emms/shuffle-with-message ()
@@ -927,7 +920,6 @@ Now using a keymap in place of that wonky as crap binding system. The new binds 
       (define-key map (kbd "d s") 'mpd/start-music-daemon)
       (define-key map (kbd "d q") 'mpd/kill-music-daemon)
       (define-key map (kbd "d u") 'mpd/update-database)
-      (define-key map (kbd "d s") 'mpd/status)
       map)
     "A keymap for controlling `emms'.")
   (global-set-key (kbd "C-c a") emms-map)
