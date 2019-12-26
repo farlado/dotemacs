@@ -1373,7 +1373,7 @@ This one is SUPER COOL.
     :ensure t
     :defer t
     :bind (:map prog-mode-map
-		("C-c C-'" . avy-flycheck-goto-error)))
+	   ("C-c C-'" . avy-flycheck-goto-error)))
 #+END_SRC
 ** company-jedi package (Python autocompletion)
 I will probably be adding company autocompletion for more languages as I start working in more languages.
@@ -1496,7 +1496,7 @@ It's gonna need more polish, but it works.
     :ensure t
     :defer t
     :bind (:map org-mode-map
-		("C-c r" . epresent-run)))
+	   ("C-c r" . epresent-run)))
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :exports none
   )
