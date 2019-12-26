@@ -1610,7 +1610,7 @@ I *hate* the default mode line. This one is much less sucky. I also show and hid
     :defer t
     :init
     (require 'spaceline-config)
-    (setq powerline-default-separator 'contour
+    (setq powerline-default-separator 'wave
 	  spaceline-buffer-encoding-abbrev-p nil
 	  spaceline-buffer-size-p nil
 	  spaceline-line-column-p t)
