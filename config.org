@@ -459,7 +459,7 @@ I have a painfully white theme which fits perfectly with my setup.
 I haven't figured out how to engrave in Emacs, so for now...
 #+BEGIN_SRC emacs-lisp
   (defun run-musescore ()
-    "Open MuseScore."
+    "Start MuseScore."
     (interactive)
     (start-process-shell-command
      "MuseScore" nil "musescore"))
@@ -472,6 +472,14 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
     (interactive)
     (start-process-shell-command
      "LibreOffice" nil "libreoffice"))
+#+END_SRC
+**** Transmission
+#+BEGIN_SRC emacs-lisp
+  (defun run-transmission ()
+    "Start Transmission."
+    (interactive)
+    (start-process-shell-command
+     "Transmission" nil "transmission-gtk"))
 #+END_SRC
 *** Other things a DE should probably have
 **** Display setup
@@ -733,17 +741,18 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 	  ([?\s-e] . farl-exwm/workspace-2)
 
 	  ;; Opening X applications
-	  ([?\s-f]    . run-firefox)
-	  ([?\s-b]    . run-libreoffice)
 	  ([?\s-g]    . run-gimp)
-	  ([?\s-t]    . run-telegram)
-	  ([?\s-d]    . run-discord)
 	  ([?\s-s]    . run-steam)
+	  ([?\s-f]    . run-firefox)
+	  ([?\s-d]    . run-discord)
+	  ([?\s-t]    . run-telegram)
 	  ([?\s-m]    . run-musescore)
-	  ([s-return] . run-terminal)
+	  ([?\s-b]    . run-libreoffice)
+	  ([?\s-o]    . run-transmission)
 	  ([?\s-r]    . monitor-settings)
 	  ([?\s-n]    . network-settings)
 	  ([?\s-v]    . volume-settings)
+	  ([s-return] . run-terminal)
 
 	  ;; Other desktop environment things
 	  ([?\s-x]       . dmenu)
