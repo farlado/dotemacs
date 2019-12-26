@@ -10,21 +10,22 @@
 ** Dependencies
 Everything has different dependencies so make sure you have what you need. The easy route to getting all these dependencies installed and configured is to deploy [[https://github.com/farlado/dotfiles][my dotfiles]]:
 #+BEGIN_SRC sh
-  sh -c "$(curl https://farlado.xyz/deploy)"
+  curl https://farlado.xyz/deploy | sh
 #+END_SRC
 *** EXWM
 - Painfully obvious here: ~xorg~
 - Checking for a window manager: ~wmctrl~
 - Always hiding the cursor while typing: ~xbanish~
 - Compositor: ~xcompmgr~
-- Monitor Configuration: ~arandr~
-- Network Configuration: ~nm-connection-editor~
-- Web Browser: ~firefox~
-- Editing Crappy Documents: ~libreoffice~
-- Crappy Image Editor: ~gimp~
-- Crappy Messenger: ~telegram-desktop~
-- Crappier Messenger: ~discord~
-- Games Platform: ~steam~
+- Monitor configuration: ~arandr~
+- Network configuration: ~nm-connection-editor~
+- Web browser: ~firefox~
+- Editing crappy documents: ~libreoffice~
+- Crappy image editor: ~gimp~
+- Crappy messenger: ~telegram-desktop~
+- Crappier messenger: ~discord~
+- Music composition: ~musescore~
+- Games platform: ~steam~
 *** desktop-environment
 - For volume control: ~alsa-utils~
 - For brightness control: ~brightnessctl~
@@ -54,14 +55,14 @@ Everything has different dependencies so make sure you have what you need. The e
 - For Haskell: ~stack~
 * Startup
 ** Start Emacs server
-Although I technically don't /have/ to do this, it is very helpful.
+Having the Emacs server running allows for a lot of neat integrations with other parts of my destop environment.
 #+BEGIN_SRC emacs-lisp
   (require 'server)
   (unless (server-running-p)
     (server-start))
 #+END_SRC
 ** Enable UTF-8 encoding
-I probably don't have to do this but it makes things work a little smoother.
+I probably don't have to do this so early, but it makes things work a little smoother.
 #+BEGIN_SRC emacs-lisp
   (set-language-environment "UTF-8")
   (set-default-coding-systems 'utf-8)
@@ -76,7 +77,7 @@ Ensures everything works as intended.
 #+BEGIN_SRC emacs-lisp
   (setq load-prefer-newer t)
 #+END_SRC
-** async package (asynchronous stuff)
+** async package (asynchronous execution)
 This should make a few different things a little faster when packages are being handled.
 #+BEGIN_SRC emacs-lisp
   (use-package async
@@ -90,17 +91,16 @@ This should make a few different things a little faster when packages are being 
 ** dashboard package (replacement start screen)
 I love the default start screen, but it just doesn't cut it for me. I just use this to have a nice screen when I start Emacs or close all my buffers.
 #+BEGIN_SRC emacs-lisp
-    (use-package dashboard
-      :ensure t
-      :defer t
-      :init
-      (setq inhibit-start-menu t
-	    dashboard-items '((recents . 10))
-	    show-week-agenda-p t
-	    dashboard-banner-logo-title "Welcome to GNU Emacs"
-	    dashboard-set-footer nil
-	    initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-      (dashboard-setup-startup-hook))
+  (use-package dashboard
+    :ensure t
+    :defer t
+    :init
+    (setq inhibit-start-menu t
+	  dashboard-items '()
+	  dashboard-banner-logo-title "Welcome to GNU Emacs"
+	  dashboard-set-footer nil
+	  initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+    (dashboard-setup-startup-hook))
 #+END_SRC
 ** auto-package-update package (self-explanatory)
 I don't want to have to manually update my stuff. This solution is literally plop-and-forget.
@@ -109,7 +109,6 @@ I don't want to have to manually update my stuff. This solution is literally plo
     :ensure t
     :defer t
     :init
-    (require 'auto-package-update)
     (setq auto-package-update-interval 2
 	  auto-package-update-delete-old-versions t
 	  auto-package-update-hide-results t)
@@ -118,12 +117,13 @@ I don't want to have to manually update my stuff. This solution is literally plo
 * Making Emacs a Desktop Environment
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness.
 #+BEGIN_SRC emacs-lisp :exports none
-  (when run-emacs-as-desktop-environment?
+  (when (and (string= (window-system) 'x)
+	   (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 1))
     (set-frame-parameter nil 'fullscreen 'fullboth)
 #+END_SRC
 ** Configuration
 *** exwm package (base window manager)
-This isn't actually where we do all the configuration, it's just where we install EXWM and load what we need to configure it.
+This isn't actually where we do all the configuration, it's just where we install EXWM and load what we need to configure it. Usually it is best to configure packages inside of ~use-package~, but that would be a horrible idea due to just how many different things there are that need configuring.
 #+BEGIN_SRC emacs-lisp
   (use-package exwm
     :ensure t
@@ -141,51 +141,6 @@ Since I'm using Emacs as a window manager, I need ~dmenu~ so I can open X window
     :ensure t
     :defer t)
 #+END_SRC
-*** system-packages package (manage system packages in Emacs)
-This one is a pleasant surprise to have honestly. Having Emacs handle system packages as well as its own is a very pleasant surprise. Since I use ~yay~ on Arch, I configure an entry for it and use it if it's installed.
-#+BEGIN_SRC emacs-lisp
-  (use-package system-packages
-    :ensure t
-    :defer t
-    :init
-    (when (executable-find "yay")
-      (require 'system-packages)
-      (add-to-list 'system-packages-supported-package-managers
-		   '(yay .
-			 ((default-sudo . nil)
-			  (install . "yay -S")
-			  (search . "yay -Ss")
-			  (uninstall . "yay -Rs")
-			  (update . "yay -Syu")
-			  (clean-cache . "yay -Sc")
-			  (log . "car /var/log/pacman.log")
-			  (get-info . "yay -Qi")
-			  (get-info-remote . "yay -Si")
-			  (list-files-provided-by . "yay -Ql")
-			  (verify-all-packages . "yay -Qkk")
-			  (verify-all-dependencies . "yay -Dk")
-			  (remove-orphaned . "yay -Rns $(yay -Qtdq)")
-			  (list-installed-packages . "yay -Qe")
-			  (list-installed-packages-all . "yay -Q")
-			  (list-dependencies-of . "yay -Qi")
-			  (noconfirm . "--noconfirm"))))
-      (setq system-packages-use-sudo nil
-	    system-packages-package-manager 'yay))
-    :bind (("C-c p i" . system-packages-install)
-	   ("C-c p e" . system-packages-ensure)
-	   ("C-c p u" . system-packages-update)
-	   ("C-c p r" . system-packages-uninstall)
-	   ("C-c p o" . system-packages-remove-orphaned)
-	   ("C-c p c" . system-packages-clean-cache)
-	   ("C-c p l" . system-packages-log)
-	   ("C-c p s" . system-packages-search)
-	   ("C-c p g" . system-packages-get-info)
-	   ("C-c p d" . system-packages-list-dependencies-of)
-	   ("C-c p f" . system-packages-list-files-provided-by)
-	   ("C-c p p" . system-packages-list-installed-packages)
-	   ("C-c p f" . system-packages-verify-all-dependencies)
-	   ("C-c p v" . system-packages-verify-all-packages)))
-#+END_SRC
 *** desktop-environment package (take a guess what it does)
 Previously I had to define a lot of functions to do these things, now I just change settings within ~desktop-environment~.
 #+BEGIN_SRC emacs-lisp
@@ -193,7 +148,6 @@ Previously I had to define a lot of functions to do these things, now I just cha
     :ensure t
     :defer t
     :init
-    (require 'desktop-environment)
     (desktop-environment-mode 1))
 #+END_SRC
 **** Volume adjustment
@@ -286,8 +240,53 @@ Haha yes, this is very long and very very stupid.
 		"--lockfailedtext='' --noinputtext='' --radius 1 --ring-width 1 "
 		" --veriftext='' --wrongtext='WRONG' --force-clock"))
 #+END_SRC
+*** system-packages package (manage system packages in Emacs)
+This one is a pleasant surprise to have honestly. Having Emacs handle system packages as well as its own is a very pleasant surprise. Since I use ~yay~ on Arch, I configure an entry for it and use it if it's installed.
+#+BEGIN_SRC emacs-lisp
+  (use-package system-packages
+    :ensure t
+    :defer t
+    :init
+    (when (executable-find "yay")
+      (require 'system-packages)
+      (add-to-list 'system-packages-supported-package-managers
+		   '(yay .
+			 ((default-sudo . nil)
+			  (install . "yay -S")
+			  (search . "yay -Ss")
+			  (uninstall . "yay -Rs")
+			  (update . "yay -Syu")
+			  (clean-cache . "yay -Sc")
+			  (log . "car /var/log/pacman.log")
+			  (get-info . "yay -Qi")
+			  (get-info-remote . "yay -Si")
+			  (list-files-provided-by . "yay -Ql")
+			  (verify-all-packages . "yay -Qkk")
+			  (verify-all-dependencies . "yay -Dk")
+			  (remove-orphaned . "yay -Rns $(yay -Qtdq)")
+			  (list-installed-packages . "yay -Qe")
+			  (list-installed-packages-all . "yay -Q")
+			  (list-dependencies-of . "yay -Qi")
+			  (noconfirm . "--noconfirm"))))
+      (setq system-packages-use-sudo nil
+	    system-packages-package-manager 'yay))
+    :bind (("C-c p i" . system-packages-install)
+	   ("C-c p e" . system-packages-ensure)
+	   ("C-c p u" . system-packages-update)
+	   ("C-c p r" . system-packages-uninstall)
+	   ("C-c p o" . system-packages-remove-orphaned)
+	   ("C-c p c" . system-packages-clean-cache)
+	   ("C-c p l" . system-packages-log)
+	   ("C-c p s" . system-packages-search)
+	   ("C-c p g" . system-packages-get-info)
+	   ("C-c p d" . system-packages-list-dependencies-of)
+	   ("C-c p f" . system-packages-list-files-provided-by)
+	   ("C-c p p" . system-packages-list-installed-packages)
+	   ("C-c p f" . system-packages-verify-all-dependencies)
+	   ("C-c p v" . system-packages-verify-all-packages)))
+#+END_SRC
 *** Workspace configuration
-No clue why you have to do so much just to give workspaces names, but at least you can do it. I also put which monitors to try to put workspaces onto here, alongside a few other useful settings for which windows should float and which workspaces they should be on.
+No clue why you have to do so much just to give workspaces names, but at least you can do it. I also put which monitors to try to put workspaces onto here, alongside settings for which windows should float and which workspaces they should be on.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-workspace-number 3
 	exwm-workspace-index-map (lambda (index)
@@ -308,6 +307,23 @@ No clue why you have to do so much just to give workspaces names, but at least y
 				      workspace 1)
 				     ((string= exwm-title "Event Tester")
 				      floating t)))
+#+END_SRC
+Additionally, I define functions for switching between workspaces, to make the global binds down the line look significantly cleaner.
+#+BEGIN_SRC emacs-lisp
+  (defun farl-exwm/workspace-0 ()
+    "Switch to EXWM workspace 0."
+    (interactive)
+    (exwm-workspace-switch-create 0))
+
+  (defun farl-exwm/workspace-1 ()
+    "Switch to EXWM workspace 1."
+    (interactive)
+    (exwm-workspace-switch-create 1))
+
+  (defun farl-exwm/workspace-2 ()
+    "Switch to EXWM workspace 2."
+    (interactive)
+    (exwm-workspace-switch-create 2))
 #+END_SRC
 *** Multi-head
 There was a point where I tried to make this into an Elisp function. Not trying that insanity again.
@@ -394,24 +410,6 @@ Uses the same color as my mode line, uses the same width as window divider width
 	exwm-floating-border-color "#335ea8")
 #+END_SRC
 *** X applications
-**** Firefox
-Firefox has some unique abilities when it comes to how to make windows behave which work better for me. I don't use tabs, and I don't want anything to do with them, and Firefox lets me hide the tab bar and force all tabs to actually open as new windows.
-#+BEGIN_SRC emacs-lisp
-  (defun run-firefox ()
-    "Start Firefox."
-    (interactive)
-    (start-process-shell-command
-     "Firefox" nil "firefox"))
-#+END_SRC
-**** LibreOffice
-Shame me all you want. I'm still in introductory courses and haven't learned enough Org-mode to use it more meaningfully.
-#+BEGIN_SRC emacs-lisp
-  (defun run-libreoffice ()
-    "Start LibreOffice."
-    (interactive)
-    (start-process-shell-command
-     "LibreOffice" nil "libreoffice"))
-#+END_SRC
 **** GIMP
 Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
 #+BEGIN_SRC emacs-lisp
@@ -420,6 +418,33 @@ Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
     (interactive)
     (start-process-shell-command
      "GIMP" nil "gimp"))
+#+END_SRC
+**** Steam
+Gaming is possible with EXWM, if you run games windowed.
+#+BEGIN_SRC emacs-lisp
+  (defun run-steam ()
+    "Start Steam."
+    (interactive)
+    (start-process-shell-command
+     "Steam" nil "steam"))
+#+END_SRC
+**** Firefox
+Firefox has some unique abilities when it comes to how to make windows behave which work better for me. I don't use tabs, and I don't want anything to do with them, and Firefox lets me hide the tab bar and force all tabs to actually open as new windows. It's like Suckless Surf, but orders of magnitude better.
+#+BEGIN_SRC emacs-lisp
+  (defun run-firefox ()
+    "Start Firefox."
+    (interactive)
+    (start-process-shell-command
+     "Firefox" nil "firefox"))
+#+END_SRC
+**** Discord
+Yeah, I also use the light theme for Discord. It looks comfy, even if Discord is a garbage application.
+#+BEGIN_SRC emacs-lisp
+  (defun run-discord ()
+    "Start Discord."
+    (interactive)
+    (start-process-shell-command
+     "Discord" nil "discord"))
 #+END_SRC
 **** Telegram
 I have a painfully white theme which fits perfectly with my setup.
@@ -430,23 +455,23 @@ I have a painfully white theme which fits perfectly with my setup.
     (start-process-shell-command
      "Telegram" nil "telegram-desktop"))
 #+END_SRC
-**** Discord
-Yeah, I also use a light theme for Discord. It looks comfy, even if Discord is a garbage application.
+**** MuseScore
+I haven't figured out how to engrave in Emacs, so for now...
 #+BEGIN_SRC emacs-lisp
-  (defun run-discord ()
-    "Start Discord."
+  (defun run-musescore ()
+    "Open MuseScore."
     (interactive)
     (start-process-shell-command
-     "Discord" nil "discord"))
+     "MuseScore" nil "musescore"))
 #+END_SRC
-**** Steam
-Gaming is possible with EXWM, if you run games windowed.
+**** LibreOffice
+Shame me all you want. I'm still in introductory courses and haven't learned enough Org-mode to use it more meaningfully.
 #+BEGIN_SRC emacs-lisp
-  (defun run-steam ()
-    "Start Steam."
+  (defun run-libreoffice ()
+    "Start LibreOffice."
     (interactive)
     (start-process-shell-command
-     "Steam" nil "steam"))
+     "LibreOffice" nil "libreoffice"))
 #+END_SRC
 *** Other things a DE should probably have
 **** Display setup
@@ -458,7 +483,7 @@ Calling ~arandr~ to adjust monitors is useful when I am preparing to present som
     (start-process-shell-command
      "Monitor Settings" nil "arandr"))
 #+END_SRC
-**** Network Settings
+**** Network settings
 This one uses two windows: one to open the NetworkManager connection editor, and another to list WiFi networks nearby.
 #+BEGIN_SRC emacs-lisp
   (defun network-settings ()
@@ -486,11 +511,10 @@ Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucon
     ;; Create two modules: `loop' and `out'
     (dolist (sink '("loop" "out"))
       (shell-command (concat "pacmd load-module module-null-sink sink_name=" sink))
-      (shell-command (concat "pacmd update-sink-proplist " sink " device.description=" sink)))
+      (shell-command (concat "pacmd update-sink-proplist "
+			     sink " device.description=" sink)))
     ;; Loop `loop' to primary output, pipe it to `out', loop primary into to `out'
-    (dolist (command '("source=loop.monitor"
-		       "source=loop.monitor sink=out"
-		       "sink=out"))
+    (dolist (command '("source=loop.monitor" "source=loop.monitor sink=out" "sink=out"))
       (shell-command (concat "pacmd load-module module-loopback " command)))
     ;; Run `pavucontrol' and then unload the modules after it completes
     (start-process-shell-command
@@ -526,7 +550,7 @@ This will eventually be its own package, but for now, it's just in my config. Fi
     :group 'keyboard-layout
     :type 'string)
 #+END_SRC
-Then, I use these functions to control setting and cycling the keyboard layout.
+Then, I use these functions to control setting and cycling the keyboard layout:
 #+BEGIN_SRC emacs-lisp
   (defun get-keyboard-layout ()
     "Get the current keyboard layout."
@@ -597,37 +621,38 @@ I copied the function for quitting Emacs to handle shutting down.
     (let ((confirm confirm-kill-emacs))
       (and
        (or (not (memq t (mapcar (function
-				 (lambda (buf) (and (buffer-file-name buf)
-						    (buffer-modified-p buf))))
-				(buffer-list))))
-	   (progn (setq confirm nil)
-		  (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
+			      (lambda (buf) (and (buffer-file-name buf)
+					  (buffer-modified-p buf))))
+			     (buffer-list))))
+	  (progn (setq confirm nil)
+		 (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
        (or (not (fboundp 'process-list))
-	   ;; process-list is not defined on MSDOS.
-	   (not confirm-kill-processes)
-	   (let ((processes (process-list))
-		 active)
-	     (while processes
-	       (and (memq (process-status (car processes)) '(run stop open listen))
-		    (process-query-on-exit-flag (car processes))
-		    (setq active t))
-	       (setq processes (cdr processes)))
-	     (or (not active)
-		 (with-current-buffer-window
-		  (get-buffer-create "*Process List*") nil
-		  #'(lambda (window _value)
-		      (with-selected-window window
-			(unwind-protect
-			    (progn
-			      (setq confirm nil)
-			      (yes-or-no-p "Active processes exist; kill them and shut down anyway? "))
-			  (when (window-live-p window)
-			    (quit-restore-window window 'kill)))))
-		  (list-processes t)))))
+	  ;; process-list is not defined on MSDOS.
+	  (not confirm-kill-processes)
+	  (let ((processes (process-list))
+		active)
+	    (while processes
+	      (and (memq (process-status (car processes)) '(run stop open listen))
+		 (process-query-on-exit-flag (car processes))
+		 (setq active t))
+	      (setq processes (cdr processes)))
+	    (or (not active)
+	       (with-current-buffer-window
+		(get-buffer-create "*Process List*") nil
+		#'(lambda (window _value)
+		    (with-selected-window window
+		      (unwind-protect
+			  (progn
+			    (setq confirm nil)
+			    (yes-or-no-p (concat "Active processes exist; kill "
+						 "them and shut down anyway? ")))
+			(when (window-live-p window)
+			  (quit-restore-window window 'kill)))))
+		(list-processes t)))))
        ;; Query the user for other things, perhaps.
        (run-hook-with-args-until-failure 'kill-emacs-query-functions)
        (or (null confirm)
-	   (funcall confirm "Really shut down? "))
+	  (funcall confirm "Really shut down? "))
        (shell-command "shutdown now")
        (kill-emacs))))
 
@@ -653,33 +678,34 @@ I copied the function for quitting Emacs to handle reboot too.
     (let ((confirm confirm-kill-emacs))
       (and
        (or (not (memq t (mapcar (function
-				 (lambda (buf) (and (buffer-file-name buf)
-						    (buffer-modified-p buf))))
-				(buffer-list))))
-	   (progn (setq confirm nil)
-		  (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
+			      (lambda (buf) (and (buffer-file-name buf)
+					  (buffer-modified-p buf))))
+			     (buffer-list))))
+	  (progn (setq confirm nil)
+		 (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
        (or (not (fboundp 'process-list))
-	   ;; process-list is not defined on MSDOS.
-	   (not confirm-kill-processes)
-	   (let ((processes (process-list))
-		 active)
-	     (while processes
-	       (and (memq (process-status (car processes)) '(run stop open listen))
-		    (process-query-on-exit-flag (car processes))
-		    (setq active t))
-	       (setq processes (cdr processes)))
-	     (or (not active)
-		 (with-current-buffer-window
-		  (get-buffer-create "*Process List*") nil
-		  #'(lambda (window _value)
-		      (with-selected-window window
-			(unwind-protect
-			    (progn
-			      (setq confirm nil)
-			      (yes-or-no-p "Active processes exist; kill them and reboot anyway? "))
-			  (when (window-live-p window)
-			    (quit-restore-window window 'kill)))))
-		  (list-processes t)))))
+	  ;; process-list is not defined on MSDOS.
+	  (not confirm-kill-processes)
+	  (let ((processes (process-list))
+		active)
+	    (while processes
+	      (and (memq (process-status (car processes)) '(run stop open listen))
+		 (process-query-on-exit-flag (car processes))
+		 (setq active t))
+	      (setq processes (cdr processes)))
+	    (or (not active)
+	       (with-current-buffer-window
+		(get-buffer-create "*Process List*") nil
+		#'(lambda (window _value)
+		    (with-selected-window window
+		      (unwind-protect
+			  (progn
+			    (setq confirm nil)
+			    (yes-or-no-p (concat "Active processes exist; kill "
+						 "them and reboot anyway? ")))
+			(when (window-live-p window)
+			  (quit-restore-window window 'kill)))))
+		(list-processes t)))))
        ;; Query the user for other things, perhaps.
        (run-hook-with-args-until-failure 'kill-emacs-query-functions)
        (or (null confirm)
@@ -702,15 +728,9 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-global-keys
 	`(;; Switching Workspaces
-	  ([?\s-w] . (lambda ()
-		       (interactive)
-		       (exwm-workspace-switch-create 0)))
-	  ([?\s-q] . (lambda ()
-		       (interactive)
-		       (exwm-workspace-switch-create 1)))
-	  ([?\s-e] . (lambda ()
-		       (interactive)
-		       (exwm-workspace-switch-create 2)))
+	  ([?\s-q] . farl-exwm/workspace-1)
+	  ([?\s-w] . farl-exwm/workspace-0)
+	  ([?\s-e] . farl-exwm/workspace-2)
 
 	  ;; Opening X applications
 	  ([?\s-f]    . run-firefox)
@@ -719,6 +739,7 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 	  ([?\s-t]    . run-telegram)
 	  ([?\s-d]    . run-discord)
 	  ([?\s-s]    . run-steam)
+	  ([?\s-m]    . run-musescore)
 	  ([s-return] . run-terminal)
 	  ([?\s-r]    . monitor-settings)
 	  ([?\s-n]    . network-settings)
@@ -789,10 +810,7 @@ This includes:
 - Toggling hiding
 - Toggling the mode line
 #+BEGIN_SRC emacs-lisp
-  (dolist (key '("C-c C-f"
-		 "C-c C-t C-f"
-		 "C-c C-t C-v"
-		 "C-c C-t C-m"))
+  (dolist (key '("C-c C-f" "C-c C-t C-f" "C-c C-t C-v" "C-c C-t C-m"))
     (define-key exwm-mode-map (kbd key) nil))
 #+END_SRC
 ** On startup
@@ -857,7 +875,7 @@ I do a crapload here, but basically the two main things I do here is configure ~
 	  emms-player-mpd-server-port "6601"
 	  mpc-host "localhost:6601"))
 #+END_SRC
-** Useful daemon functions
+** Daemon functions
 *** Starting the daemon
 #+BEGIN_SRC emacs-lisp
   (defun mpd/start-music-daemon ()
@@ -925,6 +943,112 @@ Now using a keymap in place of that wonky as crap binding system. The new binds 
 #+BEGIN_SRC emacs-lisp :exports none
   )
 #+END_SRC
+* General Functionality
+This is just stuff not pertaining to a specific task and/or not complex enough to warrant entire sections for them.
+** Disable suspending Emacs
+Why is this even something bound to begin with?
+#+BEGIN_SRC emacs-lisp
+  (dolist (key '("C-z" "C-x C-z"))
+    (global-unset-key (kbd key)))
+#+END_SRC
+** Don't make extra files on the filesystem
+I don't use auto-saves and backups. I love living on the edge.
+#+BEGIN_SRC emacs-lisp
+  (setq make-backup-files nil
+	auto-save-default nil)
+#+END_SRC
+** Don't unload fonts after loading them
+This solves a number of hanging issues related to a number of different packages and symbols.
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-compacting-font-caches t)
+#+END_SRC
+** Enable word wrapping for all buffers
+This is a point of convenience, even in programming language buffers. Wrapping words makes for a heck of a lot more readability of any kind of text, whether a program or just normal language.
+#+BEGIN_SRC emacs-lisp
+  (global-visual-line-mode 1)
+#+END_SRC
+** Move between SubWords as well as between words
+This allows for much easier navigation between words when in programming language buffers, but also has utility outside of programming so it's enabled globally.
+#+BEGIN_SRC emacs-lisp
+  (global-subword-mode 1)
+#+END_SRC
+** Spell-checking
+Just a useful little tool to check spelling while editing a buffer.
+#+BEGIN_SRC emacs-lisp
+  (require 'flyspell)
+
+  (setq ispell-program-name "aspell"
+	ispell-dictionary "american")
+
+  (add-hook 'flyspell-mode-hook 'flyspell-buffer)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+  (add-hook 'text-mode-hook 'flyspell-mode)
+#+END_SRC
+** Always confirm killing Emacs
+I constantly kill Emacs on accident when running it in terminals, so this prevents me from doing that.
+#+BEGIN_SRC emacs-lisp
+  (setq confirm-kill-emacs 'yes-or-no-p)
+#+END_SRC
+** Make scrolling a little less crazy
+Now even more comfy.
+#+BEGIN_SRC emacs-lisp
+  (setq scroll-margin 0
+	scroll-conservatively 100000
+	scroll-preserve-screen-position 1)
+#+END_SRC
+** Edit with superuser privileges via =C-x C-M-f=
+#+BEGIN_SRC emacs-lisp
+  (use-package sudo-edit
+    :ensure t
+    :defer t
+    :bind ("C-x C-M-f" . sudo-edit))
+#+END_SRC
+** Open/create the scratch buffer with =C-c s=
+Since I close it all the time and also use it all the time, it's easy to just make a bind for it.
+#+BEGIN_SRC emacs-lisp
+  (defun open-scratch-buffer ()
+    "Open the scratch buffer."
+    (interactive)
+    (switch-to-buffer (get-buffer-create "*scratch*"))
+    (lisp-interaction-mode))
+
+  (global-set-key (kbd "C-c s") 'open-scratch-buffer)
+#+END_SRC
+** Restart and open dashboard with =C-c M-d=
+I constantly accidentally close dashboard, so I made a way to open it again if I accidentally kill it.
+#+BEGIN_SRC emacs-lisp
+  (defun dashboard-restart ()
+    "Restart the dashboard buffer and switch to it."
+    (interactive)
+    (dashboard-insert-startupify-lists)
+    (switch-to-buffer "*dashboard*"))
+
+  (global-set-key (kbd "C-c M-d") 'dashboard-restart)
+#+END_SRC
+** Change current directory with =C-c d=
+Useful when getting lost in the filesystem!
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c d") 'cd)
+#+END_SRC
+** Open configuration with =C-c e=
+Since this thing is changing all the time, I really like having it available on a shortcut.
+#+BEGIN_SRC emacs-lisp
+  (defun config-visit ()
+    "Open the config file."
+    (interactive)
+    (find-file "~/.emacs.d/config.org"))
+
+  (global-set-key (kbd "C-c e") 'config-visit)
+#+END_SRC
+** graphviz-dot-mode package (diagram creation)
+A nice way to make diagrams.
+#+BEGIN_SRC emacs-lisp
+  (use-package graphviz-dot-mode
+    :ensure t
+    :defer t
+    :init
+    (require 'graphviz-dot-mode))
+#+END_SRC
 * Other Emacs Goodies
 This is other stuff I use in Emacs.
 ** Terminal
@@ -937,24 +1061,28 @@ I've been jumping between ~vterm~ and ~ansi-term~. I guess ~vterm~ is just easie
     (defalias 'run-terminal 'vterm)
     :bind ("C-c t" . vterm))
 #+END_SRC
+** Calendar
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c l") 'calendar)
+#+END_SRC
+** Calculator
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c c") 'calc)
+#+END_SRC
 ** Reading the manpages
 Wow, there's actually an Emacs mode for this!
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c m") 'man)
 #+END_SRC
-** Calculator
+** nov package (epub reader)
+Not the best way to do epub reading, but at least it's in Emacs.
 #+BEGIN_SRC emacs-lisp
-  (require 'calc)
-
-  (global-set-key (kbd "C-c c") 'calc)
-
-  (define-key calc-mode-map (kbd "ESC ESC ESC") 'kill-this-buffer-and-window)
+  (use-package nov
+    :ensure t
+    :defer t
+    :mode ("\\.epub\\'" . nov-mode))
 #+END_SRC
-** Calendar
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-c C-c") 'calendar)
-#+END_SRC
-** Weather forecasts
+** wttrin package (weather forecasts)
 Picking a service to use for this was a pain. I ended up settling for wttrin because it is the fastest and easiest to use, and plays nice with my setup.
 #+BEGIN_SRC emacs-lisp
   (use-package wttrin
@@ -964,23 +1092,22 @@ Picking a service to use for this was a pain. I ended up settling for wttrin bec
     (setq wttrin-default-cities '("Indianapolis"))
     :bind ("C-c w" . wttrin))
 #+END_SRC
-** Reading ebooks
-Not the best way to do epub reading, but at least it's in Emacs.
-#+BEGIN_SRC emacs-lisp
-  (use-package nov
-    :ensure t
-    :defer t
-    :init
-    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
-#+END_SRC
 ** Games
+To make running games easier, I set up a keymap to which I add the games.
+#+BEGIN_SRC emacs-lisp
+  (defvar games-map
+    (make-sparse-keymap)
+    "A keymap to which games can be added.")
+  (global-set-key (kbd "C-M-g") games-map)
+#+END_SRC
 *** Chess
 Just for fun. I suck but it's nice.
 #+BEGIN_SRC emacs-lisp
   (use-package chess
     :ensure t
     :defer t
-    :bind ("C-c M-c" . chess))
+    :bind (:map games-map
+	   ("c" . chess)))
 #+END_SRC
 *** Sudoku
 I /love/ sudoku puzzles.
@@ -988,30 +1115,27 @@ I /love/ sudoku puzzles.
   (use-package sudoku
     :ensure t
     :defer t
-    :bind ("C-c M-s" . sudoku))
+    :bind (:map games-map
+	   ("s" . sudoku)))
 #+END_SRC
 *** Tetris
 God I love playing Tetris
 #+BEGIN_SRC emacs-lisp
-  (require 'tetris)
-
-  (global-set-key (kbd "C-c M-t") 'tetris)
-
-  (define-key tetris-mode-map "a"     'tetris-move-left)
-  (define-key tetris-mode-map "s"     'tetris-move-down)
-  (define-key tetris-mode-map "w"     'tetris-move-bottom)
-  (define-key tetris-mode-map "d"     'tetris-move-right)
-
-  (define-key tetris-mode-map [left]  'tetris-rotate-prev)
-  (define-key tetris-mode-map [right] 'tetris-rotate-next)
-
-  (define-key tetris-mode-map [?\t]   'tetris-pause-game)
-
-  (define-key tetris-mode-map "q"     'kill-this-buffer)
-  (define-key tetris-mode-map "Q"     'kill-this-buffer-and-window)
-
-  (define-key tetris-mode-map "r"     'tetris-start-game)
-  (define-key tetris-mode-map "e"     'tetris-end-game)
+  (use-package tetris
+    :ensure t
+    :defer t
+    :bind (:map games-map
+	   ("t" . 'tetris)
+	   :map tetris-mode-map
+	   ("w" . tetris-move-bottom)
+	   ("a" . tetris-move-left)
+	   ("s" . tetris-mode-down)
+	   ("d" . tetris-move-right)
+	   ([left] . tetris-rotate-next)
+	   ([right] . tetris-rotate-prev)
+	   ([?\t] . tetris-pause-game)
+	   ("r" . tetris-start-game)
+	   ("e" . tetris-end-game)))
 #+END_SRC
 *** 2048
 A simple and fun game
@@ -1019,122 +1143,119 @@ A simple and fun game
   (use-package 2048-game
     :ensure t
     :defer t
-    :bind ("C-c M-2" . 2048-game))
+    :bind (:map games-map
+	   ("2" . 2048-game)))
 #+END_SRC
-* General Functionality
-This is just stuff not pertaining to a specific task and/or not complex enough to warrant entire sections for them.
-** Always confirm killing Emacs
-I constantly accidentally kill Emacs when running it in terminals, so this prevents me from doing that.
+* Buffers/Windows
+** Sloppy focus
+I hate having to click to focus a different window, so I would rather just have windows sloppily focus.
 #+BEGIN_SRC emacs-lisp
-  (setq confirm-kill-emacs 'yes-or-no-p)
+  (setq focus-follows-mouse t
+	mouse-autoselect-window t)
 #+END_SRC
-** Don't make extra files on the filesystem
-I don't use auto-saves and backups. I love living on the edge.
+** Kill current buffer with =C-x k=, use =C-x C-k= to kill the window too
+I had to adjust the function which kills both the current buffer and the current window, because it did not cooperate with EXWM buffers. That's why I have this weird chunk I don't actually have the expertise yet to fully parse.
 #+BEGIN_SRC emacs-lisp
-  (setq make-backup-files nil
-	auto-save-default nil)
-#+END_SRC
-** Make scrolling a little less crazy
-Now even more comfy.
-#+BEGIN_SRC emacs-lisp
-  (setq scroll-margin 0
-	scroll-conservatively 100000
-	scroll-preserve-screen-position 1)
-#+END_SRC
-** Enable word wrapping for all buffers
-It's literally never not annoying when words don't wrap.
-#+BEGIN_SRC emacs-lisp
-  (global-visual-line-mode 1)
-#+END_SRC
-** If on a system with a bell, shut it up
-#+BEGIN_SRC emacs-lisp
-  (setq ring-bell-function 'ignore)
-#+END_SRC
-** Move between SubWords as well as between words
-#+BEGIN_SRC emacs-lisp
-  (global-subword-mode 1)
-#+END_SRC
-** Disable suspending Emacs
-Why even is this a key that is bound to begin with?
-#+BEGIN_SRC emacs-lisp
-  (dolist (key '("C-z"
-		 "C-x C-z"))
-    (global-unset-key (kbd key)))
-#+END_SRC
-** Change current directory with =C-c d=
-Useful when things get especially annoying!
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-c d") 'cd)
-#+END_SRC
-** Restart and open dashboard with =C-c C-d=
-I constantly accidentally close dashboard, so I made a way to open it again if I accidentally kill it.
-#+BEGIN_SRC emacs-lisp
-  (defun dashboard-restart ()
-    "Restart the dashboard buffer and switch to it."
+  (defun kill-this-buffer-and-window ()
+    "Kill the current buffer and delete the selected window. (Adjusted for EXWM.)"
     (interactive)
-    (dashboard-insert-startupify-lists)
-    (switch-to-buffer "*dashboard*"))
+    (let ((window-to-delete (selected-window))
+	  (buffer-to-kill (current-buffer))
+	  (delete-window-hook (lambda () (ignore-errors (delete-window)))))
+      (unwind-protect
+	  (progn
+	    (add-hook 'kill-buffer-hook delete-window-hook t t)
+	    (if (kill-buffer (current-buffer))
+		;; If `delete-window' failed before, we repeat
+		;; it to regenerate the error in the echo area.
+		(when (eq (selected-window) window-to-delete)
+		  (delete-window)))))))
 
-  (global-set-key (kbd "C-c C-d") 'dashboard-restart)
+  (global-set-key (kbd "C-x k") 'kill-this-buffer)
+  (global-set-key (kbd "C-x C-k") 'kill-this-buffer-and-window)
 #+END_SRC
-** Open configuration with =C-c e=
-Since this thing is changing all the time, I really like having it available on a shortcut.
+** Close all buffers and kill all windows with =C-x C-M-k=
+I wanted a way to quickly and gracefully destroy all my open stuff at once.
 #+BEGIN_SRC emacs-lisp
-  (defun config-visit ()
-    "Open the config file."
+  (defun close-buffers-and-windows ()
+    "Close every buffer and close all windows, then restart dashboard."
     (interactive)
-    (find-file "~/.emacs.d/config.org"))
+    (save-some-buffers)
+    (when (yes-or-no-p "Really kill all buffers? ")
+      (mapc 'kill-buffer (buffer-list))
+      (delete-other-windows)
+      (dashboard-restart)))
 
-  (global-set-key (kbd "C-c e") 'config-visit)
+  (global-set-key (kbd "C-x C-M-k") 'close-buffers-and-windows)
 #+END_SRC
-** Edit with superuser privileges via =C-x C-M-f=
+** Use buffer-menu on =C-x b= so the buffer list doesn't open a new window
+Just another point of personal convenience. I don't like ~ibuffer~ just because aesthetic reasons. I also set Q to close the window, for convenience.
 #+BEGIN_SRC emacs-lisp
-  (use-package sudo-edit
-    :ensure t
-    :defer t
-    :bind ("C-x C-M-f" . sudo-edit))
+  (global-set-key (kbd "C-x b") 'ibuffer)
+  (global-unset-key (kbd "C-x C-b"))
 #+END_SRC
-** graphviz-dot-mode package (diagram creation)
-A nice way to make diagrams.
+** Move focus and show buffer-menu when explicitly creating new windows
+This to me is preferable to the default behavior.
 #+BEGIN_SRC emacs-lisp
-  (use-package graphviz-dot-mode
+  (defun split-and-follow-vertical ()
+    "Open a new window vertically."
+    (interactive)
+    (split-window-below)
+    (other-window 1)
+    (ibuffer))
+
+  (defun split-and-follow-horizontal ()
+    "Open a new window horizontally."
+    (interactive)
+    (split-window-right)
+    (other-window 1)
+    (ibuffer))
+
+  (global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
+  (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
+#+END_SRC
+** Balance windows with =C-c b=
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c b") 'balance-windows)
+#+END_SRC
+** buffer-move package and windmove (moving focus and moving windows)
+Since apparently =C-x C-o= is actually something useful by default, I decided to squash ~windmove~ and ~buffer-move~ into a single keymap.
+#+BEGIN_SRC emacs-lisp
+  (use-package buffer-move
     :ensure t
     :defer t
     :init
-    (require 'graphviz-dot-mode))
-#+END_SRC
-** Spell-checking
-Just a useful little tool to keep spelling in check.
-#+BEGIN_SRC emacs-lisp
-  (require 'flyspell)
-
-  (setq ispell-program-name "aspell"
-	ispell-dictionary "american")
-
-  (add-hook 'flyspell-mode-hook 'flyspell-buffer)
-  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-  (add-hook 'text-mode-hook 'flyspell-mode)
+    (defvar buffer-move-and-windmove-map
+      (let ((map (make-sparse-keymap)))
+	(define-key map (kbd "w") 'windmove-up)
+	(define-key map (kbd "a") 'windmove-left)
+	(define-key map (kbd "s") 'windmove-down)
+	(define-key map (kbd "d") 'windmove-right)
+	(define-key map (kbd "C-w") 'buf-move-up)
+	(define-key map (kbd "C-a") 'buf-move-left)
+	(define-key map (kbd "C-s") 'buf-move-down)
+	(define-key map (kbd "C-d") 'buf-move-right)
+	map)
+      "A keymap for `buffer-move' and `windmove' functions.")
+    (global-set-key (kbd "C-x o") buffer-move-and-windmove-map))
 #+END_SRC
 * Menus/Commands
 Menus, commands, and commands which involve menus.
 ** Enable ido-mode, install ido-vertical-mode and smex
-I /love/ ~ido-mode~. God I *love* ~ido-mode~.
-#+BEGIN_SRC emacs-lisp
-  (setq ido-mode-flex-matching nil
-	ido-create-new-buffer 'always
-	ido-everywhere t)
-  (ido-mode 1)
-#+END_SRC
-However, I /HATE/ ~ido-mode~ right out of the box. A vertical list looks craptons nicer.
+I /love/ ~ido-mode~. However, I /HATE/ ~ido-mode~ right out of the box. A vertical list looks craptons nicer. Both ~ido-mode~ and ~ido-vertical-mode~ are configured in the same block.
 #+BEGIN_SRC emacs-lisp
   (use-package ido-vertical-mode
     :ensure t
     :defer t
     :init
-    (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+    (setq ido-mode-flex-matching nil
+	  ido-create-new-buffer 'always
+	  ido-everywhere t
+	  ido-vertical-define-keys 'C-n-and-C-p-only)
+    (ido-mode 1)
     (ido-vertical-mode 1))
 #+END_SRC
-Default M-x behavior doesn't use ~ido-mode~, so we install a package which gives it ~ido-mode~.
+Default M-x behavior doesn't use ~ido-mode~, so we install a package which gives it ~ido-mode~ capabilities.
 #+BEGIN_SRC emacs-lisp
   (use-package smex
     :ensure t
@@ -1209,226 +1330,23 @@ This is the base package. I changed some key bindings to make it more pleasant t
     :init
     (setq company-idle-delay 0.75
 	  company-minimum-prefix-length 3)
-    (with-eval-after-load 'company
-      (define-key company-active-map (kbd "M-n") nil)
-      (define-key company-active-map (kbd "M-p") nil)
-      (define-key company-active-map (kbd "C-n") 'company-select-next)
-      (define-key company-active-map (kbd "C-p") 'company-select-previous)
-      (define-key company-active-map (kbd "SPC") 'company-abort))
-    (global-company-mode 1))
-#+END_SRC
-* Buffers/Windows
-** Sloppy focus
-I hate having to click to focus a different window, so I would rather just have windows sloppily focus.
-#+BEGIN_SRC emacs-lisp
-  (setq focus-follows-mouse t
-	mouse-autoselect-window t)
-#+END_SRC
-** Kill current buffer with =C-x k=, use =C-x C-k= to kill the window too
-I had to adjust the function which kills both the current buffer and the current window, because it did not cooperate with EXWM buffers. That's why I have this weird chunk I don't actually have the expertise yet to fully parse.
-#+BEGIN_SRC emacs-lisp
-  (defun kill-this-buffer-and-window ()
-    "Kill the current buffer and delete the selected window. (Adjusted for EXWM.)"
-    (interactive)
-    (let ((window-to-delete (selected-window))
-	  (buffer-to-kill (current-buffer))
-	  (delete-window-hook (lambda ()
-				(ignore-errors (delete-window)))))
-      (unwind-protect
-	  (progn
-	    (add-hook 'kill-buffer-hook delete-window-hook t t)
-	    (if (kill-buffer (current-buffer))
-		;; If `delete-window' failed before, we repeat
-		;; it to regenerate the error in the echo area.
-		(when (eq (selected-window) window-to-delete)
-		  (delete-window)))))))
-
-  (global-set-key (kbd "C-x k") 'kill-this-buffer)
-  (global-set-key (kbd "C-x C-k") 'kill-this-buffer-and-window)
-#+END_SRC
-** Close all buffers and kill all windows with =C-x C-M-k=
-I wanted a way to quickly and gracefully destroy all my open stuff at once.
-#+BEGIN_SRC emacs-lisp
-  (defun close-buffers-and-windows ()
-    "Close every buffer and close all windows, then restart dashboard."
-    (interactive)
-    (save-some-buffers)
-    (when (yes-or-no-p "Really kill all buffers? ")
-      (mapc 'kill-buffer (buffer-list))
-      (delete-other-windows)
-      (dashboard-restart)))
-
-  (global-set-key (kbd "C-x C-M-k") 'close-buffers-and-windows)
-#+END_SRC
-** Use buffer-menu on =C-x b= so the buffer list doesn't open a new window
-Just another point of personal convenience. I don't like ~ibuffer~ just because aesthetic reasons. I also set Q to close the window, for convenience.
-#+BEGIN_SRC emacs-lisp
-  (require 'ibuffer)
-
-  (global-set-key (kbd "C-x b") 'ibuffer)
-  (global-unset-key (kbd "C-x C-b"))
-
-  (define-key ibuffer-mode-map (kbd "q") 'kill-this-buffer)
-  (define-key ibuffer-mode-map (kbd "Q") 'kill-this-buffer-and-window)
-#+END_SRC
-** Move focus and show buffer-menu when explicitly creating new windows
-This to me is preferable to the default behavior.
-#+BEGIN_SRC emacs-lisp
-  (defun split-and-follow-vertical ()
-    "Open a new window vertically."
-    (interactive)
-    (split-window-below)
-    (other-window 1)
-    (ibuffer))
-
-  (defun split-and-follow-horizontal ()
-    "Open a new window horizontally."
-    (interactive)
-    (split-window-right)
-    (other-window 1)
-    (ibuffer))
-
-  (global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
-  (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
-#+END_SRC
-** Balance windows with =C-c b=
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-c b") 'balance-windows)
-#+END_SRC
-** buffer-move package and windmove (moving focus and moving windows)
-Since apparently =C-x C-o= is actually something useful by default, I decided to squash ~windmove~ and ~buffer-move~ into a single keymap.
-#+BEGIN_SRC emacs-lisp
-  (use-package buffer-move
-    :ensure t
-    :defer t
-    :init
-    (defvar buffer-move-and-windmove-map
-      (let ((map (make-sparse-keymap)))
-	(define-key map (kbd "w") 'windmove-up)
-	(define-key map (kbd "a") 'windmove-left)
-	(define-key map (kbd "s") 'windmove-down)
-	(define-key map (kbd "d") 'windmove-right)
-	(define-key map (kbd "C-w") 'buf-move-up)
-	(define-key map (kbd "C-a") 'buf-move-left)
-	(define-key map (kbd "C-s") 'buf-move-down)
-	(define-key map (kbd "C-d") 'buf-move-right)
-	map)
-      "A keymap for `buffer-move' and `windmove' functions.")
-    (global-set-key (kbd "C-x o") buffer-move-and-windmove-map))
-#+END_SRC
-* Org-mode
-I don't need much extending for org-mode.
-** Agenda (only enabled if an agenda is found)
-I use =C-c a= and =C-c C-a= to do things related to my agenda. Only one of my systems actually has my agenda, so this only runs on that machine so I don't try any funny business on other machines.
-#+BEGIN_SRC emacs-lisp
-  (if (file-exists-p "~/agenda.org")
-      (progn
-	(setq org-agenda-files (quote ("~/agenda.org")))
-
-	(defun open-agenda ()
-	  "Open the agenda file."
-	  (interactive)
-	  (find-file "~/agenda.org"))
-
-	(global-set-key (kbd "C-c a") 'org-agenda)
-	(global-set-key (kbd "C-c C-a") 'open-agenda)))
-#+END_SRC
-** Quality of life settings
-These are just quick things that make ~org-mode~ much easier to use.
-#+BEGIN_SRC emacs-lisp
-  (setq org-pretty-entities t
-	org-src-fontify-natively t
-	org-src-tab-acts-natively t
-	org-src-window-setup 'current-window
-	org-fontify-whole-heading-line t
-	org-fontify-done-headline t
-	org-fontify-quote-and-verse-blocks t
-	org-highlight-latex-and-related '(latex)
-	org-enforce-todo-dependencies t
-	org-agenda-use-time-grid nil
-	org-agenda-skip-deadline-if-done t
-	org-agenda-skip-scheduled-if-done t
-	org-ellipsis (if (string= (window-system) 'x)
-			 "⤵"
-		       "..."))
-#+END_SRC
-** Shortcuts for various snippets in org-mode
-This will expand as I get into more and more languages and take more notes in classes with different snippets of different languages.
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'org-structure-template-alist
-	       '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
-  (add-to-list 'org-structure-template-alist
-	       '("py" "#+BEGIN_SRC python\n?\n#+END_SRC"))
-  (add-to-list 'org-structure-template-alist
-	       '("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC"))
-#+END_SRC
-** Use the current window when editing source code in org-mode
-This is just a convenience thing.
-#+BEGIN_SRC emacs-lisp
-  (setq org-src-window-setup 'current-window)
-#+END_SRC
-** Automatically fix inline images generated for diagrams
-This is exactly what I was looking for lmao
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
-#+END_SRC
-** Skip confirming whether to evaluate dot snippets
-Since obviously dot snippets are purely harmless +as far as I know+, I just don't bother with having to confirm evaluation every time I try to update a graphic.
-#+BEGIN_SRC emacs-lisp
-  (setq org-confirm-babel-evaluate '(lambda (lang body) (not (string= lang "dot"))))
-#+END_SRC
-** Load various languages in org-babel
-#+BEGIN_SRC emacs-lisp
-  (org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
-#+END_SRC
-** In graphical environments
-#+BEGIN_SRC emacs-lisp :exports none
-  (when (window-system)
-#+END_SRC
-*** Fancy symbol for collapsed items
-Just makes ~org-mode~ look a little fancier, no distinct changes.
-#+BEGIN_SRC emacs-lisp
-  (setq org-ellipsis "⤵")
-#+END_SRC
-*** org-bullets package (nicer bullet points in org-mode)
-It's kinda slow, but bullet points are very very nice, much better than asterisks.
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :ensure t
-    :defer t
-    :init
-    (add-hook 'org-mode-hook 'org-bullets-mode)
-    (setq inhibit-compacting-font-caches t))
-#+END_SRC
-*** Hide emphasis markers in org-mode
-Just a point of /personal preference./ I was considering keeping this in for non-graphical environments, but I can't always trust that there will be support for the different representations of text.
-#+BEGIN_SRC emacs-lisp
-  (setq org-hide-emphasis-markers t)
-#+END_SRC
-*** epresent package
-It's gonna need more polish, but it works.
-#+BEGIN_SRC emacs-lisp
-  (use-package epresent
-    :ensure t
-    :defer t
-    :bind (:map org-mode-map
-		("C-c r" . epresent-run)))
-#+END_SRC
-#+BEGIN_SRC emacs-lisp :exports none
-  )
+    (global-company-mode 1)
+    :bind (:map company-active-map
+	   ("M-n" . nil)
+	   ("M-p" . nil)
+	   ("C-n" . company-select-next)
+	   ("C-p" . company-select-previous)
+	   ("SPC" . company-abort)))
 #+END_SRC
 * Programming
-This is quite barren, but mostly because my needs are not currently particularly that big.
+It's slowly growing, but I still truly do not need all that much when it comes to programming, mostly because I don't actually do all that much programming outside what I do for fun.
 ** magit package (git but made easier)
 I used to use a terminal for this, but holy crap this is a lot easier, a lot faster, and a whole lot nicer to use overall.
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure t
     :defer t
-    :bind ("C-c g" . magit-status)
-    :bind (:map magit-mode-map
-	       ("q" . kill-this-buffer)
-	       ("Q" . kill-this-buffer-and-window)))
+    :bind ("C-c g" . magit-status))
 #+END_SRC
 ** flycheck package (on-the-fly syntax checker)
 This is nice to have so I can be told right away when I'm doing something wrong. However, I /DON'T/ want to see all the stuff about documentation for elisp.
@@ -1479,6 +1397,101 @@ I have no words for how convenient this has been and how much faster I get thing
 			      (?\" . ?\")))
   (electric-pair-mode 1)
 #+END_SRC
+* Org-mode
+As I spend more time in Org-mode, the more I need from it.
+** Agenda (only enabled if an agenda is found)
+I use =C-c M-a= and =C-c s-a= to do things related to my agenda. Only one of my systems actually has my agenda, so this only runs on that machine so I don't try any funny business on other machines.
+#+BEGIN_SRC emacs-lisp
+  (when (file-exists-p "~/agenda.org")
+    (setq org-agenda-files (quote ("~/agenda.org")))
+
+    (defun open-agenda ()
+      "Open the agenda file."
+      (interactive)
+      (find-file "~/agenda.org"))
+
+    (global-set-key (kbd "C-c M-a") 'org-agenda)
+    (global-set-key (kbd "C-c s-a") 'open-agenda))
+#+END_SRC
+** Quality of life settings
+These are just quick things that make ~org-mode~ much easier to use.
+#+BEGIN_SRC emacs-lisp
+  (setq org-pretty-entities t
+	org-src-fontify-natively t
+	org-src-tab-acts-natively t
+	org-src-window-setup 'current-window
+	org-fontify-whole-heading-line t
+	org-fontify-done-headline t
+	org-fontify-quote-and-verse-blocks t
+	org-highlight-latex-and-related '(latex)
+	org-enforce-todo-dependencies t
+	org-agenda-use-time-grid nil
+	org-agenda-skip-deadline-if-done t
+	org-agenda-skip-scheduled-if-done t)
+#+END_SRC
+** Shortcuts for various snippets in org-mode
+This will expand as I get into more and more languages and take more notes in classes with different snippets of different languages.
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-structure-template-alist
+	       '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+  (add-to-list 'org-structure-template-alist
+	       '("py" "#+BEGIN_SRC python\n?\n#+END_SRC"))
+  (add-to-list 'org-structure-template-alist
+	       '("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC"))
+#+END_SRC
+** Use the current window when editing source code in org-mode
+This is just a convenience thing.
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-window-setup 'current-window)
+#+END_SRC
+** Automatically fix inline images generated for diagrams
+This is exactly what I was looking for lmao
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+#+END_SRC
+** Skip confirming whether to evaluate dot snippets
+Since obviously dot snippets are purely harmless +as far as I know+, I just don't bother with having to confirm evaluation every time I try to update a graphic.
+#+BEGIN_SRC emacs-lisp
+  (setq org-confirm-babel-evaluate '(lambda (lang body) (not (string= lang "dot"))))
+#+END_SRC
+** Load various languages in org-babel
+#+BEGIN_SRC emacs-lisp
+  (org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
+#+END_SRC
+** In graphical environments
+#+BEGIN_SRC emacs-lisp :exports none
+  (when (window-system)
+#+END_SRC
+*** Fancy symbol for collapsed items
+Just makes ~org-mode~ look a little fancier, no distinct changes.
+#+BEGIN_SRC emacs-lisp
+  (setq org-ellipsis "⤵")
+#+END_SRC
+*** org-bullets package (nicer bullet points in org-mode)
+It's kinda slow, but bullet points are very very nice, much better than asterisks.
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :defer t
+    :hook (org-mode . org-bullets-mode))
+#+END_SRC
+*** Hide emphasis markers in org-mode
+Just a point of /personal preference./ I was considering keeping this in for non-graphical environments, but I can't always trust that there will be support for the different representations of text.
+#+BEGIN_SRC emacs-lisp
+  (setq org-hide-emphasis-markers t)
+#+END_SRC
+*** epresent package
+It's gonna need more polish, but it works.
+#+BEGIN_SRC emacs-lisp
+  (use-package epresent
+    :ensure t
+    :defer t
+    :bind (:map org-mode-map
+		("C-c r" . epresent-run)))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :exports none
+  )
+#+END_SRC
 * Looks
 ** General
 *** Line numbers
@@ -1486,16 +1499,9 @@ I like having line numbers. However, I don't like line numbers in modes where it
 #+BEGIN_SRC emacs-lisp
   (global-display-line-numbers-mode 1)
 
-  (dolist (hook '(nov-mode-hook
-		  tetris-mode-hook
-		  snake-mode-hook
-		  sudoku-mode-hook
-		  shell-mode-hook
-		  ibuffer-mode-hook
-		  dashboard-mode-hook
-		  vterm-mode-hook
-		  shell-mode-hook
-		  epresent-mode-hook))
+  (dolist (hook '(nov-mode-hook tetris-mode-hook snake-mode-hook sudoku-mode-hook
+		  shell-mode-hook ibuffer-mode-hook dashboard-mode-hook vterm-mode-hook
+		  shell-mode-hook Man-mode-hook epresent-mode-hook))
     (add-hook hook (lambda () (display-line-numbers-mode -1))))
 #+END_SRC
 *** Highlight matching parentheses et al. when hovering near one
@@ -1547,9 +1553,7 @@ Then, we need to determine what size to make the text. This is based on the widt
 Fringes and dividers look far fancier than the alternatives.
 #+BEGIN_SRC emacs-lisp
   (setq window-divider-default-right-width 3)
-  (dolist (face '(window-divider-first-pixel
-		  window-divider
-		  window-divider-last-pixel))
+  (dolist (face '(window-divider-first-pixel window-divider window-divider-last-pixel))
     (set-face-foreground face "#335ea8"))
   (window-divider-mode 1)
   (fringe-mode 10)
@@ -1583,8 +1587,7 @@ It's subtle on my theme, but it still helps me keep track of my brackets and par
   (use-package rainbow-delimiters
     :ensure t
     :defer t
-    :init
-    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+    :hook (prog-mode . rainbow-delimiters-mode))
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :exports none
   )
@@ -1616,23 +1619,12 @@ I used to use ~fancy-battery~ but it constantly disappeared on my teeny tiny scr
 *** diminish package (hide minor modes from mode line)
 Works very nicely, makes the mode line far comfier.
 #+BEGIN_SRC emacs-lisp
-  (use-package diminish
-    :ensure t
-    :init
-    :diminish (eldoc-mode
-	       hungry-delete-mode
-	       which-key-mode
-	       subword-mode
-	       company-mode
-	       rainbow-mode
-	       flycheck-mode
-	       flyspell-mode
-	       flyspell-prog-mode
-	       visual-line-mode
-	       interactive-haskell-mode
-	       haskell-indentation-mode
-	       haskell-doc-mode
-	       page-break-lines-mode
-	       compilation-shell-minor-mode
-	       desktop-environment-mode))
+    (use-package diminish
+      :ensure t
+      :init
+      :diminish (eldoc-mode hungry-delete-mode which-key-mode subword-mode company-mode
+			    rainbow-mode flycheck-mode flyspell-mode flyspell-prog-mode
+			    visual-line-mode interactive-haskell-mode haskell-doc-mode
+			    haskell-indentation-mode page-break-lines-mode
+			    compilation-shell-minor-mode desktop-environment-mode))
 #+END_SRC

@@ -1,15 +1,12 @@
-;; Hide dumb things immediately
+;; Hide dumb things immediately (kept in init.el for speed)
 (menu-bar-mode -1)
 (tooltip-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (setq use-dialog-box nil)
 
-;; Determine whether to run Emacs as a desktop environment
-(defvar run-emacs-as-desktop-environment?
-  (and (window-system)
-     (not (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 0)))
-  "Determine whether or not to load Emacs as a desktop environment.")
+;; Disable the system bell
+(setq ring-bell-function 'ignore)
 
 ;; Package manager
 (require 'package)
@@ -24,7 +21,7 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-;; Most of the actual config is in here
+;; The rest of the actual config is in here
 (org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))
 
 (custom-set-variables
