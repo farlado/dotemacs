@@ -10,7 +10,7 @@
 ** Dependencies
 Everything has different dependencies so make sure you have what you need. The easy route to getting all these dependencies installed and configured is to deploy [[https://github.com/farlado/dotfiles][my dotfiles]]:
 #+BEGIN_SRC sh
-  curl https://farlado.xyz/deploy | sh
+  curl https://raw.githubusercontent.com/farlado/dotfiles/master/.config/deploy/deploy | sh
 #+END_SRC
 *** EXWM
 - Painfully obvious here: ~xorg~
