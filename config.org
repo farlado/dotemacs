@@ -1517,11 +1517,6 @@ I like having line numbers. However, I don't like line numbers in modes where it
 #+BEGIN_SRC emacs-lisp
   (show-paren-mode 1)
 #+END_SRC
-*** Make ^L a nice-looking line
-This one is also just a matter of personal preference really.
-#+BEGIN_SRC emacs-lisp
-  (global-page-break-lines-mode 1)
-#+END_SRC
 ** In graphical environments
 This stuff really only helps when you're in a graphical environment. Running Emacs from a terminal means these things might not work, so I don't load them when not in a graphical environment.
 #+BEGIN_SRC emacs-lisp :exports none
@@ -1587,8 +1582,8 @@ I don't use it too much, but it's nice to have it around.
     :ensure t
     :defer t
     :init
-    (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode))
-    (global-rainbow-mode 1)
+    (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode)
+    (global-rainbow-mode 1))
 #+END_SRC
 *** rainbow-delimiters package (better quotes/parentheses/brackets)
 It's subtle on my theme, but it still helps me keep track of my brackets and parentheses.
