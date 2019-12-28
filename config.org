@@ -1408,6 +1408,13 @@ I have no words for how convenient this has been and how much faster I get thing
 #+END_SRC
 * Org-mode
 As I spend more time in Org-mode, the more I need from it.
+** markdown-mode (bootleg org-mode)
+Not sure where else to put this, so...
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+    :ensure t
+    :defer t)
+#+END_SRC
 ** Agenda (only enabled if an agenda is found)
 I use =C-c M-a= and =C-c s-a= to do things related to my agenda. Only one of my systems actually has my agenda, so this only runs on that machine so I don't try any funny business on other machines.
 #+BEGIN_SRC emacs-lisp
