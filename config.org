@@ -539,22 +539,19 @@ This will eventually be its own package, but for now, it's just in my config. Fi
 
   (defcustom keyboard-layout-1 "us"
     "The first of three keyboard layouts to cycle through.
-
-  Set to nil to have one less keyboard layout."
+Set to nil to have one less keyboard layout."
     :group 'keyboard-layout
     :type 'string)
 
   (defcustom keyboard-layout-2 "epo"
     "The second of three keyboard layouts to cycle through.
-
-  Set to nil to have one less keyboard layout."
+Set to nil to have one less keyboard layout."
     :group 'keyboard-layout
     :type 'string)
 
   (defcustom keyboard-layout-3 "de"
     "The third of three keyboard layouts to cycle through.
-
-  Set to nil to have one less keyboard layout."
+Set to nil to have one less keyboard layout."
     :group 'keyboard-layout
     :type 'string)
 #+END_SRC
