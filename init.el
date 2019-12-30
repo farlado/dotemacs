@@ -1,28 +1,49 @@
-;; Hide dumb things immediately (kept in init.el for speed)
+;; Hide dumb stuff ASAP (kept in init.el for speed)
 (menu-bar-mode -1)
 (tooltip-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (setq use-dialog-box nil)
 
-;; Disable the system bell
-(setq ring-bell-function 'ignore)
+;;;;;;;;;;;;;;;;;;;;; These make Emacs load faster ;;;;;;;;;;;;;;;;;;;;;
+(setq gc-cons-threshold 402653184
+      gc-cons-percentage 0.6)
 
-;; Package manager
+(defvar startup/file-name-handler-alist file-name-handler-alist
+  "Temporary storage for `file-name-handler-alist' during startup.")
+(setq file-name-handler-alist nil)
+
+(defun startup/revert-file-name-handler-alist ()
+  "Revert `file-name-handler-alist' to its default value after startup."
+  (setq file-name-handler-alist startup/file-name-handler-alist))
+
+(defun startup/reset-gc ()
+  "Return garbage collection to normal parameters after startup."
+  (setq gc-cons-threshold 16777216
+        gc-cons-percentage 0.1))
+
+(add-hook 'emacs-startup-hook 'startup/revert-file-name-handler-alist)
+(add-hook 'emacs-startup-hook 'startup/reset-gc)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;; Package management ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'package)
 (setq package-enable-at-startup nil
       package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
 			 ("melpa" . "https://melpa.org/packages/")
 			 ("org"   . "https://orgmode.org/elpa/")))
-(package-initialize)
+;; `package-initialize' doesn't have to be called as of Emacs 27
+(when (< emacs-major-version 27)
+  (package-initialize))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Install use-package if not installed
+;; Bootstrap use-package
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
-;; The rest of the actual config is in here
-(org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))
+;; The rest of the config is in an org-file
+(org-babel-load-file (concat user-emacs-directory "config.org"))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

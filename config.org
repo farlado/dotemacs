@@ -55,7 +55,7 @@ Everything has different dependencies so make sure you have what you need. The e
 - For Haskell: ~stack~
 * Startup
 ** Start Emacs server
-Having the Emacs server running allows for a lot of neat integrations with other parts of my destop environment.
+Having the Emacs server running allows for a lot of neat integration with other parts of my destop environment.
 #+BEGIN_SRC emacs-lisp
   (require 'server)
   (unless (server-running-p)
@@ -72,10 +72,11 @@ I probably don't have to do this so early, but it makes things work a little smo
   (set-selection-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
 #+END_SRC
-** Always load newest byte code
-Ensures everything works as intended.
+** Command execution improvements
+Prefer newer bytecode and search more extensively when doing apropos commands.
 #+BEGIN_SRC emacs-lisp
-  (setq load-prefer-newer t)
+  (setq load-prefer-newer t
+        apropos-do-all t)
 #+END_SRC
 ** async package (asynchronous execution)
 This should make a few different things a little faster when packages are being handled.
@@ -95,11 +96,11 @@ I love the default start screen, but it just doesn't cut it for me. I just use t
     :ensure t
     :defer t
     :init
-    (setq inhibit-start-menu t
-	  dashboard-items '()
-	  dashboard-banner-logo-title "Welcome to GNU Emacs"
-	  dashboard-set-footer nil
-	  initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+    (setq inhibit-startup-screen t
+          dashboard-items '((recents . 10))
+          dashboard-banner-logo-title "Welcome to GNU Emacs!"
+          dashboard-set-footer nil
+          initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
     (dashboard-setup-startup-hook))
 #+END_SRC
 ** auto-package-update package (self-explanatory)
@@ -110,15 +111,15 @@ I don't want to have to manually update my stuff. This solution is literally plo
     :defer t
     :init
     (setq auto-package-update-interval 2
-	  auto-package-update-delete-old-versions t
-	  auto-package-update-hide-results t)
+          auto-package-update-delete-old-versions t
+          auto-package-update-hide-results t)
     (auto-package-update-maybe))
 #+END_SRC
 * Making Emacs a Desktop Environment
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness.
 #+BEGIN_SRC emacs-lisp :exports none
   (when (and (string= (window-system) 'x)
-	   (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 1))
+           (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 1))
     (set-frame-parameter nil 'fullscreen 'fullboth)
 #+END_SRC
 ** Configuration
@@ -154,19 +155,19 @@ Previously I had to define a lot of functions to do these things, now I just cha
 The only things I really don't like here are how much output it gives when you mute or unmute the speakers or microphone, so I set up basic scripts to give much more concise output.
 #+BEGIN_SRC emacs-lisp
   (setq desktop-environment-volume-toggle-command
-	(concat "[ \"$(amixer set Master toggle | grep off)\" ] "
-		"&& echo Volume is now muted. | tr '\n' ' ' "
-		"|| echo Volume is now unmuted. | tr '\n' ' '")
-	desktop-environment-volume-toggle-microphone-command
-	(concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
-		"&& echo Microphone is now muted. | tr '\n' ' ' "
-		"|| echo Microphone is now unmuted | tr '\n' ' '"))
+        (concat "[ \"$(amixer set Master toggle | grep off)\" ] "
+                "&& echo Volume is now muted. | tr '\n' ' ' "
+                "|| echo Volume is now unmuted. | tr '\n' ' '")
+        desktop-environment-volume-toggle-microphone-command
+        (concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
+                "&& echo Microphone is now muted. | tr '\n' ' ' "
+                "|| echo Microphone is now unmuted | tr '\n' ' '"))
 #+END_SRC
 **** Brightness adjustment
 This one all I needed to do was change the increment and decrement values.
 #+BEGIN_SRC emacs-lisp
   (setq desktop-environment-brightness-normal-increment "5%+"
-	desktop-environment-brightness-normal-decrement "5%-")
+        desktop-environment-brightness-normal-decrement "5%-")
 #+END_SRC
 **** Screenshots
 This one was the least straightforward because the way it's implemented by ~desktop-environment~ is *SUPER* wonky. Here are the binds which will be relevant.
@@ -190,9 +191,9 @@ First, I set what directory to store screenshots in.
 Then, I can set the commands for taking a full or partial screenshot and saving it to a file.
 #+BEGIN_SRC emacs-lisp
   (setq desktop-environment-screenshot-command
-	"FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
-	desktop-environment-screenshot-partial-command
-	"FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
+        "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
+        desktop-environment-screenshot-partial-command
+        "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
 #+END_SRC
 The functions which ~desktop-environment~ comes with are kinda garbage, so I made my own.
 #+BEGIN_SRC emacs-lisp
@@ -212,33 +213,33 @@ The functions which ~desktop-environment~ comes with are kinda garbage, so I mad
     "Take a screenshot and put it in the clipboard."
     (interactive)
     (shell-command (concat desktop-environment-screenshot-command
-			   " && xclip $FILENAME -selection clipboard "
-			   "-t image/png &> /dev/null && rm $FILENAME"))
+                           " && xclip $FILENAME -selection clipboard "
+                           "-t image/png &> /dev/null && rm $FILENAME"))
     (message "Screenshot copied to clipboard."))
 
   (defun farl-de/desktop-environment-screenshot-part-clip ()
     "Take a shot of a portion of the screen and put it in the clipboard."
     (interactive)
     (shell-command (concat desktop-environment-screenshot-partial-command
-			   " && xclip $FILENAME -selection clipboard "
-			   "-t image/png &> /dev/null && rm $FILENAME"))
+                           " && xclip $FILENAME -selection clipboard "
+                           "-t image/png &> /dev/null && rm $FILENAME"))
     (message "Screenshot copied to clipboard."))
 #+END_SRC
 **** Lock screen
 Haha yes, this is very long and very very stupid.
 #+BEGIN_SRC emacs-lisp
   (setq desktop-environment-screenlock-command
-	(concat "i3lock -nmk --color=000000 --timecolor=ffffffff --datecolor=ffffffff "
-		"--wrongcolor=ffffffff --ringcolor=00000000 --insidecolor=00000000 "
-		"--keyhlcolor=00000000 --bshlcolor=00000000 --separatorcolor=00000000 "
-		"--ringvercolor=00000000 --insidevercolor=00000000 --linecolor=00000000 "
-		"--ringwrongcolor=00000000 --insidewrongcolor=00000000 --timestr=%H:%M "
-		"--datestr='%a %d %b' --time-font=Iosevka --date-font=Iosevka "
-		"--wrong-font=Iosevka --timesize=128 --datesize=64 --wrongsize=32 "
-		"--time-align 0 --date-align 0 --wrong-align 0 --indpos=-10:-10 "
-		"--timepos=200:125 --datepos=200:215 --wrongpos=200:155 --locktext='' "
-		"--lockfailedtext='' --noinputtext='' --radius 1 --ring-width 1 "
-		" --veriftext='' --wrongtext='WRONG' --force-clock"))
+        (concat "i3lock -nmk --color=000000 --timecolor=ffffffff --datecolor=ffffffff "
+                "--wrongcolor=ffffffff --ringcolor=00000000 --insidecolor=00000000 "
+                "--keyhlcolor=00000000 --bshlcolor=00000000 --separatorcolor=00000000 "
+                "--ringvercolor=00000000 --insidevercolor=00000000 --linecolor=00000000 "
+                "--ringwrongcolor=00000000 --insidewrongcolor=00000000 --timestr=%H:%M "
+                "--datestr='%a %d %b' --time-font=Iosevka --date-font=Iosevka "
+                "--wrong-font=Iosevka --timesize=128 --datesize=64 --wrongsize=32 "
+                "--time-align 0 --date-align 0 --wrong-align 0 --indpos=-10:-10 "
+                "--timepos=200:125 --datepos=200:215 --wrongpos=200:155 --locktext='' "
+                "--lockfailedtext='' --noinputtext='' --radius 1 --ring-width 1 "
+                " --veriftext='' --wrongtext='WRONG' --force-clock"))
 #+END_SRC
 *** system-packages package (manage system packages in Emacs)
 This one is a pleasant surprise to have honestly. Having Emacs handle system packages as well as its own is a very pleasant surprise. Since I use ~yay~ on Arch, I configure an entry for it and use it if it's installed.
@@ -250,63 +251,64 @@ This one is a pleasant surprise to have honestly. Having Emacs handle system pac
     (when (executable-find "yay")
       (require 'system-packages)
       (add-to-list 'system-packages-supported-package-managers
-		   '(yay .
-			 ((default-sudo . nil)
-			  (install . "yay -S")
-			  (search . "yay -Ss")
-			  (uninstall . "yay -Rs")
-			  (update . "yay -Syu")
-			  (clean-cache . "yay -Sc")
-			  (log . "car /var/log/pacman.log")
-			  (get-info . "yay -Qi")
-			  (get-info-remote . "yay -Si")
-			  (list-files-provided-by . "yay -Ql")
-			  (verify-all-packages . "yay -Qkk")
-			  (verify-all-dependencies . "yay -Dk")
-			  (remove-orphaned . "yay -Rns $(yay -Qtdq)")
-			  (list-installed-packages . "yay -Qe")
-			  (list-installed-packages-all . "yay -Q")
-			  (list-dependencies-of . "yay -Qi")
-			  (noconfirm . "--noconfirm"))))
+                   '(yay .
+                         ((default-sudo . nil)
+                          (install . "yay -S")
+                          (search . "yay -Ss")
+                          (uninstall . "yay -Rs")
+                          (update . "yay -Syu")
+                          (clean-cache . "yay -Sc")
+                          (log . "car /var/log/pacman.log")
+                          (get-info . "yay -Qi")
+                          (get-info-remote . "yay -Si")
+                          (list-files-provided-by . "yay -Ql")
+                          (verify-all-packages . "yay -Qkk")
+                          (verify-all-dependencies . "yay -Dk")
+                          (remove-orphaned . "yay -Rns $(yay -Qtdq)")
+                          (list-installed-packages . "yay -Qe")
+                          (list-installed-packages-all . "yay -Q")
+                          (list-dependencies-of . "yay -Qi")
+                          (noconfirm . "--noconfirm"))))
       (setq system-packages-use-sudo nil
-	    system-packages-package-manager 'yay))
+            system-packages-package-manager 'yay))
     :bind (("C-c p i" . system-packages-install)
-	   ("C-c p e" . system-packages-ensure)
-	   ("C-c p u" . system-packages-update)
-	   ("C-c p r" . system-packages-uninstall)
-	   ("C-c p o" . system-packages-remove-orphaned)
-	   ("C-c p c" . system-packages-clean-cache)
-	   ("C-c p l" . system-packages-log)
-	   ("C-c p s" . system-packages-search)
-	   ("C-c p g" . system-packages-get-info)
-	   ("C-c p d" . system-packages-list-dependencies-of)
-	   ("C-c p f" . system-packages-list-files-provided-by)
-	   ("C-c p p" . system-packages-list-installed-packages)
-	   ("C-c p f" . system-packages-verify-all-dependencies)
-	   ("C-c p v" . system-packages-verify-all-packages)))
+           ("C-c p e" . system-packages-ensure)
+           ("C-c p u" . system-packages-update)
+           ("C-c p r" . system-packages-uninstall)
+           ("C-c p o" . system-packages-remove-orphaned)
+           ("C-c p c" . system-packages-clean-cache)
+           ("C-c p l" . system-packages-log)
+           ("C-c p s" . system-packages-search)
+           ("C-c p g" . system-packages-get-info)
+           ("C-c p d" . system-packages-list-dependencies-of)
+           ("C-c p f" . system-packages-list-files-provided-by)
+           ("C-c p p" . system-packages-list-installed-packages)
+           ("C-c p f" . system-packages-verify-all-dependencies)
+           ("C-c p v" . system-packages-verify-all-packages)))
 #+END_SRC
 *** Workspace configuration
 No clue why you have to do so much just to give workspaces names, but at least you can do it. I also put which monitors to try to put workspaces onto here, alongside settings for which windows should float and which workspaces they should be on.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-workspace-number 3
-	exwm-workspace-index-map (lambda (index)
-				   (let ((named-workspaces ["1" "2" "3"]))
-				     (if (< index (length named-workspaces))
-					 (elt named-workspaces index)
-				       (number-to-string index))))
-	exwm-randr-workspace-output-plist '(0 "LVDS1"
-					    0 "eDP-1-1"
-					    0 "DP-1-2-2"
-					    1 "DP-1-2-1"
-					    2 "DP-1-2-3")
-	exwm-manage-configurations '(((string= exwm-class-name "Steam")
-				      workspace 0 floating t floating-mode-line nil)
-				     ((string= exwm-instance-name "telegram-desktop")
-				      workspace 2)
-				     ((string= exwm-class-name "discord")
-				      workspace 1)
-				     ((string= exwm-title "Event Tester")
-				      floating t)))
+        exwm-workspace-index-map (lambda (index)
+                                   (let ((named-workspaces ["1" "2" "3"]))
+                                     (if (< index (length named-workspaces))
+                                         (elt named-workspaces index)
+                                       (number-to-string index))))
+        exwm-randr-workspace-output-plist '(0 "LVDS1"
+                                            0 "LVDS-1"
+                                            0 "eDP-1-1"
+                                            0 "DP-1-2-2"
+                                            1 "DP-1-2-1"
+                                            2 "DP-1-2-3")
+        exwm-manage-configurations '(((string= exwm-class-name "Steam")
+                                      workspace 0 floating t floating-mode-line nil)
+                                     ((string= exwm-instance-name "telegram-desktop")
+                                      workspace 2)
+                                     ((string= exwm-class-name "discord")
+                                      workspace 1)
+                                     ((string= exwm-title "Event Tester")
+                                      floating t)))
 #+END_SRC
 Additionally, I define functions for switching between workspaces, to make the global binds down the line look significantly cleaner.
 #+BEGIN_SRC emacs-lisp
@@ -332,59 +334,62 @@ There was a point where I tried to make this into an Elisp function. Not trying 
     "Configure monitors and peripherals."
     ;; Monitors (works on both my X230 and my W541)
     (let* ((connected-monitors (split-string
-				(shell-command-to-string
-				 "xrandr | grep ' connected' | awk '{print $1}'")))
-	   (possible-monitors (if (member "LVDS-1" connected-monitors)
-				  '("LVDS-1" "VGA-1")
-				'("eDP-1-1" "DP-1-2-1" "DP-1-2-2" "DP-1-2-3" "VGA-1-1")))
-	   (command "xrandr "))
+                                (shell-command-to-string
+                                 "xrandr | grep ' connected' | awk '{print $1}'")))
+           (possible-monitors (if (member "LVDS-1" connected-monitors)
+                                  '("LVDS-1" "VGA-1")
+                                (if (member "LVDS1" connected-monitors)
+                                    '("LVDS1" "VGA1")
+                                  '("eDP-1-1" "DP-1-2-1" "DP-1-2-2"
+                                    "DP-1-2-3" "VGA-1-1"))))
+           (command "xrandr "))
       (dolist (monitor possible-monitors)
-	(if (and (member monitor connected-monitors)
-	       (not (and (string= monitor "eDP-1-1")
-		     (member "DP-1-2-1" connected-monitors))))
-	    (let* ((output (concat "--output " monitor " "))
-		   (primary (when (or (string= monitor "LVDS-1")
-				     (string= monitor "eDP-1-1")
-				     (string= monitor "DP-1-2-2"))
-			      "--primary "))
-		   (rate (when (string= monitor "DP-1-2-2")
-			   "--rate 75 "))
-		   (res (concat "--mode " (if (or (string= monitor "LVDS-1")
-						 (string= monitor "VGA-1"))
-					      "1366x768 "
-					    "1920x1080 ")))
-		   (rotate (when (or (string= monitor "DP-1-2-1")
-				    (string= monitor "DP-1-2-3"))
-			     (concat "--rotate " (if (string= monitor "DP-1-2-1")
-						     "left "
-						   "right "))))
-		   (pos (concat "--pos " (if (not (or (string= monitor "DP-1-2-2")
-						   (string= monitor "DP-1-2-3")))
-					     "0x0 "
-					   (if (string= monitor "DP-1-2-2")
-					       "1080x0 "
-					     "3000x0 ")))))
-	      (setq command (concat command output primary rate res rotate pos)))
-	  (setq command (concat command "--output " monitor " --off "))))
+        (if (and (member monitor connected-monitors)
+               (not (and (string= monitor "eDP-1-1")
+                     (member "DP-1-2-1" connected-monitors))))
+            (let* ((output (concat "--output " monitor " "))
+                   (primary (when (or (string= monitor "LVDS-1")
+                                     (string= monitor "eDP-1-1")
+                                     (string= monitor "DP-1-2-2"))
+                              "--primary "))
+                   (rate (when (string= monitor "DP-1-2-2")
+                           "--rate 75 "))
+                   (res (concat "--mode " (if (or (string= monitor "LVDS-1")
+                                                 (string= monitor "VGA-1"))
+                                              "1366x768 "
+                                            "1920x1080 ")))
+                   (rotate (when (or (string= monitor "DP-1-2-1")
+                                    (string= monitor "DP-1-2-3"))
+                             (concat "--rotate " (if (string= monitor "DP-1-2-1")
+                                                     "left "
+                                                   "right "))))
+                   (pos (concat "--pos " (if (not (or (string= monitor "DP-1-2-2")
+                                                   (string= monitor "DP-1-2-3")))
+                                             "0x0 "
+                                           (if (string= monitor "DP-1-2-2")
+                                               "1080x0 "
+                                             "3000x0 ")))))
+              (setq command (concat command output primary rate res rotate pos)))
+          (setq command (concat command "--output " monitor " --off "))))
       (start-process-shell-command
        "Display Setup" nil command))
     ;; Disable trackpad
     (start-process-shell-command
      "Disable trackpad" nil (concat "xinput disable $(xinput list | "
-				    "grep Synaptics | head -n 1 | "
-				    "sed -r 's/.*id=([0-9]+).*/\\1/')"))
+                                  "grep Synaptics | head -n 1 | "
+                                  "sed -r 's/.*id=([0-9]+).*/\\1/')"))
     ;; Configure trackball
     (let* ((trackball-id (shell-command-to-string
-			  (concat "xinput | grep ELECOM | head -n 1 | sed -r "
-				  "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
+                          (concat "xinput | grep ELECOM | head -n 1 | sed -r "
+                                  "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
       (dolist (command '("'libinput Button Scrolling Button' 10"
-			 "'libinput Scroll Method Enabled' 0 0 1"))
-	(start-process-shell-command
-	 "Trackball Setup" nil (concat "sleep 2 && xinput set-prop "
-				       trackball-id command)))
+                         "'libinput Scroll Method Enabled' 0 0 1"))
+        (start-process-shell-command
+         "Trackball Setup" nil (concat "sleep 2 && xinput set-prop "
+                                     trackball-id command)))
       (start-process-shell-command
        "Trackball Setup" nil (concat "sleep 2 && xinput set-button-map " trackball-id
-				     "1 2 3 4 5 6 7 8 9 2 1 2")))
+                                   "1 2 3 4 5 6 7 8 9 2 1 2")))
     ;; Keyboard
     (start-process-shell-command
      "Keyboard Setup" nil "setxkbmap -option ctrl:nocaps"))
@@ -396,7 +401,7 @@ There was a point where I tried to make this into an Elisp function. Not trying 
 This was annoying when I first installed EXWM. Thankfully this is a very easy fix.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'exwm-update-title-hook
-	    (lambda () (exwm-workspace-rename-buffer exwm-title)))
+            (lambda () (exwm-workspace-rename-buffer exwm-title)))
 #+END_SRC
 *** Ensure Java applications know the WM is non-reparenting
 Stolen from the ~.xinitrc~ included with ~EXWM~.
@@ -407,7 +412,7 @@ Stolen from the ~.xinitrc~ included with ~EXWM~.
 Uses the same color as my mode line, uses the same width as window divider width. See below.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-floating-border-width 3
-	exwm-floating-border-color "#335ea8")
+        exwm-floating-border-color "#335ea8")
 #+END_SRC
 *** X applications
 **** GIMP
@@ -520,15 +525,15 @@ Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucon
     (dolist (sink '("loop" "out"))
       (shell-command (concat "pacmd load-module module-null-sink sink_name=" sink))
       (shell-command (concat "pacmd update-sink-proplist "
-			     sink " device.description=" sink)))
+                             sink " device.description=" sink)))
     ;; Loop `loop' to primary output, pipe it to `out', loop primary into to `out'
     (dolist (command '("source=loop.monitor" "source=loop.monitor sink=out" "sink=out"))
       (shell-command (concat "pacmd load-module module-loopback " command)))
     ;; Run `pavucontrol' and then unload the modules after it completes
     (start-process-shell-command
      "Audio Loop" nil (concat "pavucontrol && "
-			    "pacmd unload-module module-null-sink && "
-			    "pacmd unload-module module-loopback")))
+                            "pacmd unload-module module-null-sink && "
+                            "pacmd unload-module module-loopback")))
 #+END_SRC
 **** Keyboard layout selection
 This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
@@ -539,19 +544,19 @@ This will eventually be its own package, but for now, it's just in my config. Fi
 
   (defcustom keyboard-layout-1 "us"
     "The first of three keyboard layouts to cycle through.
-Set to nil to have one less keyboard layout."
+  Set to nil to have one less keyboard layout."
     :group 'keyboard-layout
     :type 'string)
 
   (defcustom keyboard-layout-2 "epo"
     "The second of three keyboard layouts to cycle through.
-Set to nil to have one less keyboard layout."
+  Set to nil to have one less keyboard layout."
     :group 'keyboard-layout
     :type 'string)
 
   (defcustom keyboard-layout-3 "de"
     "The third of three keyboard layouts to cycle through.
-Set to nil to have one less keyboard layout."
+  Set to nil to have one less keyboard layout."
     :group 'keyboard-layout
     :type 'string)
 #+END_SRC
@@ -561,8 +566,8 @@ Then, I use these functions to control setting and cycling the keyboard layout:
     "Get the current keyboard layout."
     (shell-command-to-string
      (concat "setxkbmap -query | "
-	     "grep -oP 'layout:\\s*\\K(\\w+)' | "
-	     "tr '\n' ' ' | sed 's/ //'")))
+             "grep -oP 'layout:\\s*\\K(\\w+)' | "
+             "tr '\n' ' ' | sed 's/ //'")))
 
   (defun set-keyboard-layout (&optional layout)
     "Set the keyboard layout to LAYOUT."
@@ -575,27 +580,27 @@ Then, I use these functions to control setting and cycling the keyboard layout:
     "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3'."
     (interactive)
     (let* ((current-layout (get-keyboard-layout))
-	   (new-layout (if (string= current-layout keyboard-layout-1)
-			   (or keyboard-layout-2 keyboard-layout-3)
-			 (if (string= current-layout keyboard-layout-2)
-			     (or keyboard-layout-3 keyboard-layout-1)
-			   (or keyboard-layout-1 keyboard-layout-2)))))
+           (new-layout (if (string= current-layout keyboard-layout-1)
+                           (or keyboard-layout-2 keyboard-layout-3)
+                         (if (string= current-layout keyboard-layout-2)
+                             (or keyboard-layout-3 keyboard-layout-1)
+                           (or keyboard-layout-1 keyboard-layout-2)))))
       (if new-layout
-	  (set-keyboard-layout new-layout)
-	(message "No keyboard layouts selected."))))
+          (set-keyboard-layout new-layout)
+        (message "No keyboard layouts selected."))))
 
   (defun cycle-keyboard-layout-reverse ()
     "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3' in reverse."
     (interactive)
     (let* ((current-layout (get-keyboard-layout))
-	   (new-layout (if (string= current-layout keyboard-layout-3)
-			   (or keyboard-layout-2 keyboard-layout-1)
-			 (if (string= current-layout keyboard-layout-2)
-			     (or keyboard-layout-1 keyboard-layout-3)
-			   (or keyboard-layout-3 keyboard-layout-2)))))
+           (new-layout (if (string= current-layout keyboard-layout-3)
+                           (or keyboard-layout-2 keyboard-layout-1)
+                         (if (string= current-layout keyboard-layout-2)
+                             (or keyboard-layout-1 keyboard-layout-3)
+                           (or keyboard-layout-3 keyboard-layout-2)))))
       (if new-layout
-	  (set-keyboard-layout new-layout)
-	(message "No keyboard layouts selected."))))
+          (set-keyboard-layout new-layout)
+        (message "No keyboard layouts selected."))))
 #+END_SRC
 **** Suspending
 #+BEGIN_SRC emacs-lisp
@@ -626,38 +631,38 @@ I copied the function for quitting Emacs to handle shutting down.
     (let ((confirm confirm-kill-emacs))
       (and
        (or (not (memq t (mapcar (function
-			      (lambda (buf) (and (buffer-file-name buf)
-					  (buffer-modified-p buf))))
-			     (buffer-list))))
-	  (progn (setq confirm nil)
-		 (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
+                              (lambda (buf) (and (buffer-file-name buf)
+                                          (buffer-modified-p buf))))
+                             (buffer-list))))
+          (progn (setq confirm nil)
+                 (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
        (or (not (fboundp 'process-list))
-	  ;; process-list is not defined on MSDOS.
-	  (not confirm-kill-processes)
-	  (let ((processes (process-list))
-		active)
-	    (while processes
-	      (and (memq (process-status (car processes)) '(run stop open listen))
-		 (process-query-on-exit-flag (car processes))
-		 (setq active t))
-	      (setq processes (cdr processes)))
-	    (or (not active)
-	       (with-current-buffer-window
-		(get-buffer-create "*Process List*") nil
-		#'(lambda (window _value)
-		    (with-selected-window window
-		      (unwind-protect
-			  (progn
-			    (setq confirm nil)
-			    (yes-or-no-p (concat "Active processes exist; kill "
-						 "them and shut down anyway? ")))
-			(when (window-live-p window)
-			  (quit-restore-window window 'kill)))))
-		(list-processes t)))))
+          ;; process-list is not defined on MSDOS.
+          (not confirm-kill-processes)
+          (let ((processes (process-list))
+                active)
+            (while processes
+              (and (memq (process-status (car processes)) '(run stop open listen))
+                 (process-query-on-exit-flag (car processes))
+                 (setq active t))
+              (setq processes (cdr processes)))
+            (or (not active)
+               (with-current-buffer-window
+                (get-buffer-create "*Process List*") nil
+                #'(lambda (window _value)
+                    (with-selected-window window
+                      (unwind-protect
+                          (progn
+                            (setq confirm nil)
+                            (yes-or-no-p (concat "Active processes exist; kill "
+                                                 "them and shut down anyway? ")))
+                        (when (window-live-p window)
+                          (quit-restore-window window 'kill)))))
+                (list-processes t)))))
        ;; Query the user for other things, perhaps.
        (run-hook-with-args-until-failure 'kill-emacs-query-functions)
        (or (null confirm)
-	  (funcall confirm "Really shut down? "))
+          (funcall confirm "Really shut down? "))
        (shell-command "shutdown now")
        (kill-emacs))))
 
@@ -683,38 +688,38 @@ I copied the function for quitting Emacs to handle reboot too.
     (let ((confirm confirm-kill-emacs))
       (and
        (or (not (memq t (mapcar (function
-			      (lambda (buf) (and (buffer-file-name buf)
-					  (buffer-modified-p buf))))
-			     (buffer-list))))
-	  (progn (setq confirm nil)
-		 (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
+                              (lambda (buf) (and (buffer-file-name buf)
+                                          (buffer-modified-p buf))))
+                             (buffer-list))))
+          (progn (setq confirm nil)
+                 (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
        (or (not (fboundp 'process-list))
-	  ;; process-list is not defined on MSDOS.
-	  (not confirm-kill-processes)
-	  (let ((processes (process-list))
-		active)
-	    (while processes
-	      (and (memq (process-status (car processes)) '(run stop open listen))
-		 (process-query-on-exit-flag (car processes))
-		 (setq active t))
-	      (setq processes (cdr processes)))
-	    (or (not active)
-	       (with-current-buffer-window
-		(get-buffer-create "*Process List*") nil
-		#'(lambda (window _value)
-		    (with-selected-window window
-		      (unwind-protect
-			  (progn
-			    (setq confirm nil)
-			    (yes-or-no-p (concat "Active processes exist; kill "
-						 "them and reboot anyway? ")))
-			(when (window-live-p window)
-			  (quit-restore-window window 'kill)))))
-		(list-processes t)))))
+          ;; process-list is not defined on MSDOS.
+          (not confirm-kill-processes)
+          (let ((processes (process-list))
+                active)
+            (while processes
+              (and (memq (process-status (car processes)) '(run stop open listen))
+                 (process-query-on-exit-flag (car processes))
+                 (setq active t))
+              (setq processes (cdr processes)))
+            (or (not active)
+               (with-current-buffer-window
+                (get-buffer-create "*Process List*") nil
+                #'(lambda (window _value)
+                    (with-selected-window window
+                      (unwind-protect
+                          (progn
+                            (setq confirm nil)
+                            (yes-or-no-p (concat "Active processes exist; kill "
+                                                 "them and reboot anyway? ")))
+                        (when (window-live-p window)
+                          (quit-restore-window window 'kill)))))
+                (list-processes t)))))
        ;; Query the user for other things, perhaps.
        (run-hook-with-args-until-failure 'kill-emacs-query-functions)
        (or (null confirm)
-	   (funcall confirm "Really reboot? "))
+           (funcall confirm "Really reboot? "))
        (shell-command "reboot")
        (kill-emacs))))
 
@@ -732,69 +737,69 @@ Save lines, save time.
 Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into this area.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-global-keys
-	`(;; Switching Workspaces
-	  ([?\s-q] . farl-exwm/workspace-1)
-	  ([?\s-w] . farl-exwm/workspace-0)
-	  ([?\s-e] . farl-exwm/workspace-2)
+        `(;; Switching Workspaces
+          ([?\s-q] . farl-exwm/workspace-1)
+          ([?\s-w] . farl-exwm/workspace-0)
+          ([?\s-e] . farl-exwm/workspace-2)
 
-	  ;; Opening X applications
-	  ([?\s-g]    . run-gimp)
-	  ([?\s-s]    . run-steam)
-	  ([?\s-f]    . run-firefox)
-	  ([?\s-d]    . run-discord)
-	  ([?\s-t]    . run-telegram)
-	  ([?\s-m]    . run-musescore)
-	  ([?\s-b]    . run-libreoffice)
-	  ([?\s-o]    . run-transmission)
-	  ([?\s-r]    . monitor-settings)
-	  ([?\s-n]    . network-settings)
-	  ([?\s-v]    . volume-settings)
-	  ([s-return] . run-terminal)
+          ;; Opening X applications
+          ([?\s-g]    . run-gimp)
+          ([?\s-s]    . run-steam)
+          ([?\s-f]    . run-firefox)
+          ([?\s-d]    . run-discord)
+          ([?\s-t]    . run-telegram)
+          ([?\s-m]    . run-musescore)
+          ([?\s-b]    . run-libreoffice)
+          ([?\s-o]    . run-transmission)
+          ([?\s-r]    . monitor-settings)
+          ([?\s-n]    . network-settings)
+          ([?\s-v]    . volume-settings)
+          ([s-return] . vterm)
 
-	  ;; Other desktop environment things
-	  ([?\s-x]       . dmenu)
-	  ([menu]        . smex)
-	  ([?\s- ]       . cycle-keyboard-layout)
-	  ([s-backspace] . cycle-keyboard-layout-reverse)
-	  ([s-tab]       . audio-loopback)
+          ;; Other desktop environment things
+          ([?\s-x]       . dmenu)
+          ([menu]        . smex)
+          ([?\s- ]       . cycle-keyboard-layout)
+          ([s-backspace] . cycle-keyboard-layout-reverse)
+          ([s-tab]       . audio-loopback)
 
-	  ;; Controlling EMMS
-	  ([XF86AudioNext] . emms-next)
-	  ([XF86AudioPrev] . emms-previous)
-	  ([XF86AudioPlay] . emms-pause)
-	  ([XF86AudioStop] . emms-stop)))
+          ;; Controlling EMMS
+          ([XF86AudioNext] . emms-next)
+          ([XF86AudioPrev] . emms-previous)
+          ([XF86AudioPlay] . emms-pause)
+          ([XF86AudioStop] . emms-stop)))
 #+END_SRC
 *** Emacs key bindings in X windows
 This is super nice, because I love these key bindings and they are just intuitive to me, and now they can carry over safely to other programs.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-simulation-keys
-	'(;; Navigation
-	  ([?\C-b] . [left])
-	  ([?\C-f] . [right])
-	  ([?\C-p] . [up])
-	  ([?\C-n] . [down])
+        '(;; Navigation
+          ([?\C-b] . [left])
+          ([?\C-f] . [right])
+          ([?\C-p] . [up])
+          ([?\C-n] . [down])
 
-	  ([?\M-b] . [C-left])
-	  ([?\M-f] . [C-right])
-	  ([?\M-p] . [C-up])
-	  ([?\M-n] . [C-down])
+          ([?\M-b] . [C-left])
+          ([?\M-f] . [C-right])
+          ([?\M-p] . [C-up])
+          ([?\M-n] . [C-down])
 
-	  ([?\C-a] . [home])
-	  ([?\C-e] . [end])
-	  ([?\C-v] . [next])
-	  ([?\M-v] . [prior])
+          ([?\C-a] . [home])
+          ([?\C-e] . [end])
+          ([?\C-v] . [next])
+          ([?\M-v] . [prior])
 
-	  ;; Copy/Paste
-	  ([?\C-w] . [?\C-x])
-	  ([?\M-w] . [?\C-c])
-	  ([?\C-y] . [?\C-v])
-	  ([?\C-s] . [?\C-f])
-	  ([?\C-\/] . [?\C-z])
+          ;; Copy/Paste
+          ([?\C-w] . [?\C-x])
+          ([?\M-w] . [?\C-c])
+          ([?\C-y] . [?\C-v])
+          ([?\C-s] . [?\C-f])
+          ([?\C-\/] . [?\C-z])
 
-	  ;; Other
-	  ([?\C-d] . [delete])
-	  ([?\C-k] . [S-end delete])
-	  ([?\C-g] . [escape])))
+          ;; Other
+          ([?\C-d] . [delete])
+          ([?\C-k] . [S-end delete])
+          ([?\C-g] . [escape])))
 
   ;; I can't do sequences above, so this is separate
   (defun exwm-C-s ()
@@ -806,8 +811,8 @@ This is super nice, because I love these key bindings and they are just intuitiv
 #+END_SRC
 *** Send a key verbatim more easily
 #+BEGIN_SRC emacs-lisp
-       (define-key exwm-mode-map (kbd "C-c C-q") nil)
-       (define-key exwm-mode-map (kbd "C-q") 'exwm-input-send-next-key)
+  (define-key exwm-mode-map (kbd "C-c C-q") nil)
+  (define-key exwm-mode-map (kbd "C-q") 'exwm-input-send-next-key)
 #+END_SRC
 *** Inhibit things I don't use
 This includes:
@@ -830,19 +835,19 @@ Just a personal preference, I don't like seeing the cursor when I'm pressing key
 I don't need my laptop's screen shutting off just because I'm sitting and watching a video too long.
 #+BEGIN_SRC emacs-lisp
   (start-process-shell-command
-   "" nil "xset s off -dpms")
+   "Disable Blanking" nil "xset s off -dpms")
 #+END_SRC
 *** Keyboard configuration
 This block sets the keyboard layout to US and give Caps Lock the functionality of Control. I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
 #+BEGIN_SRC emacs-lisp
   (start-process-shell-command
-   "" nil "setxkbmap us -option ctrl:nocaps")
+   "Keyboard Layout" nil "setxkbmap us -option ctrl:nocaps")
 #+END_SRC
 *** Set fallback cursor
 Some X windows will have weird cursors if this isn't done.
 #+BEGIN_SRC emacs-lisp
   (start-process-shell-command
-   "" nil "xsetroot -cursor_name left_ptr")
+   "Fallback Cursor" nil "xsetroot -cursor_name left_ptr")
 #+END_SRC
 *** Compositor
 I don't need it, but having basic compositing is very nice.
@@ -961,12 +966,28 @@ Why is this even something bound to begin with?
 I don't use auto-saves and backups. I love living on the edge.
 #+BEGIN_SRC emacs-lisp
   (setq make-backup-files nil
-	auto-save-default nil)
+        auto-save-default nil)
+#+END_SRC
+** Use a visual bell instead of sound
+#+BEGIN_SRC emacs-lisp
+  (setq ring-bell-function 'ignore
+        visible-bell t)
+#+END_SRC
+** Automatically revert files on change
+This way if files get modified in the middle of editing them, I don't overwrite the changes.
+#+BEGIN_SRC emacs-lisp
+  (global-auto-revert-mode 1)
 #+END_SRC
 ** Don't unload fonts after loading them
 This solves a number of hanging issues related to a number of different packages and symbols.
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-compacting-font-caches t)
+#+END_SRC
+** End-of-file newlines and indent tabs
+Screw indent tabs, spaces all the way.
+#+BEGIN_SRC emacs-lisp
+  (setq require-final-newline t)
+  (setq-default indent-tabs-mode nil)
 #+END_SRC
 ** Enable word wrapping for all buffers
 This is a point of convenience, even in programming language buffers. Wrapping words makes for a heck of a lot more readability of any kind of text, whether a program or just normal language.
@@ -978,29 +999,38 @@ This allows for much easier navigation between words when in programming languag
 #+BEGIN_SRC emacs-lisp
   (global-subword-mode 1)
 #+END_SRC
-** Spell-checking
-Just a useful little tool to check spelling while editing a buffer.
+** Delete whatever is selected if typing starts
+This is to reflect behavior in other programs.
 #+BEGIN_SRC emacs-lisp
-  (require 'flyspell)
+  (delete-selection-mode 1)
+#+END_SRC
+** Spell-checking
+Just a useful little tool to check spelling while editing a buffer. Only configured if ~aspell~ is installed.
+#+BEGIN_SRC emacs-lisp
+  (when (executable-find "aspell")
+    (require 'flyspell)
 
-  (setq ispell-program-name "aspell"
-	ispell-dictionary "american")
+    (setq ispell-program-name "aspell"
+          ispell-dictionary "american")
 
-  (add-hook 'flyspell-mode-hook 'flyspell-buffer)
-  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-  (add-hook 'text-mode-hook 'flyspell-mode)
+    (add-hook 'flyspell-mode-hook 'flyspell-buffer)
+    (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+    (add-hook 'text-mode-hook 'flyspell-mode))
 #+END_SRC
 ** Always confirm killing Emacs
-I constantly kill Emacs on accident when running it in terminals, so this prevents me from doing that.
+I constantly kill Emacs on accident when running it in terminals, so this prevents me from doing that +as easily+.
 #+BEGIN_SRC emacs-lisp
   (setq confirm-kill-emacs 'yes-or-no-p)
 #+END_SRC
 ** Make scrolling a little less crazy
-Now even more comfy.
+Not sure why the mouse wheel get acceleration, but thankfully I don't have to worry about that anymore.
 #+BEGIN_SRC emacs-lisp
   (setq scroll-margin 0
-	scroll-conservatively 100000
-	scroll-preserve-screen-position 1)
+        scroll-conservatively 100000
+        scroll-preserve-screen-position 1
+        mouse-wheel-scroll-amount '(1 ((shift) . 1))
+        mouse-wheel-progressive-speed nil
+        mouse-wheel-follow-mouse t)
 #+END_SRC
 ** Edit with superuser privileges via =C-x C-M-f=
 #+BEGIN_SRC emacs-lisp
@@ -1010,13 +1040,15 @@ Now even more comfy.
     :bind ("C-x C-M-f" . sudo-edit))
 #+END_SRC
 ** Open/create the scratch buffer with =C-c s=
-Since I close it all the time and also use it all the time, it's easy to just make a bind for it.
+The scratch buffer is immortal now.
 #+BEGIN_SRC emacs-lisp
   (defun open-scratch-buffer ()
     "Open the scratch buffer."
     (interactive)
-    (switch-to-buffer (get-buffer-create "*scratch*"))
-    (lisp-interaction-mode))
+    (switch-to-buffer (get-buffer "*scratch*")))
+
+  (with-current-buffer "*scratch*"
+    (emacs-lock-mode 'kill))
 
   (global-set-key (kbd "C-c s") 'open-scratch-buffer)
 #+END_SRC
@@ -1063,8 +1095,6 @@ I've been jumping between ~vterm~ and ~ansi-term~. I guess ~vterm~ is just easie
   (use-package vterm
     :ensure t
     :defer t
-    :init
-    (defalias 'run-terminal 'vterm)
     :bind ("C-c t" . vterm))
 #+END_SRC
 ** Calendar
@@ -1095,7 +1125,7 @@ Picking a service to use for this was a pain. I ended up settling for wttrin bec
     :ensure t
     :defer t
     :init
-    (setq wttrin-default-cities '("Indianapolis"))
+    (setq wttrin-default-cities '("Indianapolis" "Wadsworth"))
     :bind ("C-c w" . wttrin))
 #+END_SRC
 ** Games
@@ -1113,7 +1143,7 @@ Just for fun. I suck but it's nice.
     :ensure t
     :defer t
     :bind (:map games-map
-	   ("c" . chess)))
+           ("c" . chess)))
 #+END_SRC
 *** Sudoku
 I /love/ sudoku puzzles.
@@ -1122,7 +1152,7 @@ I /love/ sudoku puzzles.
     :ensure t
     :defer t
     :bind (:map games-map
-	   ("s" . sudoku)))
+           ("s" . sudoku)))
 #+END_SRC
 *** Tetris
 God I love playing Tetris
@@ -1131,17 +1161,17 @@ God I love playing Tetris
     :ensure t
     :defer t
     :bind (:map games-map
-	   ("t" . 'tetris)
-	   :map tetris-mode-map
-	   ("w" . tetris-move-bottom)
-	   ("a" . tetris-move-left)
-	   ("s" . tetris-mode-down)
-	   ("d" . tetris-move-right)
-	   ([left] . tetris-rotate-next)
-	   ([right] . tetris-rotate-prev)
-	   ([?\t] . tetris-pause-game)
-	   ("r" . tetris-start-game)
-	   ("e" . tetris-end-game)))
+           ("t" . 'tetris)
+           :map tetris-mode-map
+           ("w" . tetris-move-bottom)
+           ("a" . tetris-move-left)
+           ("s" . tetris-mode-down)
+           ("d" . tetris-move-right)
+           ([left] . tetris-rotate-next)
+           ([right] . tetris-rotate-prev)
+           ([?\t] . tetris-pause-game)
+           ("r" . tetris-start-game)
+           ("e" . tetris-end-game)))
 #+END_SRC
 *** 2048
 A simple and fun game
@@ -1150,14 +1180,20 @@ A simple and fun game
     :ensure t
     :defer t
     :bind (:map games-map
-	   ("2" . 2048-game)))
+           ("2" . 2048-game)))
 #+END_SRC
 * Buffers/Windows
 ** Sloppy focus
 I hate having to click to focus a different window, so I would rather just have windows sloppily focus.
 #+BEGIN_SRC emacs-lisp
   (setq focus-follows-mouse t
-	mouse-autoselect-window t)
+        mouse-autoselect-window t)
+#+END_SRC
+** Uniquify buffer name behavior
+This looks a lot fancier than the default behavior.a
+#+BEGIN_SRC emacs-lisp
+  (setq uniquify-buffer-name-style 'forward
+        uniquify-after-kill-buffer-p t)
 #+END_SRC
 ** Kill current buffer with =C-x k=, use =C-x C-k= to kill the window too
 I had to adjust the function which kills both the current buffer and the current window, because it did not cooperate with EXWM buffers. That's why I have this weird chunk I don't actually have the expertise yet to fully parse.
@@ -1166,16 +1202,16 @@ I had to adjust the function which kills both the current buffer and the current
     "Kill the current buffer and delete the selected window. (Adjusted for EXWM.)"
     (interactive)
     (let ((window-to-delete (selected-window))
-	  (buffer-to-kill (current-buffer))
-	  (delete-window-hook (lambda () (ignore-errors (delete-window)))))
+          (buffer-to-kill (current-buffer))
+          (delete-window-hook (lambda () (ignore-errors (delete-window)))))
       (unwind-protect
-	  (progn
-	    (add-hook 'kill-buffer-hook delete-window-hook t t)
-	    (if (kill-buffer (current-buffer))
-		;; If `delete-window' failed before, we repeat
-		;; it to regenerate the error in the echo area.
-		(when (eq (selected-window) window-to-delete)
-		  (delete-window)))))))
+          (progn
+            (add-hook 'kill-buffer-hook delete-window-hook t t)
+            (if (kill-buffer (current-buffer))
+                ;; If `delete-window' failed before, we repeat
+                ;; it to regenerate the error in the echo area.
+                (when (eq (selected-window) window-to-delete)
+                  (delete-window)))))))
 
   (global-set-key (kbd "C-x k") 'kill-this-buffer)
   (global-set-key (kbd "C-x C-k") 'kill-this-buffer-and-window)
@@ -1233,41 +1269,39 @@ Since apparently =C-x C-o= is actually something useful by default, I decided to
     :init
     (defvar buffer-move-and-windmove-map
       (let ((map (make-sparse-keymap)))
-	(define-key map (kbd "w") 'windmove-up)
-	(define-key map (kbd "a") 'windmove-left)
-	(define-key map (kbd "s") 'windmove-down)
-	(define-key map (kbd "d") 'windmove-right)
-	(define-key map (kbd "C-w") 'buf-move-up)
-	(define-key map (kbd "C-a") 'buf-move-left)
-	(define-key map (kbd "C-s") 'buf-move-down)
-	(define-key map (kbd "C-d") 'buf-move-right)
-	map)
+        (define-key map (kbd "w") 'windmove-up)
+        (define-key map (kbd "a") 'windmove-left)
+        (define-key map (kbd "s") 'windmove-down)
+        (define-key map (kbd "d") 'windmove-right)
+        (define-key map (kbd "C-w") 'buf-move-up)
+        (define-key map (kbd "C-a") 'buf-move-left)
+        (define-key map (kbd "C-s") 'buf-move-down)
+        (define-key map (kbd "C-d") 'buf-move-right)
+        map)
       "A keymap for `buffer-move' and `windmove' functions.")
     (global-set-key (kbd "C-x o") buffer-move-and-windmove-map))
 #+END_SRC
 * Menus/Commands
 Menus, commands, and commands which involve menus.
 ** Enable ido-mode, install ido-vertical-mode and smex
-I /love/ ~ido-mode~. However, I /HATE/ ~ido-mode~ right out of the box. A vertical list looks craptons nicer. Both ~ido-mode~ and ~ido-vertical-mode~ are configured in the same block.
+I /love/ ~ido-mode~. However, I /HATE/ ~ido-mode~ right out of the box. A vertical list looks craptons nicer. Both ~ido-mode~ and ~ido-vertical-mode~ are configured in the same block. Default M-x behavior doesn't use ~ido-mode~, so we install a package which gives it ~ido-mode~ capabilities.
 #+BEGIN_SRC emacs-lisp
   (use-package ido-vertical-mode
     :ensure t
     :defer t
     :init
     (setq ido-mode-flex-matching nil
-	  ido-create-new-buffer 'always
-	  ido-everywhere t
-	  ido-vertical-define-keys 'C-n-and-C-p-only)
+          ido-create-new-buffer 'always
+          ido-everywhere t
+          ido-vertical-define-keys 'C-n-and-C-p-only
+          ido-enable-flex-matching t)
     (ido-mode 1)
-    (ido-vertical-mode 1))
-#+END_SRC
-Default M-x behavior doesn't use ~ido-mode~, so we install a package which gives it ~ido-mode~ capabilities.
-#+BEGIN_SRC emacs-lisp
-  (use-package smex
-    :ensure t
-    :defer t
-    :bind (("M-x"    . smex)
-	   ("<menu>" . smex)))
+    (ido-vertical-mode 1)
+    (use-package smex
+      :ensure t
+      :defer t
+      :bind (("M-x"    . smex)
+             ("<menu>" . smex))))
 #+END_SRC
 ** Replace "yes or no" prompts with "y or n"
 Beauty in brevity.
@@ -1284,12 +1318,16 @@ Even as I've gotten used to Emacs key bindings, it is always nice to have this a
     (which-key-mode 1))
 #+END_SRC
 ** popup-kill-ring package (easier time managing the kill ring)
-Having the whole kill ring easy to scroll through is much less hassle than default behavior.
+Having the whole kill ring easy to scroll through is much less hassle than default behavior. We also set up some yanking behavior while we're at it.
 #+BEGIN_SRC emacs-lisp
   (use-package popup-kill-ring
     :ensure t
     :defer t
-    :bind ("M-y" . popup-kill-ring))
+    :bind ("M-y" . popup-kill-ring)
+    :init
+    (setq save-interprogram-paste-before-kill t
+          mouse-drag-copy-region t
+          mouse-yank-at-point t))
 #+END_SRC
 ** swiper package (better searches)
 This search behavior is *SO* much nicer than the default.
@@ -1335,14 +1373,14 @@ This is the base package. I changed some key bindings to make it more pleasant t
     :defer t
     :init
     (setq company-idle-delay 0.75
-	  company-minimum-prefix-length 3)
+          company-minimum-prefix-length 3)
     (global-company-mode 1)
     :bind (:map company-active-map
-	   ("M-n" . nil)
-	   ("M-p" . nil)
-	   ("C-n" . company-select-next)
-	   ("C-p" . company-select-previous)
-	   ("SPC" . company-abort)))
+           ("M-n" . nil)
+           ("M-p" . nil)
+           ("C-n" . company-select-next)
+           ("C-p" . company-select-previous)
+           ("SPC" . company-abort)))
 #+END_SRC
 * Programming
 It's slowly growing, but I still truly do not need all that much when it comes to programming, mostly because I don't actually do all that much programming outside what I do for fun.
@@ -1370,7 +1408,7 @@ This one is SUPER COOL.
     :ensure t
     :defer t
     :bind (:map prog-mode-map
-	   ("C-c C-'" . avy-flycheck-goto-error)))
+           ("C-c C-'" . avy-flycheck-goto-error)))
 #+END_SRC
 ** company-jedi package (Python autocompletion)
 I will probably be adding company autocompletion for more languages as I start working in more languages.
@@ -1390,18 +1428,19 @@ I have started to mess around with Haskell, so I needed to grab a mode for that.
     :init
     (setq haskell-stylish-on-save t)
     :hook ((haskell-mode . interactive-haskell-mode)
-	   (haskell-mode . turn-on-haskell-doc-mode)
-	   (haskell-mode . haskell-indentation-mode)
-	   (haskell-mode . haskell-auto-insert-module-template)))
+           (haskell-mode . turn-on-haskell-doc-mode)
+           (haskell-mode . haskell-indentation-mode)
+           (haskell-mode . haskell-auto-insert-module-template)))
 #+END_SRC
 ** electric-pair-mode (OH MY GOD THIS IS SO GREAT)
 I have no words for how convenient this has been and how much faster I get things done thanks to these five lines of elisp.
 #+BEGIN_SRC emacs-lisp
   (setq electric-pair-pairs '((?\{ . ?\})
-			      (?\( . ?\))
-			      (?\[ . ?\])
-			      (?\" . ?\")))
+                              (?\( . ?\))
+                              (?\[ . ?\])
+                              (?\" . ?\")))
   (electric-pair-mode 1)
+  (minibuffer-electric-default-mode 1)
 #+END_SRC
 * Org-mode
 As I spend more time in Org-mode, the more I need from it.
@@ -1416,7 +1455,7 @@ Not sure where else to put this, so...
 I use =C-c M-a= and =C-c s-a= to do things related to my agenda. Only one of my systems actually has my agenda, so this only runs on that machine so I don't try any funny business on other machines.
 #+BEGIN_SRC emacs-lisp
   (when (file-exists-p "~/agenda.org")
-    (setq org-agenda-files (quote ("~/agenda.org")))
+    (setq org-agenda-files '("~/agenda.org"))
 
     (defun open-agenda ()
       "Open the agenda file."
@@ -1430,27 +1469,27 @@ I use =C-c M-a= and =C-c s-a= to do things related to my agenda. Only one of my 
 These are just quick things that make ~org-mode~ much easier to use.
 #+BEGIN_SRC emacs-lisp
   (setq org-pretty-entities t
-	org-src-fontify-natively t
-	org-src-tab-acts-natively t
-	org-src-window-setup 'current-window
-	org-fontify-whole-heading-line t
-	org-fontify-done-headline t
-	org-fontify-quote-and-verse-blocks t
-	org-highlight-latex-and-related '(latex)
-	org-enforce-todo-dependencies t
-	org-agenda-use-time-grid nil
-	org-agenda-skip-deadline-if-done t
-	org-agenda-skip-scheduled-if-done t)
+        org-src-fontify-natively t
+        org-src-tab-acts-natively t
+        org-src-window-setup 'current-window
+        org-fontify-whole-heading-line t
+        org-fontify-done-headline t
+        org-fontify-quote-and-verse-blocks t
+        org-highlight-latex-and-related '(latex)
+        org-enforce-todo-dependencies t
+        org-agenda-use-time-grid nil
+        org-agenda-skip-deadline-if-done t
+        org-agenda-skip-scheduled-if-done t)
 #+END_SRC
 ** Shortcuts for various snippets in org-mode
 This will expand as I get into more and more languages and take more notes in classes with different snippets of different languages.
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'org-structure-template-alist
-	       '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+               '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
   (add-to-list 'org-structure-template-alist
-	       '("py" "#+BEGIN_SRC python\n?\n#+END_SRC"))
+               '("py" "#+BEGIN_SRC python\n?\n#+END_SRC"))
   (add-to-list 'org-structure-template-alist
-	       '("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC"))
+               '("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC"))
 #+END_SRC
 ** Use the current window when editing source code in org-mode
 This is just a convenience thing.
@@ -1500,7 +1539,7 @@ It's gonna need more polish, but it works.
     :ensure t
     :defer t
     :bind (:map org-mode-map
-	   ("C-c r" . epresent-run)))
+           ("C-c r" . epresent-run)))
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :exports none
   )
@@ -1513,13 +1552,15 @@ I like having line numbers. However, I don't like line numbers in modes where it
   (global-display-line-numbers-mode 1)
 
   (dolist (hook '(nov-mode-hook tetris-mode-hook snake-mode-hook sudoku-mode-hook
-		  shell-mode-hook ibuffer-mode-hook dashboard-mode-hook vterm-mode-hook
-		  shell-mode-hook Man-mode-hook epresent-mode-hook))
+                  shell-mode-hook ibuffer-mode-hook dashboard-mode-hook vterm-mode-hook
+                  shell-mode-hook Man-mode-hook epresent-mode-hook))
     (add-hook hook (lambda () (display-line-numbers-mode -1))))
 #+END_SRC
 *** Highlight matching parentheses et al. when hovering near one
 #+BEGIN_SRC emacs-lisp
   (show-paren-mode 1)
+  (setq show-paren-style 'parenthesis
+        show-paren-delay 0)
 #+END_SRC
 ** In graphical environments
 This stuff really only helps when you're in a graphical environment. Running Emacs from a terminal means these things might not work, so I don't load them when not in a graphical environment.
@@ -1544,17 +1585,17 @@ Originally I had this set up by means of ~custom-set-faces~, but frankly that is
 Then, we need to determine what size to make the text. This is based on the width of the screens I regularly use. It uses shell commands for X window systems and built-in functions for Windows.
 #+BEGIN_SRC emacs-lisp
   (let* ((res (if (string= (window-system) 'x)
-		  (string-to-number
-		   (shell-command-to-string
-		    (concat "xrandr | grep \\* | "
-			    "cut -d x -f 1 | "
-			    "sort -n | head -n 1")))
-		(/ (display-pixel-width) (display-screens))))
-	   (size (if (<= res 1366) 100
-		   (if (<= res 1920) 150
-		     (if (<= res 2560) 180
-		       (if (<= res 3840) 220
-			 240))))))
+                  (string-to-number
+                   (shell-command-to-string
+                    (concat "xrandr | grep \\* | "
+                            "cut -d x -f 1 | "
+                            "sort -n | head -n 1")))
+                (/ (display-pixel-width) (display-screens))))
+           (size (if (<= res 1366) 100
+                   (if (<= res 1920) 150
+                     (if (<= res 2560) 180
+                       (if (<= res 3840) 220
+                         240))))))
     (set-face-attribute 'default nil :height size))
 #+END_SRC
 *** Window dividers/fringes
@@ -1576,8 +1617,8 @@ I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so mu
     (global-pretty-mode 1)
     (pretty-activate-groups
      '(:nil :ordering :equality :logic :sets :parentheses :function :greek
-	    :types :punctuation :arrows :quantifiers :arithmetic :undefined
-	    :other :sub-and-superscripts)))
+            :types :punctuation :arrows :quantifiers :arithmetic :undefined
+            :other :sub-and-superscripts)))
 #+END_SRC
 *** rainbow package (show colors when typed as hex codes)
 I don't use it too much, but it's nice to have it around.
@@ -1610,11 +1651,12 @@ I *hate* the default mode line. This one is much less sucky. I also show and hid
     :init
     (require 'spaceline-config)
     (setq powerline-default-separator 'wave
-	  spaceline-buffer-encoding-abbrev-p nil
-	  spaceline-buffer-size-p nil
-	  spaceline-line-column-p t)
+          spaceline-buffer-encoding-abbrev-p nil
+          spaceline-buffer-size-p nil
+          spaceline-line-column-p t
+          column-number-indicator-zero-based nil)
     (if (window-system)
-	(spaceline-emacs-theme)
+        (spaceline-emacs-theme)
       (spaceline-spacemacs-theme)))
 #+END_SRC
 *** Show clock and battery level on mode line
@@ -1627,12 +1669,12 @@ I used to use ~fancy-battery~ but it constantly disappeared on my teeny tiny scr
 *** diminish package (hide minor modes from mode line)
 Works very nicely, makes the mode line far comfier.
 #+BEGIN_SRC emacs-lisp
-    (use-package diminish
-      :ensure t
-      :init
-      :diminish (eldoc-mode hungry-delete-mode which-key-mode subword-mode company-mode
-			    rainbow-mode flycheck-mode flyspell-mode flyspell-prog-mode
-			    visual-line-mode interactive-haskell-mode haskell-doc-mode
-			    haskell-indentation-mode page-break-lines-mode
-			    compilation-shell-minor-mode desktop-environment-mode))
+  (use-package diminish
+    :ensure t
+    :diminish (eldoc-mode hungry-delete-mode which-key-mode subword-mode company-mode
+                          flycheck-mode flyspell-mode flyspell-prog-mode rainbow-mode
+                          visual-line-mode interactive-haskell-mode haskell-doc-mode
+                          haskell-indentation-mode page-break-lines-mode
+                          auto-revert-mode compilation-shell-minor-mode
+                          desktop-environment-mode))
 #+END_SRC
