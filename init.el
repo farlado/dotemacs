@@ -4,8 +4,8 @@
   (if (fboundp mode)
       (funcall mode -1)))
 (setq use-dialog-box nil
-      use-file-dialog nil
-      indicate-empty-lines t)
+      use-file-dialog nil)
+(setq-default indicate-empty-lines t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;; I don't use `customize' at all ;;;;;;;;;;;;;;;;;;;;
