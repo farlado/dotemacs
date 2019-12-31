@@ -290,13 +290,16 @@ No clue why you have to do so much just to give workspaces names, but at least y
                                             0 "DP-1-2-2"
                                             1 "DP-1-2-1"
                                             2 "DP-1-2-3")
-        exwm-manage-configurations '(((eq exwm-class-name "Steam")
-                                      workspace 0 floating t floating-mode-line nil)
-                                     ((eq exwm-instance-name "telegram-desktop")
+        exwm-manage-configurations '(((string= exwm-class-name "Steam")
+                                      floating-mode-line nil
+                                      workspace 0
+                                      floating t)
+                                     ((string= exwm-instance-name "telegram-desktop")
                                       workspace 2)
-                                     ((eq exwm-class-name "discord")
+                                     ((string= exwm-class-name "discord")
                                       workspace 1)
-                                     ((eq exwm-title "Event Tester")
+                                     ((string= exwm-title "Event Tester")
+                                      floating-mode-line nil
                                       floating t)))
 #+END_SRC
 Additionally, I define functions for switching between workspaces, to make the global binds down the line look significantly cleaner.
@@ -511,12 +514,15 @@ Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucon
     "Loop desktop audio into a null sink alongside the primary input."
     (interactive)
     ;; Create two modules: `loop' and `out'
-    (dolist (sink '("loop" "out"))
+    (dolist (sink '("loop"
+                    "out"))
       (shell-command (concat "pacmd load-module module-null-sink sink_name=" sink))
       (shell-command (concat "pacmd update-sink-proplist "
                              sink " device.description=" sink)))
     ;; Loop `loop' to primary output, pipe it to `out', loop primary into to `out'
-    (dolist (command '("source=loop.monitor" "source=loop.monitor sink=out" "sink=out"))
+    (dolist (command '("sink=out"
+                       "source=loop.monitor"
+                       "source=loop.monitor sink=out"))
       (shell-command (concat "pacmd load-module module-loopback " command)))
     ;; Run `pavucontrol' and then unload the modules after it completes
     (start-process-shell-command
@@ -810,7 +816,10 @@ This includes:
 - Toggling hiding
 - Toggling the mode line
 #+BEGIN_SRC emacs-lisp
-  (dolist (key '("C-c C-f" "C-c C-t C-f" "C-c C-t C-v" "C-c C-t C-m"))
+  (dolist (key '("C-c C-t C-f"
+                 "C-c C-t C-v"
+                 "C-c C-t C-m"
+                 "C-c C-f"))
     (define-key exwm-mode-map (kbd key) nil))
 #+END_SRC
 ** On startup
@@ -859,7 +868,7 @@ I am big on doing as much in Emacs as possible. Having my music player moved to 
   (when (executable-find "mpd")
 #+END_SRC
 ** Install EMMS
-I do a crapload here, but basically the two main things I do here is configure ~mpd~ information and bind some keys for EMMS controls and music controls.
+All I do here is configure EMMS. Binding keys is later.
 #+BEGIN_SRC emacs-lisp
   (use-package emms
     :ensure t
@@ -948,7 +957,8 @@ This is just stuff not pertaining to a specific task and/or not complex enough t
 ** Disable suspending Emacs
 Why is this even something bound to begin with?
 #+BEGIN_SRC emacs-lisp
-  (dolist (key '("C-z" "C-x C-z"))
+  (dolist (key '("C-x C-z"
+                 "C-z"))
     (global-unset-key (kbd key)))
 #+END_SRC
 ** Don't make extra files on the filesystem
@@ -1114,7 +1124,8 @@ Picking a service to use for this was a pain. I ended up settling for wttrin bec
     :ensure t
     :defer t
     :init
-    (setq wttrin-default-cities '("Indianapolis" "Wadsworth"))
+    (setq wttrin-default-cities '("Indianapolis"
+                                  "Wadsworth"))
     :bind ("C-c w" . wttrin))
 #+END_SRC
 ** Games
@@ -1540,9 +1551,18 @@ I like having line numbers. However, I don't like line numbers in modes where it
 #+BEGIN_SRC emacs-lisp
   (global-display-line-numbers-mode 1)
 
-  (dolist (hook '(nov-mode-hook tetris-mode-hook snake-mode-hook sudoku-mode-hook
-                  shell-mode-hook ibuffer-mode-hook dashboard-mode-hook vterm-mode-hook
-                  shell-mode-hook Man-mode-hook epresent-mode-hook custom-mode-hook))
+  (dolist (hook '(Man-mode-hook
+                  nov-mode-hook
+                  shell-mode-hook
+                  vterm-mode-hook
+                  shell-mode-hook
+                  snake-mode-hook
+                  tetris-mode-hook
+                  sudoku-mode-hook
+                  custom-mode-hook
+                  ibuffer-mode-hook
+                  epresent-mode-hook
+                  dashboard-mode-hook))
     (add-hook hook (lambda () (display-line-numbers-mode -1))))
 #+END_SRC
 *** Highlight matching parentheses et al. when hovering near one
@@ -1591,7 +1611,9 @@ Then, we need to determine what size to make the text. This is based on the widt
 Fringes and dividers look far fancier than the alternatives.
 #+BEGIN_SRC emacs-lisp
   (setq window-divider-default-right-width 3)
-  (dolist (face '(window-divider-first-pixel window-divider window-divider-last-pixel))
+  (dolist (face '(window-divider
+                  window-divider-last-pixel
+                  window-divider-first-pixel))
     (set-face-foreground face "#335ea8"))
   (window-divider-mode 1)
   (fringe-mode 10)
@@ -1604,10 +1626,22 @@ I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so mu
     :defer t
     :init
     (global-pretty-mode 1)
-    (pretty-activate-groups
-     '(:nil :ordering :equality :logic :sets :parentheses :function :greek
-            :types :punctuation :arrows :quantifiers :arithmetic :undefined
-            :other :sub-and-superscripts)))
+    (pretty-activate-groups '(:nil
+                              :sets
+                              :logic
+                              :greek
+                              :types
+                              :other
+                              :arrows
+                              :ordering
+                              :equality
+                              :function
+                              :undefined
+                              :arithmetic
+                              :parentheses
+                              :punctuation
+                              :quantifiers
+                              :sub-and-superscripts)))
 #+END_SRC
 *** rainbow package (show colors when typed as hex codes)
 I don't use it too much, but it's nice to have it around.
@@ -1660,10 +1694,21 @@ Works very nicely, makes the mode line far comfier.
 #+BEGIN_SRC emacs-lisp
   (use-package diminish
     :ensure t
-    :diminish (eldoc-mode hungry-delete-mode which-key-mode subword-mode company-mode
-                          flycheck-mode flyspell-mode flyspell-prog-mode rainbow-mode
-                          visual-line-mode interactive-haskell-mode haskell-doc-mode
-                          haskell-indentation-mode page-break-lines-mode
-                          auto-revert-mode compilation-shell-minor-mode
-                          desktop-environment-mode))
+    :diminish (eldoc-mode
+               subword-mode
+               company-mode
+               rainbow-mode
+               flycheck-mode
+               flyspell-mode
+               which-key-mode
+               auto-revert-mode
+               visual-line-mode
+               haskell-doc-mode
+               flyspell-prog-mode
+               hungry-delete-mode
+               page-break-lines-mode
+               desktop-environment-mode
+               haskell-indentation-mode
+               interactive-haskell-mode
+               compilation-shell-minor-mode))
 #+END_SRC

@@ -1,6 +1,8 @@
 ;;;;;;;;;;; Hide dumb stuff ASAP (kept in init.el for speed) ;;;;;;;;;;;
-(dolist (mode '(scroll-bar-mode menu-bar-mode
-                tool-bar-mode tooltip-mode))
+(dolist (mode '(scroll-bar-mode
+                menu-bar-mode
+                tool-bar-mode
+                tooltip-mode))
   (if (fboundp mode)
       (funcall mode -1)))
 (setq use-dialog-box nil
