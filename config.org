@@ -104,7 +104,179 @@ I don't want to have to manually update my stuff. This solution is literally plo
           auto-package-update-hide-results t)
     (auto-package-update-maybe))
 #+END_SRC
-* Making Emacs a Desktop Environment
+** Protect packages installed in here from automatic removal
+Since I do not use ~customize~ anymore but really like having ~package-autoremove~, I need to still set ~package-selected-packages~ so that it'll work.
+#+BEGIN_SRC emacs-lisp
+  (setq package-selected-packages
+        '(async use-package auto-package-update dashboard exwm dmenu desktop-environment
+          system-packages emms avy ido-vertical-mode buffer-move sudo-edit 2048-game avy
+          graphviz-dot-mode vterm nov wttrin chess sudoku smex which-key popup-kill-ring
+          swiper hungry-delete magit flycheck avy-flycheck company-jedi haskell-mode
+          markdown-mode org-bullets epresent leuven-theme pretty-mode rainbow-mode
+          rainbow-delimiters spaceline diminish))
+#+END_SRC
+* Looks
+** Font
+Originally I had this set up by means of ~custom-set-faces~, but frankly that is less easily configured than this method. First, we determine whether my preferred font is present on the system and set it if present. Otherwise, keep the default that Emacs chooses.
+#+BEGIN_SRC emacs-lisp
+  (when (member "Iosevka" (font-family-list))
+      (set-face-attribute 'default nil :font "Iosevka"))
+#+END_SRC
+Then, we need to determine what size to make the text. This is based on the width of the screens I regularly use. It uses shell commands for X window systems and built-in functions for Windows.
+#+BEGIN_SRC emacs-lisp
+  (let* ((res (if (eq (window-system) 'x)
+                  (string-to-number
+                   (shell-command-to-string
+                    (concat "xrandr | grep \\* | "
+                            "cut -d x -f 1 | "
+                            "sort -n | head -n 1")))
+                (/ (display-pixel-width) (display-screens))))
+           (size (if (<= res 1366) 100
+                   (if (<= res 1920) 150
+                     (if (<= res 2560) 180
+                       (if (<= res 3840) 220
+                         240))))))
+    (set-face-attribute 'default nil :height size))
+#+END_SRC
+** Theme
+I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/.
+#+BEGIN_SRC emacs-lisp
+  (use-package leuven-theme
+    :if (window-system)
+    :ensure t
+    :defer t
+    :init
+    (load-theme 'leuven t))
+#+END_SRC
+** Mode line
+*** spaceline package (Spacemacs mode line)
+I *hate* the default mode line. This one is much less sucky. I also show and hide specific useful things when setting it up. In terminals, ~spaceline-emacs-theme~ just looks wrong, so I don't use it unless I'm in a graphical environment.
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline
+    :ensure t
+    :defer t
+    :init
+    (require 'spaceline-config)
+    (setq powerline-default-separator 'wave
+          spaceline-buffer-encoding-abbrev-p nil
+          spaceline-buffer-size-p nil
+          spaceline-line-column-p t
+          column-number-indicator-zero-based nil)
+    (if (window-system)
+        (spaceline-emacs-theme)
+      (spaceline-spacemacs-theme)))
+#+END_SRC
+*** Show clock and battery level on mode line
+I used to use ~fancy-battery~ but it constantly disappeared on my teeny tiny screens so I just decided not to bother with it. Plus it's one less package to configure lol.
+#+BEGIN_SRC emacs-lisp
+  (setq display-time-24hr-format t)
+  (display-time-mode 1)
+  (display-battery-mode 1)
+#+END_SRC
+*** diminish package (hide minor modes from mode line)
+Works very nicely, makes the mode line far comfier. I set its installation as a hook so that I can keep the look section up a little higher.
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :ensure t
+    :defer t
+    :init
+    (defun diminish-minor-modes ()
+      "Diminish the minor modes in `minor-modes-to-diminish'."
+      (dolist (mode minor-modes-to-diminish)
+        (diminish mode)))
+    (defvar minor-modes-to-diminish '(eldoc-mode subword-mode company-mode rainbow-mode
+                                      flycheck-mode flyspell-mode which-key-mode
+                                      auto-revert-mode visual-line-mode haskell-doc-mode
+                                      flyspell-prog-mode hungry-delete-mode
+                                      page-break-lines-mode desktop-environment-mode
+                                      haskell-indentation-mode interactive-haskell-mode
+                                      compilation-shell-minor-mode)
+      "Minor modes to diminish using `diminish-minor-modes'.")
+    (add-hook 'after-init-hook 'diminish-minor-modes))
+#+END_SRC
+** Line numbers
+I like having line numbers. However, I don't like line numbers in modes where it breaks the mode.
+#+BEGIN_SRC emacs-lisp
+  (global-display-line-numbers-mode 1)
+
+  (dolist (hook '(Man-mode-hook
+                  nov-mode-hook
+                  shell-mode-hook
+                  vterm-mode-hook
+                  shell-mode-hook
+                  snake-mode-hook
+                  tetris-mode-hook
+                  sudoku-mode-hook
+                  custom-mode-hook
+                  ibuffer-mode-hook
+                  epresent-mode-hook
+                  dashboard-mode-hook))
+    (add-hook hook (lambda () (display-line-numbers-mode -1))))
+#+END_SRC
+** Window dividers/fringes
+Fringes and dividers look far fancier than the alternatives.
+#+BEGIN_SRC emacs-lisp
+  (setq window-divider-default-right-width 3)
+  (dolist (face '(window-divider
+                  window-divider-last-pixel
+                  window-divider-first-pixel))
+    (set-face-foreground face "#335ea8"))
+  (window-divider-mode 1)
+  (fringe-mode 10)
+#+END_SRC
+** Highlight matching parentheses
+#+BEGIN_SRC emacs-lisp
+  (show-paren-mode 1)
+  (setq show-paren-style 'parenthesis
+        show-paren-delay 0)
+#+END_SRC
+** pretty-mode package (prettify symbols)
+I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so much more to make things look nice, especially in functional programming languages. I enable /all/ of them.
+#+BEGIN_SRC emacs-lisp
+  (use-package pretty-mode
+    :if (window-system)
+    :ensure t
+    :defer t
+    :init
+    (global-pretty-mode 1)
+    (pretty-activate-groups '(:nil
+                              :sets
+                              :logic
+                              :greek
+                              :types
+                              :other
+                              :arrows
+                              :ordering
+                              :equality
+                              :function
+                              :undefined
+                              :arithmetic
+                              :parentheses
+                              :punctuation
+                              :quantifiers
+                              :sub-and-superscripts)))
+#+END_SRC
+** rainbow package (show colors when typed as hex codes)
+I don't use it too much, but it's nice to have it around.
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode
+    :if (window-system)
+    :ensure t
+    :defer t
+    :init
+    (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode)
+    (global-rainbow-mode 1))
+#+END_SRC
+** rainbow-delimiters package (better quotes/parentheses/brackets)
+It's subtle on my theme, but it still helps me keep track of my brackets and parentheses.
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :if (window-system)
+    :ensure t
+    :defer t
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+END_SRC
+* Emacs Desktop Environment
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness.
 #+BEGIN_SRC emacs-lisp :exports none
   (when (and (eq (window-system) 'x)
@@ -862,7 +1034,7 @@ I don't need it, but having basic compositing is very nice.
 #+BEGIN_SRC emacs-lisp :exports none
   )
 #+END_SRC
-* EMMS (Emacs MultiMedia System)
+* Emacs Multimedia System
 I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it. This is only loaded if ~mpd~ is found.
 #+BEGIN_SRC emacs-lisp :exports none
   (when (executable-find "mpd")
@@ -1003,6 +1175,15 @@ This is to reflect behavior in other programs.
 #+BEGIN_SRC emacs-lisp
   (delete-selection-mode 1)
 #+END_SRC
+** graphviz-dot-mode package (diagram creation)
+A nice way to make diagrams.
+#+BEGIN_SRC emacs-lisp
+  (use-package graphviz-dot-mode
+    :ensure t
+    :defer t
+    :init
+    (require 'graphviz-dot-mode))
+#+END_SRC
 ** Spell-checking
 Just a useful little tool to check spelling while editing a buffer. Only configured if ~aspell~ is installed.
 #+BEGIN_SRC emacs-lisp
@@ -1076,15 +1257,6 @@ Since this thing is changing all the time, I really like having it available on 
     (find-file "~/.emacs.d/config.org"))
 
   (global-set-key (kbd "C-c e") 'config-visit)
-#+END_SRC
-** graphviz-dot-mode package (diagram creation)
-A nice way to make diagrams.
-#+BEGIN_SRC emacs-lisp
-  (use-package graphviz-dot-mode
-    :ensure t
-    :defer t
-    :init
-    (require 'graphviz-dot-mode))
 #+END_SRC
 * Other Emacs Goodies
 This is other stuff I use in Emacs.
@@ -1543,172 +1715,4 @@ It's gonna need more polish, but it works.
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :exports none
   )
-#+END_SRC
-* Looks
-** General
-*** Line numbers
-I like having line numbers. However, I don't like line numbers in modes where it breaks the mode.
-#+BEGIN_SRC emacs-lisp
-  (global-display-line-numbers-mode 1)
-
-  (dolist (hook '(Man-mode-hook
-                  nov-mode-hook
-                  shell-mode-hook
-                  vterm-mode-hook
-                  shell-mode-hook
-                  snake-mode-hook
-                  tetris-mode-hook
-                  sudoku-mode-hook
-                  custom-mode-hook
-                  ibuffer-mode-hook
-                  epresent-mode-hook
-                  dashboard-mode-hook))
-    (add-hook hook (lambda () (display-line-numbers-mode -1))))
-#+END_SRC
-*** Highlight matching parentheses et al. when hovering near one
-#+BEGIN_SRC emacs-lisp
-  (show-paren-mode 1)
-  (setq show-paren-style 'parenthesis
-        show-paren-delay 0)
-#+END_SRC
-** In graphical environments
-This stuff really only helps when you're in a graphical environment. Running Emacs from a terminal means these things might not work, so I don't load them when not in a graphical environment.
-#+BEGIN_SRC emacs-lisp :exports none
-  (when (window-system)
-#+END_SRC
-*** Theme
-I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/.
-#+BEGIN_SRC emacs-lisp
-  (use-package leuven-theme
-    :ensure t
-    :defer t
-    :init
-    (load-theme 'leuven t))
-#+END_SRC
-*** Font
-Originally I had this set up by means of ~custom-set-faces~, but frankly that is less easily configured than this method. First, we determine whether my preferred font is present on the system and set it if present. Otherwise, keep the default that Emacs chooses.
-#+BEGIN_SRC emacs-lisp
-  (when (member "Iosevka" (font-family-list))
-      (set-face-attribute 'default nil :font "Iosevka"))
-#+END_SRC
-Then, we need to determine what size to make the text. This is based on the width of the screens I regularly use. It uses shell commands for X window systems and built-in functions for Windows.
-#+BEGIN_SRC emacs-lisp
-  (let* ((res (if (eq (window-system) 'x)
-                  (string-to-number
-                   (shell-command-to-string
-                    (concat "xrandr | grep \\* | "
-                            "cut -d x -f 1 | "
-                            "sort -n | head -n 1")))
-                (/ (display-pixel-width) (display-screens))))
-           (size (if (<= res 1366) 100
-                   (if (<= res 1920) 150
-                     (if (<= res 2560) 180
-                       (if (<= res 3840) 220
-                         240))))))
-    (set-face-attribute 'default nil :height size))
-#+END_SRC
-*** Window dividers/fringes
-Fringes and dividers look far fancier than the alternatives.
-#+BEGIN_SRC emacs-lisp
-  (setq window-divider-default-right-width 3)
-  (dolist (face '(window-divider
-                  window-divider-last-pixel
-                  window-divider-first-pixel))
-    (set-face-foreground face "#335ea8"))
-  (window-divider-mode 1)
-  (fringe-mode 10)
-#+END_SRC
-*** pretty-mode package (prettify symbols)
-I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so much more to make things look nice, especially in functional programming languages. I enable /all/ of them.
-#+BEGIN_SRC emacs-lisp
-  (use-package pretty-mode
-    :ensure t
-    :defer t
-    :init
-    (global-pretty-mode 1)
-    (pretty-activate-groups '(:nil
-                              :sets
-                              :logic
-                              :greek
-                              :types
-                              :other
-                              :arrows
-                              :ordering
-                              :equality
-                              :function
-                              :undefined
-                              :arithmetic
-                              :parentheses
-                              :punctuation
-                              :quantifiers
-                              :sub-and-superscripts)))
-#+END_SRC
-*** rainbow package (show colors when typed as hex codes)
-I don't use it too much, but it's nice to have it around.
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-mode
-    :ensure t
-    :defer t
-    :init
-    (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode)
-    (global-rainbow-mode 1))
-#+END_SRC
-*** rainbow-delimiters package (better quotes/parentheses/brackets)
-It's subtle on my theme, but it still helps me keep track of my brackets and parentheses.
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-delimiters
-    :ensure t
-    :defer t
-    :hook (prog-mode . rainbow-delimiters-mode))
-#+END_SRC
-#+BEGIN_SRC emacs-lisp :exports none
-  )
-#+END_SRC
-** Mode line
-*** spaceline package (Spacemacs mode line)
-I *hate* the default mode line. This one is much less sucky. I also show and hide specific useful things when setting it up. In terminals, ~spaceline-emacs-theme~ just looks wrong, so I don't use it unless I'm in a graphical environment.
-#+BEGIN_SRC emacs-lisp
-  (use-package spaceline
-    :ensure t
-    :defer t
-    :init
-    (require 'spaceline-config)
-    (setq powerline-default-separator 'wave
-          spaceline-buffer-encoding-abbrev-p nil
-          spaceline-buffer-size-p nil
-          spaceline-line-column-p t
-          column-number-indicator-zero-based nil)
-    (if (window-system)
-        (spaceline-emacs-theme)
-      (spaceline-spacemacs-theme)))
-#+END_SRC
-*** Show clock and battery level on mode line
-I used to use ~fancy-battery~ but it constantly disappeared on my teeny tiny screens so I just decided not to bother with it. Plus it's one less package to configure lol.
-#+BEGIN_SRC emacs-lisp
-  (setq display-time-24hr-format t)
-  (display-time-mode 1)
-  (display-battery-mode 1)
-#+END_SRC
-*** diminish package (hide minor modes from mode line)
-Works very nicely, makes the mode line far comfier.
-#+BEGIN_SRC emacs-lisp
-  (use-package diminish
-    :ensure t
-    :diminish (eldoc-mode
-               subword-mode
-               company-mode
-               rainbow-mode
-               flycheck-mode
-               flyspell-mode
-               which-key-mode
-               auto-revert-mode
-               visual-line-mode
-               haskell-doc-mode
-               flyspell-prog-mode
-               hungry-delete-mode
-               page-break-lines-mode
-               desktop-environment-mode
-               haskell-indentation-mode
-               interactive-haskell-mode
-               compilation-shell-minor-mode))
 #+END_SRC
