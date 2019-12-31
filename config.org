@@ -1604,6 +1604,10 @@ I have started to mess around with Haskell, so I needed to grab a mode for that.
            (haskell-mode . haskell-indentation-mode)
            (haskell-mode . haskell-auto-insert-module-template)))
 #+END_SRC
+** Use SBCL for inferior LISP mode
+#+BEGIN_SRC emacs-lisp
+  (setq inferior-lisp-program "sbcl")
+#+END_SRC
 ** electric-pair-mode (OH MY GOD THIS IS SO GREAT)
 I have no words for how convenient this has been and how much faster I get things done thanks to these five lines of elisp.
 #+BEGIN_SRC emacs-lisp
