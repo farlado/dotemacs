@@ -8,6 +8,11 @@
       indicate-empty-lines t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;;;;;;;;;;;;;;;;;; I don't use `customize' at all ;;;;;;;;;;;;;;;;;;;;
+(setq custom-file "/dev/null")
+(defun package--save-selected-packages (&rest opt) nil)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;;;;;;;;;;;;;;;;;;;; These make Emacs load faster ;;;;;;;;;;;;;;;;;;;;;
 (setq gc-cons-threshold 402653184
       gc-cons-percentage 0.6)
@@ -55,9 +60,4 @@
 
 ;;;;;;;;;;;;;;; The rest of the config is in an org-file ;;;;;;;;;;;;;;;
 (org-babel-load-file (concat user-emacs-directory "config.org"))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;;;;; I don't use `customize' at all ;;;;;;;;;;;;;;;;;;;;
-(setq custom-file "/dev/null")
-(defun package--save-selected-packages (&rest opt) nil)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
