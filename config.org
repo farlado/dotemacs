@@ -107,7 +107,7 @@ I don't want to have to manually update my stuff. This solution is literally plo
 * Making Emacs a Desktop Environment
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness.
 #+BEGIN_SRC emacs-lisp :exports none
-  (when (and (string= (window-system) 'x)
+  (when (and (eq (window-system) 'x)
            (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 1))
     (set-frame-parameter nil 'fullscreen 'fullboth)
 #+END_SRC
@@ -290,13 +290,13 @@ No clue why you have to do so much just to give workspaces names, but at least y
                                             0 "DP-1-2-2"
                                             1 "DP-1-2-1"
                                             2 "DP-1-2-3")
-        exwm-manage-configurations '(((string= exwm-class-name "Steam")
+        exwm-manage-configurations '(((eq exwm-class-name "Steam")
                                       workspace 0 floating t floating-mode-line nil)
-                                     ((string= exwm-instance-name "telegram-desktop")
+                                     ((eq exwm-instance-name "telegram-desktop")
                                       workspace 2)
-                                     ((string= exwm-class-name "discord")
+                                     ((eq exwm-class-name "discord")
                                       workspace 1)
-                                     ((string= exwm-title "Event Tester")
+                                     ((eq exwm-title "Event Tester")
                                       floating t)))
 #+END_SRC
 Additionally, I define functions for switching between workspaces, to make the global binds down the line look significantly cleaner.
@@ -334,28 +334,28 @@ There was a point where I tried to make this into an Elisp function. Not trying 
            (command "xrandr "))
       (dolist (monitor possible-monitors)
         (if (and (member monitor connected-monitors)
-               (not (and (string= monitor "eDP-1-1")
+               (not (and (eq monitor "eDP-1-1")
                      (member "DP-1-2-1" connected-monitors))))
             (let* ((output (concat "--output " monitor " "))
-                   (primary (when (or (string= monitor "LVDS-1")
-                                     (string= monitor "eDP-1-1")
-                                     (string= monitor "DP-1-2-2"))
+                   (primary (when (or (eq monitor "LVDS-1")
+                                     (eq monitor "eDP-1-1")
+                                     (eq monitor "DP-1-2-2"))
                               "--primary "))
-                   (rate (when (string= monitor "DP-1-2-2")
+                   (rate (when (eq monitor "DP-1-2-2")
                            "--rate 75 "))
-                   (res (concat "--mode " (if (or (string= monitor "LVDS-1")
-                                                 (string= monitor "VGA-1"))
+                   (res (concat "--mode " (if (or (eq monitor "LVDS-1")
+                                                 (eq monitor "VGA-1"))
                                               "1366x768 "
                                             "1920x1080 ")))
-                   (rotate (when (or (string= monitor "DP-1-2-1")
-                                    (string= monitor "DP-1-2-3"))
-                             (concat "--rotate " (if (string= monitor "DP-1-2-1")
+                   (rotate (when (or (eq monitor "DP-1-2-1")
+                                    (eq monitor "DP-1-2-3"))
+                             (concat "--rotate " (if (eq monitor "DP-1-2-1")
                                                      "left "
                                                    "right "))))
-                   (pos (concat "--pos " (if (not (or (string= monitor "DP-1-2-2")
-                                                   (string= monitor "DP-1-2-3")))
+                   (pos (concat "--pos " (if (not (or (eq monitor "DP-1-2-2")
+                                                   (eq monitor "DP-1-2-3")))
                                              "0x0 "
-                                           (if (string= monitor "DP-1-2-2")
+                                           (if (eq monitor "DP-1-2-2")
                                                "1080x0 "
                                              "3000x0 ")))))
               (setq command (concat command output primary rate res rotate pos)))
@@ -569,9 +569,9 @@ Then, I use these functions to control setting and cycling the keyboard layout:
     "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3'."
     (interactive)
     (let* ((current-layout (get-keyboard-layout))
-           (new-layout (if (string= current-layout keyboard-layout-1)
+           (new-layout (if (eq current-layout keyboard-layout-1)
                            (or keyboard-layout-2 keyboard-layout-3)
-                         (if (string= current-layout keyboard-layout-2)
+                         (if (eq current-layout keyboard-layout-2)
                              (or keyboard-layout-3 keyboard-layout-1)
                            (or keyboard-layout-1 keyboard-layout-2)))))
       (if new-layout
@@ -582,9 +582,9 @@ Then, I use these functions to control setting and cycling the keyboard layout:
     "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3' in reverse."
     (interactive)
     (let* ((current-layout (get-keyboard-layout))
-           (new-layout (if (string= current-layout keyboard-layout-3)
+           (new-layout (if (eq current-layout keyboard-layout-3)
                            (or keyboard-layout-2 keyboard-layout-1)
-                         (if (string= current-layout keyboard-layout-2)
+                         (if (eq current-layout keyboard-layout-2)
                              (or keyboard-layout-1 keyboard-layout-3)
                            (or keyboard-layout-3 keyboard-layout-2)))))
       (if new-layout
@@ -1493,7 +1493,7 @@ This is exactly what I was looking for lmao
 ** Skip confirming whether to evaluate dot snippets
 Since obviously dot snippets are purely harmless +as far as I know+, I just don't bother with having to confirm evaluation every time I try to update a graphic.
 #+BEGIN_SRC emacs-lisp
-  (setq org-confirm-babel-evaluate '(lambda (lang body) (not (string= lang "dot"))))
+  (setq org-confirm-babel-evaluate '(lambda (lang body) (not (eq lang "dot"))))
 #+END_SRC
 ** Load various languages in org-babel
 #+BEGIN_SRC emacs-lisp
@@ -1542,7 +1542,7 @@ I like having line numbers. However, I don't like line numbers in modes where it
 
   (dolist (hook '(nov-mode-hook tetris-mode-hook snake-mode-hook sudoku-mode-hook
                   shell-mode-hook ibuffer-mode-hook dashboard-mode-hook vterm-mode-hook
-                  shell-mode-hook Man-mode-hook epresent-mode-hook))
+                  shell-mode-hook Man-mode-hook epresent-mode-hook custom-mode-hook))
     (add-hook hook (lambda () (display-line-numbers-mode -1))))
 #+END_SRC
 *** Highlight matching parentheses et al. when hovering near one
@@ -1573,7 +1573,7 @@ Originally I had this set up by means of ~custom-set-faces~, but frankly that is
 #+END_SRC
 Then, we need to determine what size to make the text. This is based on the width of the screens I regularly use. It uses shell commands for X window systems and built-in functions for Windows.
 #+BEGIN_SRC emacs-lisp
-  (let* ((res (if (string= (window-system) 'x)
+  (let* ((res (if (eq (window-system) 'x)
                   (string-to-number
                    (shell-command-to-string
                     (concat "xrandr | grep \\* | "
