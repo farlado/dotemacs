@@ -78,17 +78,6 @@ Prefer newer bytecode and search more extensively when doing apropos commands.
   (setq load-prefer-newer t
         apropos-do-all t)
 #+END_SRC
-** async package (asynchronous execution)
-This should make a few different things a little faster when packages are being handled.
-#+BEGIN_SRC emacs-lisp
-  (use-package async
-    :ensure t
-    :defer t
-    :init
-    (dired-async-mode 1)
-    (async-bytecomp-package-mode 1)
-    (setq async-bytecomp-allowed-packages '(all)))
-#+END_SRC
 ** dashboard package (replacement start screen)
 I love the default start screen, but it just doesn't cut it for me. I just use this to have a nice screen when I start Emacs or close all my buffers.
 #+BEGIN_SRC emacs-lisp
