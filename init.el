@@ -10,7 +10,6 @@
 
 ;;;;;;;;;;;;;;;;;;;; I don't use `customize' at all ;;;;;;;;;;;;;;;;;;;;
 (setq custom-file "/dev/null")
-(defun package--save-selected-packages (&rest opt) nil)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;; These make Emacs load faster ;;;;;;;;;;;;;;;;;;;;;
@@ -36,6 +35,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;; Package management ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'package)
+(defun package--save-selected-packages (&rest opt) nil)
 (setq package-enable-at-startup nil
       package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
 			 ("melpa" . "https://melpa.org/packages/")
