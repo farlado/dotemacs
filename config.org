@@ -100,33 +100,12 @@ Since I do not use ~customize~ anymore but really like having ~package-autoremov
 #+END_SRC
 * Making Emacs significantly less ugly
 Stock Emacs is /ugly/. Just straight up ugly. Suffice to say it leaves much to be desired.
-** Theme and font
-*** leuven-theme package
-I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/.
-#+BEGIN_SRC emacs-lisp
-  (use-package leuven-theme
-    :if (window-system)
-    :ensure t
-    :defer t
-    :init
-    (load-theme 'leuven t))
-#+END_SRC
-*** Fringes and dividers
-Fringes and windows dividers make Emacs look far less sloppy.
-#+BEGIN_SRC emacs-lisp
-  (setq window-divider-default-right-width 3)
-  (dolist (face '(window-divider-first-pixel
-                  window-divider-last-pixel
-                  window-divider))
-    (set-face-foreground face (face-attribute 'mode-line :background)))
-  (window-divider-mode 1)
-  (fringe-mode 10)
-#+END_SRC
+** Font
 *** Setting the font style
 Originally I had this set up by means of ~custom-set-faces~, but frankly that is less easily configured than this method. First, we determine whether my preferred font is present on the system and set it if present. Otherwise, keep whatever default font Emacs chooses.
 #+BEGIN_SRC emacs-lisp
   (when (member "Iosevka" (font-family-list))
-      (set-face-attribute 'default nil :font "Iosevka"))
+    (set-face-attribute 'default nil :font "Iosevka"))
 #+END_SRC
 *** Determining a good font size
 Next we need to determine what size to make the text. This is based on the width of the screens I regularly use. It uses shell commands for X window systems and built-in functions for Windows.
@@ -144,6 +123,84 @@ Next we need to determine what size to make the text. This is based on the width
                      (if (<= res 3840) 220
                        240))))))
     (set-face-attribute 'default nil :height size))
+#+END_SRC
+** Theme
+*** leuven-theme package
+I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/.
+#+BEGIN_SRC emacs-lisp
+  (use-package leuven-theme
+    :if (window-system)
+    :ensure t
+    :defer t
+    :init
+    (load-theme 'leuven t))
+#+END_SRC
+*** Fringes and dividers
+Fringes and windows dividers make Emacs look far less sloppy. The color is grabbed from the mode line for consistency.
+#+BEGIN_SRC emacs-lisp
+  (setq window-divider-default-right-width 3)
+  (dolist (face '(window-divider-first-pixel
+                  window-divider-last-pixel
+                  window-divider))
+    (set-face-foreground face (face-attribute 'mode-line :background)))
+  (window-divider-mode 1)
+  (fringe-mode 10)
+#+END_SRC
+** Mode line
+*** spaceline package (better mode line)
+I *hate* the default mode line. Using ~spaceline~ is much less sucky. I also show and hide specific things when setting it up. In terminals, ~spaceline-emacs-theme~ just looks wrong, so I don't use it unless I'm in a graphical environment.
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline
+    :ensure t
+    :defer t
+    :init
+    (require 'spaceline-config)
+    (setq powerline-default-separator 'wave
+          spaceline-buffer-encoding-abbrev-p nil
+          spaceline-buffer-size-p nil
+          spaceline-line-column-p t
+          column-number-indicator-zero-based nil)
+    (if (window-system)
+        (spaceline-emacs-theme)
+      (spaceline-spacemacs-theme)))
+#+END_SRC
+*** Show clock and battery level on mode line
+I use 24-hour time on all my clocks. I used to use ~fancy-battery~ for battery level but it constantly disappeared on my teeny tiny screens so I just decided not to bother with it. Plus it's one less package to configure lol.
+#+BEGIN_SRC emacs-lisp
+  (setq display-time-24hr-format t)
+  (display-time-mode 1)
+  (display-battery-mode 1)
+#+END_SRC
+*** diminish package (hide minor modes from mode line)
+Works very nicely, makes the mode line far comfier. I set its installation as a hook so that I can keep the look section up a little higher.
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :ensure t
+    :defer t
+    :init
+    (defun diminish-minor-modes ()
+      "Diminish the minor modes in the list `minor-modes-to-diminish'."
+      (dolist (mode minor-modes-to-diminish)
+        (diminish mode)))
+    (defvar minor-modes-to-diminish '(eldoc-mode
+                                      subword-mode
+                                      company-mode
+                                      rainbow-mode
+                                      flycheck-mode
+                                      flyspell-mode
+                                      which-key-mode
+                                      auto-revert-mode
+                                      visual-line-mode
+                                      haskell-doc-mode
+                                      flyspell-prog-mode
+                                      hungry-delete-mode
+                                      page-break-lines-mode
+                                      desktop-environment-mode
+                                      haskell-indentation-mode
+                                      interactive-haskell-mode
+                                      compilation-shell-minor-mode)
+      "Minor modes to diminish using `diminish-minor-modes'.")
+    (add-hook 'after-init-hook 'diminish-minor-modes))
 #+END_SRC
 ** In buffers
 *** Line numbers (on most buffers)
@@ -216,62 +273,6 @@ It's subtle on my theme, but it still helps me keep track of my brackets and par
     :ensure t
     :defer t
     :hook (prog-mode . rainbow-delimiters-mode))
-#+END_SRC
-** Mode line
-*** spaceline package (better mode line)
-I *hate* the default mode line. Using ~spaceline~ is much less sucky. I also show and hide specific things when setting it up. In terminals, ~spaceline-emacs-theme~ just looks wrong, so I don't use it unless I'm in a graphical environment.
-#+BEGIN_SRC emacs-lisp
-  (use-package spaceline
-    :ensure t
-    :defer t
-    :init
-    (require 'spaceline-config)
-    (setq powerline-default-separator 'wave
-          spaceline-buffer-encoding-abbrev-p nil
-          spaceline-buffer-size-p nil
-          spaceline-line-column-p t
-          column-number-indicator-zero-based nil)
-    (if (window-system)
-        (spaceline-emacs-theme)
-      (spaceline-spacemacs-theme)))
-#+END_SRC
-*** Show clock and battery level on mode line
-I use 24-hour time on all my clocks. I used to use ~fancy-battery~ for battery level but it constantly disappeared on my teeny tiny screens so I just decided not to bother with it. Plus it's one less package to configure lol.
-#+BEGIN_SRC emacs-lisp
-  (setq display-time-24hr-format t)
-  (display-time-mode 1)
-  (display-battery-mode 1)
-#+END_SRC
-*** diminish package (hide minor modes from mode line)
-Works very nicely, makes the mode line far comfier. I set its installation as a hook so that I can keep the look section up a little higher.
-#+BEGIN_SRC emacs-lisp
-  (use-package diminish
-    :ensure t
-    :defer t
-    :init
-    (defun diminish-minor-modes ()
-      "Diminish the minor modes in `minor-modes-to-diminish'."
-      (dolist (mode minor-modes-to-diminish)
-        (diminish mode)))
-    (defvar minor-modes-to-diminish '(eldoc-mode
-                                      subword-mode
-                                      company-mode
-                                      rainbow-mode
-                                      flycheck-mode
-                                      flyspell-mode
-                                      which-key-mode
-                                      auto-revert-mode
-                                      visual-line-mode
-                                      haskell-doc-mode
-                                      flyspell-prog-mode
-                                      hungry-delete-mode
-                                      page-break-lines-mode
-                                      desktop-environment-mode
-                                      haskell-indentation-mode
-                                      interactive-haskell-mode
-                                      compilation-shell-minor-mode)
-      "Minor modes to diminish using `diminish-minor-modes'.")
-    (add-hook 'after-init-hook 'diminish-minor-modes))
 #+END_SRC
 * Making Emacs a desktop environment
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness.
@@ -489,7 +490,7 @@ Additionally, I define functions for switching between workspaces, to make the g
     (exwm-workspace-switch-create 2))
 #+END_SRC
 *** Multi-head
-There was a point where I tried to make this into an Elisp function. Not trying that insanity again.
+Thankfully, EXWM comes with hooks to handle when monitors are connected and disconnected, so I can set up an elisp function to handle monitor changes for me.
 #+BEGIN_SRC emacs-lisp
   (defun display-and-dock-setup ()
     "Configure monitors and peripherals."
@@ -1197,8 +1198,13 @@ This is a point of convenience, even in programming language buffers. Wrapping w
 *** Use a visual bell instead of making noise
 Sound is obnoxious. Visual cues are not.
 #+BEGIN_SRC emacs-lisp
-  (setq ring-bell-function 'ignore
+  (setq ring-bell-function 'flash-mode-line
         visible-bell t)
+
+  (defun flash-mode-line ()
+    "Flash the mode line."
+    (invert-face 'mode-line)
+    (run-with-timer 0.25 nil 'invert-face 'mode-line))
 #+END_SRC
 *** Replace "yes or no" prompts with "y or n"
 Beauty in brevity.
@@ -1212,11 +1218,13 @@ I /love/ ~ido-mode~. However, I /HATE/ ~ido-mode~ right out of the box. A vertic
     :ensure t
     :defer t
     :init
-    (setq ido-mode-flex-matching nil
+    (setq ido-everywhere t
+          ido-max-prospects 10
+          ido-enable-prefix nil
+          ido-enable-flex-matching t
+          ido-use-filename-at-point nil
           ido-create-new-buffer 'always
-          ido-everywhere t
-          ido-vertical-define-keys 'C-n-and-C-p-only
-          ido-enable-flex-matching t)
+          ido-vertical-define-keys 'C-n-and-C-p-only)
     (ido-mode 1)
     (ido-vertical-mode 1)
     (use-package smex
@@ -1383,9 +1391,12 @@ This search behavior is *SO* much nicer than the default.
     :bind ("C-s" . swiper))
 #+END_SRC
 *** Automatically revert files on change
-This way if files get modified in the middle of editing them, I don't overwrite the changes.
+This way if files get modified in the middle of editing them, I don't overwrite the changes. This can also change ~dired~ and ~ibuffer~ buffers if I am not mistaken. However, I don't need to hear every last thing about it.
 #+BEGIN_SRC emacs-lisp
   (global-auto-revert-mode 1)
+  (setq global-auto-revert-non-file-buffers t
+        auto-revert-remote-files t
+        auto-revert-verbose nil)
 #+END_SRC
 *** End-of-file newlines and indent tabs
 Screw indent tabs, spaces all the way. Also, if there is no end-of-file newline, add it.
@@ -1605,7 +1616,9 @@ This is exactly what I was looking for lmao
 * Making Emacs handy
 This is other stuff I use in Emacs.
 ** Calendar
+Weeks start on Monday.
 #+BEGIN_SRC emacs-lisp
+  (setq calendar-week-start-day 1)
   (global-set-key (kbd "C-c l") 'calendar)
 #+END_SRC
 ** Calculator
@@ -1613,9 +1626,9 @@ This is other stuff I use in Emacs.
   (global-set-key (kbd "C-c c") 'calc)
 #+END_SRC
 ** Reading the manpages
-Wow, there's actually an Emacs mode for this!
+Wow, there's actually an Emacs mode for this! I put it into the =C-h= binds, since it is a way of getting help, after all.
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-c m") 'man)
+  (global-set-key (kbd "C-h 4 m") 'man)
 #+END_SRC
 ** vterm package (terminal)
 I've been jumping between ~vterm~ and ~ansi-term~. I guess ~vterm~ is just easier to use. In the off-chance I'm running Emacs in the terminal, =C-c t= is usable to open the terminal.
