@@ -1452,6 +1452,13 @@ I don't need it super often, but it's still nice to have.
 
   (global-set-key (kbd "C-c DEL") 'whole-kill-word)
 #+END_SRC
+*** Edit files with superuser privileges using =C-x C-M-f=
+#+BEGIN_SRC emacs-lisp
+  (use-package sudo-edit
+    :ensure t
+    :defer t
+    :bind ("C-x C-M-f" . sudo-edit))
+#+END_SRC
 *** popup-kill-ring package (easier kill ring management)
 Having the whole kill ring easy to scroll through is much less hassle than default behavior. We also set up some yanking behavior while we're at it.
 #+BEGIN_SRC emacs-lisp
