@@ -110,7 +110,7 @@ Originally I had this set up by means of ~custom-set-faces~, but frankly that is
 *** Determining a good font size
 Next we need to determine what size to make the text. This is based on the width of the screens I regularly use. It uses shell commands for X window systems and built-in functions for Windows.
 #+BEGIN_SRC emacs-lisp
-  (let* ((res (if (eq (window-system) 'x)
+  (let* ((res (if (eq window-system 'x)
                   (string-to-number
                    (shell-command-to-string
                     (concat "xrandr | grep \\* | "
@@ -129,7 +129,7 @@ Next we need to determine what size to make the text. This is based on the width
 I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/.
 #+BEGIN_SRC emacs-lisp
   (use-package leuven-theme
-    :if (window-system)
+    :if window-system
     :ensure t
     :defer t
     :init
@@ -160,7 +160,7 @@ I *hate* the default mode line. Using ~spaceline~ is much less sucky. I also sho
           spaceline-buffer-size-p nil
           spaceline-line-column-p t
           column-number-indicator-zero-based nil)
-    (if (window-system)
+    (if window-system
         (spaceline-emacs-theme)
       (spaceline-spacemacs-theme)))
 #+END_SRC
@@ -232,7 +232,7 @@ I like having line numbers. However, I don't like line numbers in modes where it
 I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so much more to make things look nice, especially in functional programming languages. I enable /all/ of them.
 #+BEGIN_SRC emacs-lisp
   (use-package pretty-mode
-    :if (window-system)
+    :if window-system
     :ensure t
     :defer t
     :init
@@ -258,7 +258,7 @@ I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so mu
 I don't use it too much, but it's nice to have it around.
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode
-    :if (window-system)
+    :if window-system
     :ensure t
     :defer t
     :init
@@ -269,7 +269,7 @@ I don't use it too much, but it's nice to have it around.
 It's subtle on my theme, but it still helps me keep track of my brackets and parentheses.
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
-    :if (window-system)
+    :if window-system
     :ensure t
     :defer t
     :hook (prog-mode . rainbow-delimiters-mode))
@@ -277,7 +277,7 @@ It's subtle on my theme, but it still helps me keep track of my brackets and par
 * Making Emacs a desktop environment
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. I also conveniently check whether there's already a running window manager, but I don't export the code blocks related to that for cleanliness.
 #+BEGIN_SRC emacs-lisp :exports none
-  (when (and (eq (window-system) 'x)
+  (when (and (eq window-system 'x)
            (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 1))
     (set-frame-parameter nil 'fullscreen 'fullboth)
 #+END_SRC
@@ -1558,8 +1558,8 @@ These are just quick things that make ~org-mode~ much easier to use.
         org-fontify-quote-and-verse-blocks t
         org-src-window-setup 'current-window
         org-highlight-latex-and-related '(latex)
-        org-ellipsis (if (window-system) "⤵" "...")
-        org-hide-emphasis-markers (when (window-system) t))
+        org-ellipsis (if window-system "⤵" "...")
+        org-hide-emphasis-markers (when window-system t))
 #+END_SRC
 *** Evaluating Graphviz blocks
 Since obviously dot snippets are purely harmless +as far as I know+, I just don't bother with having to confirm evaluation every time I try to update a graphic.
@@ -1595,7 +1595,7 @@ I use =C-c M-a= and =C-c s-a= to do things related to my agenda. Only one of my 
 It's gonna need more polish, but it works.
 #+BEGIN_SRC emacs-lisp
   (use-package epresent
-    :if (window-system)
+    :if window-system
     :ensure t
     :defer t
     :bind (:map org-mode-map
@@ -1610,7 +1610,7 @@ This is just a convenience thing.
 It's kinda slow, but bullet points are very very nice, much better than asterisks.
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
-    :if (window-system)
+    :if window-system
     :ensure t
     :defer t
     :hook (org-mode . org-bullets-mode))
