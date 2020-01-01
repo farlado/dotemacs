@@ -16,7 +16,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;; These make Emacs load faster ;;;;;;;;;;;;;;;;;;;;;
 (setq gc-cons-threshold 402653184
-      gc-cons-percentage 0.6)
+      gc-cons-percentage 0.6
+      load-prefer-newer t
+      apropos-do-all t)
 
 (defvar startup/file-name-handler-alist file-name-handler-alist
   "Temporary storage for `file-name-handler-alist' during startup.")
