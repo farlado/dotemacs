@@ -7,6 +7,7 @@
 ** Summary
 1) Make sure you have all the right dependencies.
 2) Clone the repo into your home directory as ~.emacs.d~.
+3) If using Emacs as a desktop environment, it may take a couple restarts to work right.
 ** Dependencies
 Everything has different dependencies so make sure you have what you need. The easy route to getting all these dependencies installed and configured is to deploy [[https://github.com/farlado/dotfiles][my dotfiles]]:
 #+BEGIN_SRC sh
