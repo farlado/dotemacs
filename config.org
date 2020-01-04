@@ -134,6 +134,8 @@ I used to hate light themes. I'm not in that camp anymore. This theme is /elegan
     :ensure t
     :defer t
     :init
+    (setq leuven-scale-org-agenda-structure t
+          leuven-scale-outline-headlines t)
     (load-theme 'leuven t))
 #+END_SRC
 *** Fringes and dividers
@@ -1284,20 +1286,22 @@ I had to adjust the function which kills both the current buffer and the current
 #+END_SRC
 *** Kill both the buffer and window with =C-x C-k=
 #+BEGIN_SRC emacs-lisp
-    (defun kill-this-buffer-and-window ()
-      "Kill the current buffer and delete the selected window. (Adjusted for EXWM.)"
-      (interactive)
-      (let ((window-to-delete (selected-window))
-            (buffer-to-kill (current-buffer))
-            (delete-window-hook (lambda () (ignore-errors (delete-window)))))
-        (unwind-protect
-            (progn
-              (add-hook 'kill-buffer-hook delete-window-hook t t)
-              (if (kill-buffer (current-buffer))
-                  ;; If `delete-window' failed before, we repeat
-                  ;; it to regenerate the error in the echo area.
-                  (when (eq (selected-window) window-to-delete)
-                    (delete-window)))))))
+  (defun kill-this-buffer-and-window ()
+    "Kill the current buffer and delete the selected window.
+
+  This function has been altered to accommodate EXWM."
+    (interactive)
+    (let ((window-to-delete (selected-window))
+          (buffer-to-kill (current-buffer))
+          (delete-window-hook (lambda () (ignore-errors (delete-window)))))
+      (unwind-protect
+          (progn
+            (add-hook 'kill-buffer-hook delete-window-hook t t)
+            (if (kill-buffer (current-buffer))
+                ;; If `delete-window' failed before, we repeat
+                ;; it to regenerate the error in the echo area.
+                (when (eq (selected-window) window-to-delete)
+                  (delete-window)))))))
 
   (global-set-key (kbd "C-x C-k") 'kill-this-buffer-and-window)
 #+END_SRC
@@ -1357,7 +1361,7 @@ This to me is preferable to the default behavior.
   (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
 #+END_SRC
 *** Use buffer-menu on =C-x b= so the buffer list doesn't open a new window
-Just another point of personal convenience. I don't like ~ibuffer~ just because aesthetic reasons. I also set Q to close the window, for convenience.
+Just another point of personal convenience.
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x b") 'ibuffer)
   (global-unset-key (kbd "C-x C-b"))
@@ -1454,6 +1458,7 @@ I don't need it super often, but it's still nice to have.
   (global-set-key (kbd "C-c DEL") 'whole-kill-word)
 #+END_SRC
 *** Edit files with superuser privileges using =C-x C-M-f=
+This is especially useful when I'm in my own desktop environment and need to edit system files.
 #+BEGIN_SRC emacs-lisp
   (use-package sudo-edit
     :ensure t
@@ -1623,22 +1628,24 @@ This is exactly what I was looking for lmao
 #+END_SRC
 * Making Emacs handy
 This is other stuff I use in Emacs.
-** Calendar
+** Built-in features
+*** Calendar
 Weeks start on Monday.
 #+BEGIN_SRC emacs-lisp
   (setq calendar-week-start-day 1)
   (global-set-key (kbd "C-c l") 'calendar)
 #+END_SRC
-** Calculator
+*** Calculator
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c c") 'calc)
 #+END_SRC
-** Reading the manpages
+*** Reading the manpages
 Wow, there's actually an Emacs mode for this! I put it into the =C-h= binds, since it is a way of getting help, after all.
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-h 4 m") 'man)
 #+END_SRC
-** vterm package (terminal)
+** Not built-in
+*** vterm package (terminal)
 I've been jumping between ~vterm~ and ~ansi-term~. I guess ~vterm~ is just easier to use. In the off-chance I'm running Emacs in the terminal, =C-c t= is usable to open the terminal.
 #+BEGIN_SRC emacs-lisp
   (use-package vterm
@@ -1646,7 +1653,7 @@ I've been jumping between ~vterm~ and ~ansi-term~. I guess ~vterm~ is just easie
     :defer t
     :bind ("C-c t" . vterm))
 #+END_SRC
-** nov package (epub reader)
+*** nov package (epub reader)
 Not the best way to do epub reading, but at least it's in Emacs.
 #+BEGIN_SRC emacs-lisp
   (use-package nov
@@ -1654,7 +1661,7 @@ Not the best way to do epub reading, but at least it's in Emacs.
     :defer t
     :mode ("\\.epub\\'" . nov-mode))
 #+END_SRC
-** wttrin package (weather forecasts)
+*** wttrin package (weather forecasts)
 Picking a service to use for this was a pain. I ended up settling for wttrin because it is the fastest and easiest to use, and plays nice with my setup.
 #+BEGIN_SRC emacs-lisp
   (use-package wttrin
