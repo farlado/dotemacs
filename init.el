@@ -89,6 +89,7 @@
   :init
   (setq inhibit-startup-screen t
         dashboard-items '((recents . 10))
+        dashboard-startup-banner 'official
         dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!"
         dashboard-set-footer nil
         initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
