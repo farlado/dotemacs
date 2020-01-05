@@ -1,1 +1,1 @@
-config.org
+dotemacs.org
