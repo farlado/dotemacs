@@ -37,23 +37,35 @@ Everything has different dependencies so make sure you have what you need. The e
 |                     | ~telegram~             | crappy messenger                           |
 |                     | ~discord~              | crappier messenger                         |
 |                     | ~steam~                | games platform                             |
+|---------------------+----------------------+--------------------------------------------|
 | ~desktop-environment~ | ~alsa-utils~           | volume adjustment                          |
 |                     | ~brightnessctl~        | laptop backlight adjustment                |
 |                     | ~maim~                 | screenshots                                |
 |                     | ~xclip~                | copying screenshots to the clipboard       |
 |                     | ~i3lock-color~         | lockscreen                                 |
+|---------------------+----------------------+--------------------------------------------|
 | ~EMMS~                | ~mpd~                  | playing music                              |
+p|---------------------+----------------------+--------------------------------------------|
 | ~vterm~               | ~cmake~                | handles the makefile                       |
 |                     | ~gcc~                  | any C compiler will do                     |
 |                     | ~libtool~              | make dependency                            |
+|---------------------+----------------------+--------------------------------------------|
 | ~nov~                 | ~ebook-tools~          | opening epub files                         |
+|---------------------+----------------------+--------------------------------------------|
 | ~graphviz-dot-mode~   | ~graphviz~             | process dot files                          |
+|---------------------+----------------------+--------------------------------------------|
 | ~flyspell-mode~       | ~aspell~               | spell checking                             |
+|---------------------+----------------------+--------------------------------------------|
 | ~wttrin~              | ~curl~                 | get weather data from the internet         |
+|---------------------+----------------------+--------------------------------------------|
 | ~sudo-edit~           | ~sudo~                 | duh                                        |
+|---------------------+----------------------+--------------------------------------------|
 | ~flycheck~            | ~pylint~               | Python syntax checking                     |
+|---------------------+----------------------+--------------------------------------------|
 | ~company~             | ~jedi~                 | Python autocomplete                        |
+|---------------------+----------------------+--------------------------------------------|
 | ~haskell-mode~        | ~stack~                | everything about Haskell                   |
+|---------------------+----------------------+--------------------------------------------|
 ** License
 Because I +am a lazy piece of shit who doesn't like long licenses+ do not think much harm could come from using a pushover license for an Emacs configuration, I am publishing this literate Emacs configuration under the WTFPL.
 #+BEGIN_SRC text :tangle LICENSE
