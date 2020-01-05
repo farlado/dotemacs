@@ -103,7 +103,7 @@ Because I +am a lazy piece of shit who doesn't like long licenses+ do not think 
 * Giving ~init.el~ a header
 In order to make the file look at least somewhat decent, and to warn those who are unfortunate enough to think they'll just mosey on into ~init.el~ if they want to understand the config, we create a header that tells people the reality of the file.
 #+BEGIN_SRC emacs-lisp
-  ;;; init.el --- Initializing Emacs
+  ;;; init.el --- Initializing Farlado's Illiterate GNU Emacs
 
   ;; This file is not part of GNU Emacs.
   

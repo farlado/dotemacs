@@ -1,4 +1,4 @@
-;;; init.el --- Initializing Emacs
+;;; init.el --- Initializing Farlado's Illiterate GNU Emacs
 
 ;; This file is not part of GNU Emacs.
 
