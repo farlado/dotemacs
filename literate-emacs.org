@@ -71,6 +71,23 @@ Because I +am a lazy piece of shit who doesn't like long licenses+ do not think 
 
    0. You just DO WHAT THE FUCK YOU WANT TO.
 #+END_SRC
+* Giving ~init.el~ a header
+In order to make the file look at least somewhat decent, and to warn those who are unfortunate enough to think they'll just mosey on into ~init.el~ if they want to understand the config, we create a header that tells people the reality of the file.
+#+BEGIN_SRC emacs-lisp
+  ;;; init.el --- Initializing Emacs
+
+  ;; This file is not part of GNU Emacs.
+  
+  ;;; Commentary:
+
+  ;; This file has been automatically generated from a file named `literate-emacs.org'.
+  ;; If you don't have a copy of that file, it is best not to use this init file!
+  ;; All relevant commentary is in `literate-emacs.org', not here.
+  ;; There may not be any comments past this point.
+  ;; Abandon all hope, ye who enter here.
+  
+  ;;; Code:
+#+END_SRC
 * Making Emacs start quickly and smoothly
 Even with the "small" amount I ask of Emacs, it's a lot of beef to start up as fast as I demand it start up. This is, of course, everything I want to run at startup, but also a few other settings which make more sense to set here, instead of later.
 ** Do these ASAP
@@ -328,6 +345,11 @@ Works very nicely, makes the mode line far comfier. I set its installation as a 
     (add-hook 'after-init-hook 'diminish-minor-modes))
 #+END_SRC
 ** In buffers
+*** Turn ^L into pretty lines
+This is used in a number of places in Emacs. Better to have it on all the time than never on.
+#+BEGIN_SRC emacs-lisp
+  (global-page-break-lines-mode 1)
+#+END_SRC
 *** Line numbers (on most buffers)
 I like having line numbers and indicators for lines past the EOF. However, I don't like line numbers in modes where it breaks the mode.
 #+BEGIN_SRC emacs-lisp
@@ -1374,7 +1396,8 @@ I've gotten really into literate programming lately, so this makes it much easie
   (defun tangle-literate-program ()
     "Tangle a file if it's a literate programming file."
     (interactive)
-    (when (cl-search "literate" (buffer-file-name))
+    (when (and (equal major-mode 'org-mode)
+             (cl-search "literate" (buffer-file-name)))
       (org-babel-tangle)))
 
   (add-hook 'after-save-hook 'tangle-literate-program)
@@ -1862,4 +1885,9 @@ A simple and fun game. Was a big deal when I was in high school. I still play it
     :defer t
     :bind (:map games-map
            ("2" . 2048-game)))
+#+END_SRC
+* Giving ~init.el~ a footer
+Since we gave ~init.el~ a header, I see no reason not to give it a footer.
+#+BEGIN_SRC emacs-lisp
+  ;;; init.el ends here
 #+END_SRC

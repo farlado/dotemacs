@@ -1,3 +1,17 @@
+;;; init.el --- Initializing Emacs
+
+;; This file is not part of GNU Emacs.
+
+;;; Commentary:
+
+;; This file has been automatically generated from a file named `literate-emacs.org'.
+;; If you don't have a copy of that file, it is best not to use this init file!
+;; All relevant commentary is in `literate-emacs.org', not here.
+;; There may not be any comments past this point.
+;; Abandon all hope, ye who enter here.
+
+;;; Code:
+
 (tooltip-mode -1)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -174,6 +188,8 @@
                                     compilation-shell-minor-mode)
     "Minor modes to diminish using `diminish-minor-modes'.")
   (add-hook 'after-init-hook 'diminish-minor-modes))
+
+(global-page-break-lines-mode 1)
 
 (global-display-line-numbers-mode 1)
 (setq-default indicate-empty-lines t)
@@ -997,7 +1013,8 @@ Instead of just killing Emacs, shuts down the system."
 (defun tangle-literate-program ()
   "Tangle a file if it's a literate programming file."
   (interactive)
-  (when (cl-search "literate" (buffer-file-name))
+  (when (and (equal major-mode 'org-mode)
+           (cl-search "literate" (buffer-file-name)))
     (org-babel-tangle)))
 
 (add-hook 'after-save-hook 'tangle-literate-program)
@@ -1329,3 +1346,5 @@ This function has been altered to accommodate EXWM."
   :defer t
   :bind (:map games-map
          ("2" . 2048-game)))
+
+;;; init.el ends here
