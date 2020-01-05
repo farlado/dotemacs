@@ -5,23 +5,11 @@
 #+PROPERTY: header-args :tangle (concat user-emacs-directory "init.el")
 
 #+BEGIN_QUOTE
-Overall, I think text editing is a solved problem. Text editors are like wine.
-The older the better. You do not want a shiny new text editor. You want the text
-editor that has been around long enough and used by enough geeks that every
-conceivable pattern of manipulating symbols on the screen has been thought of,
-and crystallized into a re-usable pack. -- [[https://blog.vivekhaldar.com/post/31970017734/new-frontiers-in-text-editing][Vivek Haldar]]
+Overall, I think text editing is a solved problem. Text editors are like wine. The older the better. You do not want a shiny new text editor. You want the text editor that has been around long enough and used by enough geeks that every conceivable pattern of manipulating symbols on the screen has been thought of, and crystallized into a re-usable pack. -- [[https://blog.vivekhaldar.com/post/31970017734/new-frontiers-in-text-editing][Vivek Haldar]]
 #+END_QUOTE
 
 * About this configuration
-This file is an attempt at a literate GNU Emacs (henceforth "Emacs")
-configuration. Admittedly, much of the "documentation" in here is more
-commentary I provide about my choices and personal feelings about certain things
-in Emacs based on my admittedly very limited opinion of the program than honest-
-to-god documentation of what this file contains. Regardless, the idea is that
-this file, when tangled, generates everything in my git repository, from ~LICENSE~
-to ~init.el~. I would /highly/ recommend you *NOT* try to read the ~init.el~ file
-itself. It's a jungle, especially since all of the commentary regarding the
-configuration is in this file and not in ~init.el~.
+This file is an attempt at a literate GNU Emacs (henceforth "Emacs") configuration. Admittedly, much of the "documentation" in here is more commentary I provide about my choices and personal feelings about certain things in Emacs based on my admittedly very limited opinion of the program than honest-to-god documentation of what this file contains. Regardless, the idea is that this file, when tangled, generates everything in my git repository, from ~LICENSE~ to ~init.el~. I would /highly/ recommend you *NOT* try to read the ~init.el~ file itself. It's a jungle, especially since all of the commentary regarding the configuration is in this file and not in ~init.el~.
 
 ** Okay, that's pretty neat. Why though?
 The answer is rather simple. Before I used a fully literate, I had an ~init.el~ which tangled blocks from a ~config.org~ on the fly (read: on startup). It turns out this was abysmally slow, making for a startup time of around 4.5 seconds when loading into my desktop environment. Tangling blocks from a ~literate-emacs.org~ into an ~init.el~ cuts this time by about a third, around 2.8 seconds to load into my desktop environment. This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check both ~init.el~ and ~config.org~ when I thought I might have changed something for the worse.
@@ -35,54 +23,62 @@ The answer is rather simple. Before I used a fully literate, I had an ~init.el~ 
 ** Dependencies
 Everything has different dependencies so make sure you have what you need. The easy route to getting all these dependencies installed and configured is to deploy [[https://github.com/farlado/dotfiles][my dotfiles]]:
 #+BEGIN_SRC sh :tangle no
-  curl https://raw.githubusercontent.com/farlado/dotfiles/master/.config/deploy/deploy | sh
+  sh -c "$(curl https://raw.githubusercontent.com/farlado/dotfiles/master/.config/deploy/deploy)"
 #+END_SRC
 
-|---------------------+----------------------+--------------------------------------------|
-| Emacs uses...       | Which depends on...  | Used for...                                |
-|---------------------+----------------------+--------------------------------------------|
-| ~EXWM~                | ~xorg~                 | obvious reasons                            |
-|                     | ~wmctrl~               | checking for a window manager              |
-|                     | ~xbanish~              | hiding the cursor while typing             |
-|                     | ~xcompmgr~             | compositor                                 |
-|                     | ~arandr~               | monitor configuration                      |
-|                     | ~nm-connection-editor~ | network configuration                      |
-|                     | ~firefox~              | browsing the web                           |
-|                     | ~libreoffice~          | editing unfriendly documents               |
-|                     | ~gimp~                 | editing images (Emacs can't do this sadly) |
-|                     | ~musescore~            | editing music                              |
-|                     | ~telegram~             | crappy messenger                           |
-|                     | ~discord~              | crappier messenger                         |
-|                     | ~steam~                | games platform                             |
-|---------------------+----------------------+--------------------------------------------|
-| ~desktop-environment~ | ~alsa-utils~           | volume adjustment                          |
-|                     | ~brightnessctl~        | laptop backlight adjustment                |
-|                     | ~maim~                 | screenshots                                |
-|                     | ~xclip~                | copying screenshots to the clipboard       |
-|                     | ~i3lock-color~         | lockscreen                                 |
-|---------------------+----------------------+--------------------------------------------|
-| ~EMMS~                | ~mpd~                  | playing music                              |
-|---------------------+----------------------+--------------------------------------------|
-| ~vterm~               | ~cmake~                | handles the makefile                       |
-|                     | ~gcc~                  | any C compiler will do                     |
-|                     | ~libtool~              | make dependency                            |
-|---------------------+----------------------+--------------------------------------------|
-| ~nov~                 | ~ebook-tools~          | opening epub files                         |
-|---------------------+----------------------+--------------------------------------------|
-| ~graphviz-dot-mode~   | ~graphviz~             | process dot files                          |
-|---------------------+----------------------+--------------------------------------------|
-| ~flyspell-mode~       | ~aspell~               | spell checking                             |
-|---------------------+----------------------+--------------------------------------------|
-| ~wttrin~              | ~curl~                 | get weather data from the internet         |
-|---------------------+----------------------+--------------------------------------------|
-| ~sudo-edit~           | ~sudo~                 | duh                                        |
-|---------------------+----------------------+--------------------------------------------|
-| ~flycheck~            | ~pylint~               | Python syntax checking                     |
-|---------------------+----------------------+--------------------------------------------|
-| ~company~             | ~jedi~                 | Python autocomplete                        |
-|---------------------+----------------------+--------------------------------------------|
-| ~haskell-mode~        | ~stack~                | everything about Haskell                   |
-|---------------------+----------------------+--------------------------------------------|
+|----------------------+--------------------------------------------|
+| ~EXWM~ depends on...   | which is used for...                       |
+|----------------------+--------------------------------------------|
+| ~xorg~                 | obvious reasons                            |
+| ~wmctrl~               | checking for a window manager              |
+| ~xbanish~              | hiding the cursor while typing             |
+| ~xcompmgr~             | compositor                                 |
+| ~arandr~               | monitor configuration                      |
+| ~nm-connection-editor~ | network configuration                      |
+| ~firefox~              | browsing the web                           |
+| ~libreoffice~          | editing unfriendly documents               |
+| ~gimp~                 | editing images (Emacs can't do this sadly) |
+| ~musescore~            | editing music                              |
+| ~telegram~             | crappy messenger                           |
+| ~discord~              | crappier messenger                         |
+| ~steam~                | games platform                             |
+|----------------------+--------------------------------------------|
+
+|-----------------------------------+--------------------------------------|
+| ~desktop-environment~ depends on... | which is used for...                 |
+|-----------------------------------+--------------------------------------|
+| ~alsa-utils~                        | volume adjustment                    |
+| ~brightnessctl~                     | laptop backlight adjustment          |
+| ~maim~                              | screenshots                          |
+| ~xclip~                             | copying screenshots to the clipboard |
+| ~i3lock-color~                      | lock screen                          |
+|-----------------------------------+--------------------------------------|
+
+|-------------------+---------------------+------------------------------------|
+| Emacs uses...     | which depends on... | which is used for...               |
+|-------------------+---------------------+------------------------------------|
+| ~EMMS~              | ~mpd~                 | playing music                      |
+|-------------------+---------------------+------------------------------------|
+| ~vterm~             | ~cmake~               | handles the makefile               |
+|                   | ~gcc~                 | any C compiler will do             |
+|                   | ~libtool~             | make dependency                    |
+|-------------------+---------------------+------------------------------------|
+| ~nov~               | ~ebook-tools~         | opening epub files                 |
+|-------------------+---------------------+------------------------------------|
+| ~graphviz-dot-mode~ | ~graphviz~            | process dot files                  |
+|-------------------+---------------------+------------------------------------|
+| ~flyspell-mode~     | ~aspell~              | spell checking                     |
+|-------------------+---------------------+------------------------------------|
+| ~wttrin~            | ~curl~                | get weather data from the internet |
+|-------------------+---------------------+------------------------------------|
+| ~sudo-edit~         | ~sudo~                | duh                                |
+|-------------------+---------------------+------------------------------------|
+| ~flycheck~          | ~pylint~              | Python syntax checking             |
+|-------------------+---------------------+------------------------------------|
+| ~company~           | ~jedi~                | Python autocomplete                |
+|-------------------+---------------------+------------------------------------|
+| ~haskell-mode~      | ~stack~               | everything about Haskell           |
+|-------------------+---------------------+------------------------------------|
 
 ** License
 Because I +am a lazy piece of shit who doesn't like long licenses+ do not think much harm could come from using a pushover license for an Emacs configuration, I am publishing this literate Emacs configuration under the WTFPL.
@@ -111,8 +107,8 @@ In order to make the file look at least somewhat decent, and to warn those who a
   
   ;;; Commentary:
 
-  ;; This file has been automatically generated from a file named `literate-emacs.org'.
-  ;; If you don't have a copy of that file, it is best not to use this init file!
+  ;; This file has been automatically generated from `literate-emacs.org'.
+  ;; If you don't have a copy of that file, it is best not to use this file!
   ;; All relevant commentary is in `literate-emacs.org', not here.
   ;; There may not be any comments past this point.
   ;; Abandon all hope, ye who enter here.
