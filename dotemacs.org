@@ -18,47 +18,38 @@ Everything has different dependencies so make sure you have what you need. The e
 #+BEGIN_SRC sh :tangle no
   curl https://raw.githubusercontent.com/farlado/dotfiles/master/.config/deploy/deploy | sh
 #+END_SRC
-*** EXWM
-- Painfully obvious here: ~xorg~
-- Checking for a window manager: ~wmctrl~
-- Always hiding the cursor while typing: ~xbanish~
-- Compositor: ~xcompmgr~
-- Monitor configuration: ~arandr~
-- Network configuration: ~nm-connection-editor~
-- Web browser: ~firefox~
-- Editing crappy documents: ~libreoffice~
-- Crappy image editor: ~gimp~
-- Crappy messenger: ~telegram-desktop~
-- Crappier messenger: ~discord~
-- Music composition: ~musescore~
-- Games platform: ~steam~
-*** desktop-environment
-- For volume control: ~alsa-utils~
-- For brightness control: ~brightnessctl~
-- For screenshots: ~maim~
-- For copying screenshots: ~xclip~
-- For locking the screen: ~i3lock-color~
-*** EMMS
-- For playing music: ~mpd~, ~mpc~
-- For playing video: ~mpv~
-*** vterm
-- Makefile parsing: ~cmake~
-- Compiling: I recommend ~gcc~
-- Make dependency: ~libtool~
-*** nov
-- To open epub files: ~ebook-tools~
-*** graphviz-dot-mode
-- To process dot files: ~graphviz~
-*** flyspell-mode
-- Spell checking: ~aspell~
-- Dictionaries I use: ~aspell-en~
-*** wttrin
-- To grab weather data: ~curl~
-*** sudo-edit
-- Obvious dependency: ~sudo~
-*** Other stuff
-- For Python: ~pylint~, ~jedi~
-- For Haskell: ~stack~
+| Emacs uses...       | Which depends on...  | Used for...                                |
+|---------------------+----------------------+--------------------------------------------|
+| ~EXWM~                | ~xorg~                 | obvious reasons                            |
+|                     | ~wmctrl~               | checking for a window manager              |
+|                     | ~xbanish~              | hiding the cursor while typing             |
+|                     | ~xcompmgr~             | compositor                                 |
+|                     | ~arandr~               | monitor configuration                      |
+|                     | ~nm-connection-editor~ | network configuration                      |
+|                     | ~firefox~              | browsing the web                           |
+|                     | ~libreoffice~          | editing unfriendly documents               |
+|                     | ~gimp~                 | editing images (Emacs can't do this sadly) |
+|                     | ~musescore~            | editing music                              |
+|                     | ~telegram~             | crappy messenger                           |
+|                     | ~discord~              | crappier messenger                         |
+|                     | ~steam~                | games platform                             |
+| ~desktop-environment~ | ~alsa-utils~           | volume adjustment                          |
+|                     | ~brightnessctl~        | laptop backlight adjustment                |
+|                     | ~maim~                 | screenshots                                |
+|                     | ~xclip~                | copying screenshots to the clipboard       |
+|                     | ~i3lock-color~         | lockscreen                                 |
+| ~EMMS~                | ~mpd~                  | playing music                              |
+| ~vterm~               | ~cmake~                | handles the makefile                       |
+|                     | ~gcc~                  | any C compiler will do                     |
+|                     | ~libtool~              | make dependency                            |
+| ~nov~                 | ~ebook-tools~          | opening epub files                         |
+| ~graphviz-dot-mode~   | ~graphviz~             | process dot files                          |
+| ~flyspell-mode~       | ~aspell~               | spell checking                             |
+| ~wttrin~              | ~curl~                 | get weather data from the internet         |
+| ~sudo-edit~           | ~sudo~                 | duh                                        |
+| ~flycheck~            | ~pylint~               | Python syntax checking                     |
+| ~company~             | ~jedi~                 | Python autocomplete                        |
+| ~haskell-mode~        | ~stack~                | everything about Haskell                   |
 ** License
 Because I +am a lazy piece of shit who doesn't like long licenses+ do not think much harm could come from using a pushover license for an Emacs configuration, I am publishing this literate Emacs configuration under the WTFPL.
 #+BEGIN_SRC text :tangle LICENSE
