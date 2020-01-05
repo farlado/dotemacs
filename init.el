@@ -87,12 +87,12 @@
   :ensure t
   :defer t
   :init
-  (setq inhibit-startup-screen t
+  (setq dashboard-set-footer nil
+        inhibit-startup-screen t
         dashboard-items '((recents . 10))
         dashboard-startup-banner 'official
-        dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!"
-        dashboard-set-footer nil
-        initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+        initial-buffer-choice (lambda () (get-buffer "*dashboard*"))
+        dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
   (dashboard-setup-startup-hook))
 
 (when (member "Iosevka" (font-family-list))

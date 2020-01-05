@@ -213,12 +213,12 @@ I like the default start screen, but it just doesn't cut it for me. I just use t
     :ensure t
     :defer t
     :init
-    (setq inhibit-startup-screen t
+    (setq dashboard-set-footer nil
+          inhibit-startup-screen t
           dashboard-items '((recents . 10))
           dashboard-startup-banner 'official
-          dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!"
-          dashboard-set-footer nil
-          initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+          initial-buffer-choice (lambda () (get-buffer "*dashboard*"))
+          dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
     (dashboard-setup-startup-hook))
 #+END_SRC
 * Making Emacs significantly less ugly
