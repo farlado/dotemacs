@@ -141,6 +141,8 @@
                 window-divider))
   (set-face-foreground face (face-attribute 'mode-line :background)))
 (window-divider-mode 1)
+
+(set-face-background 'fringe (face-attribute 'default :background))
 (fringe-mode 10)
 
 (use-package spaceline
@@ -193,6 +195,10 @@
 
 (global-display-line-numbers-mode 1)
 (setq-default indicate-empty-lines t)
+
+(set-face-attribute 'line-number nil
+                    :foreground (face-attribute 'default :foreground)
+                    :background (face-attribute 'default :background))
 
 (dolist (hook '(Man-mode-hook
                 nov-mode-hook
@@ -593,18 +599,21 @@
 
 (defcustom keyboard-layout-1 "us"
   "The first of three keyboard layouts to cycle through.
+
 Set to nil to have one less keyboard layout."
   :group 'keyboard-layout
   :type 'string)
 
 (defcustom keyboard-layout-2 "epo"
   "The second of three keyboard layouts to cycle through.
+
 Set to nil to have one less keyboard layout."
   :group 'keyboard-layout
   :type 'string)
 
 (defcustom keyboard-layout-3 "de"
   "The third of three keyboard layouts to cycle through.
+
 Set to nil to have one less keyboard layout."
   :group 'keyboard-layout
   :type 'string)
@@ -874,11 +883,11 @@ Instead of just killing Emacs, shuts down the system."
   (require 'emms-player-mpd)
   (emms-all)
   (setq emms-seek-seconds 5
-	emms-player-list '(emms-player-mpd)
-	emms-info-functions '(emms-info mpd)
-	emms-player-mpd-server-name "localhost"
-	emms-player-mpd-server-port "6601"
-	mpc-host "localhost:6601"))
+        emms-player-list '(emms-player-mpd)
+        emms-info-functions '(emms-info mpd)
+        emms-player-mpd-server-name "localhost"
+        emms-player-mpd-server-port "6601"
+        mpc-host "localhost:6601"))
 
 (defun mpd/start-music-daemon ()
   "Start MPD, connect to it and sync the metadata cache"

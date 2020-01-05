@@ -339,6 +339,12 @@ Fringes and windows dividers make Emacs look far less sloppy. The color is grabb
                   window-divider))
     (set-face-foreground face (face-attribute 'mode-line :background)))
   (window-divider-mode 1)
+#+END_SRC
+
+*** Fringes
+Having fringes also helps keep things looking good. However, I really do not want the fringes to have a color that is different from the default background.
+#+BEGIN_SRC emacs-lisp
+  (set-face-background 'fringe (face-attribute 'default :background))
   (fringe-mode 10)
 #+END_SRC
 
@@ -409,10 +415,14 @@ This is used in a number of places in Emacs. Better to have it on all the time t
 #+END_SRC
 
 *** Line numbers (on most buffers)
-I like having line numbers and indicators for lines past the EOF. However, I don't like line numbers in modes where it breaks the mode.
+I like having line numbers and indicators for lines past the EOF. I also like having the current line highlighted. However, I don't like line numbers in modes where it breaks the mode, and I want line numbers to look consistent.
 #+BEGIN_SRC emacs-lisp
   (global-display-line-numbers-mode 1)
   (setq-default indicate-empty-lines t)
+
+  (set-face-attribute 'line-number nil
+                      :foreground (face-attribute 'default :foreground)
+                      :background (face-attribute 'default :background))
 
   (dolist (hook '(Man-mode-hook
                   nov-mode-hook
@@ -689,6 +699,7 @@ No clue why you have to do so much just to give workspaces names, but at least y
                                       floating-mode-line nil
                                       floating t)))
 #+END_SRC
+
 Additionally, I define functions for switching between workspaces, to make the global binds down the line look significantly cleaner.
 #+BEGIN_SRC emacs-lisp
   (defun farl-exwm/workspace-0 ()
@@ -808,6 +819,7 @@ Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
     (start-process-shell-command
      "GIMP" nil "gimp"))
 #+END_SRC
+
 **** Steam
 Gaming is possible with EXWM, if you run games windowed.
 #+BEGIN_SRC emacs-lisp
@@ -817,6 +829,7 @@ Gaming is possible with EXWM, if you run games windowed.
     (start-process-shell-command
      "Steam" nil "steam"))
 #+END_SRC
+
 **** Firefox
 Firefox has some unique abilities when it comes to how to make windows behave which work better for me. I don't use tabs, and I don't want anything to do with them, and Firefox lets me hide the tab bar and force all tabs to actually open as new windows. It's like Suckless Surf, but orders of magnitude better.
 #+BEGIN_SRC emacs-lisp
@@ -826,6 +839,7 @@ Firefox has some unique abilities when it comes to how to make windows behave wh
     (start-process-shell-command
      "Firefox" nil "firefox"))
 #+END_SRC
+
 **** Discord
 Yeah, I also use the light theme for Discord. It looks comfy, even if Discord is a garbage application.
 #+BEGIN_SRC emacs-lisp
@@ -835,6 +849,7 @@ Yeah, I also use the light theme for Discord. It looks comfy, even if Discord is
     (start-process-shell-command
      "Discord" nil "discord"))
 #+END_SRC
+
 **** Telegram
 I have a painfully white theme which fits perfectly with my setup.
 #+BEGIN_SRC emacs-lisp
@@ -844,6 +859,7 @@ I have a painfully white theme which fits perfectly with my setup.
     (start-process-shell-command
      "Telegram" nil "telegram-desktop"))
 #+END_SRC
+
 **** MuseScore
 I haven't figured out how to engrave in Emacs, so for now...
 #+BEGIN_SRC emacs-lisp
@@ -853,6 +869,7 @@ I haven't figured out how to engrave in Emacs, so for now...
     (start-process-shell-command
      "MuseScore" nil "musescore"))
 #+END_SRC
+
 **** LibreOffice
 Shame me all you want. I'm still in introductory courses and haven't learned enough Org-mode to use it more meaningfully.
 #+BEGIN_SRC emacs-lisp
@@ -862,6 +879,7 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
     (start-process-shell-command
      "LibreOffice" nil "libreoffice"))
 #+END_SRC
+
 **** Transmission
 #+BEGIN_SRC emacs-lisp
   (defun run-transmission ()
@@ -881,6 +899,7 @@ Calling ~arandr~ to adjust monitors is useful when I am preparing to present som
     (start-process-shell-command
      "Monitor Settings" nil "arandr"))
 #+END_SRC
+
 **** Network settings
 This one uses two windows: one to open the NetworkManager connection editor, and another to list WiFi networks nearby.
 #+BEGIN_SRC emacs-lisp
@@ -891,6 +910,7 @@ This one uses two windows: one to open the NetworkManager connection editor, and
      "Connections" nil "nm-connection-editor")
     (async-shell-command "nmcli dev wifi list"))
 #+END_SRC
+
 **** Volume mixer
 For when you need to do volume mixing.
 #+BEGIN_SRC emacs-lisp
@@ -900,6 +920,7 @@ For when you need to do volume mixing.
     (start-process-shell-command
      "Volume Mixer" nil "pavucontrol"))
 #+END_SRC
+
 **** Audio loop-back
 Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucontrol~ to set up which programs to pass through to Discord.
 #+BEGIN_SRC emacs-lisp
@@ -923,6 +944,7 @@ Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucon
                             "pacmd unload-module module-null-sink && "
                             "pacmd unload-module module-loopback")))
 #+END_SRC
+
 **** Keyboard layout selection
 This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
 #+BEGIN_SRC emacs-lisp
@@ -932,22 +954,26 @@ This will eventually be its own package, but for now, it's just in my config. Fi
 
   (defcustom keyboard-layout-1 "us"
     "The first of three keyboard layouts to cycle through.
+
   Set to nil to have one less keyboard layout."
     :group 'keyboard-layout
     :type 'string)
 
   (defcustom keyboard-layout-2 "epo"
     "The second of three keyboard layouts to cycle through.
+
   Set to nil to have one less keyboard layout."
     :group 'keyboard-layout
     :type 'string)
 
   (defcustom keyboard-layout-3 "de"
     "The third of three keyboard layouts to cycle through.
+
   Set to nil to have one less keyboard layout."
     :group 'keyboard-layout
     :type 'string)
 #+END_SRC
+
 Then, I use these functions to control setting and cycling the keyboard layout:
 #+BEGIN_SRC emacs-lisp
   (defun get-keyboard-layout ()
@@ -990,6 +1016,7 @@ Then, I use these functions to control setting and cycling the keyboard layout:
           (set-keyboard-layout new-layout)
         (message "No keyboard layouts selected."))))
 #+END_SRC
+
 **** Suspending
 #+BEGIN_SRC emacs-lisp
   (defun suspend-computer ()
@@ -999,6 +1026,7 @@ Then, I use these functions to control setting and cycling the keyboard layout:
 
   (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
 #+END_SRC
+
 **** Shutting down
 I copied the function for quitting Emacs to handle shutting down.
 #+BEGIN_SRC emacs-lisp
@@ -1056,6 +1084,7 @@ I copied the function for quitting Emacs to handle shutting down.
 
   (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
 #+END_SRC
+
 **** Rebooting
 I copied the function for quitting Emacs to handle reboot too.
 #+BEGIN_SRC emacs-lisp
@@ -1277,11 +1306,11 @@ All I do here is configure EMMS. Binding keys is later.
     (require 'emms-player-mpd)
     (emms-all)
     (setq emms-seek-seconds 5
-	  emms-player-list '(emms-player-mpd)
-	  emms-info-functions '(emms-info mpd)
-	  emms-player-mpd-server-name "localhost"
-	  emms-player-mpd-server-port "6601"
-	  mpc-host "localhost:6601"))
+          emms-player-list '(emms-player-mpd)
+          emms-info-functions '(emms-info mpd)
+          emms-player-mpd-server-name "localhost"
+          emms-player-mpd-server-port "6601"
+          mpc-host "localhost:6601"))
 #+END_SRC
 
 ** Daemon functions
