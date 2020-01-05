@@ -11,7 +11,7 @@ Overall, I think text editing is a solved problem. Text editors are like wine. T
 * About this configuration
 This file is an attempt at a literate GNU Emacs (henceforth "Emacs") configuration. Admittedly, much of the "documentation" in here is more commentary I provide about my choices and personal feelings about certain things in Emacs based on my admittedly very limited opinion of the program than honest-to-god documentation of what this file contains. Regardless, the idea is that this file, when tangled, generates everything in my git repository, from ~LICENSE~ to ~init.el~. I would /highly/ recommend you *NOT* try to read the ~init.el~ file itself. It's a jungle, especially since all of the commentary regarding the configuration is in this file and not in ~init.el~.
 ** Okay, that's pretty neat. Why though?
-The answer is rather simple. Before I used a fully literate, I had an ~init.el~ which tangled blocks from a ~config.org~ on the fly (read: on startup). It turns out this was abysmally slow, making for a startup time of around 4.5 seconds when loading into my desktop environment. Tangling blocks from a ~dotemacs.org~ into an ~init.el~ cuts this time by about a third, around 2.8 seconds to load into my desktop environment. This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check both ~init.el~ and ~config.org~ when I thought I might have changed something for the worse.
+The answer is rather simple. Before I used a fully literate, I had an ~init.el~ which tangled blocks from a ~config.org~ on the fly (read: on startup). It turns out this was abysmally slow, making for a startup time of around 4.5 seconds when loading into my desktop environment. Tangling blocks from a ~literate-emacs.org~ into an ~init.el~ cuts this time by about a third, around 2.8 seconds to load into my desktop environment. This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check both ~init.el~ and ~config.org~ when I thought I might have changed something for the worse.
 ** Installation
 /Note: these instructions are for users of GNU/Linux or other *NIX systems./
 1) Clone the repo into your home directory as ~.emacs.d~.
@@ -1294,7 +1294,7 @@ Since this thing is changing all the time, I really like having it available on 
   (defun config-visit ()
     "Open the configuration file."
     (interactive)
-    (find-file (concat user-emacs-directory "dotemacs.org")))
+    (find-file (concat user-emacs-directory "literate-emacs.org")))
 
   (global-set-key (kbd "C-c e") 'config-visit)
 #+END_SRC
@@ -1368,17 +1368,16 @@ I /love/ ~ido-mode~. However, I /HATE/ ~ido-mode~ right out of the box. A vertic
 #+END_SRC
 ** Personal save hooks
 When I save a file, sometimes I want specific things to be done.
-*** Tangle my personal configuration when it's saved
-This file is used to produce my ~init.el~, so it would be pretty dumb for it not to tangle when I'm configuring it.
+*** Tangle literate programming files
+I've gotten really into literate programming lately, so this makes it much easier to tangle files.
 #+BEGIN_SRC emacs-lisp
-  (defun my/tangle-literate-emacs-config ()
-    "Tangle the current `org-mode' buffer if it is my literate Emacs configuration."
+  (defun tangle-literate-program ()
+    "Tangle a file if it's a literate programming file."
     (interactive)
-    (when (equal (buffer-file-name)
-                 (expand-file-name (concat user-emacs-directory "dotemacs.org")))
+    (when (string-match-p (regexp-quote "literate") (buffer-file-name))
       (org-babel-tangle)))
 
-  (add-hook 'after-save-hook 'my/tangle-literate-emacs-config)
+  (add-hook 'after-save-hook 'tangle-literate-program)
 #+END_SRC
 ** Buffers/windows
 *** Sloppy focus windows

@@ -946,7 +946,7 @@ Instead of just killing Emacs, shuts down the system."
 (defun config-visit ()
   "Open the configuration file."
   (interactive)
-  (find-file (concat user-emacs-directory "dotemacs.org")))
+  (find-file (concat user-emacs-directory "literate-emacs.org")))
 
 (global-set-key (kbd "C-c e") 'config-visit)
 
@@ -994,14 +994,13 @@ Instead of just killing Emacs, shuts down the system."
     :bind (("M-x"    . smex)
            ("<menu>" . smex))))
 
-(defun my/tangle-literate-emacs-config ()
-  "Tangle the current `org-mode' buffer if it is my literate Emacs configuration."
+(defun tangle-literate-program ()
+  "Tangle a file if it's a literate programming file."
   (interactive)
-  (when (equal (buffer-file-name)
-               (expand-file-name (concat user-emacs-directory "dotemacs.org")))
+  (when (string-match-p (regexp-quote "literate") (buffer-file-name))
     (org-babel-tangle)))
 
-(add-hook 'after-save-hook 'my/tangle-literate-emacs-config)
+(add-hook 'after-save-hook 'tangle-literate-program)
 
 (setq focus-follows-mouse t
       mouse-autoselect-window t)
