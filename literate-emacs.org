@@ -5,7 +5,11 @@
 #+PROPERTY: header-args :tangle (concat user-emacs-directory "init.el")
 
 #+BEGIN_QUOTE
-Overall, I think text editing is a solved problem. Text editors are like wine. The older the better. You do not want a shiny new text editor. You want the text editor that has been around long enough and used by enough geeks that every conceivable pattern of manipulating symbols on the screen has been thought of, and crystallized into a re-usable pack. -- [[https://blog.vivekhaldar.com/post/31970017734/new-frontiers-in-text-editing][Vivek Haldar]]
+Overall, I think text editing is a solved problem. Text editors are like wine.
+The older the better. You do not want a shiny new text editor. You want the text
+editor that has been around long enough and used by enough geeks that every
+conceivable pattern of manipulating symbols on the screen has been thought of,
+and crystallized into a re-usable pack. -- [[https://blog.vivekhaldar.com/post/31970017734/new-frontiers-in-text-editing][Vivek Haldar]]
 #+END_QUOTE
 
 * About this configuration
