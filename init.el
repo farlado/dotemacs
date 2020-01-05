@@ -997,7 +997,7 @@ Instead of just killing Emacs, shuts down the system."
 (defun tangle-literate-program ()
   "Tangle a file if it's a literate programming file."
   (interactive)
-  (when (string-match-p (regexp-quote "literate") (buffer-file-name))
+  (when (cl-search "literate" (buffer-file-name))
     (org-babel-tangle)))
 
 (add-hook 'after-save-hook 'tangle-literate-program)

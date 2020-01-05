@@ -1374,7 +1374,7 @@ I've gotten really into literate programming lately, so this makes it much easie
   (defun tangle-literate-program ()
     "Tangle a file if it's a literate programming file."
     (interactive)
-    (when (string-match-p (regexp-quote "literate") (buffer-file-name))
+    (when (cl-search "literate" (buffer-file-name))
       (org-babel-tangle)))
 
   (add-hook 'after-save-hook 'tangle-literate-program)
