@@ -44,6 +44,7 @@ Everything has different dependencies so make sure you have what you need. The e
 | ~steam~                | games platform                             |
 |----------------------+--------------------------------------------|
 
+
 |-----------------------------------+--------------------------------------|
 | ~desktop-environment~ depends on... | which is used for...                 |
 |-----------------------------------+--------------------------------------|
@@ -53,6 +54,7 @@ Everything has different dependencies so make sure you have what you need. The e
 | ~xclip~                             | copying screenshots to the clipboard |
 | ~i3lock-color~                      | lock screen                          |
 |-----------------------------------+--------------------------------------|
+
 
 |-------------------+---------------------+------------------------------------|
 | Emacs uses...     | which depends on... | which is used for...               |
