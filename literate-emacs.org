@@ -45,7 +45,7 @@ Everything has different dependencies so make sure you have what you need. The e
 |                     | ~i3lock-color~         | lockscreen                                 |
 |---------------------+----------------------+--------------------------------------------|
 | ~EMMS~                | ~mpd~                  | playing music                              |
-p|---------------------+----------------------+--------------------------------------------|
+|---------------------+----------------------+--------------------------------------------|
 | ~vterm~               | ~cmake~                | handles the makefile                       |
 |                     | ~gcc~                  | any C compiler will do                     |
 |                     | ~libtool~              | make dependency                            |
