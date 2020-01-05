@@ -1243,14 +1243,13 @@ This function has been altered to accommodate EXWM."
 (org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
 (setq org-confirm-babel-evaluate '(lambda (lang body) (not (eq lang "dot"))))
 
-(add-to-list 'org-structure-template-alist
-             '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
-(add-to-list 'org-structure-template-alist
-             '("py" "#+BEGIN_SRC python\n?\n#+END_SRC"))
-(add-to-list 'org-structure-template-alist
-             '("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC"))
-(add-to-list 'org-structure-template-alist
-             '("t" "#+BEGIN_SRC text :tangle ?\n\n#+END_SRC"))
+(dolist (shortcut
+         '(("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")
+           ("py" "#+BEGIN_SRC python\n?\n#+END_SRC")
+           ("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC")
+           ("t" "#+BEGIN_SRC text :tangle ?\n\n#+END_SRC")
+           ("css" "#+BEGIN_SRC css\n?\n#+END_SRC")))
+  (add-to-list 'org-structure-template-alist shortcut))
 
 (when (file-exists-p "~/agenda.org")
   (setq org-agenda-files '("~/agenda.org"))

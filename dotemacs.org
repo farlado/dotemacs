@@ -1727,14 +1727,13 @@ Since obviously dot snippets are purely harmless +as far as I know+, I just don'
 *** Shortcuts for various snippets in org-mode
 This will expand as I get into more and more languages and take more notes in classes with different snippets of different languages.
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'org-structure-template-alist
-               '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
-  (add-to-list 'org-structure-template-alist
-               '("py" "#+BEGIN_SRC python\n?\n#+END_SRC"))
-  (add-to-list 'org-structure-template-alist
-               '("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC"))
-  (add-to-list 'org-structure-template-alist
-               '("t" "#+BEGIN_SRC text :tangle ?\n\n#+END_SRC"))
+  (dolist (shortcut
+           '(("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")
+             ("py" "#+BEGIN_SRC python\n?\n#+END_SRC")
+             ("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC")
+             ("t" "#+BEGIN_SRC text :tangle ?\n\n#+END_SRC")
+             ("css" "#+BEGIN_SRC css\n?\n#+END_SRC")))
+    (add-to-list 'org-structure-template-alist shortcut))
 #+END_SRC
 *** Agenda (only enabled if an agenda is found)
 I use =C-c M-a= and =C-c s-a= to do things related to my agenda. Only one of my systems actually has my agenda, so this only runs on that machine so I don't try any funny business on other machines.
