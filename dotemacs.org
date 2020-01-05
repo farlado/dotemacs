@@ -1,13 +1,13 @@
-#+TITLE: Farlado's Emacs
-#+SUBTITLE: A far-from-sane "literate" Emacs configuration
+#+TITLE: Farlado's Illiterate GNU Emacs
+#+SUBTITLE: A far-from-sane literate Emacs configuration
 #+LANGUAGE: en
 #+OPTIONS: num:2 toc:2
 #+PROPERTY: header-args :tangle (concat user-emacs-directory "init.el")
 
-* About this Emacs configuration
-This file is an attempt at as close to a literate Emacs configuration as possible. Admittedly, much of the "documentation" in here is more commentary I provide about my choices and personal feelings about certain things in Emacs based on my admittedly very limited opinion of the program. Regardless, the idea is that this file, when tangled, generates everything in my repository, most importantly my ~init.el~. I would /highly/ recommend you *NOT* try to read the ~init.el~ file itself. It's a jungle, especially since all of the commentary regarding the configuration is in this file and not in ~init.el~.
-** Why a "literate" ~init.el~?
-The answer is rather simple. Before I used a literate-like file for my entire configuration, I had an ~init.el~ which tangled blocks from a ~config.org~ on startup. It turns out this was abysmally slow (around 4.5 seconds on a cold startup), and that tangling blocks from a ~dotemacs.org~ into an ~init.el~ would cut that time by about a third (around 2.8 seconds). This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check both ~init.el~ and ~config.org~ when I thought I might have changed something for the worse.
+* About this configuration
+This file is an attempt at a literate GNU Emacs (henceforth "Emacs") configuration. Admittedly, much of the "documentation" in here is more commentary I provide about my choices and personal feelings about certain things in Emacs based on my admittedly very limited opinion of the program than honest-to-god documentation of what this file contains. Regardless, the idea is that this file, when tangled, generates everything in my git repository, from ~LICENSE~ to ~init.el~. I would /highly/ recommend you *NOT* try to read the ~init.el~ file itself. It's a jungle, especially since all of the commentary regarding the configuration is in this file and not in ~init.el~.
+** Okay, that's pretty neat. Why though?
+The answer is rather simple. Before I used a fully literate, I had an ~init.el~ which tangled blocks from a ~config.org~ on the fly (read: on startup). It turns out this was abysmally slow, making for a startup time of around 4.5 seconds when loading into my desktop environment. Tangling blocks from a ~dotemacs.org~ into an ~init.el~ cuts this time by about a third, around 2.8 seconds to load into my desktop environment. This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check both ~init.el~ and ~config.org~ when I thought I might have changed something for the worse.
 ** Installation
 /Note: these instructions are for users of GNU/Linux or other *NIX systems./
 1) Clone the repo into your home directory as ~.emacs.d~.
@@ -126,7 +126,7 @@ Garbage collection shouldn't happen during startup, as that will slow Emacs down
 ** Package management
 Because I am writing this configuration to be as portable as possible (e.g. I should be able to dump this onto any machine and run it), I manage all packages through Emacs.
 *** Protect packages from ~package-autoremove~
-Since I do not use ~customize~ but really like protecting packages used in my config from ~package-autoremove~, I need to still set ~package-selected-packages~ so that it'll work.
+Since I do not use ~customize~ but really like protecting packages used in my configuration from ~package-autoremove~, I need to still set ~package-selected-packages~ so that it'll work.
 #+BEGIN_SRC emacs-lisp
   (setq package-selected-packages
         '(async use-package auto-package-update dashboard exwm dmenu desktop-environment
@@ -211,7 +211,7 @@ I like the default start screen, but it just doesn't cut it for me. I just use t
     :init
     (setq inhibit-startup-screen t
           dashboard-items '((recents . 10))
-          dashboard-banner-logo-title "Welcome to GNU Emacs!"
+          dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!"
           dashboard-set-footer nil
           initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
     (dashboard-setup-startup-hook))
@@ -243,7 +243,7 @@ Next we need to determine what size to make the text. This is based on the width
     (set-face-attribute 'default nil :height size))
 #+END_SRC
 ** Theme
-*** ~leuven-theme~
+*** ~leuven-theme~ (my theme of choice)
 I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/.
 #+BEGIN_SRC emacs-lisp
   (use-package leuven-theme
@@ -1287,7 +1287,7 @@ I constantly kill Emacs on accident when running it in terminals, so this preven
 Since this thing is changing all the time, I really like having it available on a shortcut.
 #+BEGIN_SRC emacs-lisp
   (defun config-visit ()
-    "Open the config file."
+    "Open the configuration file."
     (interactive)
     (find-file (concat user-emacs-directory "dotemacs.org")))
 
@@ -1363,7 +1363,7 @@ I /love/ ~ido-mode~. However, I /HATE/ ~ido-mode~ right out of the box. A vertic
 #+END_SRC
 ** Personal save hooks
 When I save a file, sometimes I want specific things to be done.
-*** Tangle my personal config when it's saved
+*** Tangle my personal configuration when it's saved
 This file is used to produce my ~init.el~, so it would be pretty dumb for it not to tangle when I'm configuring it.
 #+BEGIN_SRC emacs-lisp
   (defun my/tangle-literate-emacs-config ()

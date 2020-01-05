@@ -89,7 +89,7 @@
   :init
   (setq inhibit-startup-screen t
         dashboard-items '((recents . 10))
-        dashboard-banner-logo-title "Welcome to GNU Emacs!"
+        dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!"
         dashboard-set-footer nil
         initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
   (dashboard-setup-startup-hook))
@@ -943,7 +943,7 @@ Instead of just killing Emacs, shuts down the system."
 (setq confirm-kill-emacs 'yes-or-no-p)
 
 (defun config-visit ()
-  "Open the config file."
+  "Open the configuration file."
   (interactive)
   (find-file (concat user-emacs-directory "dotemacs.org")))
 
