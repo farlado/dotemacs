@@ -60,10 +60,10 @@ Everything has different dependencies so make sure you have what you need. The e
 - For Python: ~pylint~, ~jedi~
 - For Haskell: ~stack~
 ** License
-Because I +am a lazy piece of shit who doesn't like long licenses+ do not think much harm could come from using a pushover license for this specific configuration, I am publishing this literate Emacs configuration under the WTFPL.
+Because I +am a lazy piece of shit who doesn't like long licenses+ do not think much harm could come from using a pushover license for an Emacs configuration, I am publishing this literate Emacs configuration under the WTFPL.
 #+BEGIN_SRC text :tangle LICENSE
-             DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-                     Version 2, December 2004
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+  Version 2, December 2004
 
   Copyright (c) 2019-20 Farlado
 
