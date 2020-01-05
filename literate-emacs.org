@@ -317,8 +317,8 @@ Next we need to determine what size to make the text. This is based on the width
 #+END_SRC
 
 ** Theme
-*** ~leuven-theme~ (my theme of choice)
-I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/.
+*** Leuven
+I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/. I spent almost two entire weeks trying to find a dark theme that comes anywhere close to being as comfortable as Leuven, and even Leuven's dark alternative doesn't cut it.
 #+BEGIN_SRC emacs-lisp
   (use-package leuven-theme
     :if window-system
@@ -330,8 +330,15 @@ I used to hate light themes. I'm not in that camp anymore. This theme is /elegan
     (load-theme 'leuven t))
 #+END_SRC
 
-*** Fringes and dividers
-Fringes and windows dividers make Emacs look far less sloppy. The color is grabbed from the mode line for consistency.
+*** Fringes
+Having fringes helps keep things looking good. However, I really do not want the fringes to have a color that is different from the default background.
+#+BEGIN_SRC emacs-lisp
+  (set-face-background 'fringe (face-attribute 'default :background))
+  (fringe-mode 10)
+#+END_SRC
+
+*** Window dividers
+Windows dividers make Emacs look far less sloppy. The color is grabbed from the mode line for consistency.
 #+BEGIN_SRC emacs-lisp
   (setq window-divider-default-right-width 3)
   (dolist (face '(window-divider-first-pixel
@@ -339,13 +346,6 @@ Fringes and windows dividers make Emacs look far less sloppy. The color is grabb
                   window-divider))
     (set-face-foreground face (face-attribute 'mode-line :background)))
   (window-divider-mode 1)
-#+END_SRC
-
-*** Fringes
-Having fringes also helps keep things looking good. However, I really do not want the fringes to have a color that is different from the default background.
-#+BEGIN_SRC emacs-lisp
-  (set-face-background 'fringe (face-attribute 'default :background))
-  (fringe-mode 10)
 #+END_SRC
 
 ** Mode line

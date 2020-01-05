@@ -135,15 +135,15 @@
         leuven-scale-outline-headlines t)
   (load-theme 'leuven t))
 
+(set-face-background 'fringe (face-attribute 'default :background))
+(fringe-mode 10)
+
 (setq window-divider-default-right-width 3)
 (dolist (face '(window-divider-first-pixel
                 window-divider-last-pixel
                 window-divider))
   (set-face-foreground face (face-attribute 'mode-line :background)))
 (window-divider-mode 1)
-
-(set-face-background 'fringe (face-attribute 'default :background))
-(fringe-mode 10)
 
 (use-package spaceline
   :ensure t
