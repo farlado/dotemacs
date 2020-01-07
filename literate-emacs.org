@@ -115,6 +115,7 @@ Like mentioned above, this file is supposed to tangle into everything in my git 
   tramp
   elpa
   emms
+  url
 #+END_SRC
 
 * Giving ~init.el~ a header
@@ -210,8 +211,8 @@ Since I do not use ~customize~ but really like protecting packages used in my co
           system-packages emms avy ido-vertical-mode buffer-move sudo-edit 2048-game
           graphviz-dot-mode vterm nov wttrin chess sudoku smex which-key popup-kill-ring
           swiper hungry-delete magit flycheck avy-flycheck company-jedi haskell-mode
-          markdown-mode org-bullets epresent leuven-theme pretty-mode rainbow-mode
-          rainbow-delimiters spaceline diminish))
+          markdown-mode org-bullets epresent leuven-theme rainbow-mode rainbow-delimiters
+          spaceline diminish yahtzee))
 #+END_SRC
 
 *** Disable an annoying customize function
@@ -287,7 +288,6 @@ Having the Emacs server running allows for a lot of neat integration with other 
 
   (add-hook 'after-init-hook 'server-start-if-not-running)
 #+END_SRC
-
 *** dashboard package (replacement start screen)
 I like the default start screen, but it just doesn't cut it for me. I just use this to have a nice screen when I start Emacs or close all my buffers.
 #+BEGIN_SRC emacs-lisp
@@ -299,7 +299,8 @@ I like the default start screen, but it just doesn't cut it for me. I just use t
           inhibit-startup-screen t
           dashboard-items '((recents . 10))
           dashboard-startup-banner 'official
-          initial-buffer-choice (lambda () (get-buffer "*dashboard*"))
+          initial-buffer-choice (lambda () (or (get-buffer "*dashboard*")
+                                               (get-buffer "*scratch*")))
           dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
     (dashboard-setup-startup-hook))
 #+END_SRC
@@ -433,7 +434,7 @@ This is used in a number of places in Emacs. Better to have it on all the time t
 #+END_SRC
 
 *** Line numbers (on most buffers)
-I like having line numbers and indicators for lines past the EOF. I also like having the current line highlighted. However, I don't like line numbers in modes where it breaks the mode, and I want line numbers to look consistent.
+I like having line numbers and indicators for lines past the EOF. However, I don't like line numbers in modes where it breaks the mode, and I want line numbers to look consistent.
 #+BEGIN_SRC emacs-lisp
   (global-display-line-numbers-mode 1)
   (setq-default indicate-empty-lines t)
@@ -442,6 +443,7 @@ I like having line numbers and indicators for lines past the EOF. I also like ha
 
   (dolist (hook '(Man-mode-hook
                   nov-mode-hook
+                  help-mode-hook
                   shell-mode-hook
                   vterm-mode-hook
                   shell-mode-hook
@@ -451,7 +453,8 @@ I like having line numbers and indicators for lines past the EOF. I also like ha
                   custom-mode-hook
                   ibuffer-mode-hook
                   epresent-mode-hook
-                  dashboard-mode-hook))
+                  dashboard-mode-hook
+                  package-menu-mode-hook))
     (add-hook hook (lambda () (display-line-numbers-mode -1))))
 #+END_SRC
 
@@ -461,33 +464,6 @@ For those moments where I can't figure out what is going on with the parentheses
   (show-paren-mode 1)
   (setq show-paren-style 'parenthesis
         show-paren-delay 0)
-#+END_SRC
-
-*** Prettify various symbols in programming buffers
-I don't like ~prettify-symbols-mode~. It doesn't do enough. This one helps so much more to make things look nice, especially in functional programming languages. I enable /all/ of them.
-#+BEGIN_SRC emacs-lisp
-  (use-package pretty-mode
-    :if window-system
-    :ensure t
-    :defer t
-    :init
-    (global-pretty-mode 1)
-    (pretty-activate-groups '(:nil
-                              :sets
-                              :logic
-                              :greek
-                              :types
-                              :other
-                              :arrows
-                              :ordering
-                              :equality
-                              :function
-                              :undefined
-                              :arithmetic
-                              :parentheses
-                              :punctuation
-                              :quantifiers
-                              :sub-and-superscripts)))
 #+END_SRC
 
 *** Color the background of text based on the color/hex typed
@@ -516,7 +492,7 @@ It's subtle on my theme, but it still helps me keep track of my brackets and par
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. Before I get ahead of myself, I check whether there's already a running window manager. If there is, we can make this process a lot easier by making Emacs full-screen ASAP.
 #+BEGIN_SRC emacs-lisp
   (when (and (eq window-system 'x)
-           (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 1))
+             (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 1))
     (set-frame-parameter nil 'fullscreen 'fullboth)
 #+END_SRC
 
@@ -752,26 +728,26 @@ Thankfully, EXWM comes with hooks to handle when monitors are connected and disc
            (command "xrandr "))
       (dolist (monitor possible-monitors)
         (if (and (member monitor connected-monitors)
-               (not (and (eq monitor "eDP-1-1")
-                     (member "DP-1-2-1" connected-monitors))))
+                 (not (and (eq monitor "eDP-1-1")
+                           (member "DP-1-2-1" connected-monitors))))
             (let* ((output (concat "--output " monitor " "))
                    (primary (when (or (eq monitor "LVDS-1")
-                                     (eq monitor "eDP-1-1")
-                                     (eq monitor "DP-1-2-2"))
+                                      (eq monitor "eDP-1-1")
+                                      (eq monitor "DP-1-2-2"))
                               "--primary "))
                    (rate (when (eq monitor "DP-1-2-2")
                            "--rate 75 "))
                    (res (concat "--mode " (if (or (eq monitor "LVDS-1")
-                                                 (eq monitor "VGA-1"))
+                                                  (eq monitor "VGA-1"))
                                               "1366x768 "
                                             "1920x1080 ")))
                    (rotate (when (or (eq monitor "DP-1-2-1")
-                                    (eq monitor "DP-1-2-3"))
+                                     (eq monitor "DP-1-2-3"))
                              (concat "--rotate " (if (eq monitor "DP-1-2-1")
                                                      "left "
                                                    "right "))))
                    (pos (concat "--pos " (if (not (or (eq monitor "DP-1-2-2")
-                                                   (eq monitor "DP-1-2-3")))
+                                                      (eq monitor "DP-1-2-3")))
                                              "0x0 "
                                            (if (eq monitor "DP-1-2-2")
                                                "1080x0 "
@@ -906,7 +882,7 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
 #+END_SRC
 
 *** Other things a DE should probably have
-**** Display setup
+**** Monitor settings
 Calling ~arandr~ to adjust monitors is useful when I am preparing to present something using my computer or need to adjust how monitors are set up in a unique way that isn't a preset from my dotfiles.
 #+BEGIN_SRC emacs-lisp
   (defun monitor-settings ()
@@ -923,7 +899,7 @@ This one uses two windows: one to open the NetworkManager connection editor, and
     "Open a NetworkManager connection editor."
     (interactive)
     (start-process-shell-command
-     "Connections" nil "nm-connection-editor")
+     "Network Settings" nil "nm-connection-editor")
     (async-shell-command "nmcli dev wifi list"))
 #+END_SRC
 
@@ -1037,8 +1013,8 @@ Then, I use these functions to control setting and cycling the keyboard layout:
 #+BEGIN_SRC emacs-lisp
   (defun suspend-computer ()
     (interactive)
-    (when (yes-or-no-p "Really suspend? ")
-      (shell-command "systemctl suspend -i")))
+    (and (yes-or-no-p "Really suspend? ")
+         (shell-command "systemctl suspend -i")))
 
   (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
 #+END_SRC
@@ -1063,38 +1039,38 @@ I copied the function for quitting Emacs to handle shutting down.
     (let ((confirm confirm-kill-emacs))
       (and
        (or (not (memq t (mapcar (function
-                              (lambda (buf) (and (buffer-file-name buf)
-                                          (buffer-modified-p buf))))
-                             (buffer-list))))
-          (progn (setq confirm nil)
-                 (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
+                                 (lambda (buf) (and (buffer-file-name buf)
+                                                    (buffer-modified-p buf))))
+                                (buffer-list))))
+           (progn (setq confirm nil)
+                  (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
        (or (not (fboundp 'process-list))
-          ;; process-list is not defined on MSDOS.
-          (not confirm-kill-processes)
-          (let ((processes (process-list))
-                active)
-            (while processes
-              (and (memq (process-status (car processes)) '(run stop open listen))
-                 (process-query-on-exit-flag (car processes))
-                 (setq active t))
-              (setq processes (cdr processes)))
-            (or (not active)
-               (with-current-buffer-window
-                (get-buffer-create "*Process List*") nil
-                #'(lambda (window _value)
-                    (with-selected-window window
-                      (unwind-protect
-                          (progn
-                            (setq confirm nil)
-                            (yes-or-no-p (concat "Active processes exist; kill "
-                                                 "them and shut down anyway? ")))
-                        (when (window-live-p window)
-                          (quit-restore-window window 'kill)))))
-                (list-processes t)))))
+           ;; process-list is not defined on MSDOS.
+           (not confirm-kill-processes)
+           (let ((processes (process-list))
+                 active)
+             (while processes
+               (and (memq (process-status (car processes)) '(run stop open listen))
+                    (process-query-on-exit-flag (car processes))
+                    (setq active t))
+               (setq processes (cdr processes)))
+             (or (not active)
+                 (with-current-buffer-window
+                  (get-buffer-create "*Process List*") nil
+                  #'(lambda (window _value)
+                      (with-selected-window window
+                        (unwind-protect
+                            (progn
+                              (setq confirm nil)
+                              (yes-or-no-p (concat "Active processes exist; kill "
+                                                   "them and shut down anyway? ")))
+                          (when (window-live-p window)
+                            (quit-restore-window window 'kill)))))
+                  (list-processes t)))))
        ;; Query the user for other things, perhaps.
        (run-hook-with-args-until-failure 'kill-emacs-query-functions)
        (or (null confirm)
-          (funcall confirm "Really shut down? "))
+           (funcall confirm "Really shut down? "))
        (shell-command "shutdown now")
        (kill-emacs))))
 
@@ -1121,34 +1097,34 @@ I copied the function for quitting Emacs to handle reboot too.
     (let ((confirm confirm-kill-emacs))
       (and
        (or (not (memq t (mapcar (function
-                              (lambda (buf) (and (buffer-file-name buf)
-                                          (buffer-modified-p buf))))
-                             (buffer-list))))
-          (progn (setq confirm nil)
-                 (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
+                                 (lambda (buf) (and (buffer-file-name buf)
+                                                    (buffer-modified-p buf))))
+                                (buffer-list))))
+           (progn (setq confirm nil)
+                  (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
        (or (not (fboundp 'process-list))
-          ;; process-list is not defined on MSDOS.
-          (not confirm-kill-processes)
-          (let ((processes (process-list))
-                active)
-            (while processes
-              (and (memq (process-status (car processes)) '(run stop open listen))
-                 (process-query-on-exit-flag (car processes))
-                 (setq active t))
-              (setq processes (cdr processes)))
-            (or (not active)
-               (with-current-buffer-window
-                (get-buffer-create "*Process List*") nil
-                #'(lambda (window _value)
-                    (with-selected-window window
-                      (unwind-protect
-                          (progn
-                            (setq confirm nil)
-                            (yes-or-no-p (concat "Active processes exist; kill "
-                                                 "them and reboot anyway? ")))
-                        (when (window-live-p window)
-                          (quit-restore-window window 'kill)))))
-                (list-processes t)))))
+           ;; process-list is not defined on MSDOS.
+           (not confirm-kill-processes)
+           (let ((processes (process-list))
+                 active)
+             (while processes
+               (and (memq (process-status (car processes)) '(run stop open listen))
+                    (process-query-on-exit-flag (car processes))
+                    (setq active t))
+               (setq processes (cdr processes)))
+             (or (not active)
+                 (with-current-buffer-window
+                  (get-buffer-create "*Process List*") nil
+                  #'(lambda (window _value)
+                      (with-selected-window window
+                        (unwind-protect
+                            (progn
+                              (setq confirm nil)
+                              (yes-or-no-p (concat "Active processes exist; kill "
+                                                   "them and reboot anyway? ")))
+                          (when (window-live-p window)
+                            (quit-restore-window window 'kill)))))
+                  (list-processes t)))))
        ;; Query the user for other things, perhaps.
        (run-hook-with-args-until-failure 'kill-emacs-query-functions)
        (or (null confirm)
@@ -1461,7 +1437,8 @@ Since this thing is changing all the time, I really like having it available on 
   (defun config-visit ()
     "Open the configuration file."
     (interactive)
-    (find-file (concat user-emacs-directory "literate-emacs.org")))
+    (find-file (expand-file-name "literate-emacs.org"
+                                 user-emacs-directory)))
 
   (global-set-key (kbd "C-c e") 'config-visit)
 #+END_SRC
@@ -1499,8 +1476,7 @@ This is a point of convenience, even in programming language buffers. Wrapping w
 *** Use a visual bell instead of making noise
 Sound is obnoxious and it should be visibly obvious without flashing the frame or mode line that something has gone wrong.
 #+BEGIN_SRC emacs-lisp
-  (setq ring-bell-function 'ignore
-        visible-bell t)
+  (setq ring-bell-function 'ignore)
 #+END_SRC
 
 *** ~which-key~ (small menus to help with commands)
@@ -1552,7 +1528,7 @@ I've gotten really into literate programming lately, so this makes it much easie
     "Tangle a file if it's a literate programming file."
     (interactive)
     (when (and (equal major-mode 'org-mode)
-             (cl-search "literate" (buffer-file-name)))
+               (cl-search "literate" (buffer-file-name)))
       (org-babel-tangle)))
 
   (add-hook 'after-save-hook 'tangle-literate-program)
@@ -2045,14 +2021,14 @@ To make running games easier, I set up a keymap to which I add the games.
   (global-set-key (kbd "C-M-g") games-map)
 #+END_SRC
 
-*** Chess
-Just for fun. I suck at chess but it's nice to have.
+*** Yahtzee
+Fun dice game from my childhood. Now I can get mad at Emacs instead of my sister.
 #+BEGIN_SRC emacs-lisp
-  (use-package chess
+  (use-package yahtzee
     :ensure t
     :defer t
     :bind (:map games-map
-           ("c" . chess)))
+           ("y" . yahtzee)))
 #+END_SRC
 
 *** Sudoku
@@ -2085,6 +2061,16 @@ Tetris is my childhood. No way I wouldn't set it up to be nice and comfy.
            ("e" . tetris-end-game)))
 #+END_SRC
 
+*** Chess
+Just for fun. I suck at chess but it's nice to have.
+#+BEGIN_SRC emacs-lisp
+  (use-package chess
+    :ensure t
+    :defer t
+    :bind (:map games-map
+           ("c" . chess)))
+#+END_SRC
+
 *** 2048
 A simple and fun game. Was a big deal when I was in high school. I still play it from time to time.
 #+BEGIN_SRC emacs-lisp
@@ -2094,7 +2080,6 @@ A simple and fun game. Was a big deal when I was in high school. I still play it
     :bind (:map games-map
            ("2" . 2048-game)))
 #+END_SRC
-
 * Giving ~init.el~ a footer
 Since we gave ~init.el~ a header, I see no reason not to give it a footer.
 #+BEGIN_SRC emacs-lisp

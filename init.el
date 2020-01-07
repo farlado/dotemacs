@@ -51,8 +51,8 @@
         system-packages emms avy ido-vertical-mode buffer-move sudo-edit 2048-game
         graphviz-dot-mode vterm nov wttrin chess sudoku smex which-key popup-kill-ring
         swiper hungry-delete magit flycheck avy-flycheck company-jedi haskell-mode
-        markdown-mode org-bullets epresent leuven-theme pretty-mode rainbow-mode
-        rainbow-delimiters spaceline diminish))
+        markdown-mode org-bullets epresent leuven-theme rainbow-mode rainbow-delimiters
+        spaceline diminish yahtzee))
 
 (require 'package)
 (defun package--save-selected-packages (&rest opt) nil)
@@ -105,7 +105,8 @@
         inhibit-startup-screen t
         dashboard-items '((recents . 10))
         dashboard-startup-banner 'official
-        initial-buffer-choice (lambda () (get-buffer "*dashboard*"))
+        initial-buffer-choice (lambda () (or (get-buffer "*dashboard*")
+                                             (get-buffer "*scratch*")))
         dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
   (dashboard-setup-startup-hook))
 
@@ -201,6 +202,7 @@
 
 (dolist (hook '(Man-mode-hook
                 nov-mode-hook
+                help-mode-hook
                 shell-mode-hook
                 vterm-mode-hook
                 shell-mode-hook
@@ -210,35 +212,13 @@
                 custom-mode-hook
                 ibuffer-mode-hook
                 epresent-mode-hook
-                dashboard-mode-hook))
+                dashboard-mode-hook
+                package-menu-mode-hook))
   (add-hook hook (lambda () (display-line-numbers-mode -1))))
 
 (show-paren-mode 1)
 (setq show-paren-style 'parenthesis
       show-paren-delay 0)
-
-(use-package pretty-mode
-  :if window-system
-  :ensure t
-  :defer t
-  :init
-  (global-pretty-mode 1)
-  (pretty-activate-groups '(:nil
-                            :sets
-                            :logic
-                            :greek
-                            :types
-                            :other
-                            :arrows
-                            :ordering
-                            :equality
-                            :function
-                            :undefined
-                            :arithmetic
-                            :parentheses
-                            :punctuation
-                            :quantifiers
-                            :sub-and-superscripts)))
 
 (use-package rainbow-mode
   :if window-system
@@ -255,7 +235,7 @@
   :hook (prog-mode . rainbow-delimiters-mode))
 
 (when (and (eq window-system 'x)
-         (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 1))
+           (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 1))
   (set-frame-parameter nil 'fullscreen 'fullboth)
 
 (use-package exwm
@@ -445,26 +425,26 @@
          (command "xrandr "))
     (dolist (monitor possible-monitors)
       (if (and (member monitor connected-monitors)
-             (not (and (eq monitor "eDP-1-1")
-                   (member "DP-1-2-1" connected-monitors))))
+               (not (and (eq monitor "eDP-1-1")
+                         (member "DP-1-2-1" connected-monitors))))
           (let* ((output (concat "--output " monitor " "))
                  (primary (when (or (eq monitor "LVDS-1")
-                                   (eq monitor "eDP-1-1")
-                                   (eq monitor "DP-1-2-2"))
+                                    (eq monitor "eDP-1-1")
+                                    (eq monitor "DP-1-2-2"))
                             "--primary "))
                  (rate (when (eq monitor "DP-1-2-2")
                          "--rate 75 "))
                  (res (concat "--mode " (if (or (eq monitor "LVDS-1")
-                                               (eq monitor "VGA-1"))
+                                                (eq monitor "VGA-1"))
                                             "1366x768 "
                                           "1920x1080 ")))
                  (rotate (when (or (eq monitor "DP-1-2-1")
-                                  (eq monitor "DP-1-2-3"))
+                                   (eq monitor "DP-1-2-3"))
                            (concat "--rotate " (if (eq monitor "DP-1-2-1")
                                                    "left "
                                                  "right "))))
                  (pos (concat "--pos " (if (not (or (eq monitor "DP-1-2-2")
-                                                 (eq monitor "DP-1-2-3")))
+                                                    (eq monitor "DP-1-2-3")))
                                            "0x0 "
                                          (if (eq monitor "DP-1-2-2")
                                              "1080x0 "
@@ -563,7 +543,7 @@
   "Open a NetworkManager connection editor."
   (interactive)
   (start-process-shell-command
-   "Connections" nil "nm-connection-editor")
+   "Network Settings" nil "nm-connection-editor")
   (async-shell-command "nmcli dev wifi list"))
 
 (defun volume-settings ()
@@ -659,8 +639,8 @@ Set to nil to have one less keyboard layout."
 
 (defun suspend-computer ()
   (interactive)
-  (when (yes-or-no-p "Really suspend? ")
-    (shell-command "systemctl suspend -i")))
+  (and (yes-or-no-p "Really suspend? ")
+       (shell-command "systemctl suspend -i")))
 
 (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
 
@@ -681,38 +661,38 @@ Instead of just killing Emacs, shuts down the system."
   (let ((confirm confirm-kill-emacs))
     (and
      (or (not (memq t (mapcar (function
-                            (lambda (buf) (and (buffer-file-name buf)
-                                        (buffer-modified-p buf))))
-                           (buffer-list))))
-        (progn (setq confirm nil)
-               (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
+                               (lambda (buf) (and (buffer-file-name buf)
+                                                  (buffer-modified-p buf))))
+                              (buffer-list))))
+         (progn (setq confirm nil)
+                (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
      (or (not (fboundp 'process-list))
-        ;; process-list is not defined on MSDOS.
-        (not confirm-kill-processes)
-        (let ((processes (process-list))
-              active)
-          (while processes
-            (and (memq (process-status (car processes)) '(run stop open listen))
-               (process-query-on-exit-flag (car processes))
-               (setq active t))
-            (setq processes (cdr processes)))
-          (or (not active)
-             (with-current-buffer-window
-              (get-buffer-create "*Process List*") nil
-              #'(lambda (window _value)
-                  (with-selected-window window
-                    (unwind-protect
-                        (progn
-                          (setq confirm nil)
-                          (yes-or-no-p (concat "Active processes exist; kill "
-                                               "them and shut down anyway? ")))
-                      (when (window-live-p window)
-                        (quit-restore-window window 'kill)))))
-              (list-processes t)))))
+         ;; process-list is not defined on MSDOS.
+         (not confirm-kill-processes)
+         (let ((processes (process-list))
+               active)
+           (while processes
+             (and (memq (process-status (car processes)) '(run stop open listen))
+                  (process-query-on-exit-flag (car processes))
+                  (setq active t))
+             (setq processes (cdr processes)))
+           (or (not active)
+               (with-current-buffer-window
+                (get-buffer-create "*Process List*") nil
+                #'(lambda (window _value)
+                    (with-selected-window window
+                      (unwind-protect
+                          (progn
+                            (setq confirm nil)
+                            (yes-or-no-p (concat "Active processes exist; kill "
+                                                 "them and shut down anyway? ")))
+                        (when (window-live-p window)
+                          (quit-restore-window window 'kill)))))
+                (list-processes t)))))
      ;; Query the user for other things, perhaps.
      (run-hook-with-args-until-failure 'kill-emacs-query-functions)
      (or (null confirm)
-        (funcall confirm "Really shut down? "))
+         (funcall confirm "Really shut down? "))
      (shell-command "shutdown now")
      (kill-emacs))))
 
@@ -735,34 +715,34 @@ Instead of just killing Emacs, shuts down the system."
   (let ((confirm confirm-kill-emacs))
     (and
      (or (not (memq t (mapcar (function
-                            (lambda (buf) (and (buffer-file-name buf)
-                                        (buffer-modified-p buf))))
-                           (buffer-list))))
-        (progn (setq confirm nil)
-               (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
+                               (lambda (buf) (and (buffer-file-name buf)
+                                                  (buffer-modified-p buf))))
+                              (buffer-list))))
+         (progn (setq confirm nil)
+                (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
      (or (not (fboundp 'process-list))
-        ;; process-list is not defined on MSDOS.
-        (not confirm-kill-processes)
-        (let ((processes (process-list))
-              active)
-          (while processes
-            (and (memq (process-status (car processes)) '(run stop open listen))
-               (process-query-on-exit-flag (car processes))
-               (setq active t))
-            (setq processes (cdr processes)))
-          (or (not active)
-             (with-current-buffer-window
-              (get-buffer-create "*Process List*") nil
-              #'(lambda (window _value)
-                  (with-selected-window window
-                    (unwind-protect
-                        (progn
-                          (setq confirm nil)
-                          (yes-or-no-p (concat "Active processes exist; kill "
-                                               "them and reboot anyway? ")))
-                      (when (window-live-p window)
-                        (quit-restore-window window 'kill)))))
-              (list-processes t)))))
+         ;; process-list is not defined on MSDOS.
+         (not confirm-kill-processes)
+         (let ((processes (process-list))
+               active)
+           (while processes
+             (and (memq (process-status (car processes)) '(run stop open listen))
+                  (process-query-on-exit-flag (car processes))
+                  (setq active t))
+             (setq processes (cdr processes)))
+           (or (not active)
+               (with-current-buffer-window
+                (get-buffer-create "*Process List*") nil
+                #'(lambda (window _value)
+                    (with-selected-window window
+                      (unwind-protect
+                          (progn
+                            (setq confirm nil)
+                            (yes-or-no-p (concat "Active processes exist; kill "
+                                                 "them and reboot anyway? ")))
+                        (when (window-live-p window)
+                          (quit-restore-window window 'kill)))))
+                (list-processes t)))))
      ;; Query the user for other things, perhaps.
      (run-hook-with-args-until-failure 'kill-emacs-query-functions)
      (or (null confirm)
@@ -970,7 +950,8 @@ Instead of just killing Emacs, shuts down the system."
 (defun config-visit ()
   "Open the configuration file."
   (interactive)
-  (find-file (concat user-emacs-directory "literate-emacs.org")))
+  (find-file (expand-file-name "literate-emacs.org"
+                               user-emacs-directory)))
 
 (global-set-key (kbd "C-c e") 'config-visit)
 
@@ -988,8 +969,7 @@ Instead of just killing Emacs, shuts down the system."
 
 (global-visual-line-mode 1)
 
-(setq ring-bell-function 'ignore
-      visible-bell t)
+(setq ring-bell-function 'ignore)
 
 (use-package which-key
   :ensure t
@@ -1022,7 +1002,7 @@ Instead of just killing Emacs, shuts down the system."
   "Tangle a file if it's a literate programming file."
   (interactive)
   (when (and (equal major-mode 'org-mode)
-           (cl-search "literate" (buffer-file-name)))
+             (cl-search "literate" (buffer-file-name)))
     (org-babel-tangle)))
 
 (add-hook 'after-save-hook 'tangle-literate-program)
@@ -1321,11 +1301,11 @@ This function has been altered to accommodate EXWM."
 
 (global-set-key (kbd "C-M-g") games-map)
 
-(use-package chess
+(use-package yahtzee
   :ensure t
   :defer t
   :bind (:map games-map
-         ("c" . chess)))
+         ("y" . yahtzee)))
 
 (use-package sudoku
   :ensure t
@@ -1348,6 +1328,12 @@ This function has been altered to accommodate EXWM."
          ([?\t] . tetris-pause-game)
          ("r" . tetris-start-game)
          ("e" . tetris-end-game)))
+
+(use-package chess
+  :ensure t
+  :defer t
+  :bind (:map games-map
+         ("c" . chess)))
 
 (use-package 2048-game
   :ensure t
