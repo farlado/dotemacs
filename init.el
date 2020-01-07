@@ -46,13 +46,15 @@
 
 (add-hook 'emacs-startup-hook 'startup/reset-gc)
 
-(setq package-selected-packages
-      '(async use-package auto-package-update dashboard exwm dmenu desktop-environment
-        system-packages emms avy ido-vertical-mode buffer-move sudo-edit 2048-game
-        graphviz-dot-mode vterm nov wttrin chess sudoku smex which-key popup-kill-ring
-        swiper hungry-delete magit flycheck avy-flycheck company-jedi haskell-mode
-        markdown-mode org-bullets epresent leuven-theme rainbow-mode rainbow-delimiters
-        spaceline diminish yahtzee))
+(setq package-selected-packages '(async use-package auto-package-update dashboard
+                                  leuven-theme spaceline diminish raindow-mode
+                                  rainbow-delimiters exwm dmenu desktop-environment
+                                  system-packages emms graphviz-dot-mode markdown-mode
+                                  which-key ido-vertical-mode smex buffer-move swiper
+                                  popup-kill-ring hungry-delete avy sudo-edit magit
+                                  company haskell-mode company-jedi flycheck
+                                  avy-flycheck org-bullets epresent nov wttrin
+                                  yahtzee sudoku chess 2048-game))
 
 (require 'package)
 (defun package--save-selected-packages (&rest opt) nil)
@@ -84,8 +86,7 @@
   :defer t
   :init
   (setq auto-package-update-interval 2
-        auto-package-update-delete-old-versions t
-        auto-package-update-hide-results t)
+        auto-package-update-delete-old-versions t)
   (auto-package-update-maybe))
 
 (require 'server)
@@ -204,7 +205,7 @@
                 nov-mode-hook
                 help-mode-hook
                 shell-mode-hook
-                vterm-mode-hook
+                term-mode-hook
                 shell-mode-hook
                 snake-mode-hook
                 tetris-mode-hook
@@ -770,7 +771,7 @@ Instead of just killing Emacs, shuts down the system."
         ([?\s-r]    . monitor-settings)
         ([?\s-n]    . network-settings)
         ([?\s-v]    . volume-settings)
-        ([s-return] . vterm)
+        ([s-return] . ansi-term)
 
         ;; Other desktop environment things
         ([?\s-x]       . dmenu)
@@ -1278,10 +1279,11 @@ This function has been altered to accommodate EXWM."
 
 (global-set-key (kbd "C-h 4 m") 'man)
 
-(use-package vterm
-  :ensure t
-  :defer t
-  :bind ("C-c t" . vterm))
+(defadvice ansi-term (before force-bash)
+  (interactive (list (getenv "SHELL"))))
+(ad-activate 'ansi-term)
+
+(global-set-key (kbd "C-c t") 'ansi-term)
 
 (use-package nov
   :ensure t
