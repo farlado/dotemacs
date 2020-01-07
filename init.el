@@ -135,7 +135,6 @@
         leuven-scale-outline-headlines t)
   (load-theme 'leuven t))
 
-(set-face-background 'fringe (face-attribute 'default :background))
 (fringe-mode 10)
 
 (setq window-divider-default-right-width 3)
@@ -195,10 +194,6 @@
 
 (global-display-line-numbers-mode 1)
 (setq-default indicate-empty-lines t)
-
-(set-face-attribute 'line-number nil
-                    :foreground (face-attribute 'default :foreground)
-                    :background (face-attribute 'default :background))
 
 (dolist (hook '(Man-mode-hook
                 nov-mode-hook
