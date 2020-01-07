@@ -862,10 +862,10 @@ Instead of just killing Emacs, shuts down the system."
  "Keyboard Layout" nil "setxkbmap us -option ctrl:nocaps")
 
 (start-process-shell-command
- "Fallback Cursor" nil "xsetroot -cursor_name left_ptr")
+ "Compositor" nil "xcompmgr")
 
 (start-process-shell-command
- "Compositor" nil "xcompmgr")
+ "Fallback Cursor" nil "xsetroot -cursor_name left_ptr")
 
 (exwm-enable)
 (exwm-config-ido)

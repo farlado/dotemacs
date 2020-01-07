@@ -15,7 +15,7 @@ This file is an attempt at a literate GNU Emacs (henceforth "Emacs") configurati
 The answer is rather simple. Before I used a fully literate, I had an ~init.el~ which tangled blocks from a ~config.org~ on the fly (read: on startup). It turns out this was abysmally slow, making for a startup time of around 4.5 seconds when loading into my desktop environment. Tangling blocks from a ~literate-emacs.org~ into an ~init.el~ cuts this time by about a third, around 2.8 seconds to load into my desktop environment. This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check both ~init.el~ and ~config.org~ when I thought I might have changed something for the worse.
 
 ** Installation
-/Note: these instructions are for users of GNU/Linux or other *NIX systems./
+/Note: these instructions are for users of GNU/Linux or other *NIX systems. These instructions may not apply for users of Windows or macOS./
 1) Clone the repo into your home directory as ~.emacs.d~.
 2) Make sure you have all the right dependencies. See below for more details.
 3) If using Emacs as a desktop environment, it may take a couple restarts to work right.
@@ -26,61 +26,62 @@ Everything has different dependencies so make sure you have what you need. The e
   sh -c "$(curl https://raw.githubusercontent.com/farlado/dotfiles/master/.config/deploy/deploy)"
 #+END_SRC
 
-|----------------------+--------------------------------------------|
-| ~EXWM~ depends on...   | which is used for...                       |
-|----------------------+--------------------------------------------|
-| ~xorg~                 | obvious reasons                            |
-| ~wmctrl~               | checking for a window manager              |
-| ~xbanish~              | hiding the cursor while typing             |
-| ~xcompmgr~             | compositor                                 |
-| ~arandr~               | monitor configuration                      |
-| ~nm-connection-editor~ | network configuration                      |
-| ~firefox~              | browsing the web                           |
-| ~libreoffice~          | editing unfriendly documents               |
-| ~gimp~                 | editing images (Emacs can't do this sadly) |
-| ~musescore~            | editing music                              |
-| ~telegram~             | crappy messenger                           |
-| ~discord~              | crappier messenger                         |
-| ~steam~                | games platform                             |
-|----------------------+--------------------------------------------|
+*** For EXWM
+    |----------------------+--------------------------------------------|
+    | ~EXWM~ depends on...   | which is used for...                       |
+    |----------------------+--------------------------------------------|
+    | ~xorg~                 | obvious reasons                            |
+    | ~wmctrl~               | checking for a window manager              |
+    | ~xbanish~              | hiding the cursor while typing             |
+    | ~xcompmgr~             | compositor                                 |
+    | ~arandr~               | monitor configuration                      |
+    | ~nm-connection-editor~ | network configuration                      |
+    | ~firefox~              | browsing the web                           |
+    | ~libreoffice~          | editing unfriendly documents               |
+    | ~gimp~                 | editing images (Emacs can't do this sadly) |
+    | ~musescore~            | editing music                              |
+    | ~telegram~             | crappy messenger                           |
+    | ~discord~              | crappier messenger                         |
+    | ~steam~                | games platform                             |
+    |----------------------+--------------------------------------------|
 
+*** For ~desktop-environment~
+    |-----------------------------------+--------------------------------------|
+    | ~desktop-environment~ depends on... | which is used for...                 |
+    |-----------------------------------+--------------------------------------|
+    | ~alsa-utils~                        | volume adjustment                    |
+    | ~brightnessctl~                     | laptop backlight adjustment          |
+    | ~maim~                              | screenshots                          |
+    | ~xclip~                             | copying screenshots to the clipboard |
+    | ~i3lock-color~                      | lock screen                          |
+    |-----------------------------------+--------------------------------------|
 
-|-----------------------------------+--------------------------------------|
-| ~desktop-environment~ depends on... | which is used for...                 |
-|-----------------------------------+--------------------------------------|
-| ~alsa-utils~                        | volume adjustment                    |
-| ~brightnessctl~                     | laptop backlight adjustment          |
-| ~maim~                              | screenshots                          |
-| ~xclip~                             | copying screenshots to the clipboard |
-| ~i3lock-color~                      | lock screen                          |
-|-----------------------------------+--------------------------------------|
-
-
-|-------------------+---------------------+------------------------------------|
-| Emacs uses...     | which depends on... | which is used for...               |
-|-------------------+---------------------+------------------------------------|
-| ~EMMS~              | ~mpd~                 | playing music                      |
-|-------------------+---------------------+------------------------------------|
-| ~vterm~             | ~cmake~               | handles the makefile               |
-|                   | ~gcc~                 | any C compiler will do             |
-|                   | ~libtool~             | make dependency                    |
-|-------------------+---------------------+------------------------------------|
-| ~nov~               | ~ebook-tools~         | opening epub files                 |
-|-------------------+---------------------+------------------------------------|
-| ~graphviz-dot-mode~ | ~graphviz~            | process dot files                  |
-|-------------------+---------------------+------------------------------------|
-| ~flyspell-mode~     | ~aspell~              | spell checking                     |
-|-------------------+---------------------+------------------------------------|
-| ~wttrin~            | ~curl~                | get weather data from the internet |
-|-------------------+---------------------+------------------------------------|
-| ~sudo-edit~         | ~sudo~                | duh                                |
-|-------------------+---------------------+------------------------------------|
-| ~flycheck~          | ~pylint~              | Python syntax checking             |
-|-------------------+---------------------+------------------------------------|
-| ~company~           | ~jedi~                | Python autocomplete                |
-|-------------------+---------------------+------------------------------------|
-| ~haskell-mode~      | ~stack~               | everything about Haskell           |
-|-------------------+---------------------+------------------------------------|
+*** Other
+    |-------------------+---------------------+------------------------------------|
+    | Emacs uses...     | which depends on... | which is used for...               |
+    |-------------------+---------------------+------------------------------------|
+    | ~EMMS~              | ~mpd~                 | playing music                      |
+    |-------------------+---------------------+------------------------------------|
+    | ~vterm~             | ~cmake~               | handles the makefile               |
+    |                   | ~gcc~                 | any C compiler will do             |
+    |                   | ~libtool~             | make dependency                    |
+    |-------------------+---------------------+------------------------------------|
+    | ~nov~               | ~ebook-tools~         | opening epub files                 |
+    |-------------------+---------------------+------------------------------------|
+    | ~graphviz-dot-mode~ | ~graphviz~            | process dot files                  |
+    |-------------------+---------------------+------------------------------------|
+    | ~flyspell-mode~     | ~aspell~              | spell checking                     |
+    |-------------------+---------------------+------------------------------------|
+    | ~wttrin~            | ~curl~                | get weather data from the internet |
+    |-------------------+---------------------+------------------------------------|
+    | ~sudo-edit~         | ~sudo~                | duh                                |
+    |-------------------+---------------------+------------------------------------|
+    | ~flycheck~          | ~pylint~              | Python syntax checking             |
+    |-------------------+---------------------+------------------------------------|
+    | ~company~           | ~jedi~                | Python autocomplete                |
+    |-------------------+---------------------+------------------------------------|
+    | ~haskell-mode~      | ~stack~               | everything about Haskell           |
+    |-------------------+---------------------+------------------------------------|
 
 ** License
 Because I +am a lazy piece of shit who doesn't like long licenses+ do not think much harm could come from using a pushover license for an Emacs configuration, I am publishing this literate Emacs configuration under the WTFPL.
@@ -98,6 +99,22 @@ Because I +am a lazy piece of shit who doesn't like long licenses+ do not think 
     TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
    0. You just DO WHAT THE FUCK YOU WANT TO.
+#+END_SRC
+
+** Files to ignore
+Like mentioned above, this file is supposed to tangle into everything in my git repository. That includes ~.gitignore~
+#+BEGIN_SRC text :tangle .gitignore
+  .last-package-update-day
+  auto-save-list
+  dmenu-items
+  smex-items
+  transient
+  ido.last
+  recentf
+  eshell
+  tramp
+  elpa
+  emms
 #+END_SRC
 
 * Giving ~init.el~ a header
@@ -497,7 +514,7 @@ It's subtle on my theme, but it still helps me keep track of my brackets and par
 #+END_SRC
 
 * Making Emacs a desktop environment
-Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. Before I get ahead of myself, I check whether there's already a running window manager.
+Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. Before I get ahead of myself, I check whether there's already a running window manager. If there is, we can make this process a lot easier by making Emacs full-screen ASAP.
 #+BEGIN_SRC emacs-lisp
   (when (and (eq window-system 'x)
            (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 1))
@@ -1243,7 +1260,7 @@ This includes:
 #+END_SRC
 
 ** On startup
-*** Always hide the cursor when typing
+*** Hide the cursor when typing
 Just a personal preference, I don't like seeing the cursor when I'm pressing keys.
 #+BEGIN_SRC emacs-lisp
   (start-process-shell-command
@@ -1264,18 +1281,17 @@ This block sets the keyboard layout to US and give Caps Lock the functionality o
    "Keyboard Layout" nil "setxkbmap us -option ctrl:nocaps")
 #+END_SRC
 
+*** Start the compositor
+I don't need it, but having basic compositing is very nice.
+#+BEGIN_SRC emacs-lisp
+  (start-process-shell-command
+   "Compositor" nil "xcompmgr")
+#+END_SRC
 *** Set fallback cursor
 Some X windows will have weird cursors if this isn't done.
 #+BEGIN_SRC emacs-lisp
   (start-process-shell-command
    "Fallback Cursor" nil "xsetroot -cursor_name left_ptr")
-#+END_SRC
-
-*** Compositor
-I don't need it, but having basic compositing is very nice.
-#+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Compositor" nil "xcompmgr")
 #+END_SRC
 
 *** Start EXWM
