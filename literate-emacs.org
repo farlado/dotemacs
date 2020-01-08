@@ -332,6 +332,14 @@ Next we need to determine what size to make the text. This is based on the width
     (set-face-attribute 'default nil :height size))
 #+END_SRC
 
+*** Getting emoji to work properly
+God does this one feel great to have. However, it only works if we're using Emacs 27 or later...
+#+BEGIN_SRC emacs-lisp
+  (when (and (member "Noto Color Emoji" (font-family-list))
+             (not (< emacs-major-version 27)))
+    (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
+#+END_SRC
+
 ** Theme
 *** Leuven
 I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/. I spent almost two entire weeks trying to find a dark theme that comes anywhere close to being as comfortable as Leuven, and even Leuven's dark alternative doesn't cut it.
@@ -1570,7 +1578,7 @@ I've gotten really into literate programming lately, so this makes it much easie
     "Tangle a file if it's a literate programming file."
     (interactive)
     (when (and (equal major-mode 'org-mode)
-               (cl-search "literate" (buffer-file-name)))
+               (string-match-p "literate" (buffer-file-name)))
       (org-babel-tangle)))
 
   (add-hook 'after-save-hook 'tangle-literate-program)
@@ -2018,9 +2026,10 @@ Weeks start on Monday.
 #+END_SRC
 
 *** Reading the manpages
-Wow, there's actually an Emacs mode for this! I put it into the =C-h= binds, since it is a way of getting help, after all.
+Wow, there's actually an Emacs mode for this! I put these into the =C-h= binds, since it is a way of getting help, after all. If for some reason ~man~ is working, ~woman~ can still grab a manpage without calling ~man~.
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-h 4 m") 'man)
+  (global-set-key (kbd "C-h 4 w") 'woman)
 #+END_SRC
 
 *** Emacs is my terminal

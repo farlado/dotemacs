@@ -129,6 +129,10 @@
                      240))))))
   (set-face-attribute 'default nil :height size))
 
+(when (and (member "Noto Color Emoji" (font-family-list))
+           (not (< emacs-major-version 27)))
+  (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
+
 (use-package leuven-theme
   :if window-system
   :ensure t
@@ -1035,7 +1039,7 @@ Instead of just killing Emacs, shuts down the system."
   "Tangle a file if it's a literate programming file."
   (interactive)
   (when (and (equal major-mode 'org-mode)
-             (cl-search "literate" (buffer-file-name)))
+             (string-match-p "literate" (buffer-file-name)))
     (org-babel-tangle)))
 
 (add-hook 'after-save-hook 'tangle-literate-program)
@@ -1310,6 +1314,7 @@ This function has been altered to accommodate EXWM."
 (global-set-key (kbd "C-c c") 'calc)
 
 (global-set-key (kbd "C-h 4 m") 'man)
+(global-set-key (kbd "C-h 4 w") 'woman)
 
 (defadvice ansi-term (before force-bash)
   (interactive (list (getenv "SHELL"))))
