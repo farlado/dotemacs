@@ -47,14 +47,15 @@
 (add-hook 'emacs-startup-hook 'startup/reset-gc)
 
 (setq package-selected-packages '(async use-package auto-package-update dashboard
-                                  leuven-theme spaceline diminish raindow-mode
+                                  leuven-theme spaceline diminish rainbow-mode
                                   rainbow-delimiters exwm dmenu desktop-environment
-                                  system-packages emms graphviz-dot-mode markdown-mode
-                                  which-key ido-vertical-mode smex buffer-move swiper
+                                  system-packages exwm-mff exwm-edit emms
+                                  graphviz-dot-mode markdown-mode which-key
+                                  ido-vertical-mode smex buffer-move swiper
                                   popup-kill-ring hungry-delete avy sudo-edit magit
                                   company haskell-mode company-jedi flycheck
-                                  avy-flycheck org-bullets epresent nov wttrin
-                                  yahtzee sudoku chess 2048-game))
+                                  avy-flycheck org-bullets epresent nov wttrin yahtzee
+                                  sudoku chess 2048-game))
 
 (require 'package)
 (defun package--save-selected-packages (&rest opt) nil)
@@ -411,6 +412,21 @@
   (interactive)
   (exwm-workspace-switch-create 2))
 
+(defun farl-exwm/move-window-0 ()
+  "Move the currently focused window to workspace 0."
+  (interactive)
+  (exwm-workspace-move-window 0))
+
+(defun farl-exwm/move-window-1 ()
+  "Move the currently focused window to workspace 1."
+  (interactive)
+  (exwm-workspace-move-window 1))
+
+(defun farl-exwm/move-window-2 ()
+  "Move the currently focused window to workspace 2."
+  (interactive)
+  (exwm-workspace-move-window 2))
+
 (defun display-and-dock-setup ()
   "Configure monitors and peripherals."
   ;; Monitors (works on both my X230 and my W541)
@@ -478,6 +494,11 @@
 (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
 (exwm-randr-enable)
 
+(use-package exwm-mff
+  :ensure t
+  :defer t
+  :hook (exwm-init . exwm-mff-mode))
+
 (setq exwm-floating-border-width 3
       exwm-floating-border-color (face-attribute 'mode-line :background))
 
@@ -485,6 +506,12 @@
           (lambda () (exwm-workspace-rename-buffer exwm-title)))
 
 (setenv "_JAVA_AWT_WM_NONREPARENTING" "1")
+
+(use-package exwm-edit
+  :ensure t
+  :defer t
+  :init
+  (require 'exwm-edit))
 
 (defun run-gimp ()
   "Start GIMP."
@@ -754,10 +781,15 @@ Instead of just killing Emacs, shuts down the system."
 (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
 
 (setq exwm-input-global-keys
-      `(;; Switching Workspaces
+      `(;; Switching workspace focus
         ([?\s-q] . farl-exwm/workspace-1)
         ([?\s-w] . farl-exwm/workspace-0)
         ([?\s-e] . farl-exwm/workspace-2)
+
+        ;; Moving windows to workspaces
+        ([8388625] . farl-exwm/move-window-1) ; C-s-q
+        ([8388631] . farl-exwm/move-window-0) ; C-s-w
+        ([8388613] . farl-exwm/move-window-2) ; C-s-e
 
         ;; Opening X applications
         ([?\s-g]    . run-gimp)

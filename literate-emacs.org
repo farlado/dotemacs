@@ -27,57 +27,57 @@ Everything has different dependencies so make sure you have what you need. The e
 #+END_SRC
 
 *** For EXWM
-    |----------------------+--------------------------------------------|
-    | ~EXWM~ depends on...   | which is used for...                       |
-    |----------------------+--------------------------------------------|
-    | ~xorg~                 | obvious reasons                            |
-    | ~wmctrl~               | checking for a window manager              |
-    | ~xbanish~              | hiding the cursor while typing             |
-    | ~xcompmgr~             | compositor                                 |
-    | ~arandr~               | monitor configuration                      |
-    | ~nm-connection-editor~ | network configuration                      |
-    | ~firefox~              | browsing the web                           |
-    | ~libreoffice~          | editing unfriendly documents               |
-    | ~gimp~                 | editing images (Emacs can't do this sadly) |
-    | ~musescore~            | editing music                              |
-    | ~telegram~             | crappy messenger                           |
-    | ~discord~              | crappier messenger                         |
-    | ~steam~                | games platform                             |
-    |----------------------+--------------------------------------------|
+|----------------------+--------------------------------------------|
+| ~EXWM~ depends on...   | which is used for...                       |
+|----------------------+--------------------------------------------|
+| ~xorg~                 | obvious reasons                            |
+| ~wmctrl~               | checking for a window manager              |
+| ~xbanish~              | hiding the cursor while typing             |
+| ~xcompmgr~             | compositor                                 |
+| ~arandr~               | monitor configuration                      |
+| ~nm-connection-editor~ | network configuration                      |
+| ~firefox~              | browsing the web                           |
+| ~libreoffice~          | editing unfriendly documents               |
+| ~gimp~                 | editing images (Emacs can't do this sadly) |
+| ~musescore~            | editing music                              |
+| ~telegram~             | crappy messenger                           |
+| ~discord~              | crappier messenger                         |
+| ~steam~                | games platform                             |
+|----------------------+--------------------------------------------|
 
 *** For ~desktop-environment~
-    |-----------------------------------+--------------------------------------|
-    | ~desktop-environment~ depends on... | which is used for...                 |
-    |-----------------------------------+--------------------------------------|
-    | ~alsa-utils~                        | volume adjustment                    |
-    | ~brightnessctl~                     | laptop backlight adjustment          |
-    | ~maim~                              | screenshots                          |
-    | ~xclip~                             | copying screenshots to the clipboard |
-    | ~i3lock-color~                      | lock screen                          |
-    |-----------------------------------+--------------------------------------|
+|-----------------------------------+--------------------------------------|
+| ~desktop-environment~ depends on... | which is used for...                 |
+|-----------------------------------+--------------------------------------|
+| ~alsa-utils~                        | volume adjustment                    |
+| ~brightnessctl~                     | laptop backlight adjustment          |
+| ~maim~                              | screenshots                          |
+| ~xclip~                             | copying screenshots to the clipboard |
+| ~i3lock-color~                      | lock screen                          |
+|-----------------------------------+--------------------------------------|
 
 *** Other
-    |-------------------+---------------------+------------------------------------|
-    | Emacs uses...     | which depends on... | which is used for...               |
-    |-------------------+---------------------+------------------------------------|
-    | ~EMMS~              | ~mpd~                 | playing music                      |
-    |-------------------+---------------------+------------------------------------|
-    | ~nov~               | ~ebook-tools~         | opening epub files                 |
-    |-------------------+---------------------+------------------------------------|
-    | ~graphviz-dot-mode~ | ~graphviz~            | process dot files                  |
-    |-------------------+---------------------+------------------------------------|
-    | ~flyspell-mode~     | ~aspell~              | spell checking                     |
-    |-------------------+---------------------+------------------------------------|
-    | ~wttrin~            | ~curl~                | get weather data from the internet |
-    |-------------------+---------------------+------------------------------------|
-    | ~sudo-edit~         | ~sudo~                | duh                                |
-    |-------------------+---------------------+------------------------------------|
-    | ~flycheck~          | ~pylint~              | Python syntax checking             |
-    |-------------------+---------------------+------------------------------------|
-    | ~company~           | ~jedi~                | Python autocomplete                |
-    |-------------------+---------------------+------------------------------------|
-    | ~haskell-mode~      | ~stack~               | everything about Haskell           |
-    |-------------------+---------------------+------------------------------------|
+|-------------------+---------------------+------------------------------------|
+| Emacs uses...     | which depends on... | which is used for...               |
+|-------------------+---------------------+------------------------------------|
+| ~EMMS~              | ~mpd~                 | playing music                      |
+|-------------------+---------------------+------------------------------------|
+| ~nov~               | ~ebook-tools~         | opening epub files                 |
+|-------------------+---------------------+------------------------------------|
+| ~graphviz-dot-mode~ | ~graphviz~            | process dot files                  |
+|-------------------+---------------------+------------------------------------|
+| ~flyspell-mode~     | ~aspell~              | spell checking                     |
+|-------------------+---------------------+------------------------------------|
+| ~wttrin~            | ~curl~                | get weather data from the internet |
+|-------------------+---------------------+------------------------------------|
+| ~sudo-edit~         | ~sudo~                | duh                                |
+|-------------------+---------------------+------------------------------------|
+| ~flycheck~          | ~pylint~              | Python syntax checking             |
+|-------------------+---------------------+------------------------------------|
+| ~company~           | ~jedi~                | Python autocomplete                |
+|-------------------+---------------------+------------------------------------|
+| ~haskell-mode~      | ~stack~               | everything about Haskell           |
+|-------------------+---------------------+------------------------------------|
 
 ** License
 Because I +am a lazy piece of shit who doesn't like long licenses+ do not think much harm could come from using a pushover license for an Emacs configuration, I am publishing this literate Emacs configuration under the WTFPL.
@@ -200,17 +200,18 @@ Garbage collection shouldn't happen during startup, as that will slow Emacs down
 Because I am writing this configuration to be as portable as possible (e.g. I should be able to dump this onto any machine and run it), I manage all packages through Emacs.
 
 *** Protect packages from ~package-autoremove~
-Since I do not use ~customize~ but really like protecting packages used in my configuration from ~package-autoremove~, I need to still set ~package-selected-packages~ so that it'll work.
+Since I do not use ~customize~ but really like protecting packages used in my configuration from ~package-autoremove~, I need to still set ~package-selected-packages~ so that it'll work. Packages are listed in the order in which they are installed.
 #+BEGIN_SRC emacs-lisp
   (setq package-selected-packages '(async use-package auto-package-update dashboard
-                                    leuven-theme spaceline diminish raindow-mode
+                                    leuven-theme spaceline diminish rainbow-mode
                                     rainbow-delimiters exwm dmenu desktop-environment
-                                    system-packages emms graphviz-dot-mode markdown-mode
-                                    which-key ido-vertical-mode smex buffer-move swiper
+                                    system-packages exwm-mff exwm-edit emms
+                                    graphviz-dot-mode markdown-mode which-key
+                                    ido-vertical-mode smex buffer-move swiper
                                     popup-kill-ring hungry-delete avy sudo-edit magit
                                     company haskell-mode company-jedi flycheck
-                                    avy-flycheck org-bullets epresent nov wttrin
-                                    yahtzee sudoku chess 2048-game))
+                                    avy-flycheck org-bullets epresent nov wttrin yahtzee
+                                    sudoku chess 2048-game))
 #+END_SRC
 
 *** Disable an annoying customize function
@@ -689,7 +690,8 @@ No clue why you have to do so much just to give workspaces names, but at least y
                                       floating t)))
 #+END_SRC
 
-Additionally, I define functions for switching between workspaces, to make the global binds down the line look significantly cleaner.
+*** Moving focus between workspaces
+This makes the global binds down the line look significantly cleaner.
 #+BEGIN_SRC emacs-lisp
   (defun farl-exwm/workspace-0 ()
     "Switch to EXWM workspace 0."
@@ -705,6 +707,25 @@ Additionally, I define functions for switching between workspaces, to make the g
     "Switch to EXWM workspace 2."
     (interactive)
     (exwm-workspace-switch-create 2))
+#+END_SRC
+
+*** Moving windows between workspaces
+Only recently did I learn about it, but you can also assign windows to a new workspace on the fly.
+#+BEGIN_SRC emacs-lisp
+  (defun farl-exwm/move-window-0 ()
+    "Move the currently focused window to workspace 0."
+    (interactive)
+    (exwm-workspace-move-window 0))
+
+  (defun farl-exwm/move-window-1 ()
+    "Move the currently focused window to workspace 1."
+    (interactive)
+    (exwm-workspace-move-window 1))
+
+  (defun farl-exwm/move-window-2 ()
+    "Move the currently focused window to workspace 2."
+    (interactive)
+    (exwm-workspace-move-window 2))
 #+END_SRC
 
 *** Multi-head configuration
@@ -778,6 +799,15 @@ Thankfully, EXWM comes with hooks to handle when monitors are connected and disc
   (exwm-randr-enable)
 #+END_SRC
 
+*** Mouse follows on focus change
+This is a setting I had back when I used ~dwm~. I really wanted it back so I'm glad I found this. When focus changes, unless the mouse caused the focus change, warp the mouse to the center of the newly focused window.
+#+BEGIN_SRC emacs-lisp
+  (use-package exwm-mff
+    :ensure t
+    :defer t
+    :hook (exwm-init . exwm-mff-mode))
+#+END_SRC
+
 *** Configure floating window borders
 Uses the same color as my mode line, uses the same width as window divider width. See below.
 #+BEGIN_SRC emacs-lisp
@@ -796,6 +826,16 @@ This was annoying when I first installed EXWM. Thankfully this is a very easy fi
 Stolen from the ~.xinitrc~ included with ~EXWM~.
 #+BEGIN_SRC emacs-lisp
   (setenv "_JAVA_AWT_WM_NONREPARENTING" "1")
+#+END_SRC
+
+*** Edit text for an X window in Emacs
+At first I questioned why I would do this, but now that I know the advantages of this, it's too good to pass up.
+#+BEGIN_SRC emacs-lisp
+  (use-package exwm-edit
+    :ensure t
+    :defer t
+    :init
+    (require 'exwm-edit))
 #+END_SRC
 
 *** X applications
@@ -1137,10 +1177,15 @@ I copied the function for quitting Emacs to handle reboot too.
 Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into this area.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-global-keys
-        `(;; Switching Workspaces
+        `(;; Switching workspace focus
           ([?\s-q] . farl-exwm/workspace-1)
           ([?\s-w] . farl-exwm/workspace-0)
           ([?\s-e] . farl-exwm/workspace-2)
+
+          ;; Moving windows to workspaces
+          ([8388625] . farl-exwm/move-window-1) ; C-s-q
+          ([8388631] . farl-exwm/move-window-0) ; C-s-w
+          ([8388613] . farl-exwm/move-window-2) ; C-s-e
 
           ;; Opening X applications
           ([?\s-g]    . run-gimp)
