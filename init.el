@@ -384,11 +384,11 @@
                                        (elt named-workspaces index)
                                      (number-to-string index))))
       exwm-randr-workspace-output-plist '(0 "LVDS1"
-                                          0 "LVDS-1"
-                                          0 "eDP-1-1"
-                                          0 "DP-1-2-2"
-                                          1 "DP-1-2-1"
-                                          2 "DP-1-2-3")
+                                          0 "VGA1"
+                                          0 "eDP1"
+                                          0 "DP2-2"
+                                          1 "DP2-1"
+                                          2 "DP2-3")
       exwm-manage-configurations '(((string= exwm-class-name "Steam")
                                     floating-mode-line nil
                                     workspace 0
@@ -435,42 +435,40 @@
   "Configure monitors and peripherals."
   (interactive)
   ;; Monitors (works on both my X230 and my W541)
-  ;; Don't do if arandr is running
+  ;; Don't do if `arandr' is running
   (unless (= 0 (shell-command "pgrep arandr"))
-    (let* ((connected-monitors (split-string
-                                (shell-command-to-string
-                                 "xrandr | grep ' connected' | awk '{print $1}'")))
-           (possible-monitors (if (member "LVDS-1" connected-monitors)
-                                  '("LVDS-1" "VGA-1")
-                                (if (member "LVDS1" connected-monitors)
-                                    '("LVDS1" "VGA1")
-                                  '("eDP-1-1" "DP-1-2-1" "DP-1-2-2"
-                                    "DP-1-2-3" "VGA-1-1"))))
+    (let* ((monitors (split-string
+                      (shell-command-to-string
+                       "xrandr | grep ' connected' | awk '{print $1}'")))
+           (possible (if (member "LVDS1" monitors)
+                         '("LVDS1" "VGA1")
+                       '("eDP1" "DP2-1" "DP2-2" "DP2-3" "VGA1")))
            (command "xrandr "))
-      (dolist (monitor possible-monitors)
-        (if (and (member monitor connected-monitors)
-                 (not (and (string= monitor "eDP-1-1")
-                           (member "DP-1-2-1" connected-monitors))))
+      (dolist (monitor possible)
+        (if (and (member monitor monitors)
+                 (not (and (string= monitor "eDP1")
+                           (member "DP2-1" monitors))))
             (let* ((output (concat "--output " monitor " "))
-                   (primary (when (or (string= monitor "LVDS-1")
-                                      (string= monitor "eDP-1-1")
-                                      (string= monitor "DP-1-2-2"))
+                   (primary (when (or (string= monitor "LVDS1")
+                                      (string= monitor "eDP1")
+                                      (string= monitor "DP2-2"))
                               "--primary "))
-                   (rate (when (string= monitor "DP-1-2-2")
+                   (rate (when (string= monitor "DP2-2")
                            "--rate 75 "))
-                   (res (concat "--mode " (if (or (string= monitor "LVDS-1")
-                                                  (string= monitor "VGA-1"))
+                   (res (concat "--mode " (if (or (string= monitor "LVDS1")
+                                                  (and (string= monitor "VGA1")
+                                                       (member "LVDS1" possible)))
                                               "1366x768 "
                                             "1920x1080 ")))
-                   (rotate (when (or (string= monitor "DP-1-2-1")
-                                     (string= monitor "DP-1-2-3"))
-                             (concat "--rotate " (if (string= monitor "DP-1-2-1")
+                   (rotate (when (or (string= monitor "DP2-1")
+                                     (string= monitor "DP2-3"))
+                             (concat "--rotate " (if (string= monitor "DP2-1")
                                                      "left "
                                                    "right "))))
-                   (pos (concat "--pos " (if (not (or (string= monitor "DP-1-2-2")
-                                                      (string= monitor "DP-1-2-3")))
+                   (pos (concat "--pos " (if (not (or (string= monitor "DP2-2")
+                                                      (string= monitor "DP2-3")))
                                              "0x0 "
-                                           (if (string= monitor "DP-1-2-2")
+                                           (if (string= monitor "DP2-2")
                                                "1080x0 "
                                              "3000x0 ")))))
               (setq command (concat command output primary rate res rotate pos)))
