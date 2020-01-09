@@ -483,19 +483,17 @@
                                 "sed -r 's/.*id=([0-9]+).*/\\1/')"))
   ;; Configure trackball
   (let* ((trackball-id (shell-command-to-string
-                        (concat "xinput | grep ELECOM | head -n 1 | sed -r "
+                        (concat "sleep 2 && "
+                                "xinput | grep ELECOM | head -n 1 | sed -r "
                                 "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
     (dolist (command '("'libinput Button Scrolling Button' 10"
                        "'libinput Scroll Method Enabled' 0 0 1"))
       (start-process-shell-command
-       "Trackball Setup" nil (concat "sleep 2 && xinput set-prop "
-                                   trackball-id command)))
-    (start-process-shell-command
-     "Trackball Setup" nil (concat "sleep 2 && xinput set-button-map " trackball-id
-                                 "1 2 3 4 5 6 7 8 9 2 1 2")))
+       "Trackball Setup" nil (concat "sleep 2 && xinput set-button-map " trackball-id
+                                     "1 2 3 4 5 6 7 8 9 2 1 2"))))
   ;; Keyboard
   (start-process-shell-command
-   "Keyboard Setup" nil "setxkbmap -option ctrl:nocaps"))
+   "Keyboard Setup" nil "sleep 2 && setxkbmap -option ctrl:nocaps"))
 
 (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
 (exwm-randr-enable)
