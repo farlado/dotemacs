@@ -789,9 +789,7 @@ Instead of just killing Emacs, shuts down the system."
 
 (setq exwm-input-global-keys
       `(;; Switching workspace focus
-        ([?\s-q] . exwm-workspace-swap)
-        ([?\s-w] . exwm-workspace-switch)
-        ([?\s-e] . exwm-workspace-move-window)
+        ;; 1 opens 0, 2 opens 1, etc.
         ,@(mapcar
            (lambda (i)
              `(,(kbd (format "s-%d" (% (+ i 1) 10))) .
@@ -799,6 +797,17 @@ Instead of just killing Emacs, shuts down the system."
                  (interactive)
                  (exwm-workspace-switch-create ,i))))
            (number-sequence 0 9))
+
+        ;; Other workspace management
+        ([?\s-q] . exwm-workspace-swap)
+        ([?\s-w] . exwm-workspace-switch)
+        ([?\s-e] . exwm-workspace-move-window)
+
+        ;; Window size adjustment
+        ([8388631] . enlarge-window) ; C-s-w
+        ([8388627] . shrink-window) ; C-s-s
+        ([8388609] . shrink-window-horizontally) ; C-s-a
+        ([8388612] . enlarge-window-horizontally) ; C-s-d
 
         ;; Opening X applications
         ([?\s-g]    . run-gimp)

@@ -1,6 +1,7 @@
 #+TITLE: Farlado's Illiterate GNU Emacs
 #+SUBTITLE: A far-from-sane literate Emacs configuration
 #+LANGUAGE: en
+#+STARTUP: hideblocks
 #+OPTIONS: num:2 toc:2
 #+PROPERTY: header-args :tangle (concat user-emacs-directory "init.el")
 
@@ -9,19 +10,16 @@ I use Emacs, which might be thought of as a thermonuclear word processor.
 
 -- Neal Stephenson, /In the Beginning... was the Command Line/
 #+END_QUOTE
-
 #+BEGIN_QUOTE
 Overall, I think text editing is a solved problem. Text editors are like wine. The older the better. You do not want a shiny new text editor. You want the text editor that has been around long enough and used by enough geeks that every conceivable pattern of manipulating symbols on the screen has been thought of, and crystallized into a re-usable pack.
 
 -- [[https://blog.vivekhaldar.com/post/31970017734/new-frontiers-in-text-editing][Vivek Haldar]]
 #+END_QUOTE
-
 #+BEGIN_QUOTE
 Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his workshop, I feel a realm of possibility open before me. I feel the comfort of an environment that has evolved over time to fit me perfectly – an assortment of packages and keybindings which help me bring ideas to life day after day.
 
 -- [[https://www.braveclojure.com/basic-emacs/][Daniel Higginbotham]]
 #+END_QUOTE
-
 #+BEGIN_QUOTE
 an infinite number of monkeys typing into GNU emacs would never make a good program
 
@@ -1235,9 +1233,7 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-global-keys
         `(;; Switching workspace focus
-          ([?\s-q] . exwm-workspace-swap)
-          ([?\s-w] . exwm-workspace-switch)
-          ([?\s-e] . exwm-workspace-move-window)
+          ;; 1 opens 0, 2 opens 1, etc.
           ,@(mapcar
              (lambda (i)
                `(,(kbd (format "s-%d" (% (+ i 1) 10))) .
@@ -1245,6 +1241,17 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
                    (interactive)
                    (exwm-workspace-switch-create ,i))))
              (number-sequence 0 9))
+
+          ;; Other workspace management
+          ([?\s-q] . exwm-workspace-swap)
+          ([?\s-w] . exwm-workspace-switch)
+          ([?\s-e] . exwm-workspace-move-window)
+
+          ;; Window size adjustment
+          ([8388631] . enlarge-window) ; C-s-w
+          ([8388627] . shrink-window) ; C-s-s
+          ([8388609] . shrink-window-horizontally) ; C-s-a
+          ([8388612] . enlarge-window-horizontally) ; C-s-d
 
           ;; Opening X applications
           ([?\s-g]    . run-gimp)
