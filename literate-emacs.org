@@ -502,9 +502,9 @@ Yes, Emacs is my *entire desktop environment*. You should probably remove this s
     (set-frame-parameter nil 'fullscreen 'fullboth)
 #+END_SRC
 
-** Configuration
+** Window management
 *** Installing the base window manager
-This isn't actually where we do all the configuration, it's just where we install EXWM and load what we need to configure it. Usually it is best to configure packages inside of ~use-package~, but that would be a horrible idea due to just how many different things there are that need configuring.
+This isn't actually where we do all the configuration, it's just where we install EXWM and load what we need to configure it. Usually it is best to configure packages inside of ~use-package~, but that would be a horrible idea due to just how many different things there are that need configuring. However, we can do one useful thing here: set an environment variable that lets Java applications know that EXWM is not a reparenting window manager.
 #+BEGIN_SRC emacs-lisp
   (use-package exwm
     :ensure t
@@ -513,115 +513,45 @@ This isn't actually where we do all the configuration, it's just where we instal
     (require 'exwm)
     (require 'exwm-randr)
     (require 'exwm-config)
-    (require 'exwm-systemtray))
+    (require 'exwm-systemtray)
+    (setenv "_JAVA_AWT_WM_NONREPARENTING" "1"))
 #+END_SRC
 
-*** Getting a ~dmenu~ equivalent
-Since I'm using Emacs as a window manager, I need ~dmenu~ so I can open X windows I haven't bound to keys. It will be bound elsewhere.
+*** Name EXWM buffers after the window title
+This was annoying when I first installed EXWM. Thankfully this is a very easy fix.
+#+BEGIN_SRC emacs-lisp
+  (defun farl-exwm/name-buffer-after-window-title ()
+    "Rename the current `exwm-mode' buffer after the X window's title."
+    (exwm-workspace-rename-buffer exwm-title))
+
+  (add-hook 'exwm-update-title-hook 'farl-exwm/name-buffer-after-window-title)
+#+END_SRC
+
+*** Edit text for an X window in Emacs
+At first I questioned why I would do this, but now that I know the advantages of this, it's too good to pass up. This allows me to edit text from an X window using Emacs by pressing =C-c '=.
+#+BEGIN_SRC emacs-lisp
+  (use-package exwm-edit
+    :ensure t
+    :defer t
+    :init
+    (require 'exwm-edit))
+#+END_SRC
+
+*** Mouse follows on focus change
+This is a setting I had back when I used ~dwm~. I really wanted it back so I'm glad I found this. When focus changes, unless the mouse caused the focus change, warp the mouse to the center of the newly focused window.
+#+BEGIN_SRC emacs-lisp
+  (use-package exwm-mff
+    :ensure t
+    :defer t
+    :hook (exwm-init . exwm-mff-mode))
+#+END_SRC
+
+*** Getting a ~rofi~ equivalent
+Since I'm using Emacs as a window manager, I need something comparable to ~rofi~ so I can open X windows I haven't bound to keys. It will be bound elsewhere. I really don't want one named after +a project made by Nazis+ a Suckless project, but laziness makes that hard.
 #+BEGIN_SRC emacs-lisp
   (use-package dmenu
     :ensure t
     :defer t)
-#+END_SRC
-
-*** ~desktop-environment-mode~
-Previously I had to define a lot of functions to do these things, now I just change settings within ~desktop-environment-mode~.
-#+BEGIN_SRC emacs-lisp
-  (use-package desktop-environment
-    :ensure t
-    :defer t
-    :init
-    (desktop-environment-mode 1))
-#+END_SRC
-**** Volume adjustment
-The only things I really don't like here are how much output it gives when you mute or unmute the speakers or microphone, so I set up basic scripts to give much more concise output.
-#+BEGIN_SRC emacs-lisp
-  (setq desktop-environment-volume-toggle-command
-        (concat "[ \"$(amixer set Master toggle | grep off)\" ] "
-                "&& echo Volume is now muted. | tr '\n' ' ' "
-                "|| echo Volume is now unmuted. | tr '\n' ' '")
-        desktop-environment-volume-toggle-microphone-command
-        (concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
-                "&& echo Microphone is now muted. | tr '\n' ' ' "
-                "|| echo Microphone is now unmuted | tr '\n' ' '"))
-#+END_SRC
-**** Brightness adjustment
-This one all I needed to do was change the increment and decrement values.
-#+BEGIN_SRC emacs-lisp
-  (setq desktop-environment-brightness-normal-increment "5%+"
-        desktop-environment-brightness-normal-decrement "5%-")
-#+END_SRC
-**** Screenshots
-This one was the least straightforward because the way it's implemented by ~desktop-environment~ is *SUPER* wonky. Here are the binds which will be relevant.
-#+BEGIN_SRC emacs-lisp
-  ;; Storing to clipboard
-  (define-key desktop-environment-mode-map (kbd "<print>")
-    'farl-de/desktop-environment-screenshot-part-clip)
-  (define-key desktop-environment-mode-map (kbd "<S-print>")
-    'farl-de/desktop-environment-screenshot-clip)
-
-  ;; Storing to file
-  (define-key desktop-environment-mode-map (kbd "<C-print>")
-    'farl-de/desktop-environment-screenshot-part)
-  (define-key desktop-environment-mode-map (kbd "<C-S-print>")
-    'farl-de/desktop-environment-screenshot)
-#+END_SRC
-First, I set what directory to store screenshots in.
-#+BEGIN_SRC emacs-lisp
-  (setq desktop-environment-screenshot-directory "~/screenshots")
-#+END_SRC
-Then, I can set the commands for taking a full or partial screenshot and saving it to a file.
-#+BEGIN_SRC emacs-lisp
-  (setq desktop-environment-screenshot-command
-        "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
-        desktop-environment-screenshot-partial-command
-        "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
-#+END_SRC
-The functions which ~desktop-environment~ comes with are kinda garbage, so I made my own.
-#+BEGIN_SRC emacs-lisp
-  (defun farl-de/desktop-environment-screenshot ()
-    "Take a screenshot and store it in a file."
-    (interactive)
-    (desktop-environment-screenshot)
-    (message "Screenshot saved in ~/screenshots."))
-
-  (defun farl-de/desktop-environment-screenshot-part ()
-    "Take a capture of a portion of the screen and store it in a file."
-    (interactive)
-    (desktop-environment-screenshot-part)
-    (message "Screenshot saved in ~/screenshots."))
-
-  (defun farl-de/desktop-environment-screenshot-clip ()
-    "Take a screenshot and put it in the clipboard."
-    (interactive)
-    (shell-command (concat desktop-environment-screenshot-command
-                           " && xclip $FILENAME -selection clipboard "
-                           "-t image/png &> /dev/null && rm $FILENAME"))
-    (message "Screenshot copied to clipboard."))
-
-  (defun farl-de/desktop-environment-screenshot-part-clip ()
-    "Take a shot of a portion of the screen and put it in the clipboard."
-    (interactive)
-    (shell-command (concat desktop-environment-screenshot-partial-command
-                           " && xclip $FILENAME -selection clipboard "
-                           "-t image/png &> /dev/null && rm $FILENAME"))
-    (message "Screenshot copied to clipboard."))
-#+END_SRC
-**** Lock screen
-Haha yes, this is very long and very very stupid.
-#+BEGIN_SRC emacs-lisp
-  (setq desktop-environment-screenlock-command
-        (concat "i3lock -nmk --color=000000 --timecolor=ffffffff --datecolor=ffffffff "
-                "--wrongcolor=ffffffff --ringcolor=00000000 --insidecolor=00000000 "
-                "--keyhlcolor=00000000 --bshlcolor=00000000 --separatorcolor=00000000 "
-                "--ringvercolor=00000000 --insidevercolor=00000000 --linecolor=00000000 "
-                "--ringwrongcolor=00000000 --insidewrongcolor=00000000 --timestr=%H:%M "
-                "--datestr='%a %d %b' --time-font=Iosevka --date-font=Iosevka "
-                "--wrong-font=Iosevka --timesize=128 --datesize=64 --wrongsize=32 "
-                "--time-align 0 --date-align 0 --wrong-align 0 --indpos=-10:-10 "
-                "--timepos=200:125 --datepos=200:215 --wrongpos=200:155 --locktext='' "
-                "--lockfailedtext='' --noinputtext='' --radius 1 --ring-width 1 "
-                " --veriftext='' --wrongtext='WRONG' --force-clock"))
 #+END_SRC
 
 *** System package management
@@ -670,23 +600,29 @@ This one is a pleasant surprise to have honestly. Having Emacs handle system pac
            ("C-c p v" . system-packages-verify-all-packages)))
 #+END_SRC
 
-*** Workspace configuration
-No clue why you have to do so much just to give workspaces names, but at least you can do it. I also put which monitors to try to put workspaces onto here, alongside settings for which windows should float and which workspaces they should be on.
+** Workspace configuration
+*** Load 3 workspaces on startup
+I want all three workspaces I use to be loaded when I start EXWM.
 #+BEGIN_SRC emacs-lisp
-  (setq exwm-workspace-number 3
-        exwm-workspace-index-map (lambda (index)
-                                   (let ((named-workspaces ["1" "2" "3"]))
-                                     (if (< index (length named-workspaces))
-                                         (elt named-workspaces index)
-                                       (number-to-string index))))
-        exwm-randr-workspace-output-plist '(0 "LVDS1"
-                                            0 "VGA1"
+  (setq exwm-workspace-number 3)
+#+END_SRC
+
+*** Assign workspaces to monitors
+This contains multiple assignments for the same workspace because of the different setups my ThinkPads are part of.
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-randr-workspace-output-plist '(0 "LVDS1"
                                             0 "eDP1"
                                             0 "DP2-2"
                                             1 "DP2-1"
-                                            2 "DP2-3")
-        exwm-manage-configurations '(((string= exwm-class-name "Steam")
+                                            2 "DP2-3"))
+#+END_SRC
+
+*** Assign programs to workspaces
+...and also have some launch floating and/or without a mode line or borders.
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
                                       floating-mode-line nil
+                                      border-width 0
                                       workspace 0
                                       floating t)
                                      ((string= exwm-instance-name "telegram-desktop")
@@ -696,6 +632,17 @@ No clue why you have to do so much just to give workspaces names, but at least y
                                      ((string= exwm-title "Event Tester")
                                       floating-mode-line nil
                                       floating t)))
+#+END_SRC
+
+*** Name workspaces a little more intuitively
+No clue why you have to do so much just to give workspaces names, but at least you can do it.
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-workspace-index-map
+        (lambda (index)
+          (let ((named-workspaces ["1" "2" "3"]))
+            (if (< index (length named-workspaces))
+                (elt named-workspaces index)
+              (number-to-string index)))))
 #+END_SRC
 
 *** Moving focus between workspaces
@@ -736,114 +683,81 @@ Only recently did I learn about it, but you can also assign windows to a new wor
     (exwm-workspace-move-window 2))
 #+END_SRC
 
-*** Multi-head configuration
-Thankfully, EXWM comes with hooks to handle when monitors are connected and disconnected, so I can set up an elisp function to handle monitor changes for me.
-#+BEGIN_SRC emacs-lisp
-  (defun display-and-dock-setup ()
-    "Configure monitors and peripherals."
-    (interactive)
-    ;; Monitors (works on both my X230 and my W541)
-    ;; Don't do if `arandr' is running
-    (unless (= 0 (shell-command "pgrep arandr"))
-      (let* ((monitors (split-string
-                        (shell-command-to-string
-                         "xrandr | grep ' connected' | awk '{print $1}'")))
-             (possible (if (member "LVDS1" monitors)
-                           '("LVDS1" "VGA1")
-                         '("eDP1" "DP2-1" "DP2-2" "DP2-3" "VGA1")))
-             (command "xrandr "))
-        (dolist (monitor possible)
-          (if (and (member monitor monitors)
-                   (not (and (string= monitor "eDP1")
-                             (member "DP2-1" monitors))))
-              (let* ((output (concat "--output " monitor " "))
-                     (primary (when (or (string= monitor "LVDS1")
-                                        (string= monitor "eDP1")
-                                        (string= monitor "DP2-2"))
-                                "--primary "))
-                     (rate (when (string= monitor "DP2-2")
-                             "--rate 75 "))
-                     (res (concat "--mode " (if (or (string= monitor "LVDS1")
-                                                    (and (string= monitor "VGA1")
-                                                         (member "LVDS1" possible)))
-                                                "1366x768 "
-                                              "1920x1080 ")))
-                     (rotate (when (or (string= monitor "DP2-1")
-                                       (string= monitor "DP2-3"))
-                               (concat "--rotate " (if (string= monitor "DP2-1")
-                                                       "left "
-                                                     "right "))))
-                     (pos (concat "--pos " (if (not (or (string= monitor "DP2-2")
-                                                        (string= monitor "DP2-3")))
-                                               "0x0 "
-                                             (if (string= monitor "DP2-2")
-                                                 "1080x0 "
-                                               "3000x0 ")))))
-                (setq command (concat command output primary rate res rotate pos)))
-            (setq command (concat command "--output " monitor " --off "))))
-        (start-process-shell-command
-         "Display Setup" nil command)
-        command))
-    ;; Disable trackpad
-    (start-process-shell-command
-     "Disable trackpad" nil (concat "xinput disable $(xinput list | "
-                                  "grep Synaptics | head -n 1 | "
-                                  "sed -r 's/.*id=([0-9]+).*/\\1/')"))
-    ;; Configure trackball
-    (let* ((trackball-id (shell-command-to-string
-                          (concat "sleep 2 && "
-                                  "xinput | grep ELECOM | head -n 1 | sed -r "
-                                  "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
-      (dolist (command '("'libinput Button Scrolling Button' 10"
-                         "'libinput Scroll Method Enabled' 0 0 1"))
-        (start-process-shell-command
-         "Trackball Setup" nil (concat "sleep 2 && xinput set-button-map " trackball-id
-                                       "1 2 3 4 5 6 7 8 9 2 1 2"))))
-    ;; Keyboard
-    (start-process-shell-command
-     "Keyboard Setup" nil "sleep 2 && setxkbmap -option ctrl:nocaps"))
+** TODO Multi-head configuration
+Thankfully, EXWM comes with hooks to handle when monitors are connected and disconnected, so I can do monitor configuration entirely in Emacs Lisp. I have two laptops: a ThinkPad X230 and a ThinkPad W541. Each has different displays and is used for different purposes. Due to recent updates to Arch Linux and the fact that the original code here was a dumpster fire, this section is basically a construction zone.
 
-  (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
-  (exwm-randr-enable)
+*** Getting the currently connected monitors
+The first thing to do is set up a function to return a list of currently connected monitors.
+#+BEGIN_SRC emacs-lisp
+  (defun get-connected-monitors ()
+    "Return a list of the currently connected monitors."
+    (split-string (shell-command-to-string (concat "xrandr | "
+                                                   "grep ' connected ' | "
+                                                   "awk '{print $1}'"))))
 #+END_SRC
 
-*** Mouse follows on focus change
-This is a setting I had back when I used ~dwm~. I really wanted it back so I'm glad I found this. When focus changes, unless the mouse caused the focus change, warp the mouse to the center of the newly focused window.
+*** Configuring monitor arrangement on my X230
+This one is straightforward. I never do any kind of split-monitor setup on my ThinkPad X230, so every monitor looks over the same screen.
 #+BEGIN_SRC emacs-lisp
-  (use-package exwm-mff
-    :ensure t
-    :defer t
-    :hook (exwm-init . exwm-mff-mode))
+  (defun display-setup-x230 ()
+    "Set up the connected monitors on a ThinkPad X230."
+    (let ((monitors (get-connected-monitors))
+          (possible '("LVDS1"
+                      "VGA1"))
+          (command "xrandr "))
+      (dolist (monitor possible)
+        (if (member monitor monitors)
+            (setq command (concat command "--output " monitor
+                                  " --mode 1366x768 --pos 0x0 "))
+          (setq command (concat command "--output " monitor " --off "))))
+      (shell-command command)))
 #+END_SRC
 
+*** Configuring monitor arrangement on my W541
+This is where it gets really fun. This ThinkPad /does/ get docked, so I handle very different outputs.
+#+BEGIN_SRC emacs-lisp
+  (defun display-setup-w541 ()
+    "Set up the connected monitors on a ThinkPad W541."
+    (let* ((connected-monitors (get-connected-monitors))
+           (docked-p (member "DP2-1" connected-monitors))
+           (possible-monitors '("eDP1"
+                                "VGA1"
+                                "DP2-1"
+                                "DP2-2"
+                                "DP2-3"))
+           (command "xrandr "))
+      (dolist (monitor possible-monitors)
+        (if (and (member monitor connected-monitors)
+                 (not (and docked-p (string= "eDP1" monitor))))
+            (let ((output (concat "--output " monitor " "))
+                  (primary (when (is-primary monitor)
+                             "--primary "))
+                  (mode (concat "--mode " (if (string= "eDP1" monitor)
+                                              "2880x1620 "
+                                            "1920x1080 ")))
+                  (scale (when (string-match-p "DP2" monitor)
+                           "--scale-from 2880x1620 "))
+                  (rotate (if (string= "DP2-1" monitor)
+                              "--rotate left "
+                            (if (string= "DP2-3" monitor)
+                                "--rotate right ")))
+                  (pos (concat "--pos " (if (string-match-p "1" monitor)
+                                            "0x0 "
+                                          (if (string= monitor "DP2-2")
+                                              "1620x0 "
+                                            "4500x0 ")))))
+              (setq command (concat command output primary
+                                    mode scale rotate pos)))
+          (setq command (concat command "--output " monitor " --off "))))
+      command))
+#+END_SRC
+
+** X window configuration
 *** Configure floating window borders
 Uses the same color as my mode line, uses the same width as window divider width. See below.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-floating-border-width 3
         exwm-floating-border-color (face-attribute 'mode-line :background))
-#+END_SRC
-
-*** Name EXWM buffers after the window title
-This was annoying when I first installed EXWM. Thankfully this is a very easy fix.
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'exwm-update-title-hook
-            (lambda () (exwm-workspace-rename-buffer exwm-title)))
-#+END_SRC
-
-*** Ensure Java applications know the WM is non-reparenting
-Stolen from the ~.xinitrc~ included with ~EXWM~.
-#+BEGIN_SRC emacs-lisp
-  (setenv "_JAVA_AWT_WM_NONREPARENTING" "1")
-#+END_SRC
-
-*** Edit text for an X window in Emacs
-At first I questioned why I would do this, but now that I know the advantages of this, it's too good to pass up.
-#+BEGIN_SRC emacs-lisp
-  (use-package exwm-edit
-    :ensure t
-    :defer t
-    :init
-    (require 'exwm-edit))
 #+END_SRC
 
 *** X applications
@@ -925,9 +839,115 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
     (start-process-shell-command
      "Transmission" nil "transmission-gtk"))
 #+END_SRC
+** Things a DE should probably have
+*** ~desktop-environment-mode~
+Previously I had to define a lot of functions to do these things, now I just change settings within ~desktop-environment-mode~.
+#+BEGIN_SRC emacs-lisp
+  (use-package desktop-environment
+    :ensure t
+    :defer t
+    :init
+    (desktop-environment-mode 1))
+#+END_SRC
 
-*** Other things a DE should probably have
-**** Monitor settings
+**** Volume adjustment
+The only things I really don't like about how ~desktop-environment~'s volume controlling is ~desktop-environment-toggle-mute~, which gives way too much output when you mute or unmute the speakers or microphone, so I set up basic scripts to give much more concise output.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-volume-toggle-command
+        (concat "[ \"$(amixer set Master toggle | grep off)\" ] "
+                "&& echo Volume is now muted. | tr '\n' ' ' "
+                "|| echo Volume is now unmuted. | tr '\n' ' '")
+        desktop-environment-volume-toggle-microphone-command
+        (concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
+                "&& echo Microphone is now muted. | tr '\n' ' ' "
+                "|| echo Microphone is now unmuted | tr '\n' ' '"))
+#+END_SRC
+
+**** Brightness adjustment
+This one all I needed to do was change the increment and decrement values.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-brightness-normal-increment "5%+"
+        desktop-environment-brightness-normal-decrement "5%-")
+#+END_SRC
+
+**** Screenshots
+This one was the least straightforward because the way it's implemented by ~desktop-environment~ is *SUPER* wonky. Here are the binds which will be relevant.
+#+BEGIN_SRC emacs-lisp
+  ;; Storing to clipboard
+  (define-key desktop-environment-mode-map (kbd "<print>")
+    'farl-de/desktop-environment-screenshot-part-clip)
+  (define-key desktop-environment-mode-map (kbd "<S-print>")
+    'farl-de/desktop-environment-screenshot-clip)
+
+  ;; Storing to file
+  (define-key desktop-environment-mode-map (kbd "<C-print>")
+    'farl-de/desktop-environment-screenshot-part)
+  (define-key desktop-environment-mode-map (kbd "<C-S-print>")
+    'farl-de/desktop-environment-screenshot)
+#+END_SRC
+
+First, I set what directory to store screenshots in.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-screenshot-directory "~/screenshots")
+#+END_SRC
+
+Then, I can set the commands for taking a full or partial screenshot and saving it to a file.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-screenshot-command
+        "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
+        desktop-environment-screenshot-partial-command
+        "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
+#+END_SRC
+
+The functions which ~desktop-environment~ comes with are kinda garbage, so I made my own.
+#+BEGIN_SRC emacs-lisp
+  (defun farl-de/desktop-environment-screenshot ()
+    "Take a screenshot and store it in a file."
+    (interactive)
+    (desktop-environment-screenshot)
+    (message "Screenshot saved in ~/screenshots."))
+
+  (defun farl-de/desktop-environment-screenshot-part ()
+    "Take a capture of a portion of the screen and store it in a file."
+    (interactive)
+    (desktop-environment-screenshot-part)
+    (message "Screenshot saved in ~/screenshots."))
+
+  (defun farl-de/desktop-environment-screenshot-clip ()
+    "Take a screenshot and put it in the clipboard."
+    (interactive)
+    (shell-command (concat desktop-environment-screenshot-command
+                           " && xclip $FILENAME -selection clipboard "
+                           "-t image/png &> /dev/null && rm $FILENAME"))
+    (message "Screenshot copied to clipboard."))
+
+  (defun farl-de/desktop-environment-screenshot-part-clip ()
+    "Take a shot of a portion of the screen and put it in the clipboard."
+    (interactive)
+    (shell-command (concat desktop-environment-screenshot-partial-command
+                           " && xclip $FILENAME -selection clipboard "
+                           "-t image/png &> /dev/null && rm $FILENAME"))
+    (message "Screenshot copied to clipboard."))
+#+END_SRC
+
+**** Lock screen
+Haha yes, this is very long and very very stupid.
+#+BEGIN_SRC emacs-lisp
+  (setq desktop-environment-screenlock-command
+        (concat "i3lock -nmk --color=000000 --timecolor=ffffffff --datecolor=ffffffff "
+                "--wrongcolor=ffffffff --ringcolor=00000000 --insidecolor=00000000 "
+                "--keyhlcolor=00000000 --bshlcolor=00000000 --separatorcolor=00000000 "
+                "--ringvercolor=00000000 --insidevercolor=00000000 --linecolor=00000000 "
+                "--ringwrongcolor=00000000 --insidewrongcolor=00000000 --timestr=%H:%M "
+                "--datestr='%a %d %b' --time-font=Iosevka --date-font=Iosevka "
+                "--wrong-font=Iosevka --timesize=128 --datesize=64 --wrongsize=32 "
+                "--time-align 0 --date-align 0 --wrong-align 0 --indpos=-10:-10 "
+                "--timepos=200:125 --datepos=200:215 --wrongpos=200:155 --locktext='' "
+                "--lockfailedtext='' --noinputtext='' --radius 1 --ring-width 1 "
+                " --veriftext='' --wrongtext='WRONG' --force-clock"))
+#+END_SRC
+
+*** Monitor settings
 Calling ~arandr~ to adjust monitors is useful when I am preparing to present something using my computer or need to adjust how monitors are set up in a unique way that isn't a preset from my dotfiles.
 #+BEGIN_SRC emacs-lisp
   (defun monitor-settings ()
@@ -937,7 +957,7 @@ Calling ~arandr~ to adjust monitors is useful when I am preparing to present som
      "Monitor Settings" nil "arandr"))
 #+END_SRC
 
-**** Network settings
+*** Network settings
 This one uses two windows: one to open the NetworkManager connection editor, and another to list WiFi networks nearby.
 #+BEGIN_SRC emacs-lisp
   (defun network-settings ()
@@ -948,7 +968,7 @@ This one uses two windows: one to open the NetworkManager connection editor, and
     (async-shell-command "nmcli dev wifi list"))
 #+END_SRC
 
-**** Volume mixer
+*** Volume mixer
 For when you need to do volume mixing.
 #+BEGIN_SRC emacs-lisp
   (defun volume-settings ()
@@ -958,7 +978,7 @@ For when you need to do volume mixing.
      "Volume Mixer" nil "pavucontrol"))
 #+END_SRC
 
-**** Audio loop-back
+*** Audio loop-back
 Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucontrol~ to set up which programs to pass through to Discord.
 #+BEGIN_SRC emacs-lisp
   (defun audio-loopback ()
@@ -982,7 +1002,7 @@ Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucon
                             "pacmd unload-module module-loopback")))
 #+END_SRC
 
-**** Keyboard layout selection
+*** Keyboard layout selection
 This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
 #+BEGIN_SRC emacs-lisp
   (defgroup keyboard-layout nil
@@ -1054,7 +1074,7 @@ Then, I use these functions to control setting and cycling the keyboard layout:
         (message "No keyboard layouts selected."))))
 #+END_SRC
 
-**** Suspending
+*** Suspending
 #+BEGIN_SRC emacs-lisp
   (defun suspend-computer ()
     (interactive)
@@ -1064,7 +1084,7 @@ Then, I use these functions to control setting and cycling the keyboard layout:
   (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
 #+END_SRC
 
-**** Shutting down
+*** Shutting down
 I copied the function for quitting Emacs to handle shutting down.
 #+BEGIN_SRC emacs-lisp
   (defun save-buffers-shut-down (&optional arg)
@@ -1122,7 +1142,7 @@ I copied the function for quitting Emacs to handle shutting down.
   (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
 #+END_SRC
 
-**** Rebooting
+*** Rebooting
 I copied the function for quitting Emacs to handle reboot too.
 #+BEGIN_SRC emacs-lisp
   (defun save-buffers-reboot (&optional arg)
@@ -1627,7 +1647,7 @@ I had to adjust the function which kills both the current buffer and the current
   (defun kill-this-buffer-and-window ()
     "Kill the current buffer and delete the selected window.
 
-  This function has been altered to accommodate EXWM."
+  This function has been altered to accommodate `exwm-mode'."
     (interactive)
     (let ((window-to-delete (selected-window))
           (buffer-to-kill (current-buffer))

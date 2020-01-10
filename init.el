@@ -251,11 +251,234 @@
   (require 'exwm)
   (require 'exwm-randr)
   (require 'exwm-config)
-  (require 'exwm-systemtray))
+  (require 'exwm-systemtray)
+  (setenv "_JAVA_AWT_WM_NONREPARENTING" "1"))
+
+(defun farl-exwm/name-buffer-after-window-title ()
+  "Rename the current `exwm-mode' buffer after the X window's title."
+  (exwm-workspace-rename-buffer exwm-title))
+
+(add-hook 'exwm-update-title-hook 'farl-exwm/name-buffer-after-window-title)
+
+(use-package exwm-edit
+  :ensure t
+  :defer t
+  :init
+  (require 'exwm-edit))
+
+(use-package exwm-mff
+  :ensure t
+  :defer t
+  :hook (exwm-init . exwm-mff-mode))
 
 (use-package dmenu
   :ensure t
   :defer t)
+
+(use-package system-packages
+  :ensure t
+  :defer t
+  :init
+  (when (executable-find "yay")
+    (require 'system-packages)
+    (add-to-list 'system-packages-supported-package-managers
+                 '(yay .
+                       ((default-sudo . nil)
+                        (install . "yay -S")
+                        (search . "yay -Ss")
+                        (uninstall . "yay -Rs")
+                        (update . "yay -Syu")
+                        (clean-cache . "yay -Sc")
+                        (log . "car /var/log/pacman.log")
+                        (get-info . "yay -Qi")
+                        (get-info-remote . "yay -Si")
+                        (list-files-provided-by . "yay -Ql")
+                        (verify-all-packages . "yay -Qkk")
+                        (verify-all-dependencies . "yay -Dk")
+                        (remove-orphaned . "yay -Rns $(yay -Qtdq)")
+                        (list-installed-packages . "yay -Qe")
+                        (list-installed-packages-all . "yay -Q")
+                        (list-dependencies-of . "yay -Qi")
+                        (noconfirm . "--noconfirm"))))
+    (setq system-packages-use-sudo nil
+          system-packages-package-manager 'yay))
+  :bind (("C-c p i" . system-packages-install)
+         ("C-c p e" . system-packages-ensure)
+         ("C-c p u" . system-packages-update)
+         ("C-c p r" . system-packages-uninstall)
+         ("C-c p o" . system-packages-remove-orphaned)
+         ("C-c p c" . system-packages-clean-cache)
+         ("C-c p l" . system-packages-log)
+         ("C-c p s" . system-packages-search)
+         ("C-c p g" . system-packages-get-info)
+         ("C-c p d" . system-packages-list-dependencies-of)
+         ("C-c p f" . system-packages-list-files-provided-by)
+         ("C-c p p" . system-packages-list-installed-packages)
+         ("C-c p f" . system-packages-verify-all-dependencies)
+         ("C-c p v" . system-packages-verify-all-packages)))
+
+(setq exwm-workspace-number 3)
+
+(setq exwm-randr-workspace-output-plist '(0 "LVDS1"
+                                          0 "eDP1"
+                                          0 "DP2-2"
+                                          1 "DP2-1"
+                                          2 "DP2-3"))
+
+(setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
+                                    floating-mode-line nil
+                                    border-width 0
+                                    workspace 0
+                                    floating t)
+                                   ((string= exwm-instance-name "telegram-desktop")
+                                    workspace 2)
+                                   ((string= exwm-class-name "discord")
+                                    workspace 1)
+                                   ((string= exwm-title "Event Tester")
+                                    floating-mode-line nil
+                                    floating t)))
+
+(setq exwm-workspace-index-map
+      (lambda (index)
+        (let ((named-workspaces ["1" "2" "3"]))
+          (if (< index (length named-workspaces))
+              (elt named-workspaces index)
+            (number-to-string index)))))
+
+(defun farl-exwm/workspace-0 ()
+  "Switch to EXWM workspace 0."
+  (interactive)
+  (exwm-workspace-switch-create 0))
+
+(defun farl-exwm/workspace-1 ()
+  "Switch to EXWM workspace 1."
+  (interactive)
+  (exwm-workspace-switch-create 1))
+
+(defun farl-exwm/workspace-2 ()
+  "Switch to EXWM workspace 2."
+  (interactive)
+  (exwm-workspace-switch-create 2))
+
+(defun farl-exwm/move-window-0 ()
+  "Move the currently focused window to workspace 0."
+  (interactive)
+  (exwm-workspace-move-window 0))
+
+(defun farl-exwm/move-window-1 ()
+  "Move the currently focused window to workspace 1."
+  (interactive)
+  (exwm-workspace-move-window 1))
+
+(defun farl-exwm/move-window-2 ()
+  "Move the currently focused window to workspace 2."
+  (interactive)
+  (exwm-workspace-move-window 2))
+
+(defun get-connected-monitors ()
+  "Return a list of the currently connected monitors."
+  (split-string (shell-command-to-string (concat "xrandr | "
+                                                 "grep ' connected ' | "
+                                                 "awk '{print $1}'"))))
+
+(defun display-setup-x230 ()
+  "Set up the connected monitors on a ThinkPad X230."
+  (let ((monitors (get-connected-monitors))
+        (possible '("LVDS1"
+                    "VGA1"))
+        (command "xrandr "))
+    (dolist (monitor possible)
+      (if (member monitor monitors)
+          (setq command (concat command "--output " monitor
+                                " --mode 1366x768 --pos 0x0 "))
+        (setq command (concat command "--output " monitor " --off "))))
+    (shell-command command)))
+
+(defun display-setup-w541 ()
+  "Set up the connected monitors on a ThinkPad W541."
+  (let* ((connected-monitors (get-connected-monitors))
+         (docked-p (member "DP2-1" connected-monitors))
+         (possible-monitors '("eDP1"
+                              "VGA1"
+                              "DP2-1"
+                              "DP2-2"
+                              "DP2-3"))
+         (command "xrandr "))
+    (dolist (monitor possible-monitors)
+      (if (and (member monitor connected-monitors)
+               (not (and docked-p (string= "eDP1" monitor))))
+          (let ((output (concat "--output " monitor " "))
+                (primary (when (is-primary monitor)
+                           "--primary "))
+                (mode (concat "--mode " (if (string= "eDP1" monitor)
+                                            "2880x1620 "
+                                          "1920x1080 ")))
+                (scale (when (string-match-p "DP2" monitor)
+                         "--scale-from 2880x1620 "))
+                (rotate (if (string= "DP2-1" monitor)
+                            "--rotate left "
+                          (if (string= "DP2-3" monitor)
+                              "--rotate right ")))
+                (pos (concat "--pos " (if (string-match-p "1" monitor)
+                                          "0x0 "
+                                        (if (string= monitor "DP2-2")
+                                            "1620x0 "
+                                          "4500x0 ")))))
+            (setq command (concat command output primary
+                                  mode scale rotate pos)))
+        (setq command (concat command "--output " monitor " --off "))))
+    command))
+
+(setq exwm-floating-border-width 3
+      exwm-floating-border-color (face-attribute 'mode-line :background))
+
+(defun run-gimp ()
+  "Start GIMP."
+  (interactive)
+  (start-process-shell-command
+   "GIMP" nil "gimp"))
+
+(defun run-steam ()
+  "Start Steam."
+  (interactive)
+  (start-process-shell-command
+   "Steam" nil "steam"))
+
+(defun run-firefox ()
+  "Start Firefox."
+  (interactive)
+  (start-process-shell-command
+   "Firefox" nil "firefox"))
+
+(defun run-discord ()
+  "Start Discord."
+  (interactive)
+  (start-process-shell-command
+   "Discord" nil "discord"))
+
+(defun run-telegram ()
+  "Start Telegram."
+  (interactive)
+  (start-process-shell-command
+   "Telegram" nil "telegram-desktop"))
+
+(defun run-musescore ()
+  "Start MuseScore."
+  (interactive)
+  (start-process-shell-command
+   "MuseScore" nil "musescore"))
+
+(defun run-libreoffice ()
+  "Start LibreOffice."
+  (interactive)
+  (start-process-shell-command
+   "LibreOffice" nil "libreoffice"))
+
+(defun run-transmission ()
+  "Start Transmission."
+  (interactive)
+  (start-process-shell-command
+   "Transmission" nil "transmission-gtk"))
 
 (use-package desktop-environment
   :ensure t
@@ -334,236 +557,6 @@
               "--timepos=200:125 --datepos=200:215 --wrongpos=200:155 --locktext='' "
               "--lockfailedtext='' --noinputtext='' --radius 1 --ring-width 1 "
               " --veriftext='' --wrongtext='WRONG' --force-clock"))
-
-(use-package system-packages
-  :ensure t
-  :defer t
-  :init
-  (when (executable-find "yay")
-    (require 'system-packages)
-    (add-to-list 'system-packages-supported-package-managers
-                 '(yay .
-                       ((default-sudo . nil)
-                        (install . "yay -S")
-                        (search . "yay -Ss")
-                        (uninstall . "yay -Rs")
-                        (update . "yay -Syu")
-                        (clean-cache . "yay -Sc")
-                        (log . "car /var/log/pacman.log")
-                        (get-info . "yay -Qi")
-                        (get-info-remote . "yay -Si")
-                        (list-files-provided-by . "yay -Ql")
-                        (verify-all-packages . "yay -Qkk")
-                        (verify-all-dependencies . "yay -Dk")
-                        (remove-orphaned . "yay -Rns $(yay -Qtdq)")
-                        (list-installed-packages . "yay -Qe")
-                        (list-installed-packages-all . "yay -Q")
-                        (list-dependencies-of . "yay -Qi")
-                        (noconfirm . "--noconfirm"))))
-    (setq system-packages-use-sudo nil
-          system-packages-package-manager 'yay))
-  :bind (("C-c p i" . system-packages-install)
-         ("C-c p e" . system-packages-ensure)
-         ("C-c p u" . system-packages-update)
-         ("C-c p r" . system-packages-uninstall)
-         ("C-c p o" . system-packages-remove-orphaned)
-         ("C-c p c" . system-packages-clean-cache)
-         ("C-c p l" . system-packages-log)
-         ("C-c p s" . system-packages-search)
-         ("C-c p g" . system-packages-get-info)
-         ("C-c p d" . system-packages-list-dependencies-of)
-         ("C-c p f" . system-packages-list-files-provided-by)
-         ("C-c p p" . system-packages-list-installed-packages)
-         ("C-c p f" . system-packages-verify-all-dependencies)
-         ("C-c p v" . system-packages-verify-all-packages)))
-
-(setq exwm-workspace-number 3
-      exwm-workspace-index-map (lambda (index)
-                                 (let ((named-workspaces ["1" "2" "3"]))
-                                   (if (< index (length named-workspaces))
-                                       (elt named-workspaces index)
-                                     (number-to-string index))))
-      exwm-randr-workspace-output-plist '(0 "LVDS1"
-                                          0 "VGA1"
-                                          0 "eDP1"
-                                          0 "DP2-2"
-                                          1 "DP2-1"
-                                          2 "DP2-3")
-      exwm-manage-configurations '(((string= exwm-class-name "Steam")
-                                    floating-mode-line nil
-                                    workspace 0
-                                    floating t)
-                                   ((string= exwm-instance-name "telegram-desktop")
-                                    workspace 2)
-                                   ((string= exwm-class-name "discord")
-                                    workspace 1)
-                                   ((string= exwm-title "Event Tester")
-                                    floating-mode-line nil
-                                    floating t)))
-
-(defun farl-exwm/workspace-0 ()
-  "Switch to EXWM workspace 0."
-  (interactive)
-  (exwm-workspace-switch-create 0))
-
-(defun farl-exwm/workspace-1 ()
-  "Switch to EXWM workspace 1."
-  (interactive)
-  (exwm-workspace-switch-create 1))
-
-(defun farl-exwm/workspace-2 ()
-  "Switch to EXWM workspace 2."
-  (interactive)
-  (exwm-workspace-switch-create 2))
-
-(defun farl-exwm/move-window-0 ()
-  "Move the currently focused window to workspace 0."
-  (interactive)
-  (exwm-workspace-move-window 0))
-
-(defun farl-exwm/move-window-1 ()
-  "Move the currently focused window to workspace 1."
-  (interactive)
-  (exwm-workspace-move-window 1))
-
-(defun farl-exwm/move-window-2 ()
-  "Move the currently focused window to workspace 2."
-  (interactive)
-  (exwm-workspace-move-window 2))
-
-(defun display-and-dock-setup ()
-  "Configure monitors and peripherals."
-  (interactive)
-  ;; Monitors (works on both my X230 and my W541)
-  ;; Don't do if `arandr' is running
-  (unless (= 0 (shell-command "pgrep arandr"))
-    (let* ((monitors (split-string
-                      (shell-command-to-string
-                       "xrandr | grep ' connected' | awk '{print $1}'")))
-           (possible (if (member "LVDS1" monitors)
-                         '("LVDS1" "VGA1")
-                       '("eDP1" "DP2-1" "DP2-2" "DP2-3" "VGA1")))
-           (command "xrandr "))
-      (dolist (monitor possible)
-        (if (and (member monitor monitors)
-                 (not (and (string= monitor "eDP1")
-                           (member "DP2-1" monitors))))
-            (let* ((output (concat "--output " monitor " "))
-                   (primary (when (or (string= monitor "LVDS1")
-                                      (string= monitor "eDP1")
-                                      (string= monitor "DP2-2"))
-                              "--primary "))
-                   (rate (when (string= monitor "DP2-2")
-                           "--rate 75 "))
-                   (res (concat "--mode " (if (or (string= monitor "LVDS1")
-                                                  (and (string= monitor "VGA1")
-                                                       (member "LVDS1" possible)))
-                                              "1366x768 "
-                                            "1920x1080 ")))
-                   (rotate (when (or (string= monitor "DP2-1")
-                                     (string= monitor "DP2-3"))
-                             (concat "--rotate " (if (string= monitor "DP2-1")
-                                                     "left "
-                                                   "right "))))
-                   (pos (concat "--pos " (if (not (or (string= monitor "DP2-2")
-                                                      (string= monitor "DP2-3")))
-                                             "0x0 "
-                                           (if (string= monitor "DP2-2")
-                                               "1080x0 "
-                                             "3000x0 ")))))
-              (setq command (concat command output primary rate res rotate pos)))
-          (setq command (concat command "--output " monitor " --off "))))
-      (start-process-shell-command
-       "Display Setup" nil command)
-      command))
-  ;; Disable trackpad
-  (start-process-shell-command
-   "Disable trackpad" nil (concat "xinput disable $(xinput list | "
-                                "grep Synaptics | head -n 1 | "
-                                "sed -r 's/.*id=([0-9]+).*/\\1/')"))
-  ;; Configure trackball
-  (let* ((trackball-id (shell-command-to-string
-                        (concat "sleep 2 && "
-                                "xinput | grep ELECOM | head -n 1 | sed -r "
-                                "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
-    (dolist (command '("'libinput Button Scrolling Button' 10"
-                       "'libinput Scroll Method Enabled' 0 0 1"))
-      (start-process-shell-command
-       "Trackball Setup" nil (concat "sleep 2 && xinput set-button-map " trackball-id
-                                     "1 2 3 4 5 6 7 8 9 2 1 2"))))
-  ;; Keyboard
-  (start-process-shell-command
-   "Keyboard Setup" nil "sleep 2 && setxkbmap -option ctrl:nocaps"))
-
-(add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
-(exwm-randr-enable)
-
-(use-package exwm-mff
-  :ensure t
-  :defer t
-  :hook (exwm-init . exwm-mff-mode))
-
-(setq exwm-floating-border-width 3
-      exwm-floating-border-color (face-attribute 'mode-line :background))
-
-(add-hook 'exwm-update-title-hook
-          (lambda () (exwm-workspace-rename-buffer exwm-title)))
-
-(setenv "_JAVA_AWT_WM_NONREPARENTING" "1")
-
-(use-package exwm-edit
-  :ensure t
-  :defer t
-  :init
-  (require 'exwm-edit))
-
-(defun run-gimp ()
-  "Start GIMP."
-  (interactive)
-  (start-process-shell-command
-   "GIMP" nil "gimp"))
-
-(defun run-steam ()
-  "Start Steam."
-  (interactive)
-  (start-process-shell-command
-   "Steam" nil "steam"))
-
-(defun run-firefox ()
-  "Start Firefox."
-  (interactive)
-  (start-process-shell-command
-   "Firefox" nil "firefox"))
-
-(defun run-discord ()
-  "Start Discord."
-  (interactive)
-  (start-process-shell-command
-   "Discord" nil "discord"))
-
-(defun run-telegram ()
-  "Start Telegram."
-  (interactive)
-  (start-process-shell-command
-   "Telegram" nil "telegram-desktop"))
-
-(defun run-musescore ()
-  "Start MuseScore."
-  (interactive)
-  (start-process-shell-command
-   "MuseScore" nil "musescore"))
-
-(defun run-libreoffice ()
-  "Start LibreOffice."
-  (interactive)
-  (start-process-shell-command
-   "LibreOffice" nil "libreoffice"))
-
-(defun run-transmission ()
-  "Start Transmission."
-  (interactive)
-  (start-process-shell-command
-   "Transmission" nil "transmission-gtk"))
 
 (defun monitor-settings ()
   "Open arandr to configure monitors."
@@ -1065,7 +1058,7 @@ Instead of just killing Emacs, shuts down the system."
 (defun kill-this-buffer-and-window ()
   "Kill the current buffer and delete the selected window.
 
-This function has been altered to accommodate EXWM."
+This function has been altered to accommodate `exwm-mode'."
   (interactive)
   (let ((window-to-delete (selected-window))
         (buffer-to-kill (current-buffer))
