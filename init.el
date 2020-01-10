@@ -19,8 +19,6 @@
 (setq use-dialog-box nil
       use-file-dialog nil)
 
-(setq custom-file "/dev/null")
-
 (setq load-prefer-newer t)
 
 (setq-default apropos-do-all t)
@@ -46,7 +44,8 @@
 
 (add-hook 'emacs-startup-hook 'startup/reset-gc)
 
-(setq package-selected-packages '(async use-package auto-package-update dashboard
+(setq custom-file "/dev/null"
+      package-selected-packages '(async use-package auto-package-update dashboard
                                   leuven-theme spaceline diminish rainbow-mode
                                   rainbow-delimiters exwm dmenu desktop-environment
                                   system-packages exwm-mff exwm-edit emms
@@ -791,43 +790,44 @@ Instead of just killing Emacs, shuts down the system."
 
 (setq exwm-input-global-keys
       `(;; Switching workspace focus
-	([?\s-q] . exwm-workspace-swap)
-	([?\s-w] . exwm-workspace-switch)
-	([?\s-e] . exwm-workspace-move-window)
-	,@(mapcar
-	   (lambda (i)
-	     `(,(kbd (format "s-%d" (% (+ i 1) 10))) .
-	       (lambda ()
-		 (interactive)
-		 (exwm-workspace-switch-create ,i))))
-	   (number-sequence 0 9))
+        ([?\s-q] . exwm-workspace-swap)
+        ([?\s-w] . exwm-workspace-switch)
+        ([?\s-e] . exwm-workspace-move-window)
+        ,@(mapcar
+           (lambda (i)
+             `(,(kbd (format "s-%d" (% (+ i 1) 10))) .
+               (lambda ()
+                 (interactive)
+                 (exwm-workspace-switch-create ,i))))
+           (number-sequence 0 9))
 
-	;; Opening X applications
-	([?\s-g]    . run-gimp)
-	([?\s-s]    . run-steam)
-	([?\s-f]    . run-firefox)
-	([?\s-d]    . run-discord)
-	([?\s-t]    . run-telegram)
-	([?\s-m]    . run-musescore)
-	([?\s-b]    . run-libreoffice)
-	([?\s-o]    . run-transmission)
-	([?\s-r]    . monitor-settings)
-	([?\s-n]    . network-settings)
-	([?\s-v]    . volume-settings)
-	([s-return] . vterm)
+        ;; Opening X applications
+        ([?\s-g]    . run-gimp)
+        ([?\s-s]    . run-steam)
+        ([?\s-f]    . run-firefox)
+        ([?\s-d]    . run-discord)
+        ([?\s-t]    . run-telegram)
+        ([?\s-m]    . run-musescore)
+        ([?\s-b]    . run-libreoffice)
+        ([?\s-o]    . run-transmission)
+        ([?\s-r]    . monitor-settings)
+        ([?\s-n]    . network-settings)
+        ([?\s-v]    . volume-settings)
+        ([s-return] . vterm)
+        ([XF86Calculator] . calc)
 
-	;; Other desktop environment things
-	([?\s-x]       . dmenu)
-	([menu]        . smex)
-	([?\s- ]       . cycle-keyboard-layout)
-	([s-backspace] . cycle-keyboard-layout-reverse)
-	([s-tab]       . audio-loopback)
+        ;; Other desktop environment things
+        ([?\s-x]       . dmenu)
+        ([menu]        . smex)
+        ([?\s- ]       . cycle-keyboard-layout)
+        ([s-backspace] . cycle-keyboard-layout-reverse)
+        ([s-tab]       . audio-loopback)
 
-	;; Controlling EMMS
-	([XF86AudioNext] . emms-next)
-	([XF86AudioPrev] . emms-previous)
-	([XF86AudioPlay] . emms-pause)
-	([XF86AudioStop] . emms-stop)))
+        ;; Controlling EMMS
+        ([XF86AudioNext] . emms-next)
+        ([XF86AudioPrev] . emms-previous)
+        ([XF86AudioPlay] . emms-pause)
+        ([XF86AudioStop] . emms-stop)))
 
 (setq exwm-input-simulation-keys
       '(;; Navigation

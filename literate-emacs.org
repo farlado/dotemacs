@@ -149,12 +149,6 @@ I want to get GUI elements out of my face as soon as I possibly can. They just t
         use-file-dialog nil)
 #+END_SRC
 
-*** Disable customize
-I /hate/ ~customize~. I configure everything in this file, so I don't need anything messing with my ~init.el~, much less changing settings on me.
-#+BEGIN_SRC emacs-lisp
-  (setq custom-file "/dev/null")
-#+END_SRC
-
 *** Load newest bytecode
 Always prefer the newest files when loading.
 #+BEGIN_SRC emacs-lisp
@@ -199,10 +193,11 @@ Garbage collection shouldn't happen during startup, as that will slow Emacs down
 ** Package management
 Because I am writing this configuration to be as portable as possible (e.g. I should be able to dump this onto any machine and run it), I manage all packages through Emacs.
 
-*** Protect packages from ~package-autoremove~
-Since I do not use ~customize~ but really like protecting packages used in my configuration from ~package-autoremove~, I need to still set ~package-selected-packages~ so that it'll work. Packages are listed in the order in which they are installed.
+*** Disable ~customize~, keep ~package-autoremove~ working
+I /hate/ ~customize~. I configure everything in this file, so I don't need anything messing with my ~init.el~, much less changing settings on me. Even though I do not use ~customize~ but really like protecting packages used in my configuration from ~package-autoremove~, I need to still set ~package-selected-packages~ so that it'll work. Packages are listed in the order in which they are installed.
 #+BEGIN_SRC emacs-lisp
-  (setq package-selected-packages '(async use-package auto-package-update dashboard
+  (setq custom-file "/dev/null"
+        package-selected-packages '(async use-package auto-package-update dashboard
                                     leuven-theme spaceline diminish rainbow-mode
                                     rainbow-delimiters exwm dmenu desktop-environment
                                     system-packages exwm-mff exwm-edit emms
@@ -214,7 +209,7 @@ Since I do not use ~customize~ but really like protecting packages used in my co
                                     yahtzee sudoku chess 2048-game))
 #+END_SRC
 
-*** Disable an annoying customize function
+*** Disable an annoying ~customize~ function
 Since I don't use ~customize~, we don't need to mess with it every time a package is installed or uninstalled. Because of this, I need to first load everything related to package management.
 #+BEGIN_SRC emacs-lisp
   (require 'package)
@@ -1220,44 +1215,45 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
 Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into this area.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-global-keys
-	`(;; Switching workspace focus
-	  ([?\s-q] . exwm-workspace-swap)
-	  ([?\s-w] . exwm-workspace-switch)
-	  ([?\s-e] . exwm-workspace-move-window)
-	  ,@(mapcar
-	     (lambda (i)
-	       `(,(kbd (format "s-%d" (% (+ i 1) 10))) .
-		 (lambda ()
-		   (interactive)
-		   (exwm-workspace-switch-create ,i))))
-	     (number-sequence 0 9))
+        `(;; Switching workspace focus
+          ([?\s-q] . exwm-workspace-swap)
+          ([?\s-w] . exwm-workspace-switch)
+          ([?\s-e] . exwm-workspace-move-window)
+          ,@(mapcar
+             (lambda (i)
+               `(,(kbd (format "s-%d" (% (+ i 1) 10))) .
+                 (lambda ()
+                   (interactive)
+                   (exwm-workspace-switch-create ,i))))
+             (number-sequence 0 9))
 
-	  ;; Opening X applications
-	  ([?\s-g]    . run-gimp)
-	  ([?\s-s]    . run-steam)
-	  ([?\s-f]    . run-firefox)
-	  ([?\s-d]    . run-discord)
-	  ([?\s-t]    . run-telegram)
-	  ([?\s-m]    . run-musescore)
-	  ([?\s-b]    . run-libreoffice)
-	  ([?\s-o]    . run-transmission)
-	  ([?\s-r]    . monitor-settings)
-	  ([?\s-n]    . network-settings)
-	  ([?\s-v]    . volume-settings)
-	  ([s-return] . vterm)
+          ;; Opening X applications
+          ([?\s-g]    . run-gimp)
+          ([?\s-s]    . run-steam)
+          ([?\s-f]    . run-firefox)
+          ([?\s-d]    . run-discord)
+          ([?\s-t]    . run-telegram)
+          ([?\s-m]    . run-musescore)
+          ([?\s-b]    . run-libreoffice)
+          ([?\s-o]    . run-transmission)
+          ([?\s-r]    . monitor-settings)
+          ([?\s-n]    . network-settings)
+          ([?\s-v]    . volume-settings)
+          ([s-return] . vterm)
+          ([XF86Calculator] . calc)
 
-	  ;; Other desktop environment things
-	  ([?\s-x]       . dmenu)
-	  ([menu]        . smex)
-	  ([?\s- ]       . cycle-keyboard-layout)
-	  ([s-backspace] . cycle-keyboard-layout-reverse)
-	  ([s-tab]       . audio-loopback)
+          ;; Other desktop environment things
+          ([?\s-x]       . dmenu)
+          ([menu]        . smex)
+          ([?\s- ]       . cycle-keyboard-layout)
+          ([s-backspace] . cycle-keyboard-layout-reverse)
+          ([s-tab]       . audio-loopback)
 
-	  ;; Controlling EMMS
-	  ([XF86AudioNext] . emms-next)
-	  ([XF86AudioPrev] . emms-previous)
-	  ([XF86AudioPlay] . emms-pause)
-	  ([XF86AudioStop] . emms-stop)))
+          ;; Controlling EMMS
+          ([XF86AudioNext] . emms-next)
+          ([XF86AudioPrev] . emms-previous)
+          ([XF86AudioPlay] . emms-pause)
+          ([XF86AudioStop] . emms-stop)))
 #+END_SRC
 
 *** Emacs key bindings in X windows
