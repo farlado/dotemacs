@@ -292,8 +292,7 @@
 
 (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
                                     floating-mode-line nil
-                                    workspace 9
-                                    floating t)
+                                    workspace 9)
                                    ((string= exwm-instance-name "telegram-desktop")
                                     workspace 8)
                                    ((string= exwm-class-name "discord")

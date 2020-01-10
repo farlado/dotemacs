@@ -583,8 +583,7 @@ This contains multiple assignments for the same workspace because of the differe
 #+BEGIN_SRC emacs-lisp
   (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
                                       floating-mode-line nil
-                                      workspace 9
-                                      floating t)
+                                      workspace 9)
                                      ((string= exwm-instance-name "telegram-desktop")
                                       workspace 8)
                                      ((string= exwm-class-name "discord")
@@ -1143,7 +1142,7 @@ Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
 #+END_SRC
 
 *** Steam
-Gaming is possible with EXWM, if you run games windowed.
+Gaming is possible with EXWM, if you run games windowed. I used to run it floating, but honestly just having it tile is so much easier to manage.
 #+BEGIN_SRC emacs-lisp
   (defun run-steam ()
     "Start Steam."
