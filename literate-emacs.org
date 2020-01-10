@@ -5,19 +5,23 @@
 #+PROPERTY: header-args :tangle (concat user-emacs-directory "init.el")
 
 #+BEGIN_QUOTE
-I use Emacs, which might be thought of as a thermonuclear word processor. -- Neal Stephenson, /In the Beginning... was the Command Line/
+I use Emacs, which might be thought of as a thermonuclear word processor.
+-- Neal Stephenson, /In the Beginning... was the Command Line/
 #+END_QUOTE
 
 #+BEGIN_QUOTE
-Overall, I think text editing is a solved problem. Text editors are like wine. The older the better. You do not want a shiny new text editor. You want the text editor that has been around long enough and used by enough geeks that every conceivable pattern of manipulating symbols on the screen has been thought of, and crystallized into a re-usable pack. -- [[https://blog.vivekhaldar.com/post/31970017734/new-frontiers-in-text-editing][Vivek Haldar]]
+Overall, I think text editing is a solved problem. Text editors are like wine. The older the better. You do not want a shiny new text editor. You want the text editor that has been around long enough and used by enough geeks that every conceivable pattern of manipulating symbols on the screen has been thought of, and crystallized into a re-usable pack.
+-- [[https://blog.vivekhaldar.com/post/31970017734/new-frontiers-in-text-editing][Vivek Haldar]]
 #+END_QUOTE
 
 #+BEGIN_QUOTE
-Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his workshop, I feel a realm of possibility open before me. I feel the comfort of an environment that has evolved over time to fit me perfectly – an assortment of packages and keybindings which help me bring ideas to life day after day. -- [[https://www.braveclojure.com/basic-emacs/][Daniel Higginbotham]]
+Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his workshop, I feel a realm of possibility open before me. I feel the comfort of an environment that has evolved over time to fit me perfectly – an assortment of packages and keybindings which help me bring ideas to life day after day.
+-- [[https://www.braveclojure.com/basic-emacs/][Daniel Higginbotham]]
 #+END_QUOTE
 
 #+BEGIN_QUOTE
-an infinite number of monkeys typing into GNU emacs would never make a good program -- [[https://www.kernel.org/doc/html/v4.10/process/coding-style.html][Linus Torvalds]]
+an infinite number of monkeys typing into GNU emacs would never make a good program
+-- [[https://www.kernel.org/doc/html/v4.10/process/coding-style.html][Linus Torvalds]]
 #+END_QUOTE
 
 * About this configuration
