@@ -123,10 +123,7 @@
                           "sort -n | head -n 1")))
               (/ (display-pixel-width) (display-screens))))
        (size (if (<= res 1366) 100
-               (if (<= res 1920) 140
-                 (if (<= res 2560) 160
-                   (if (<= res 3840) 180
-                     200))))))
+               180)))
   (set-face-attribute 'default nil :height size))
 
 (when (and (member "Noto Color Emoji" (font-family-list))
@@ -255,6 +252,9 @@
   (require 'exwm-systemtray)
   (setenv "_JAVA_AWT_WM_NONREPARENTING" "1"))
 
+(setq exwm-floating-border-width 3
+      exwm-floating-border-color (face-attribute 'mode-line :background))
+
 (defun farl-exwm/name-buffer-after-window-title ()
   "Rename the current `exwm-mode' buffer after the X window's title."
   (exwm-workspace-rename-buffer exwm-title))
@@ -275,6 +275,132 @@
 (use-package dmenu
   :ensure t
   :defer t)
+
+(setq exwm-workspace-number 10)
+
+(setq exwm-randr-workspace-output-plist '(0 "LVDS1"
+                                          0 "eDP1"
+                                          0 "DP2-2"
+                                          1 "DP2-1"
+                                          2 "DP2-3"
+                                          3 "DP2-2"
+                                          4 "DP2-1"
+                                          5 "DP2-3"
+                                          6 "DP2-2"
+                                          7 "DP2-1"
+                                          8 "DP2-3"
+                                          9 "DP2-2"))
+
+(setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
+                                    floating-mode-line nil
+                                    workspace 9
+                                    floating t)
+                                   ((string= exwm-instance-name "telegram-desktop")
+                                    workspace 8)
+                                   ((string= exwm-class-name "discord")
+                                    workspace 7)
+                                   ((or (string= exwm-class-name "libreoffice")
+                                        (string= exwm-class-name "MuseScore3")
+                                        (string= exwm-class-name "gimp"))
+                                    workspace 6)
+                                   ((string= exwm-title "Event Tester")
+                                    floating-mode-line nil
+                                    floating t)))
+
+(setq exwm-workspace-index-map
+      (lambda (index)
+        (let ((named-workspaces ["1" "2" "3" "4" "5" "6"
+                                 "office" "discord"
+                                 "telegram" "games"]))
+          (if (< index (length named-workspaces))
+              (elt named-workspaces index)
+            (number-to-string index)))))
+
+(defun get-connected-monitors ()
+  "Return a list of the currently connected monitors."
+  (split-string (shell-command-to-string (concat "xrandr | "
+                                                 "grep ' connected ' | "
+                                                 "awk '{print $1}'"))))
+
+(defun display-setup-x230 ()
+  "Set up the connected monitors on a ThinkPad X230."
+  (let ((monitors (get-connected-monitors))
+        (possible '("LVDS1"
+                    "VGA1"))
+        (command "xrandr "))
+    (dolist (monitor possible)
+      (if (member monitor monitors)
+          (setq command (concat command "--output " monitor
+                                " --mode 1366x768 --pos 0x0 "))
+        (setq command (concat command "--output " monitor " --off "))))
+    (shell-command-to-string command)))
+
+(defun display-setup-w541 ()
+  "Set up the connected monitors on a ThinkPad W541."
+  (let* ((connected-monitors (get-connected-monitors))
+         (docked-p (member "DP2-1" connected-monitors))
+         (possible-monitors '("eDP1"
+                              "VGA1"
+                              "DP2-1"
+                              "DP2-2"
+                              "DP2-3"))
+         (command "xrandr "))
+    (dolist (monitor possible-monitors)
+      (if (and (member monitor connected-monitors)
+               (not (and docked-p (string= "eDP1" monitor))))
+          (let ((output (concat "--output " monitor " "))
+                (primary (when (or (string= "DP2-2" monitor)
+                                   (string= "eDP1" monitor))
+                           "--primary "))
+                (mode (concat "--mode " (if (string= "eDP1" monitor)
+                                            "2880x1620 "
+                                          "1920x1080 ")))
+                (scale (when (string-match-p "DP2" monitor)
+                         "--scale-from 2880x1620 "))
+                (rotate (if (string= "DP2-1" monitor)
+                            "--rotate left "
+                          (if (string= "DP2-3" monitor)
+                              "--rotate right ")))
+                (pos (concat "--pos " (if (string-match-p "1" monitor)
+                                          "0x0 "
+                                        (if (string= monitor "DP2-2")
+                                            "1620x0 "
+                                          "4500x0 ")))))
+            (shell-command (concat "xrandr " output primary
+                                   mode scale rotate pos)))
+        (shell-command (concat "xrandr --output " monitor " --off "))))))
+;
+
+(defun peripheral-setup ()
+  "Configure peripherals I connect to my dock."
+  ;; Trackball
+  (let ((trackball-id (shell-command-to-string
+                       (concat "xinput | grep ELECOM | head -n 1 | sed -r "
+                               "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
+    (dolist (command '("'libinput Button Scrolling Button' 10"
+                       "'libinput Scroll Method Enabled' 0 0 1"))
+      (start-process-shell-command
+       "Trackball Setup" nil (concat "xinput set-prop "
+                                     trackball-id
+                                     command)))
+    (start-process-shell-command
+     "Trackball Setup" nil (concat "xinput set-button-map "
+                                   trackball-id
+                                   "1 2 3 4 5 6 7 8 9 2 1 2")))
+  ;; Keyboard
+  (start-process-shell-command
+   "Keyboard Setup" nil "setxkbmap -option ctrl:nocaps"))
+
+(defun display-and-dock-setup ()
+  "Configure displays and dock if applicable."
+  (interactive)
+  (if (member "LVDS1" (get-connected-monitors))
+      (display-setup-x230)
+    (display-setup-w541)
+    (peripheral-setup)))
+
+(add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
+(exwm-randr-enable)
 
 (use-package system-packages
   :ensure t
@@ -317,170 +443,6 @@
          ("C-c p p" . system-packages-list-installed-packages)
          ("C-c p f" . system-packages-verify-all-dependencies)
          ("C-c p v" . system-packages-verify-all-packages)))
-
-(setq exwm-workspace-number 3)
-
-(setq exwm-randr-workspace-output-plist '(0 "LVDS1"
-                                          0 "eDP1"
-                                          0 "DP2-2"
-                                          1 "DP2-1"
-                                          2 "DP2-3"))
-
-(setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
-                                    floating-mode-line nil
-                                    border-width 0
-                                    workspace 0
-                                    floating t)
-                                   ((string= exwm-instance-name "telegram-desktop")
-                                    workspace 2)
-                                   ((string= exwm-class-name "discord")
-                                    workspace 1)
-                                   ((string= exwm-title "Event Tester")
-                                    floating-mode-line nil
-                                    floating t)))
-
-(setq exwm-workspace-index-map
-      (lambda (index)
-        (let ((named-workspaces ["1" "2" "3"]))
-          (if (< index (length named-workspaces))
-              (elt named-workspaces index)
-            (number-to-string index)))))
-
-(defun farl-exwm/workspace-0 ()
-  "Switch to EXWM workspace 0."
-  (interactive)
-  (exwm-workspace-switch-create 0))
-
-(defun farl-exwm/workspace-1 ()
-  "Switch to EXWM workspace 1."
-  (interactive)
-  (exwm-workspace-switch-create 1))
-
-(defun farl-exwm/workspace-2 ()
-  "Switch to EXWM workspace 2."
-  (interactive)
-  (exwm-workspace-switch-create 2))
-
-(defun farl-exwm/move-window-0 ()
-  "Move the currently focused window to workspace 0."
-  (interactive)
-  (exwm-workspace-move-window 0))
-
-(defun farl-exwm/move-window-1 ()
-  "Move the currently focused window to workspace 1."
-  (interactive)
-  (exwm-workspace-move-window 1))
-
-(defun farl-exwm/move-window-2 ()
-  "Move the currently focused window to workspace 2."
-  (interactive)
-  (exwm-workspace-move-window 2))
-
-(defun get-connected-monitors ()
-  "Return a list of the currently connected monitors."
-  (split-string (shell-command-to-string (concat "xrandr | "
-                                                 "grep ' connected ' | "
-                                                 "awk '{print $1}'"))))
-
-(defun display-setup-x230 ()
-  "Set up the connected monitors on a ThinkPad X230."
-  (let ((monitors (get-connected-monitors))
-        (possible '("LVDS1"
-                    "VGA1"))
-        (command "xrandr "))
-    (dolist (monitor possible)
-      (if (member monitor monitors)
-          (setq command (concat command "--output " monitor
-                                " --mode 1366x768 --pos 0x0 "))
-        (setq command (concat command "--output " monitor " --off "))))
-    (shell-command command)))
-
-(defun display-setup-w541 ()
-  "Set up the connected monitors on a ThinkPad W541."
-  (let* ((connected-monitors (get-connected-monitors))
-         (docked-p (member "DP2-1" connected-monitors))
-         (possible-monitors '("eDP1"
-                              "VGA1"
-                              "DP2-1"
-                              "DP2-2"
-                              "DP2-3"))
-         (command "xrandr "))
-    (dolist (monitor possible-monitors)
-      (if (and (member monitor connected-monitors)
-               (not (and docked-p (string= "eDP1" monitor))))
-          (let ((output (concat "--output " monitor " "))
-                (primary (when (or (string= "DP2-2" monitor)
-                                   (string= "eDP1" monitor))
-                           "--primary "))
-                (mode (concat "--mode " (if (string= "eDP1" monitor)
-                                            "2880x1620 "
-                                          "1920x1080 ")))
-                (scale (when (string-match-p "DP2" monitor)
-                         "--scale-from 2880x1620 "))
-                (rotate (if (string= "DP2-1" monitor)
-                            "--rotate left "
-                          (if (string= "DP2-3" monitor)
-                              "--rotate right ")))
-                (pos (concat "--pos " (if (string-match-p "1" monitor)
-                                          "0x0 "
-                                        (if (string= monitor "DP2-2")
-                                            "1620x0 "
-                                          "4500x0 ")))))
-            (setq command (concat command output primary
-                                  mode scale rotate pos)))
-        (setq command (concat command "--output " monitor " --off "))))
-    (shell-command-to-string command)))
-
-(setq exwm-floating-border-width 3
-      exwm-floating-border-color (face-attribute 'mode-line :background))
-
-(defun run-gimp ()
-  "Start GIMP."
-  (interactive)
-  (start-process-shell-command
-   "GIMP" nil "gimp"))
-
-(defun run-steam ()
-  "Start Steam."
-  (interactive)
-  (start-process-shell-command
-   "Steam" nil "steam"))
-
-(defun run-firefox ()
-  "Start Firefox."
-  (interactive)
-  (start-process-shell-command
-   "Firefox" nil "firefox"))
-
-(defun run-discord ()
-  "Start Discord."
-  (interactive)
-  (start-process-shell-command
-   "Discord" nil "discord"))
-
-(defun run-telegram ()
-  "Start Telegram."
-  (interactive)
-  (start-process-shell-command
-   "Telegram" nil "telegram-desktop"))
-
-(defun run-musescore ()
-  "Start MuseScore."
-  (interactive)
-  (start-process-shell-command
-   "MuseScore" nil "musescore"))
-
-(defun run-libreoffice ()
-  "Start LibreOffice."
-  (interactive)
-  (start-process-shell-command
-   "LibreOffice" nil "libreoffice"))
-
-(defun run-transmission ()
-  "Start Transmission."
-  (interactive)
-  (start-process-shell-command
-   "Transmission" nil "transmission-gtk"))
 
 (use-package desktop-environment
   :ensure t
@@ -671,60 +633,6 @@ Set to nil to have one less keyboard layout."
 
 (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
 
-(defun save-buffers-shut-down (&optional arg)
-  "Offer to save each buffer, then shut down the computer.
-This function is literally just a copycat of `save-buffers-kill-emacs'.
-With prefix ARG, silently save all file-visiting buffers without asking.
-If there are active processes where `process-query-on-exit-flag'
-returns non-nil and `confirm-kill-processes' is non-nil,
-asks whether processes should be killed.
-Runs the members of `kill-emacs-query-functions' in turn and stops
-if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
-Instead of just killing Emacs, shuts down the system."
-  (interactive "P")
-  ;; Don't use save-some-buffers-default-predicate, because we want
-  ;; to ask about all the buffers before killing Emacs.
-  (save-some-buffers arg t)
-  (let ((confirm confirm-kill-emacs))
-    (and
-     (or (not (memq t (mapcar (function
-                               (lambda (buf) (and (buffer-file-name buf)
-                                                  (buffer-modified-p buf))))
-                              (buffer-list))))
-         (progn (setq confirm nil)
-                (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
-     (or (not (fboundp 'process-list))
-         ;; process-list is not defined on MSDOS.
-         (not confirm-kill-processes)
-         (let ((processes (process-list))
-               active)
-           (while processes
-             (and (memq (process-status (car processes)) '(run stop open listen))
-                  (process-query-on-exit-flag (car processes))
-                  (setq active t))
-             (setq processes (cdr processes)))
-           (or (not active)
-               (with-current-buffer-window
-                (get-buffer-create "*Process List*") nil
-                #'(lambda (window _value)
-                    (with-selected-window window
-                      (unwind-protect
-                          (progn
-                            (setq confirm nil)
-                            (yes-or-no-p (concat "Active processes exist; kill "
-                                                 "them and shut down anyway? ")))
-                        (when (window-live-p window)
-                          (quit-restore-window window 'kill)))))
-                (list-processes t)))))
-     ;; Query the user for other things, perhaps.
-     (run-hook-with-args-until-failure 'kill-emacs-query-functions)
-     (or (null confirm)
-         (funcall confirm "Really shut down? "))
-     (shell-command "shutdown now")
-     (kill-emacs))))
-
-(global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
-
 (defun save-buffers-reboot (&optional arg)
   "Offer to save each buffer, then shut down the computer.
 This function is literally just a copycat of `save-buffers-kill-emacs'.
@@ -779,43 +687,147 @@ Instead of just killing Emacs, shuts down the system."
 
 (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
 
+(defun save-buffers-shut-down (&optional arg)
+  "Offer to save each buffer, then shut down the computer.
+This function is literally just a copycat of `save-buffers-kill-emacs'.
+With prefix ARG, silently save all file-visiting buffers without asking.
+If there are active processes where `process-query-on-exit-flag'
+returns non-nil and `confirm-kill-processes' is non-nil,
+asks whether processes should be killed.
+Runs the members of `kill-emacs-query-functions' in turn and stops
+if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
+Instead of just killing Emacs, shuts down the system."
+  (interactive "P")
+  ;; Don't use save-some-buffers-default-predicate, because we want
+  ;; to ask about all the buffers before killing Emacs.
+  (save-some-buffers arg t)
+  (let ((confirm confirm-kill-emacs))
+    (and
+     (or (not (memq t (mapcar (function
+                               (lambda (buf) (and (buffer-file-name buf)
+                                                  (buffer-modified-p buf))))
+                              (buffer-list))))
+         (progn (setq confirm nil)
+                (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
+     (or (not (fboundp 'process-list))
+         ;; process-list is not defined on MSDOS.
+         (not confirm-kill-processes)
+         (let ((processes (process-list))
+               active)
+           (while processes
+             (and (memq (process-status (car processes)) '(run stop open listen))
+                  (process-query-on-exit-flag (car processes))
+                  (setq active t))
+             (setq processes (cdr processes)))
+           (or (not active)
+               (with-current-buffer-window
+                (get-buffer-create "*Process List*") nil
+                #'(lambda (window _value)
+                    (with-selected-window window
+                      (unwind-protect
+                          (progn
+                            (setq confirm nil)
+                            (yes-or-no-p (concat "Active processes exist; kill "
+                                                 "them and shut down anyway? ")))
+                        (when (window-live-p window)
+                          (quit-restore-window window 'kill)))))
+                (list-processes t)))))
+     ;; Query the user for other things, perhaps.
+     (run-hook-with-args-until-failure 'kill-emacs-query-functions)
+     (or (null confirm)
+         (funcall confirm "Really shut down? "))
+     (shell-command "shutdown now")
+     (kill-emacs))))
+
+(global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
+
+(defun run-gimp ()
+  "Start GIMP."
+  (interactive)
+  (start-process-shell-command
+   "GIMP" nil "gimp"))
+
+(defun run-steam ()
+  "Start Steam."
+  (interactive)
+  (start-process-shell-command
+   "Steam" nil "steam"))
+
+(defun run-firefox ()
+  "Start Firefox."
+  (interactive)
+  (start-process-shell-command
+   "Firefox" nil "firefox"))
+
+(defun run-discord ()
+  "Start Discord."
+  (interactive)
+  (start-process-shell-command
+   "Discord" nil "discord"))
+
+(defun run-telegram ()
+  "Start Telegram."
+  (interactive)
+  (start-process-shell-command
+   "Telegram" nil "telegram-desktop"))
+
+(defun run-musescore ()
+  "Start MuseScore."
+  (interactive)
+  (start-process-shell-command
+   "MuseScore" nil "musescore"))
+
+(defun run-libreoffice ()
+  "Start LibreOffice."
+  (interactive)
+  (start-process-shell-command
+   "LibreOffice" nil "libreoffice"))
+
+(defun run-transmission ()
+  "Start Transmission."
+  (interactive)
+  (start-process-shell-command
+   "Transmission" nil "transmission-gtk"))
+
 (setq exwm-input-global-keys
       `(;; Switching workspace focus
-        ([?\s-q] . farl-exwm/workspace-1)
-        ([?\s-w] . farl-exwm/workspace-0)
-        ([?\s-e] . farl-exwm/workspace-2)
+	([?\s-q] . exwm-workspace-swap)
+	([?\s-w] . exwm-workspace-switch)
+	([?\s-e] . exwm-workspace-move-window)
+	,@(mapcar
+	   (lambda (i)
+	     `(,(kbd (format "s-%d" (% (+ i 1) 10))) .
+	       (lambda ()
+		 (interactive)
+		 (exwm-workspace-switch-create ,i))))
+	   (number-sequence 0 9))
 
-        ;; Moving windows to workspaces
-        ([8388625] . farl-exwm/move-window-1) ; C-s-q
-        ([8388631] . farl-exwm/move-window-0) ; C-s-w
-        ([8388613] . farl-exwm/move-window-2) ; C-s-e
+	;; Opening X applications
+	([?\s-g]    . run-gimp)
+	([?\s-s]    . run-steam)
+	([?\s-f]    . run-firefox)
+	([?\s-d]    . run-discord)
+	([?\s-t]    . run-telegram)
+	([?\s-m]    . run-musescore)
+	([?\s-b]    . run-libreoffice)
+	([?\s-o]    . run-transmission)
+	([?\s-r]    . monitor-settings)
+	([?\s-n]    . network-settings)
+	([?\s-v]    . volume-settings)
+	([s-return] . vterm)
 
-        ;; Opening X applications
-        ([?\s-g]    . run-gimp)
-        ([?\s-s]    . run-steam)
-        ([?\s-f]    . run-firefox)
-        ([?\s-d]    . run-discord)
-        ([?\s-t]    . run-telegram)
-        ([?\s-m]    . run-musescore)
-        ([?\s-b]    . run-libreoffice)
-        ([?\s-o]    . run-transmission)
-        ([?\s-r]    . monitor-settings)
-        ([?\s-n]    . network-settings)
-        ([?\s-v]    . volume-settings)
-        ([s-return] . vterm)
+	;; Other desktop environment things
+	([?\s-x]       . dmenu)
+	([menu]        . smex)
+	([?\s- ]       . cycle-keyboard-layout)
+	([s-backspace] . cycle-keyboard-layout-reverse)
+	([s-tab]       . audio-loopback)
 
-        ;; Other desktop environment things
-        ([?\s-x]       . dmenu)
-        ([menu]        . smex)
-        ([?\s- ]       . cycle-keyboard-layout)
-        ([s-backspace] . cycle-keyboard-layout-reverse)
-        ([s-tab]       . audio-loopback)
-
-        ;; Controlling EMMS
-        ([XF86AudioNext] . emms-next)
-        ([XF86AudioPrev] . emms-previous)
-        ([XF86AudioPlay] . emms-pause)
-        ([XF86AudioStop] . emms-stop)))
+	;; Controlling EMMS
+	([XF86AudioNext] . emms-next)
+	([XF86AudioPrev] . emms-previous)
+	([XF86AudioPlay] . emms-pause)
+	([XF86AudioStop] . emms-stop)))
 
 (setq exwm-input-simulation-keys
       '(;; Navigation

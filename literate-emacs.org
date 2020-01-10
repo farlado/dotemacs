@@ -325,10 +325,7 @@ Next we need to determine what size to make the text. This is based on the width
                             "sort -n | head -n 1")))
                 (/ (display-pixel-width) (display-screens))))
          (size (if (<= res 1366) 100
-                 (if (<= res 1920) 140
-                   (if (<= res 2560) 160
-                     (if (<= res 3840) 180
-                       200))))))
+                 180)))
     (set-face-attribute 'default nil :height size))
 #+END_SRC
 
@@ -518,6 +515,13 @@ This isn't actually where we do all the configuration, it's just where we instal
     (setenv "_JAVA_AWT_WM_NONREPARENTING" "1"))
 #+END_SRC
 
+*** Configure floating window borders
+Uses the same color as my mode line, uses the same width as window divider width. See below.
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-floating-border-width 3
+        exwm-floating-border-color (face-attribute 'mode-line :background))
+#+END_SRC
+
 *** Name EXWM buffers after the window title
 This was annoying when I first installed EXWM. Thankfully this is a very easy fix.
 #+BEGIN_SRC emacs-lisp
@@ -555,8 +559,179 @@ Since I'm using Emacs as a window manager, I need something comparable to ~rofi~
     :defer t)
 #+END_SRC
 
+** Workspace configuration
+*** Load all workspaces on startup
+I do not want to have to load all of them on my own...
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-workspace-number 10)
+#+END_SRC
+
+*** Assign workspaces to monitors
+This contains multiple assignments for the same workspace because of the different setups my ThinkPads are part of.
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-randr-workspace-output-plist '(0 "LVDS1"
+                                            0 "eDP1"
+                                            0 "DP2-2"
+                                            1 "DP2-1"
+                                            2 "DP2-3"
+                                            3 "DP2-2"
+                                            4 "DP2-1"
+                                            5 "DP2-3"
+                                            6 "DP2-2"
+                                            7 "DP2-1"
+                                            8 "DP2-3"
+                                            9 "DP2-2"))
+#+END_SRC
+
+*** Assign programs to workspaces
+...and also have some launch floating and/or without a mode line or borders.
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
+                                      floating-mode-line nil
+                                      workspace 9
+                                      floating t)
+                                     ((string= exwm-instance-name "telegram-desktop")
+                                      workspace 8)
+                                     ((string= exwm-class-name "discord")
+                                      workspace 7)
+                                     ((or (string= exwm-class-name "libreoffice")
+                                          (string= exwm-class-name "MuseScore3")
+                                          (string= exwm-class-name "gimp"))
+                                      workspace 6)
+                                     ((string= exwm-title "Event Tester")
+                                      floating-mode-line nil
+                                      floating t)))
+#+END_SRC
+
+*** Name workspaces a little more intuitively
+No clue why you have to do so much just to give workspaces names, but at least you can do it.
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-workspace-index-map
+        (lambda (index)
+          (let ((named-workspaces ["1" "2" "3" "4" "5" "6"
+                                   "office" "discord"
+                                   "telegram" "games"]))
+            (if (< index (length named-workspaces))
+                (elt named-workspaces index)
+              (number-to-string index)))))
+#+END_SRC
+
+** Multi-head configuration
+Thankfully, EXWM comes with hooks to handle when monitors are connected and disconnected, so I can do monitor configuration entirely in Emacs Lisp. I have two laptops: a ThinkPad X230 and a ThinkPad W541. Each has different displays and is used for different purposes. Due to recent updates to Arch Linux and the fact that the original code here was a dumpster fire, this section is basically a construction zone.
+
+*** Getting the currently connected monitors
+The first thing to do is set up a function to return a list of currently connected monitors.
+#+BEGIN_SRC emacs-lisp
+  (defun get-connected-monitors ()
+    "Return a list of the currently connected monitors."
+    (split-string (shell-command-to-string (concat "xrandr | "
+                                                   "grep ' connected ' | "
+                                                   "awk '{print $1}'"))))
+#+END_SRC
+
+*** Configuring monitor arrangement on my X230
+This one is straightforward. I never do any kind of split-monitor setup on my ThinkPad X230, so every monitor looks over the same screen.
+#+BEGIN_SRC emacs-lisp
+  (defun display-setup-x230 ()
+    "Set up the connected monitors on a ThinkPad X230."
+    (let ((monitors (get-connected-monitors))
+          (possible '("LVDS1"
+                      "VGA1"))
+          (command "xrandr "))
+      (dolist (monitor possible)
+        (if (member monitor monitors)
+            (setq command (concat command "--output " monitor
+                                  " --mode 1366x768 --pos 0x0 "))
+          (setq command (concat command "--output " monitor " --off "))))
+      (shell-command-to-string command)))
+#+END_SRC
+
+*** Configuring monitor arrangement on my W541
+This is where it gets really fun. This ThinkPad /does/ get docked, so I handle very different outputs.
+#+BEGIN_SRC emacs-lisp
+  (defun display-setup-w541 ()
+    "Set up the connected monitors on a ThinkPad W541."
+    (let* ((connected-monitors (get-connected-monitors))
+           (docked-p (member "DP2-1" connected-monitors))
+           (possible-monitors '("eDP1"
+                                "VGA1"
+                                "DP2-1"
+                                "DP2-2"
+                                "DP2-3"))
+           (command "xrandr "))
+      (dolist (monitor possible-monitors)
+        (if (and (member monitor connected-monitors)
+                 (not (and docked-p (string= "eDP1" monitor))))
+            (let ((output (concat "--output " monitor " "))
+                  (primary (when (or (string= "DP2-2" monitor)
+                                     (string= "eDP1" monitor))
+                             "--primary "))
+                  (mode (concat "--mode " (if (string= "eDP1" monitor)
+                                              "2880x1620 "
+                                            "1920x1080 ")))
+                  (scale (when (string-match-p "DP2" monitor)
+                           "--scale-from 2880x1620 "))
+                  (rotate (if (string= "DP2-1" monitor)
+                              "--rotate left "
+                            (if (string= "DP2-3" monitor)
+                                "--rotate right ")))
+                  (pos (concat "--pos " (if (string-match-p "1" monitor)
+                                            "0x0 "
+                                          (if (string= monitor "DP2-2")
+                                              "1620x0 "
+                                            "4500x0 ")))))
+              (shell-command (concat "xrandr " output primary
+                                     mode scale rotate pos)))
+          (shell-command (concat "xrandr --output " monitor " --off "))))))
+  ;
+#+END_SRC
+
+*** Configuring peripherals while docked
+Because I use a dock on my W541, there are some things I need to do alongside setting up my monitors.
+#+BEGIN_SRC emacs-lisp
+  (defun peripheral-setup ()
+    "Configure peripherals I connect to my dock."
+    ;; Trackball
+    (let ((trackball-id (shell-command-to-string
+                         (concat "xinput | grep ELECOM | head -n 1 | sed -r "
+                                 "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
+      (dolist (command '("'libinput Button Scrolling Button' 10"
+                         "'libinput Scroll Method Enabled' 0 0 1"))
+        (start-process-shell-command
+         "Trackball Setup" nil (concat "xinput set-prop "
+                                       trackball-id
+                                       command)))
+      (start-process-shell-command
+       "Trackball Setup" nil (concat "xinput set-button-map "
+                                     trackball-id
+                                     "1 2 3 4 5 6 7 8 9 2 1 2")))
+    ;; Keyboard
+    (start-process-shell-command
+     "Keyboard Setup" nil "setxkbmap -option ctrl:nocaps"))
+#+END_SRC
+
+*** Bringing it all together
+Finally, I can make my generic display-and-dock setup function.
+#+BEGIN_SRC emacs-lisp
+  (defun display-and-dock-setup ()
+    "Configure displays and dock if applicable."
+    (interactive)
+    (if (member "LVDS1" (get-connected-monitors))
+        (display-setup-x230)
+      (display-setup-w541)
+      (peripheral-setup)))
+#+END_SRC
+
+*** Start ~exwm-randr~
+This is where the real magic happens.
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
+  (exwm-randr-enable)
+#+END_SRC
+
+** Desktop environment components
 *** System package management
-This one is a pleasant surprise to have honestly. Having Emacs handle system packages as well as its own is a very pleasant surprise. Since I use ~yay~ on Arch, I configure an entry for it and use it if it's installed.
+This one is a pleasant surprise to have honestly. Having Emacs handle system packages as well as its own makes life a million times easier. Since I use ~yay~ on Arch, I configure an entry for it and use it if it's installed.
 #+BEGIN_SRC emacs-lisp
   (use-package system-packages
     :ensure t
@@ -601,247 +776,6 @@ This one is a pleasant surprise to have honestly. Having Emacs handle system pac
            ("C-c p v" . system-packages-verify-all-packages)))
 #+END_SRC
 
-** Workspace configuration
-*** Load 3 workspaces on startup
-I want all three workspaces I use to be loaded when I start EXWM.
-#+BEGIN_SRC emacs-lisp
-  (setq exwm-workspace-number 3)
-#+END_SRC
-
-*** Assign workspaces to monitors
-This contains multiple assignments for the same workspace because of the different setups my ThinkPads are part of.
-#+BEGIN_SRC emacs-lisp
-  (setq exwm-randr-workspace-output-plist '(0 "LVDS1"
-                                            0 "eDP1"
-                                            0 "DP2-2"
-                                            1 "DP2-1"
-                                            2 "DP2-3"))
-#+END_SRC
-
-*** Assign programs to workspaces
-...and also have some launch floating and/or without a mode line or borders.
-#+BEGIN_SRC emacs-lisp
-  (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
-                                      floating-mode-line nil
-                                      border-width 0
-                                      workspace 0
-                                      floating t)
-                                     ((string= exwm-instance-name "telegram-desktop")
-                                      workspace 2)
-                                     ((string= exwm-class-name "discord")
-                                      workspace 1)
-                                     ((string= exwm-title "Event Tester")
-                                      floating-mode-line nil
-                                      floating t)))
-#+END_SRC
-
-*** Name workspaces a little more intuitively
-No clue why you have to do so much just to give workspaces names, but at least you can do it.
-#+BEGIN_SRC emacs-lisp
-  (setq exwm-workspace-index-map
-        (lambda (index)
-          (let ((named-workspaces ["1" "2" "3"]))
-            (if (< index (length named-workspaces))
-                (elt named-workspaces index)
-              (number-to-string index)))))
-#+END_SRC
-
-*** Moving focus between workspaces
-This makes the global binds down the line look significantly cleaner.
-#+BEGIN_SRC emacs-lisp
-  (defun farl-exwm/workspace-0 ()
-    "Switch to EXWM workspace 0."
-    (interactive)
-    (exwm-workspace-switch-create 0))
-
-  (defun farl-exwm/workspace-1 ()
-    "Switch to EXWM workspace 1."
-    (interactive)
-    (exwm-workspace-switch-create 1))
-
-  (defun farl-exwm/workspace-2 ()
-    "Switch to EXWM workspace 2."
-    (interactive)
-    (exwm-workspace-switch-create 2))
-#+END_SRC
-
-*** Moving windows between workspaces
-Only recently did I learn about it, but you can also assign windows to a new workspace on the fly.
-#+BEGIN_SRC emacs-lisp
-  (defun farl-exwm/move-window-0 ()
-    "Move the currently focused window to workspace 0."
-    (interactive)
-    (exwm-workspace-move-window 0))
-
-  (defun farl-exwm/move-window-1 ()
-    "Move the currently focused window to workspace 1."
-    (interactive)
-    (exwm-workspace-move-window 1))
-
-  (defun farl-exwm/move-window-2 ()
-    "Move the currently focused window to workspace 2."
-    (interactive)
-    (exwm-workspace-move-window 2))
-#+END_SRC
-
-** TODO Multi-head configuration
-Thankfully, EXWM comes with hooks to handle when monitors are connected and disconnected, so I can do monitor configuration entirely in Emacs Lisp. I have two laptops: a ThinkPad X230 and a ThinkPad W541. Each has different displays and is used for different purposes. Due to recent updates to Arch Linux and the fact that the original code here was a dumpster fire, this section is basically a construction zone.
-
-*** Getting the currently connected monitors
-The first thing to do is set up a function to return a list of currently connected monitors.
-#+BEGIN_SRC emacs-lisp
-  (defun get-connected-monitors ()
-    "Return a list of the currently connected monitors."
-    (split-string (shell-command-to-string (concat "xrandr | "
-                                                   "grep ' connected ' | "
-                                                   "awk '{print $1}'"))))
-#+END_SRC
-
-*** Configuring monitor arrangement on my X230
-This one is straightforward. I never do any kind of split-monitor setup on my ThinkPad X230, so every monitor looks over the same screen.
-#+BEGIN_SRC emacs-lisp
-  (defun display-setup-x230 ()
-    "Set up the connected monitors on a ThinkPad X230."
-    (let ((monitors (get-connected-monitors))
-          (possible '("LVDS1"
-                      "VGA1"))
-          (command "xrandr "))
-      (dolist (monitor possible)
-        (if (member monitor monitors)
-            (setq command (concat command "--output " monitor
-                                  " --mode 1366x768 --pos 0x0 "))
-          (setq command (concat command "--output " monitor " --off "))))
-      (shell-command command)))
-#+END_SRC
-
-*** Configuring monitor arrangement on my W541
-This is where it gets really fun. This ThinkPad /does/ get docked, so I handle very different outputs.
-#+BEGIN_SRC emacs-lisp
-  (defun display-setup-w541 ()
-    "Set up the connected monitors on a ThinkPad W541."
-    (let* ((connected-monitors (get-connected-monitors))
-           (docked-p (member "DP2-1" connected-monitors))
-           (possible-monitors '("eDP1"
-                                "VGA1"
-                                "DP2-1"
-                                "DP2-2"
-                                "DP2-3"))
-           (command "xrandr "))
-      (dolist (monitor possible-monitors)
-        (if (and (member monitor connected-monitors)
-                 (not (and docked-p (string= "eDP1" monitor))))
-            (let ((output (concat "--output " monitor " "))
-                  (primary (when (or (string= "DP2-2" monitor)
-                                     (string= "eDP1" monitor))
-                             "--primary "))
-                  (mode (concat "--mode " (if (string= "eDP1" monitor)
-                                              "2880x1620 "
-                                            "1920x1080 ")))
-                  (scale (when (string-match-p "DP2" monitor)
-                           "--scale-from 2880x1620 "))
-                  (rotate (if (string= "DP2-1" monitor)
-                              "--rotate left "
-                            (if (string= "DP2-3" monitor)
-                                "--rotate right ")))
-                  (pos (concat "--pos " (if (string-match-p "1" monitor)
-                                            "0x0 "
-                                          (if (string= monitor "DP2-2")
-                                              "1620x0 "
-                                            "4500x0 ")))))
-              (setq command (concat command output primary
-                                    mode scale rotate pos)))
-          (setq command (concat command "--output " monitor " --off "))))
-      (shell-command-to-string command)))
-#+END_SRC
-
-** X window configuration
-*** Configure floating window borders
-Uses the same color as my mode line, uses the same width as window divider width. See below.
-#+BEGIN_SRC emacs-lisp
-  (setq exwm-floating-border-width 3
-        exwm-floating-border-color (face-attribute 'mode-line :background))
-#+END_SRC
-
-*** X applications
-**** GIMP
-Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
-#+BEGIN_SRC emacs-lisp
-  (defun run-gimp ()
-    "Start GIMP."
-    (interactive)
-    (start-process-shell-command
-     "GIMP" nil "gimp"))
-#+END_SRC
-
-**** Steam
-Gaming is possible with EXWM, if you run games windowed.
-#+BEGIN_SRC emacs-lisp
-  (defun run-steam ()
-    "Start Steam."
-    (interactive)
-    (start-process-shell-command
-     "Steam" nil "steam"))
-#+END_SRC
-
-**** Firefox
-Firefox has some unique abilities when it comes to how to make windows behave which work better for me. I don't use tabs, and I don't want anything to do with them, and Firefox lets me hide the tab bar and force all tabs to actually open as new windows. It's like Suckless Surf, but orders of magnitude better.
-#+BEGIN_SRC emacs-lisp
-  (defun run-firefox ()
-    "Start Firefox."
-    (interactive)
-    (start-process-shell-command
-     "Firefox" nil "firefox"))
-#+END_SRC
-
-**** Discord
-Yeah, I also use the light theme for Discord. It looks comfy, even if Discord is a garbage application.
-#+BEGIN_SRC emacs-lisp
-  (defun run-discord ()
-    "Start Discord."
-    (interactive)
-    (start-process-shell-command
-     "Discord" nil "discord"))
-#+END_SRC
-
-**** Telegram
-I have a painfully white theme which fits perfectly with my setup.
-#+BEGIN_SRC emacs-lisp
-  (defun run-telegram ()
-    "Start Telegram."
-    (interactive)
-    (start-process-shell-command
-     "Telegram" nil "telegram-desktop"))
-#+END_SRC
-
-**** MuseScore
-I haven't figured out how to engrave in Emacs, so for now...
-#+BEGIN_SRC emacs-lisp
-  (defun run-musescore ()
-    "Start MuseScore."
-    (interactive)
-    (start-process-shell-command
-     "MuseScore" nil "musescore"))
-#+END_SRC
-
-**** LibreOffice
-Shame me all you want. I'm still in introductory courses and haven't learned enough Org-mode to use it more meaningfully.
-#+BEGIN_SRC emacs-lisp
-  (defun run-libreoffice ()
-    "Start LibreOffice."
-    (interactive)
-    (start-process-shell-command
-     "LibreOffice" nil "libreoffice"))
-#+END_SRC
-
-**** Transmission
-#+BEGIN_SRC emacs-lisp
-  (defun run-transmission ()
-    "Start Transmission."
-    (interactive)
-    (start-process-shell-command
-     "Transmission" nil "transmission-gtk"))
-#+END_SRC
-** Things a DE should probably have
 *** ~desktop-environment-mode~
 Previously I had to define a lot of functions to do these things, now I just change settings within ~desktop-environment-mode~.
 #+BEGIN_SRC emacs-lisp
@@ -1086,64 +1020,6 @@ Then, I use these functions to control setting and cycling the keyboard layout:
   (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
 #+END_SRC
 
-*** Shutting down
-I copied the function for quitting Emacs to handle shutting down.
-#+BEGIN_SRC emacs-lisp
-  (defun save-buffers-shut-down (&optional arg)
-    "Offer to save each buffer, then shut down the computer.
-  This function is literally just a copycat of `save-buffers-kill-emacs'.
-  With prefix ARG, silently save all file-visiting buffers without asking.
-  If there are active processes where `process-query-on-exit-flag'
-  returns non-nil and `confirm-kill-processes' is non-nil,
-  asks whether processes should be killed.
-  Runs the members of `kill-emacs-query-functions' in turn and stops
-  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
-  Instead of just killing Emacs, shuts down the system."
-    (interactive "P")
-    ;; Don't use save-some-buffers-default-predicate, because we want
-    ;; to ask about all the buffers before killing Emacs.
-    (save-some-buffers arg t)
-    (let ((confirm confirm-kill-emacs))
-      (and
-       (or (not (memq t (mapcar (function
-                                 (lambda (buf) (and (buffer-file-name buf)
-                                                    (buffer-modified-p buf))))
-                                (buffer-list))))
-           (progn (setq confirm nil)
-                  (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
-       (or (not (fboundp 'process-list))
-           ;; process-list is not defined on MSDOS.
-           (not confirm-kill-processes)
-           (let ((processes (process-list))
-                 active)
-             (while processes
-               (and (memq (process-status (car processes)) '(run stop open listen))
-                    (process-query-on-exit-flag (car processes))
-                    (setq active t))
-               (setq processes (cdr processes)))
-             (or (not active)
-                 (with-current-buffer-window
-                  (get-buffer-create "*Process List*") nil
-                  #'(lambda (window _value)
-                      (with-selected-window window
-                        (unwind-protect
-                            (progn
-                              (setq confirm nil)
-                              (yes-or-no-p (concat "Active processes exist; kill "
-                                                   "them and shut down anyway? ")))
-                          (when (window-live-p window)
-                            (quit-restore-window window 'kill)))))
-                  (list-processes t)))))
-       ;; Query the user for other things, perhaps.
-       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
-       (or (null confirm)
-           (funcall confirm "Really shut down? "))
-       (shell-command "shutdown now")
-       (kill-emacs))))
-
-  (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
-#+END_SRC
-
 *** Rebooting
 I copied the function for quitting Emacs to handle reboot too.
 #+BEGIN_SRC emacs-lisp
@@ -1202,47 +1078,186 @@ I copied the function for quitting Emacs to handle reboot too.
   (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
 #+END_SRC
 
+*** Shutting down
+I copied the function for quitting Emacs to handle shutting down.
+#+BEGIN_SRC emacs-lisp
+  (defun save-buffers-shut-down (&optional arg)
+    "Offer to save each buffer, then shut down the computer.
+  This function is literally just a copycat of `save-buffers-kill-emacs'.
+  With prefix ARG, silently save all file-visiting buffers without asking.
+  If there are active processes where `process-query-on-exit-flag'
+  returns non-nil and `confirm-kill-processes' is non-nil,
+  asks whether processes should be killed.
+  Runs the members of `kill-emacs-query-functions' in turn and stops
+  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
+  Instead of just killing Emacs, shuts down the system."
+    (interactive "P")
+    ;; Don't use save-some-buffers-default-predicate, because we want
+    ;; to ask about all the buffers before killing Emacs.
+    (save-some-buffers arg t)
+    (let ((confirm confirm-kill-emacs))
+      (and
+       (or (not (memq t (mapcar (function
+                                 (lambda (buf) (and (buffer-file-name buf)
+                                                    (buffer-modified-p buf))))
+                                (buffer-list))))
+           (progn (setq confirm nil)
+                  (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
+       (or (not (fboundp 'process-list))
+           ;; process-list is not defined on MSDOS.
+           (not confirm-kill-processes)
+           (let ((processes (process-list))
+                 active)
+             (while processes
+               (and (memq (process-status (car processes)) '(run stop open listen))
+                    (process-query-on-exit-flag (car processes))
+                    (setq active t))
+               (setq processes (cdr processes)))
+             (or (not active)
+                 (with-current-buffer-window
+                  (get-buffer-create "*Process List*") nil
+                  #'(lambda (window _value)
+                      (with-selected-window window
+                        (unwind-protect
+                            (progn
+                              (setq confirm nil)
+                              (yes-or-no-p (concat "Active processes exist; kill "
+                                                   "them and shut down anyway? ")))
+                          (when (window-live-p window)
+                            (quit-restore-window window 'kill)))))
+                  (list-processes t)))))
+       ;; Query the user for other things, perhaps.
+       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
+       (or (null confirm)
+           (funcall confirm "Really shut down? "))
+       (shell-command "shutdown now")
+       (kill-emacs))))
+
+  (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
+#+END_SRC
+
+** X applications
+*** GIMP
+Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
+#+BEGIN_SRC emacs-lisp
+  (defun run-gimp ()
+    "Start GIMP."
+    (interactive)
+    (start-process-shell-command
+     "GIMP" nil "gimp"))
+#+END_SRC
+
+*** Steam
+Gaming is possible with EXWM, if you run games windowed.
+#+BEGIN_SRC emacs-lisp
+  (defun run-steam ()
+    "Start Steam."
+    (interactive)
+    (start-process-shell-command
+     "Steam" nil "steam"))
+#+END_SRC
+
+*** Firefox
+Firefox has some unique abilities when it comes to how to make windows behave which work better for me. I don't use tabs, and I don't want anything to do with them, and Firefox lets me hide the tab bar and force all tabs to actually open as new windows. It's like Suckless Surf, but orders of magnitude better.
+#+BEGIN_SRC emacs-lisp
+  (defun run-firefox ()
+    "Start Firefox."
+    (interactive)
+    (start-process-shell-command
+     "Firefox" nil "firefox"))
+#+END_SRC
+
+*** Discord
+Yeah, I also use the light theme for Discord. It looks comfy, even if Discord is a garbage application.
+#+BEGIN_SRC emacs-lisp
+  (defun run-discord ()
+    "Start Discord."
+    (interactive)
+    (start-process-shell-command
+     "Discord" nil "discord"))
+#+END_SRC
+
+*** Telegram
+I have a painfully white theme which fits perfectly with my setup.
+#+BEGIN_SRC emacs-lisp
+  (defun run-telegram ()
+    "Start Telegram."
+    (interactive)
+    (start-process-shell-command
+     "Telegram" nil "telegram-desktop"))
+#+END_SRC
+
+*** MuseScore
+I haven't figured out how to engrave in Emacs, so for now...
+#+BEGIN_SRC emacs-lisp
+  (defun run-musescore ()
+    "Start MuseScore."
+    (interactive)
+    (start-process-shell-command
+     "MuseScore" nil "musescore"))
+#+END_SRC
+
+*** LibreOffice
+Shame me all you want. I'm still in introductory courses and haven't learned enough Org-mode to use it more meaningfully.
+#+BEGIN_SRC emacs-lisp
+  (defun run-libreoffice ()
+    "Start LibreOffice."
+    (interactive)
+    (start-process-shell-command
+     "LibreOffice" nil "libreoffice"))
+#+END_SRC
+
+*** Transmission
+#+BEGIN_SRC emacs-lisp
+  (defun run-transmission ()
+    "Start Transmission."
+    (interactive)
+    (start-process-shell-command
+     "Transmission" nil "transmission-gtk"))
+#+END_SRC
 ** Keybindings
 *** Global binds to use across everything
 Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into this area.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-input-global-keys
-        `(;; Switching workspace focus
-          ([?\s-q] . farl-exwm/workspace-1)
-          ([?\s-w] . farl-exwm/workspace-0)
-          ([?\s-e] . farl-exwm/workspace-2)
+	`(;; Switching workspace focus
+	  ([?\s-q] . exwm-workspace-swap)
+	  ([?\s-w] . exwm-workspace-switch)
+	  ([?\s-e] . exwm-workspace-move-window)
+	  ,@(mapcar
+	     (lambda (i)
+	       `(,(kbd (format "s-%d" (% (+ i 1) 10))) .
+		 (lambda ()
+		   (interactive)
+		   (exwm-workspace-switch-create ,i))))
+	     (number-sequence 0 9))
 
-          ;; Moving windows to workspaces
-          ([8388625] . farl-exwm/move-window-1) ; C-s-q
-          ([8388631] . farl-exwm/move-window-0) ; C-s-w
-          ([8388613] . farl-exwm/move-window-2) ; C-s-e
+	  ;; Opening X applications
+	  ([?\s-g]    . run-gimp)
+	  ([?\s-s]    . run-steam)
+	  ([?\s-f]    . run-firefox)
+	  ([?\s-d]    . run-discord)
+	  ([?\s-t]    . run-telegram)
+	  ([?\s-m]    . run-musescore)
+	  ([?\s-b]    . run-libreoffice)
+	  ([?\s-o]    . run-transmission)
+	  ([?\s-r]    . monitor-settings)
+	  ([?\s-n]    . network-settings)
+	  ([?\s-v]    . volume-settings)
+	  ([s-return] . vterm)
 
-          ;; Opening X applications
-          ([?\s-g]    . run-gimp)
-          ([?\s-s]    . run-steam)
-          ([?\s-f]    . run-firefox)
-          ([?\s-d]    . run-discord)
-          ([?\s-t]    . run-telegram)
-          ([?\s-m]    . run-musescore)
-          ([?\s-b]    . run-libreoffice)
-          ([?\s-o]    . run-transmission)
-          ([?\s-r]    . monitor-settings)
-          ([?\s-n]    . network-settings)
-          ([?\s-v]    . volume-settings)
-          ([s-return] . vterm)
+	  ;; Other desktop environment things
+	  ([?\s-x]       . dmenu)
+	  ([menu]        . smex)
+	  ([?\s- ]       . cycle-keyboard-layout)
+	  ([s-backspace] . cycle-keyboard-layout-reverse)
+	  ([s-tab]       . audio-loopback)
 
-          ;; Other desktop environment things
-          ([?\s-x]       . dmenu)
-          ([menu]        . smex)
-          ([?\s- ]       . cycle-keyboard-layout)
-          ([s-backspace] . cycle-keyboard-layout-reverse)
-          ([s-tab]       . audio-loopback)
-
-          ;; Controlling EMMS
-          ([XF86AudioNext] . emms-next)
-          ([XF86AudioPrev] . emms-previous)
-          ([XF86AudioPlay] . emms-pause)
-          ([XF86AudioStop] . emms-stop)))
+	  ;; Controlling EMMS
+	  ([XF86AudioNext] . emms-next)
+	  ([XF86AudioPrev] . emms-previous)
+	  ([XF86AudioPlay] . emms-pause)
+	  ([XF86AudioStop] . emms-stop)))
 #+END_SRC
 
 *** Emacs key bindings in X windows
