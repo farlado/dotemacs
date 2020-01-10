@@ -303,197 +303,6 @@ I like the default start screen, but it just doesn't cut it for me. I just use t
     (dashboard-setup-startup-hook))
 #+END_SRC
 
-* Making Emacs significantly less ugly
-Stock Emacs is /ugly/. Just straight up ugly. Suffice to say it leaves much to be desired.
-
-** Font
-*** Setting the font style
-Originally I had this set up by means of ~custom-set-faces~, but frankly that is less easily configured than this method. First, we determine whether my preferred font is present on the system and set it if present. Otherwise, keep whatever default font Emacs chooses.
-#+BEGIN_SRC emacs-lisp
-  (when (member "Iosevka" (font-family-list))
-    (set-face-attribute 'default nil :font "Iosevka"))
-#+END_SRC
-
-*** Determining a good font size
-Next we need to determine what size to make the text. This is based on the width of the screens I regularly use. It uses shell commands for X window systems and built-in functions for Windows.
-#+BEGIN_SRC emacs-lisp
-  (let* ((res (if (eq window-system 'x)
-                  (string-to-number
-                   (shell-command-to-string
-                    (concat "xrandr | grep \\* | "
-                            "cut -d x -f 1 | "
-                            "sort -n | head -n 1")))
-                (/ (display-pixel-width) (display-screens))))
-         (size (if (<= res 1366) 100
-                 (if (<= res 1920) 150
-                   (if (<= res 2560) 180
-                     (if (<= res 3840) 220
-                       240))))))
-    (set-face-attribute 'default nil :height size))
-#+END_SRC
-
-*** Getting emoji to work properly
-God does this one feel great to have. However, it only works if we're using Emacs 27 or later...
-#+BEGIN_SRC emacs-lisp
-  (when (and (member "Noto Color Emoji" (font-family-list))
-             (not (< emacs-major-version 27)))
-    (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
-#+END_SRC
-
-** Theme
-*** Leuven
-I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/. I spent almost two entire weeks trying to find a dark theme that comes anywhere close to being as comfortable as Leuven, and even Leuven's dark alternative doesn't cut it.
-#+BEGIN_SRC emacs-lisp
-  (use-package leuven-theme
-    :if window-system
-    :ensure t
-    :defer t
-    :init
-    (setq leuven-scale-org-agenda-structure t
-          leuven-scale-outline-headlines t)
-    (load-theme 'leuven t))
-#+END_SRC
-
-*** Fringes
-Having fringes helps keep things looking good. However, I really do not want the fringes to have a color that is different from the default background.
-#+BEGIN_SRC emacs-lisp
-  (set-face-background 'fringe (face-attribute 'default :background))
-
-  (fringe-mode 10)
-#+END_SRC
-
-*** Window dividers
-Windows dividers make Emacs look far less sloppy. The color is grabbed from the mode line for consistency.
-#+BEGIN_SRC emacs-lisp
-  (setq window-divider-default-right-width 3)
-  (dolist (face '(window-divider-first-pixel
-                  window-divider-last-pixel
-                  window-divider))
-    (set-face-foreground face (face-attribute 'mode-line :background)))
-  (window-divider-mode 1)
-#+END_SRC
-
-** Mode line
-*** Use the mode line from Spacemacs
-I *hate* the default mode line. The mode line from Spacemacs, ~spaceline~, is much less sucky. I also show and hide specific things when setting it up. In terminals, ~spaceline-emacs-theme~ just looks wrong, so I don't use it unless I'm in a graphical environment.
-#+BEGIN_SRC emacs-lisp
-  (use-package spaceline
-    :ensure t
-    :defer t
-    :init
-    (require 'spaceline-config)
-    (setq powerline-default-separator 'wave
-          spaceline-buffer-encoding-abbrev-p nil
-          spaceline-buffer-size-p nil
-          spaceline-line-column-p t
-          column-number-indicator-zero-based nil)
-    (if window-system
-        (spaceline-emacs-theme)
-      (spaceline-spacemacs-theme)))
-#+END_SRC
-
-*** Show clock and battery level on mode line
-I use 24-hour time on all my clocks. I used to use ~fancy-battery~ for battery level but it constantly disappeared on my teeny tiny screens so I just decided not to bother with it. Plus it's one less package to configure lol.
-#+BEGIN_SRC emacs-lisp
-  (setq display-time-24hr-format t)
-  (display-time-mode 1)
-  (display-battery-mode 1)
-#+END_SRC
-
-*** Hide various minor modes from the mode line
-Works very nicely, makes the mode line far comfier. I set its installation as a hook so that I can keep the look section up a little higher.
-#+BEGIN_SRC emacs-lisp
-  (use-package diminish
-    :ensure t
-    :defer t
-    :init
-    (defun diminish-minor-modes ()
-      "Diminish the minor modes in the list `minor-modes-to-diminish'."
-      (dolist (mode minor-modes-to-diminish)
-        (diminish mode)))
-    (defvar minor-modes-to-diminish '(eldoc-mode
-                                      subword-mode
-                                      company-mode
-                                      rainbow-mode
-                                      flycheck-mode
-                                      flyspell-mode
-                                      which-key-mode
-                                      auto-revert-mode
-                                      visual-line-mode
-                                      haskell-doc-mode
-                                      flyspell-prog-mode
-                                      hungry-delete-mode
-                                      page-break-lines-mode
-                                      desktop-environment-mode
-                                      haskell-indentation-mode
-                                      interactive-haskell-mode
-                                      compilation-shell-minor-mode)
-      "Minor modes to diminish using `diminish-minor-modes'.")
-    (add-hook 'after-init-hook 'diminish-minor-modes))
-#+END_SRC
-
-** In buffers
-*** Turn ^L into pretty lines
-This is used in a number of places in Emacs. Better to have it on all the time than never on.
-#+BEGIN_SRC emacs-lisp
-  (global-page-break-lines-mode 1)
-#+END_SRC
-
-*** Line numbers (on most buffers)
-I like having line numbers and indicators for lines past the EOF. However, I don't like line numbers in modes where it breaks the mode, and I want line numbers to look consistent.
-#+BEGIN_SRC emacs-lisp
-  (global-display-line-numbers-mode 1)
-  (setq-default indicate-empty-lines t)
-
-  (set-face-background 'line-number (face-attribute 'default :background))
-
-  (dolist (hook '(Man-mode-hook
-                  nov-mode-hook
-                  help-mode-hook
-                  shell-mode-hook
-                  term-mode-hook
-                  shell-mode-hook
-                  snake-mode-hook
-                  tetris-mode-hook
-                  sudoku-mode-hook
-                  custom-mode-hook
-                  ibuffer-mode-hook
-                  epresent-mode-hook
-                  dashboard-mode-hook
-                  package-menu-mode-hook))
-    (add-hook hook (lambda () (display-line-numbers-mode -1))))
-#+END_SRC
-
-*** Highlight matching parentheses
-For those moments where I can't figure out what is going on with the parentheses...
-#+BEGIN_SRC emacs-lisp
-  (show-paren-mode 1)
-  (setq show-paren-style 'parenthesis
-        show-paren-delay 0)
-#+END_SRC
-
-*** Color the background of text based on the color/hex typed
-I don't use it too much, but it's nice to have it around.
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-mode
-    :if window-system
-    :ensure t
-    :defer t
-    :init
-    (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode)
-    (global-rainbow-mode 1))
-#+END_SRC
-
-*** Change the color of various delimiters based on how deep they go
-It's subtle on my theme, but it still helps me keep track of my brackets and parentheses.
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-delimiters
-    :if window-system
-    :ensure t
-    :defer t
-    :hook (prog-mode . rainbow-delimiters-mode))
-#+END_SRC
-
 * Making Emacs a desktop environment
 Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. Before I get ahead of myself, I check whether there's already a running window manager. If there is, we can make this process a lot easier by making Emacs full-screen ASAP.
 #+BEGIN_SRC emacs-lisp
@@ -1351,9 +1160,11 @@ With that out of the way, we can close off this block and move on to the next se
 #+END_SRC
 
 * Making Emacs organize/play music
-I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it. We only configure EMMS if ~mpd~ is found.
+I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it. We only configure EMMS if ~mpd~ is found. When checking whether ~mpd~ is installed, a couple environment variables are also set.
 #+BEGIN_SRC emacs-lisp
   (when (executable-find "mpd")
+    (setenv "MPD_HOST" "localhost")
+    (setenv "MPD_PORT" "6601")
 #+END_SRC
 
 ** Installing EMMS
@@ -2152,6 +1963,197 @@ A simple and fun game. Was a big deal when I was in high school. I still play it
     :bind (:map games-map
            ("2" . 2048-game)))
 #+END_SRC
+* Making Emacs not ugly
+Stock Emacs is /ugly/. Just straight up ugly. Suffice to say it leaves much to be desired.
+
+** Font
+*** Setting the font style
+Originally I had this set up by means of ~custom-set-faces~, but frankly that is less easily configured than this method. First, we determine whether my preferred font is present on the system and set it if present. Otherwise, keep whatever default font Emacs chooses.
+#+BEGIN_SRC emacs-lisp
+  (when (member "Iosevka" (font-family-list))
+    (set-face-attribute 'default nil :font "Iosevka"))
+#+END_SRC
+
+*** Determining a good font size
+Next we need to determine what size to make the text. This is based on the width of the screens I regularly use. It uses shell commands for X window systems and built-in functions for Windows.
+#+BEGIN_SRC emacs-lisp
+  (let* ((res (if (eq window-system 'x)
+                  (string-to-number
+                   (shell-command-to-string
+                    (concat "xrandr | grep \\* | "
+                            "cut -d x -f 1 | "
+                            "sort -n | head -n 1")))
+                (/ (display-pixel-width) (display-screens))))
+         (size (if (<= res 1366) 100
+                 (if (<= res 1920) 140
+                   (if (<= res 2560) 160
+                     (if (<= res 3840) 180
+                       200))))))
+    (set-face-attribute 'default nil :height size))
+#+END_SRC
+
+*** Getting emoji to work properly
+God does this one feel great to have. However, it only works if we're using Emacs 27 or later...
+#+BEGIN_SRC emacs-lisp
+  (when (and (member "Noto Color Emoji" (font-family-list))
+             (not (< emacs-major-version 27)))
+    (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
+#+END_SRC
+
+** Theme
+*** Leuven
+I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/. I spent almost two entire weeks trying to find a dark theme that comes anywhere close to being as comfortable as Leuven, and even Leuven's dark alternative doesn't cut it.
+#+BEGIN_SRC emacs-lisp
+  (use-package leuven-theme
+    :if window-system
+    :ensure t
+    :defer t
+    :init
+    (setq leuven-scale-org-agenda-structure t
+          leuven-scale-outline-headlines t)
+    (load-theme 'leuven t))
+#+END_SRC
+
+*** Fringes
+Having fringes helps keep things looking good. However, I really do not want the fringes to have a color that is different from the default background.
+#+BEGIN_SRC emacs-lisp
+  (set-face-background 'fringe (face-attribute 'default :background))
+
+  (fringe-mode 10)
+#+END_SRC
+
+*** Window dividers
+Windows dividers make Emacs look far less sloppy. The color is grabbed from the mode line for consistency.
+#+BEGIN_SRC emacs-lisp
+  (setq window-divider-default-right-width 3)
+  (dolist (face '(window-divider-first-pixel
+                  window-divider-last-pixel
+                  window-divider))
+    (set-face-foreground face (face-attribute 'mode-line :background)))
+  (window-divider-mode 1)
+#+END_SRC
+
+** Mode line
+*** Use the mode line from Spacemacs
+I *hate* the default mode line. The mode line from Spacemacs, ~spaceline~, is much less sucky. I also show and hide specific things when setting it up. In terminals, ~spaceline-emacs-theme~ just looks wrong, so I don't use it unless I'm in a graphical environment.
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline
+    :ensure t
+    :defer t
+    :init
+    (require 'spaceline-config)
+    (setq powerline-default-separator 'wave
+          spaceline-buffer-encoding-abbrev-p nil
+          spaceline-buffer-size-p nil
+          spaceline-line-column-p t
+          column-number-indicator-zero-based nil)
+    (if window-system
+        (spaceline-emacs-theme)
+      (spaceline-spacemacs-theme)))
+#+END_SRC
+
+*** Show clock and battery level on mode line
+I use 24-hour time on all my clocks. I used to use ~fancy-battery~ for battery level but it constantly disappeared on my teeny tiny screens so I just decided not to bother with it. Plus it's one less package to configure lol.
+#+BEGIN_SRC emacs-lisp
+  (setq display-time-24hr-format t)
+  (display-time-mode 1)
+  (display-battery-mode 1)
+#+END_SRC
+
+*** Hide various minor modes from the mode line
+Works very nicely, makes the mode line far comfier. I set its installation as a hook so that I can keep the look section up a little higher.
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :ensure t
+    :defer t
+    :init
+    (defun diminish-minor-modes ()
+      "Diminish the minor modes in the list `minor-modes-to-diminish'."
+      (dolist (mode minor-modes-to-diminish)
+        (diminish mode)))
+    (defvar minor-modes-to-diminish '(eldoc-mode
+                                      subword-mode
+                                      company-mode
+                                      rainbow-mode
+                                      flycheck-mode
+                                      flyspell-mode
+                                      which-key-mode
+                                      auto-revert-mode
+                                      visual-line-mode
+                                      haskell-doc-mode
+                                      flyspell-prog-mode
+                                      hungry-delete-mode
+                                      page-break-lines-mode
+                                      desktop-environment-mode
+                                      haskell-indentation-mode
+                                      interactive-haskell-mode
+                                      compilation-shell-minor-mode)
+      "Minor modes to diminish using `diminish-minor-modes'.")
+    (add-hook 'after-init-hook 'diminish-minor-modes))
+#+END_SRC
+
+** In buffers
+*** Turn ^L into pretty lines
+This is used in a number of places in Emacs. Better to have it on all the time than never on.
+#+BEGIN_SRC emacs-lisp
+  (global-page-break-lines-mode 1)
+#+END_SRC
+
+*** Line numbers (on most buffers)
+I like having line numbers and indicators for lines past the EOF. However, I don't like line numbers in modes where it breaks the mode, and I want line numbers to look consistent.
+#+BEGIN_SRC emacs-lisp
+  (global-display-line-numbers-mode 1)
+  (setq-default indicate-empty-lines t)
+
+  (set-face-background 'line-number (face-attribute 'default :background))
+
+  (dolist (hook '(Man-mode-hook
+                  nov-mode-hook
+                  help-mode-hook
+                  shell-mode-hook
+                  term-mode-hook
+                  shell-mode-hook
+                  snake-mode-hook
+                  tetris-mode-hook
+                  sudoku-mode-hook
+                  custom-mode-hook
+                  ibuffer-mode-hook
+                  epresent-mode-hook
+                  dashboard-mode-hook
+                  package-menu-mode-hook))
+    (add-hook hook (lambda () (display-line-numbers-mode -1))))
+#+END_SRC
+
+*** Highlight matching parentheses
+For those moments where I can't figure out what is going on with the parentheses...
+#+BEGIN_SRC emacs-lisp
+  (show-paren-mode 1)
+  (setq show-paren-style 'parenthesis
+        show-paren-delay 0)
+#+END_SRC
+
+*** Color the background of text based on the color/hex typed
+I don't use it too much, but it's nice to have it around.
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode
+    :if window-system
+    :ensure t
+    :defer t
+    :init
+    (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode)
+    (global-rainbow-mode 1))
+#+END_SRC
+
+*** Change the color of various delimiters based on how deep they go
+It's subtle on my theme, but it still helps me keep track of my brackets and parentheses.
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :if window-system
+    :ensure t
+    :defer t
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+END_SRC
+
 * Giving ~init.el~ a footer
 Since we gave ~init.el~ a header, I see no reason not to give it a footer.
 #+BEGIN_SRC emacs-lisp

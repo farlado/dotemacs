@@ -112,134 +112,6 @@
         dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
   (dashboard-setup-startup-hook))
 
-(when (member "Iosevka" (font-family-list))
-  (set-face-attribute 'default nil :font "Iosevka"))
-
-(let* ((res (if (eq window-system 'x)
-                (string-to-number
-                 (shell-command-to-string
-                  (concat "xrandr | grep \\* | "
-                          "cut -d x -f 1 | "
-                          "sort -n | head -n 1")))
-              (/ (display-pixel-width) (display-screens))))
-       (size (if (<= res 1366) 100
-               (if (<= res 1920) 150
-                 (if (<= res 2560) 180
-                   (if (<= res 3840) 220
-                     240))))))
-  (set-face-attribute 'default nil :height size))
-
-(when (and (member "Noto Color Emoji" (font-family-list))
-           (not (< emacs-major-version 27)))
-  (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
-
-(use-package leuven-theme
-  :if window-system
-  :ensure t
-  :defer t
-  :init
-  (setq leuven-scale-org-agenda-structure t
-        leuven-scale-outline-headlines t)
-  (load-theme 'leuven t))
-
-(set-face-background 'fringe (face-attribute 'default :background))
-
-(fringe-mode 10)
-
-(setq window-divider-default-right-width 3)
-(dolist (face '(window-divider-first-pixel
-                window-divider-last-pixel
-                window-divider))
-  (set-face-foreground face (face-attribute 'mode-line :background)))
-(window-divider-mode 1)
-
-(use-package spaceline
-  :ensure t
-  :defer t
-  :init
-  (require 'spaceline-config)
-  (setq powerline-default-separator 'wave
-        spaceline-buffer-encoding-abbrev-p nil
-        spaceline-buffer-size-p nil
-        spaceline-line-column-p t
-        column-number-indicator-zero-based nil)
-  (if window-system
-      (spaceline-emacs-theme)
-    (spaceline-spacemacs-theme)))
-
-(setq display-time-24hr-format t)
-(display-time-mode 1)
-(display-battery-mode 1)
-
-(use-package diminish
-  :ensure t
-  :defer t
-  :init
-  (defun diminish-minor-modes ()
-    "Diminish the minor modes in the list `minor-modes-to-diminish'."
-    (dolist (mode minor-modes-to-diminish)
-      (diminish mode)))
-  (defvar minor-modes-to-diminish '(eldoc-mode
-                                    subword-mode
-                                    company-mode
-                                    rainbow-mode
-                                    flycheck-mode
-                                    flyspell-mode
-                                    which-key-mode
-                                    auto-revert-mode
-                                    visual-line-mode
-                                    haskell-doc-mode
-                                    flyspell-prog-mode
-                                    hungry-delete-mode
-                                    page-break-lines-mode
-                                    desktop-environment-mode
-                                    haskell-indentation-mode
-                                    interactive-haskell-mode
-                                    compilation-shell-minor-mode)
-    "Minor modes to diminish using `diminish-minor-modes'.")
-  (add-hook 'after-init-hook 'diminish-minor-modes))
-
-(global-page-break-lines-mode 1)
-
-(global-display-line-numbers-mode 1)
-(setq-default indicate-empty-lines t)
-
-(set-face-background 'line-number (face-attribute 'default :background))
-
-(dolist (hook '(Man-mode-hook
-                nov-mode-hook
-                help-mode-hook
-                shell-mode-hook
-                term-mode-hook
-                shell-mode-hook
-                snake-mode-hook
-                tetris-mode-hook
-                sudoku-mode-hook
-                custom-mode-hook
-                ibuffer-mode-hook
-                epresent-mode-hook
-                dashboard-mode-hook
-                package-menu-mode-hook))
-  (add-hook hook (lambda () (display-line-numbers-mode -1))))
-
-(show-paren-mode 1)
-(setq show-paren-style 'parenthesis
-      show-paren-delay 0)
-
-(use-package rainbow-mode
-  :if window-system
-  :ensure t
-  :defer t
-  :init
-  (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode)
-  (global-rainbow-mode 1))
-
-(use-package rainbow-delimiters
-  :if window-system
-  :ensure t
-  :defer t
-  :hook (prog-mode . rainbow-delimiters-mode))
-
 (when (and (eq window-system 'x)
            (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 1))
   (set-frame-parameter nil 'fullscreen 'fullboth)
@@ -408,7 +280,8 @@
       (if (and (member monitor connected-monitors)
                (not (and docked-p (string= "eDP1" monitor))))
           (let ((output (concat "--output " monitor " "))
-                (primary (when (is-primary monitor)
+                (primary (when (or (string= "DP2-2" monitor)
+                                   (string= "eDP1" monitor))
                            "--primary "))
                 (mode (concat "--mode " (if (string= "eDP1" monitor)
                                             "2880x1620 "
@@ -427,7 +300,7 @@
             (setq command (concat command output primary
                                   mode scale rotate pos)))
         (setq command (concat command "--output " monitor " --off "))))
-    command))
+    (shell-command-to-string command)))
 
 (setq exwm-floating-border-width 3
       exwm-floating-border-color (face-attribute 'mode-line :background))
@@ -800,7 +673,7 @@ Instead of just killing Emacs, shuts down the system."
         ([?\s-r]    . monitor-settings)
         ([?\s-n]    . network-settings)
         ([?\s-v]    . volume-settings)
-        ([s-return] . ansi-term)
+        ([s-return] . vterm)
 
         ;; Other desktop environment things
         ([?\s-x]       . dmenu)
@@ -883,6 +756,8 @@ Instead of just killing Emacs, shuts down the system."
 )
 
 (when (executable-find "mpd")
+  (setenv "MPD_HOST" "localhost")
+  (setenv "MPD_PORT" "6601")
 
 (use-package emms
   :ensure t
@@ -1309,11 +1184,10 @@ This function has been altered to accommodate `exwm-mode'."
 (global-set-key (kbd "C-h 4 m") 'man)
 (global-set-key (kbd "C-h 4 w") 'woman)
 
-(defadvice ansi-term (before force-bash)
-  (interactive (list (getenv "SHELL"))))
-(ad-activate 'ansi-term)
-
-(global-set-key (kbd "C-c t") 'ansi-term)
+(use-package vterm
+  :ensure t
+  :defer t
+  :bind ("C-c t" . vterm))
 
 (use-package nov
   :ensure t
@@ -1372,5 +1246,134 @@ This function has been altered to accommodate `exwm-mode'."
   :defer t
   :bind (:map games-map
          ("2" . 2048-game)))
+
+(when (member "Iosevka" (font-family-list))
+  (set-face-attribute 'default nil :font "Iosevka"))
+
+(let* ((res (if (eq window-system 'x)
+                (string-to-number
+                 (shell-command-to-string
+                  (concat "xrandr | grep \\* | "
+                          "cut -d x -f 1 | "
+                          "sort -n | head -n 1")))
+              (/ (display-pixel-width) (display-screens))))
+       (size (if (<= res 1366) 100
+               (if (<= res 1920) 140
+                 (if (<= res 2560) 160
+                   (if (<= res 3840) 180
+                     200))))))
+  (set-face-attribute 'default nil :height size))
+
+(when (and (member "Noto Color Emoji" (font-family-list))
+           (not (< emacs-major-version 27)))
+  (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
+
+(use-package leuven-theme
+  :if window-system
+  :ensure t
+  :defer t
+  :init
+  (setq leuven-scale-org-agenda-structure t
+        leuven-scale-outline-headlines t)
+  (load-theme 'leuven t))
+
+(set-face-background 'fringe (face-attribute 'default :background))
+
+(fringe-mode 10)
+
+(setq window-divider-default-right-width 3)
+(dolist (face '(window-divider-first-pixel
+                window-divider-last-pixel
+                window-divider))
+  (set-face-foreground face (face-attribute 'mode-line :background)))
+(window-divider-mode 1)
+
+(use-package spaceline
+  :ensure t
+  :defer t
+  :init
+  (require 'spaceline-config)
+  (setq powerline-default-separator 'wave
+        spaceline-buffer-encoding-abbrev-p nil
+        spaceline-buffer-size-p nil
+        spaceline-line-column-p t
+        column-number-indicator-zero-based nil)
+  (if window-system
+      (spaceline-emacs-theme)
+    (spaceline-spacemacs-theme)))
+
+(setq display-time-24hr-format t)
+(display-time-mode 1)
+(display-battery-mode 1)
+
+(use-package diminish
+  :ensure t
+  :defer t
+  :init
+  (defun diminish-minor-modes ()
+    "Diminish the minor modes in the list `minor-modes-to-diminish'."
+    (dolist (mode minor-modes-to-diminish)
+      (diminish mode)))
+  (defvar minor-modes-to-diminish '(eldoc-mode
+                                    subword-mode
+                                    company-mode
+                                    rainbow-mode
+                                    flycheck-mode
+                                    flyspell-mode
+                                    which-key-mode
+                                    auto-revert-mode
+                                    visual-line-mode
+                                    haskell-doc-mode
+                                    flyspell-prog-mode
+                                    hungry-delete-mode
+                                    page-break-lines-mode
+                                    desktop-environment-mode
+                                    haskell-indentation-mode
+                                    interactive-haskell-mode
+                                    compilation-shell-minor-mode)
+    "Minor modes to diminish using `diminish-minor-modes'.")
+  (add-hook 'after-init-hook 'diminish-minor-modes))
+
+(global-page-break-lines-mode 1)
+
+(global-display-line-numbers-mode 1)
+(setq-default indicate-empty-lines t)
+
+(set-face-background 'line-number (face-attribute 'default :background))
+
+(dolist (hook '(Man-mode-hook
+                nov-mode-hook
+                help-mode-hook
+                shell-mode-hook
+                term-mode-hook
+                vterm-mode-hook
+                shell-mode-hook
+                snake-mode-hook
+                tetris-mode-hook
+                sudoku-mode-hook
+                custom-mode-hook
+                ibuffer-mode-hook
+                epresent-mode-hook
+                dashboard-mode-hook
+                package-menu-mode-hook))
+  (add-hook hook (lambda () (display-line-numbers-mode -1))))
+
+(show-paren-mode 1)
+(setq show-paren-style 'parenthesis
+      show-paren-delay 0)
+
+(use-package rainbow-mode
+  :if window-system
+  :ensure t
+  :defer t
+  :init
+  (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode)
+  (global-rainbow-mode 1))
+
+(use-package rainbow-delimiters
+  :if window-system
+  :ensure t
+  :defer t
+  :hook (prog-mode . rainbow-delimiters-mode))
 
 ;;; init.el ends here
