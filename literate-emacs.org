@@ -210,8 +210,8 @@ Since I do not use ~customize~ but really like protecting packages used in my co
                                     ido-vertical-mode smex buffer-move swiper
                                     popup-kill-ring hungry-delete avy sudo-edit magit
                                     company haskell-mode company-jedi flycheck
-                                    avy-flycheck org-bullets epresent nov wttrin yahtzee
-                                    sudoku chess 2048-game))
+                                    avy-flycheck org-bullets epresent vterm nov wttrin
+                                    yahtzee sudoku chess 2048-game))
 #+END_SRC
 
 *** Disable an annoying customize function
@@ -539,7 +539,8 @@ This is where it gets really fun. This ThinkPad /does/ get docked, so I handle v
         (if (and (member monitor connected-monitors)
                  (not (and docked-p (string= "eDP1" monitor))))
             (let ((output (concat "--output " monitor " "))
-                  (primary (when (is-primary monitor)
+                  (primary (when (or (string= "DP2-2" monitor)
+                                     (string= "eDP1" monitor))
                              "--primary "))
                   (mode (concat "--mode " (if (string= "eDP1" monitor)
                                               "2880x1620 "
@@ -558,7 +559,7 @@ This is where it gets really fun. This ThinkPad /does/ get docked, so I handle v
               (setq command (concat command output primary
                                     mode scale rotate pos)))
           (setq command (concat command "--output " monitor " --off "))))
-      command))
+      (shell-command-to-string command)))
 #+END_SRC
 
 ** X window configuration
@@ -1036,7 +1037,7 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
           ([?\s-r]    . monitor-settings)
           ([?\s-n]    . network-settings)
           ([?\s-v]    . volume-settings)
-          ([s-return] . ansi-term)
+          ([s-return] . vterm)
 
           ;; Other desktop environment things
           ([?\s-x]       . dmenu)
@@ -1863,17 +1864,16 @@ Wow, there's actually an Emacs mode for this! I put these into the =C-h= binds, 
   (global-set-key (kbd "C-h 4 w") 'woman)
 #+END_SRC
 
+** Not built-in
 *** Emacs is my terminal
-I've been jumping between ~vterm~ and ~ansi-term~. I guess ~ansi-term~ is just easier to use. In the off-chance I'm running Emacs in the terminal, =C-c t= can open ~ansi-term~.
+I've been jumping between ~vterm~ and ~ansi-term~. In the end ~vterm~ blows ~ansi-term~ clean out of the water. In the off-chance I'm running Emacs in the terminal, =C-c t= can open ~vterm~.
 #+BEGIN_SRC emacs-lisp
-  (defadvice ansi-term (before force-bash)
-    (interactive (list (getenv "SHELL"))))
-  (ad-activate 'ansi-term)
-
-  (global-set-key (kbd "C-c t") 'ansi-term)
+  (use-package vterm
+    :ensure t
+    :defer t
+    :bind ("C-c t" . vterm))
 #+END_SRC
 
-** Not built-in
 *** Reading ebooks in Emacs
 Not the best way to do epub reading, but at least it's in Emacs.
 #+BEGIN_SRC emacs-lisp
@@ -2112,6 +2112,7 @@ I like having line numbers and indicators for lines past the EOF. However, I don
                   help-mode-hook
                   shell-mode-hook
                   term-mode-hook
+                  vterm-mode-hook
                   shell-mode-hook
                   snake-mode-hook
                   tetris-mode-hook

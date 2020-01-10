@@ -54,8 +54,8 @@
                                   ido-vertical-mode smex buffer-move swiper
                                   popup-kill-ring hungry-delete avy sudo-edit magit
                                   company haskell-mode company-jedi flycheck
-                                  avy-flycheck org-bullets epresent nov wttrin yahtzee
-                                  sudoku chess 2048-game))
+                                  avy-flycheck org-bullets epresent vterm nov wttrin
+                                  yahtzee sudoku chess 2048-game))
 
 (require 'package)
 (defun package--save-selected-packages (&rest opt) nil)
