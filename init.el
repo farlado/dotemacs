@@ -299,7 +299,7 @@
                                     workspace 7)
                                    ((or (string= exwm-class-name "libreoffice")
                                         (string= exwm-class-name "MuseScore3")
-                                        (string= exwm-class-name "gimp"))
+                                        (string= exwm-class-name "Gimp"))
                                     workspace 6)
                                    ((string= exwm-title "Event Tester")
                                     floating-mode-line nil
@@ -324,14 +324,15 @@
   "Set up the connected monitors on a ThinkPad X230."
   (let ((monitors (get-connected-monitors))
         (possible '("LVDS1"
-                    "VGA1"))
-        (command "xrandr "))
+                    "VGA1")))
     (dolist (monitor possible)
       (if (member monitor monitors)
-          (setq command (concat command "--output " monitor
+          (start-process-shell-command
+           "xrandr" nil (concat "xrandr --output " monitor
                                 " --mode 1366x768 --pos 0x0 "))
-        (setq command (concat command "--output " monitor " --off "))))
-    (shell-command-to-string command)))
+        (start-process-shell-command
+         "xrandr" nil (concat "xrandr --output "
+                              monitor " --off "))))))
 
 (defun display-setup-w541 ()
   "Set up the connected monitors on a ThinkPad W541."
@@ -341,8 +342,7 @@
                               "VGA1"
                               "DP2-1"
                               "DP2-2"
-                              "DP2-3"))
-         (command "xrandr "))
+                              "DP2-3")))
     (dolist (monitor possible-monitors)
       (if (and (member monitor connected-monitors)
                (not (and docked-p (string= "eDP1" monitor))))
@@ -364,10 +364,12 @@
                                         (if (string= monitor "DP2-2")
                                             "1620x0 "
                                           "4500x0 ")))))
-            (shell-command (concat "xrandr " output primary
-                                   mode scale rotate pos)))
-        (shell-command (concat "xrandr --output " monitor " --off "))))))
-;
+            (start-process-shell-command
+             "xrandr" nil (concat "xrandr " output primary
+                                  mode scale rotate pos)))
+        (start-process-shell-command
+         "xrandr" nil (concat "xrandr --output "
+                              monitor " --off "))))))
 
 (defun peripheral-setup ()
   "Configure peripherals I connect to my dock."
@@ -866,13 +868,19 @@ Instead of just killing Emacs, shuts down the system."
         ([?\C-k] . [S-end delete])
         ([?\C-g] . [escape])))
 
-;; I can't do sequences above, so this is separate
-(defun exwm-C-s ()
+;; I can't do sequences above, so these are separate
+(defun farl-exwm/C-s ()
   "Pass C-s to the EXWM window."
   (interactive)
   (execute-kbd-macro (kbd "C-q C-s")))
 
-(define-key exwm-mode-map (kbd "C-x C-s") 'exwm-C-s)
+(defun farl-exwm/C-k ()
+  "Pass C-k to the EXWM window."
+  (interactive)
+  (execute-kbd-macro (kbd "C-q C-k")))
+
+(define-key exwm-mode-map (kbd "C-x C-s") 'farl-exwm/C-s)
+(define-key exwm-mode-map (kbd "C-c C-l") 'farl-exwm/C-k)
 
 (define-key exwm-mode-map (kbd "C-c C-q") nil)
 (define-key exwm-mode-map (kbd "C-q") 'exwm-input-send-next-key)
