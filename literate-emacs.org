@@ -528,7 +528,7 @@ This was annoying when I first installed EXWM. Thankfully this is a very easy fi
 #+END_SRC
 
 *** Edit text for an X window in Emacs
-At first I questioned why I would do this, but now that I know the advantages of this, it's too good to pass up. This allows me to edit text from an X window using Emacs by pressing =C-c '= in spite of some window splitting issues the package has...
+At first I questioned why I would do this, but now that I know the advantages of this, it's too good to pass up. This allows me to edit text from an X window using an Emacs buffer.
 #+BEGIN_SRC emacs-lisp
   (use-package exwm-edit
     :ensure t
