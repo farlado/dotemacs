@@ -628,6 +628,25 @@ No clue why you have to do so much just to give workspaces names, but at least y
               (number-to-string index)))))
 #+END_SRC
 
+*** Show a list of workspaces in the echo area
+Because I now use so many workspaces, I need to be able to see what workspace I am currently on. This makes it easier to do that.
+#+BEGIN_SRC emacs-lisp
+  (defun farl-exwm/list-workspaces ()
+    "List EXWM workspaces."
+    (exwm-workspace--update-switch-history)
+    (elt exwm-workspace--switch-history
+         (exwm-workspace--position exwm-workspace--current)))
+
+  (use-package minibuffer-line
+    :ensure t
+    :defer t
+    :hook (exwm-workspace-switch . minibuffer-line--update)
+    :init
+    (minibuffer-line-mode 1)
+    (set-face-attribute 'minibuffer-line nil :inherit 'default)
+    (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces)))))
+#+END_SRC
+
 ** Multi-head configuration
 Thankfully, EXWM comes with hooks to handle when monitors are connected and disconnected, so I can do monitor configuration entirely in Emacs Lisp. I have two laptops: a ThinkPad X230 and a ThinkPad W541. Each has different displays and is used for different purposes. Due to recent updates to Arch Linux and the fact that the original code here was a dumpster fire, this section is basically a construction zone.
 
