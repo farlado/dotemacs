@@ -50,7 +50,6 @@ Everything has different dependencies so make sure you have what you need. The e
 |----------------------+--------------------------------------------|
 | ~xorg~                 | obvious reasons                            |
 | ~wmctrl~               | checking for a window manager              |
-| ~xbanish~              | hiding the cursor while typing             |
 | ~xcompmgr~             | compositor                                 |
 | ~arandr~               | monitor configuration                      |
 | ~nm-connection-editor~ | network configuration                      |
@@ -1369,13 +1368,6 @@ This includes:
 #+END_SRC
 
 ** On startup
-*** Hide the cursor when typing
-Just a personal preference, I don't like seeing the cursor when I'm pressing keys.
-#+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Cursor Hiding" nil "xbanish")
-#+END_SRC
-
 *** Disable screen blanking
 I don't need my laptop's screen shutting off just because I'm sitting and watching a video too long.
 #+BEGIN_SRC emacs-lisp
