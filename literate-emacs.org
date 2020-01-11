@@ -606,7 +606,7 @@ This contains multiple assignments for the same workspace because of the differe
                                       workspace 8)
                                      ((string= exwm-class-name "discord")
                                       workspace 7)
-                                     ((or (string= exwm-class-name "libreoffice")
+                                     ((or (string-match-p "libreoffice" exwm-class-name)
                                           (string= exwm-class-name "MuseScore3")
                                           (string= exwm-class-name "Gimp"))
                                       workspace 6)
@@ -629,7 +629,7 @@ No clue why you have to do so much just to give workspaces names, but at least y
 #+END_SRC
 
 *** Show a list of workspaces in the echo area
-Because I now use so many workspaces, I need to be able to see what workspace I am currently on. This makes it easier to do that.
+Because I now use so many workspaces, I need to be able to see what workspace I am currently on. This makes it easier to do that. I also forcibly get rid of the dumb startup message so workspace labels immediately are visible.
 #+BEGIN_SRC emacs-lisp
   (defun farl-exwm/list-workspaces ()
     "List EXWM workspaces."
@@ -1385,6 +1385,18 @@ I don't need my laptop's screen shutting off just because I'm sitting and watchi
    "Disable Blanking" nil "xset s off -dpms")
 #+END_SRC
 
+*** Disable the trackpad
+This thing is disgusting, and I prefer trackpoints way more.
+#+BEGIN_SRC emacs-lisp
+  (start-process-shell-command
+   "Trackpad Setup" nil (concat "xinput disable "
+                                (shell-command-to-string
+                                 (concat "xinput | grep Synap | "
+                                         "head -n 1 | sed -r "
+                                         "'s/.*id=([0-9]+).*/\\1/' | "
+                                         "tr '\n' ' '"))))
+#+END_SRC
+
 *** Keyboard configuration
 This block sets the keyboard layout to US and give Caps Lock the functionality of Control. I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
 #+BEGIN_SRC emacs-lisp
@@ -1398,6 +1410,7 @@ I don't need it, but having basic compositing is very nice.
   (start-process-shell-command
    "Compositor" nil "xcompmgr")
 #+END_SRC
+
 *** Set fallback cursor
 Some X windows will have weird cursors if this isn't done.
 #+BEGIN_SRC emacs-lisp

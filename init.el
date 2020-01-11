@@ -297,7 +297,7 @@
                                     workspace 8)
                                    ((string= exwm-class-name "discord")
                                     workspace 7)
-                                   ((or (string= exwm-class-name "libreoffice")
+                                   ((or (string-match-p "libreoffice" exwm-class-name)
                                         (string= exwm-class-name "MuseScore3")
                                         (string= exwm-class-name "Gimp"))
                                     workspace 6)
@@ -911,6 +911,14 @@ Instead of just killing Emacs, shuts down the system."
 
 (start-process-shell-command
  "Disable Blanking" nil "xset s off -dpms")
+
+(start-process-shell-command
+ "Trackpad Setup" nil (concat "xinput disable "
+                              (shell-command-to-string
+                               (concat "xinput | grep Synap | "
+                                       "head -n 1 | sed -r "
+                                       "'s/.*id=([0-9]+).*/\\1/' | "
+                                       "tr '\n' ' '"))))
 
 (start-process-shell-command
  "Keyboard Layout" nil "setxkbmap us -option ctrl:nocaps")
