@@ -323,11 +323,11 @@
 (use-package minibuffer-line
   :ensure t
   :defer t
-  :hook (exwm-workspace-switch . minibuffer-line--update)
   :init
   (minibuffer-line-mode 1)
   (set-face-attribute 'minibuffer-line nil :inherit 'default)
-  (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces)))))
+  (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
+  (add-hook 'exwm-workspace-switch-hook 'minibuffer-line--update))
 
 (defun get-connected-monitors ()
   "Return a list of the currently connected monitors."

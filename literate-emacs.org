@@ -640,11 +640,11 @@ Because I now use so many workspaces, I need to be able to see what workspace I 
   (use-package minibuffer-line
     :ensure t
     :defer t
-    :hook (exwm-workspace-switch . minibuffer-line--update)
     :init
     (minibuffer-line-mode 1)
     (set-face-attribute 'minibuffer-line nil :inherit 'default)
-    (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces)))))
+    (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
+    (add-hook 'exwm-workspace-switch-hook 'minibuffer-line--update))
 #+END_SRC
 
 ** Multi-head configuration
