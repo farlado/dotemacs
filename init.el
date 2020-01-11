@@ -277,9 +277,7 @@
 
 (setq exwm-workspace-number 10)
 
-(setq exwm-randr-workspace-output-plist '(0 "LVDS1"
-                                          0 "eDP1"
-                                          0 "DP2-2"
+(setq exwm-randr-workspace-output-plist '(0 "DP2-2"
                                           1 "DP2-1"
                                           2 "DP2-3"
                                           3 "DP2-2"

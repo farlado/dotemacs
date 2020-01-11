@@ -515,7 +515,7 @@ Yes, Emacs is my *entire desktop environment*. You should probably remove this s
 
 ** Window management
 *** Installing the base window manager
-This isn't actually where we do all the configuration, it's just where we install EXWM and load what we need to configure it. Usually it is best to configure packages inside of ~use-package~, but that would be a horrible idea due to just how many different things there are that need configuring. However, we can do one useful thing here: set an environment variable that lets Java applications know that EXWM is not a reparenting window manager.
+This isn't actually where we do all the configuration, it's just where we install EXWM and load what we need to configure it. Usually it is best to configure packages inside of ~use-package~, but that would be a horrible idea due to just how many different things there are that need configuring. However, we can do one useful thing here: set an environment variable that lets Java applications know that EXWM is not a reparenting window manager. If we don't, some games lock up really bad when changing focus.
 #+BEGIN_SRC emacs-lisp
   (use-package exwm
     :ensure t
@@ -529,7 +529,7 @@ This isn't actually where we do all the configuration, it's just where we instal
 #+END_SRC
 
 *** Configure floating window borders
-Uses the same color as my mode line, uses the same width as window divider width. See below.
+Uses the same color as my mode line, uses the same width as window divider width.
 #+BEGIN_SRC emacs-lisp
   (setq exwm-floating-border-width 3
         exwm-floating-border-color (face-attribute 'mode-line :background))
@@ -580,11 +580,9 @@ I do not want to have to load all of them on my own...
 #+END_SRC
 
 *** Assign workspaces to monitors
-This contains multiple assignments for the same workspace because of the different setups my ThinkPads are part of.
+This section is only to ensure the proper workspaces are placed on the right monitors when my W541 is docked.
 #+BEGIN_SRC emacs-lisp
-  (setq exwm-randr-workspace-output-plist '(0 "LVDS1"
-                                            0 "eDP1"
-                                            0 "DP2-2"
+  (setq exwm-randr-workspace-output-plist '(0 "DP2-2"
                                             1 "DP2-1"
                                             2 "DP2-3"
                                             3 "DP2-2"
@@ -629,7 +627,7 @@ No clue why you have to do so much just to give workspaces names, but at least y
 #+END_SRC
 
 *** Show a list of workspaces in the echo area
-Because I now use so many workspaces, I need to be able to see what workspace I am currently on. This makes it easier to do that. I also forcibly get rid of the dumb startup message so workspace labels immediately are visible.
+Because I now use so many workspaces, I need to be able to see what workspace I am currently on. This makes it easier to do that. It's rather buggy at times, but it does what it needs to do.
 #+BEGIN_SRC emacs-lisp
   (defun farl-exwm/list-workspaces ()
     "List EXWM workspaces."
@@ -648,7 +646,7 @@ Because I now use so many workspaces, I need to be able to see what workspace I 
 #+END_SRC
 
 ** Multi-head configuration
-Thankfully, EXWM comes with hooks to handle when monitors are connected and disconnected, so I can do monitor configuration entirely in Emacs Lisp. I have two laptops: a ThinkPad X230 and a ThinkPad W541. Each has different displays and is used for different purposes. Due to recent updates to Arch Linux and the fact that the original code here was a dumpster fire, this section is basically a construction zone.
+Thankfully, EXWM comes with hooks to handle when monitors are connected and disconnected, so I can do monitor configuration entirely in Emacs Lisp. I have two laptops: a ThinkPad X230 and a ThinkPad W541. Each has different displays and is used for different purposes. Due to recent updates to Arch Linux and the fact that the original code here was a dumpster fire, this section had to be reworked.
 
 *** Getting the currently connected monitors
 The first thing to do is set up a function to return a list of currently connected monitors.
