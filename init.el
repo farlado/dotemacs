@@ -907,9 +907,6 @@ Instead of just killing Emacs, shuts down the system."
   (define-key exwm-mode-map (kbd key) nil))
 
 (start-process-shell-command
- "Cursor Hiding" nil "xbanish")
-
-(start-process-shell-command
  "Disable Blanking" nil "xset s off -dpms")
 
 (start-process-shell-command
