@@ -1428,7 +1428,7 @@ This is just a point of personal preference. I tried not using it for a while an
 I don't need my laptop's screen shutting off just because I'm sitting and watching a video too long.
 #+BEGIN_SRC emacs-lisp
   (start-process "Disable Blanking" nil "xset"
-                 "s off -dpms")
+                 "s" "off" "-dpms")
 #+END_SRC
 
 *** Disable the trackpad

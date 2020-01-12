@@ -955,7 +955,7 @@ Instead of just killing Emacs, shuts down the system."
 (start-process "Hide Cursor" nil "xbanish")
 
 (start-process "Disable Blanking" nil "xset"
-               "s off -dpms")
+               "s" "off" "-dpms")
 
 (start-process "Trackpad Setup" nil "xinput"
                "disable" (shell-command-to-string
