@@ -393,8 +393,8 @@
       (if (member monitor monitors)
           (start-process "xrandr" nil "xrandr"
                          "--output" monitor
-                         "--mode 1366x768"
-                         "--pos 0x0")
+                         "--mode" "1366x768"
+                         "--pos" "0x0")
         (start-process "xrandr" nil "xrandr"
                        "--output" monitor
                        "--off")))))
@@ -411,34 +411,42 @@
     (dolist (monitor possible-monitors)
       (if (and (member monitor connected-monitors)
                (not (and docked-p (string= "eDP1" monitor))))
-          (let ((output (concat "--output " monitor " "))
-                (primary (when (or (string= "DP2-2" monitor)
-                                   (string= "eDP1" monitor))
-                           "--primary "))
-                (mode (concat "--mode " (if (string= "eDP1" monitor)
-                                            "2880x1620 "
-                                          "1920x1080 ")))
-                (scale (when (string-match-p "DP2" monitor)
-                         "--scale-from 2880x1620 "))
-                (rotate (if (string= "DP2-1" monitor)
-                            "--rotate left "
-                          (if (string= "DP2-3" monitor)
-                              "--rotate right ")))
-                (pos (concat "--pos " (if (string-match-p "1" monitor)
-                                          "0x0 "
-                                        (if (string= monitor "DP2-2")
-                                            "1620x0 "
-                                          "4500x0 ")))))
-            (start-process "xrandr" nil "xrandr"
-                           (concat output
-                                   primary
-                                   mode
-                                   scale
-                                   rotate
-                                   pos)))
+          (start-process "xrandr" nil "xrandr"
+                         "--output" monitor
+                         ;; Is this the primary monitor?
+                         (if (or (string= "DP2-2" monitor)
+                                 (string= "eDP1" monitor))
+                             "--primary"
+                           "")
+                         ;; Any enabled monitor needs a resolution
+                         "--mode" (if (string= "eDP1" monitor)
+                                      "2880x1620"
+                                    "1920x1080")
+                         ;; If it's a DP2 monitor, scale up to 3K
+                         (if (string-match-p "DP2" monitor)
+                             "--scale-from"
+                           "")
+                         (if (string-match-p "DP2" monitor)
+                             "2880x1620"
+                           "")
+                         ;; DP2-1 and DP2-3 are rotated
+                         (if (string-match-p "DP2-[13]" monitor)
+                             "--rotate"
+                           "")
+                         (if (string= "DP2-1" monitor)
+                             "left"
+                           (if (string= "DP2-3" monitor)
+                               "right"
+                             ""))
+                         ;; Every enabled monitor needs a position
+                         "--pos" (if (string-match-p "1" monitor)
+                                     "0x0"
+                                   (if (string= monitor "DP2-2")
+                                       "1620x0"
+                                     "4500x0")))
         (start-process "xrandr" nil "xrandr"
                        "--output" monitor
-                       "--off ")))))
+                       "--off")))))
 
 (defun peripheral-setup ()
   "Configure peripherals I connect to my dock."
@@ -448,15 +456,15 @@
                                "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
     (dolist (command '("'libinput Button Scrolling Button' 10"
                        "'libinput Scroll Method Enabled' 0 0 1"))
-      (start-process "Trackball Setup" nil "xinput"
-                     "set-prop" trackball-id
-                     command))
-    (start-process "Trackball Setup" nil "xinput"
-                   "set-button-map" trackball-id
-                   "1 2 3 4 5 6 7 8 9 2 1 2"))
+      (start-process-shell-command
+       "Trackball Setup" nil (concat "xinput set-prop "
+                                     trackball-id command)))
+    (start-process-shell-command
+     "Trackball Setup" nil (concat "xinput set-button-map " trackball-id
+                                   "1 2 3 4 5 6 7 8 9 2 1 2")))
   ;; Keyboard
   (start-process "Keyboard Setup" nil "setxkbmap"
-                 "-option ctrl:nocaps"))
+                 "-option" "ctrl:nocaps"))
 
 (defun display-and-dock-setup ()
   "Configure displays and dock if applicable."
@@ -955,18 +963,17 @@ Instead of just killing Emacs, shuts down the system."
 
 (start-process "Trackpad Setup" nil "xinput"
                "disable" (shell-command-to-string
-                          (concat "xinput | grep Synap | "
-                                  "head -n 1 | sed -r "
-                                  "'s/.*id=([0-9]+).*/\\1/' | "
-                                  "tr '\n' ' '")))
+                          (concat "xinput | grep Synap | head -n 1 | "
+                                  "sed -r 's/.*id=([0-9]+).*/\\1/' | "
+                                  "tr '\n' ' ' | sed 's/ //'")))
 
 (start-process "Keyboard Layout" nil "setxkbmap"
-               "us -option ctrl:nocaps")
+               "us" "-option" "ctrl:swapcaps")
 
 (start-process "Compositor" nil "xcompmgr")
 
 (start-process "Fallback Cursor" nil "xsetroot"
-               "-cursor_name left_ptr")
+               "-cursor_name" "left_ptr")
 
 (exwm-systemtray-enable)
 (exwm-config-ido)
