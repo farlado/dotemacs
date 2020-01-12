@@ -53,6 +53,7 @@ Everything has different dependencies so make sure you have what you need. The e
 | ~xcompmgr~             | compositor                                 |
 | ~arandr~               | monitor configuration                      |
 | ~nm-connection-editor~ | network configuration                      |
+| ~pavucontrol~          | volume mixing                              |
 | ~firefox~              | browsing the web                           |
 | ~libreoffice~          | editing unfriendly documents               |
 | ~gimp~                 | editing images (Emacs can't do this sadly) |
