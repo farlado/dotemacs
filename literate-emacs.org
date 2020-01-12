@@ -49,7 +49,7 @@ Everything has different dependencies so make sure you have what you need. The e
 | ~EXWM~ depends on...   | which is used for...                       |
 |----------------------+--------------------------------------------|
 | ~xorg~                 | obvious reasons                            |
-| ~wmctrl~               | checking for a window manager              |
+| ~xbanish~              | hiding the mouse cursor                    |
 | ~xcompmgr~             | compositor                                 |
 | ~arandr~               | monitor configuration                      |
 | ~nm-connection-editor~ | network configuration                      |
@@ -121,6 +121,7 @@ Like mentioned above, this file is supposed to tangle into everything in my git 
   auto-save-list
   dmenu-items
   smex-items
+  nov-places
   transient
   ido.last
   recentf
@@ -214,16 +215,68 @@ Because I am writing this configuration to be as portable as possible (e.g. I sh
 I /hate/ ~customize~. I configure everything in this file, so I don't need anything messing with my ~init.el~, much less changing settings on me. Even though I do not use ~customize~ but really like protecting packages used in my configuration from ~package-autoremove~, I need to still set ~package-selected-packages~ so that it'll work. Packages are listed in the order in which they are installed.
 #+BEGIN_SRC emacs-lisp
   (setq custom-file "/dev/null"
-        package-selected-packages '(async use-package auto-package-update dashboard
-                                    leuven-theme spaceline diminish rainbow-mode
-                                    rainbow-delimiters exwm dmenu desktop-environment
-                                    system-packages exwm-mff exwm-edit emms
-                                    graphviz-dot-mode markdown-mode which-key
-                                    ido-vertical-mode smex buffer-move swiper
-                                    popup-kill-ring hungry-delete avy sudo-edit magit
-                                    company haskell-mode company-jedi flycheck
-                                    avy-flycheck org-bullets epresent vterm nov wttrin
-                                    yahtzee sudoku chess 2048-game))
+        package-selected-packages '(;; Core
+                                    async
+                                    use-package
+                                    auto-package-update
+
+                                    ;; Looks
+                                    dashboard
+                                    leuven-theme
+                                    spaceline
+                                    diminish
+                                    rainbow-mode
+                                    rainbow-delimiters
+
+                                    ;; Desktop environment
+                                    exwm
+                                    dmenu
+                                    minibuffer-line
+                                    desktop-environment
+                                    system-packages
+                                    exwm-edit
+                                    exwm-mff
+
+                                    ;; Multimedia
+                                    emms
+
+                                    ;; Extra major modes
+                                    graphviz-dot-mode
+                                    markdown-mode
+
+                                    ;; Functionality
+                                    which-key
+                                    ido-vertical-mode
+                                    smex
+                                    buffer-move
+                                    swiper
+                                    popup-kill-ring
+                                    hungry-delete
+                                    avy
+                                    sudo-edit
+
+                                    ;; Programming
+                                    magit
+                                    company
+                                    haskell-mode
+                                    company-jedi
+                                    flycheck
+                                    avy-flycheck
+
+                                    ;; org-mode
+                                    org-bullets
+                                    epresent
+
+                                    ;; Other
+                                    vterm
+                                    nov
+                                    wttrin
+
+                                    ;; Games
+                                    yahtzee
+                                    sudoku
+                                    chess
+                                    2048-game))
 #+END_SRC
 
 *** Disable an annoying ~customize~ function
@@ -505,10 +558,9 @@ It's subtle on my theme, but it still helps me keep track of my brackets and par
 #+END_SRC
 
 * Making Emacs a desktop environment
-Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows, so I really don't want this running when I'm not in an X window system. Before I get ahead of myself, I check whether there's already a running window manager. If there is, we can make this process a lot easier by making Emacs full-screen ASAP.
+Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows and on systems that have a desktop environment already, so I really don't want this part loaded in those cases. The original solution was to call ~wmctrl~ and see if it failed in a specific way. The new solution is to look for the environment variable ~_RUN_EXWM~ and start EXWM if it is set. This means setting this variable somewhere in your ~.xinitrc~ or in the =.desktop= file your display manager uses.
 #+BEGIN_SRC emacs-lisp
-  (when (and (eq window-system 'x)
-             (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 1))
+  (when (getenv "_RUN_EXWM")
     (set-frame-parameter nil 'fullscreen 'fullboth)
 #+END_SRC
 
@@ -667,12 +719,13 @@ This one is straightforward. I never do any kind of split-monitor setup on my Th
                       "VGA1")))
       (dolist (monitor possible)
         (if (member monitor monitors)
-            (start-process-shell-command
-             "xrandr" nil (concat "xrandr --output " monitor
-                                  " --mode 1366x768 --pos 0x0 "))
-          (start-process-shell-command
-           "xrandr" nil (concat "xrandr --output "
-                                monitor " --off "))))))
+            (start-process "xrandr" nil "xrandr"
+                           "--output" monitor
+                           "--mode 1366x768"
+                           "--pos 0x0")
+          (start-process "xrandr" nil "xrandr"
+                         "--output" monitor
+                         "--off")))))
 #+END_SRC
 
 *** Configuring monitor arrangement on my W541
@@ -708,12 +761,16 @@ This is where it gets really fun. This ThinkPad /does/ get docked, so I handle v
                                           (if (string= monitor "DP2-2")
                                               "1620x0 "
                                             "4500x0 ")))))
-              (start-process-shell-command
-               "xrandr" nil (concat "xrandr " output primary
-                                    mode scale rotate pos)))
-          (start-process-shell-command
-           "xrandr" nil (concat "xrandr --output "
-                                monitor " --off "))))))
+              (start-process "xrandr" nil "xrandr"
+                             (concat output
+                                     primary
+                                     mode
+                                     scale
+                                     rotate
+                                     pos)))
+          (start-process "xrandr" nil "xrandr"
+                         "--output" monitor
+                         "--off ")))))
 #+END_SRC
 
 *** Configuring peripherals while docked
@@ -727,17 +784,15 @@ Because I use a dock on my W541, there are some things I need to do alongside se
                                  "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
       (dolist (command '("'libinput Button Scrolling Button' 10"
                          "'libinput Scroll Method Enabled' 0 0 1"))
-        (start-process-shell-command
-         "Trackball Setup" nil (concat "xinput set-prop "
-                                       trackball-id
-                                       command)))
-      (start-process-shell-command
-       "Trackball Setup" nil (concat "xinput set-button-map "
-                                     trackball-id
-                                     "1 2 3 4 5 6 7 8 9 2 1 2")))
+        (start-process "Trackball Setup" nil "xinput"
+                       "set-prop" trackball-id
+                       command))
+      (start-process "Trackball Setup" nil "xinput"
+                     "set-button-map" trackball-id
+                     "1 2 3 4 5 6 7 8 9 2 1 2"))
     ;; Keyboard
-    (start-process-shell-command
-     "Keyboard Setup" nil "setxkbmap -option ctrl:nocaps"))
+    (start-process "Keyboard Setup" nil "setxkbmap"
+                   "-option ctrl:nocaps"))
 #+END_SRC
 
 *** Bringing it all together
@@ -790,6 +845,7 @@ This one is a pleasant surprise to have honestly. Having Emacs handle system pac
                           (noconfirm . "--noconfirm"))))
       (setq system-packages-use-sudo nil
             system-packages-package-manager 'yay))
+    (setq system-packages-noconfirm t)
     :bind (("C-c p i" . system-packages-install)
            ("C-c p e" . system-packages-ensure)
            ("C-c p u" . system-packages-update)
@@ -919,8 +975,7 @@ Calling ~arandr~ to adjust monitors is useful when I am preparing to present som
   (defun monitor-settings ()
     "Open arandr to configure monitors."
     (interactive)
-    (start-process-shell-command
-     "Monitor Settings" nil "arandr"))
+    (start-process "Monitor Settings" nil "arandr"))
 #+END_SRC
 
 *** Network settings
@@ -929,9 +984,8 @@ This one uses two windows: one to open the NetworkManager connection editor, and
   (defun network-settings ()
     "Open a NetworkManager connection editor."
     (interactive)
-    (start-process-shell-command
-     "Network Settings" nil "nm-connection-editor")
-    (async-shell-command "nmcli dev wifi list"))
+    (start-process "Network Settings" nil "nm-connection-editor")
+    (async-shell-command "nmcli dev wifi list" "*Wi-Fi Networks*"))
 #+END_SRC
 
 *** Volume mixer
@@ -940,8 +994,7 @@ For when you need to do volume mixing.
   (defun volume-settings ()
     "Open pavucontrol to adjust volume."
     (interactive)
-    (start-process-shell-command
-     "Volume Mixer" nil "pavucontrol"))
+    (start-process "Volume Mixer" nil "pavucontrol"))
 #+END_SRC
 
 *** Audio loop-back
@@ -964,8 +1017,8 @@ Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucon
     ;; Run `pavucontrol' and then unload the modules after it completes
     (start-process-shell-command
      "Audio Loop" nil (concat "pavucontrol && "
-                            "pacmd unload-module module-null-sink && "
-                            "pacmd unload-module module-loopback")))
+                              "pacmd unload-module module-null-sink && "
+                              "pacmd unload-module module-loopback")))
 #+END_SRC
 
 *** Keyboard layout selection
@@ -1173,8 +1226,7 @@ Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
   (defun run-gimp ()
     "Start GIMP."
     (interactive)
-    (start-process-shell-command
-     "GIMP" nil "gimp"))
+    (start-process "GIMP" nil "gimp"))
 #+END_SRC
 
 *** Steam
@@ -1183,8 +1235,7 @@ Gaming is possible with EXWM, if you run games windowed. I used to run it floati
   (defun run-steam ()
     "Start Steam."
     (interactive)
-    (start-process-shell-command
-     "Steam" nil "steam"))
+    (start-process "Steam" nil "steam"))
 #+END_SRC
 
 *** Firefox
@@ -1193,8 +1244,7 @@ Firefox has some unique abilities when it comes to how to make windows behave wh
   (defun run-firefox ()
     "Start Firefox."
     (interactive)
-    (start-process-shell-command
-     "Firefox" nil "firefox"))
+    (start-process "Firefox" nil "firefox"))
 #+END_SRC
 
 *** Discord
@@ -1203,8 +1253,7 @@ Yeah, I also use the light theme for Discord. It looks comfy, even if Discord is
   (defun run-discord ()
     "Start Discord."
     (interactive)
-    (start-process-shell-command
-     "Discord" nil "discord"))
+    (start-process "Discord" nil "discord"))
 #+END_SRC
 
 *** Telegram
@@ -1213,8 +1262,7 @@ I have a painfully white theme which fits perfectly with my setup.
   (defun run-telegram ()
     "Start Telegram."
     (interactive)
-    (start-process-shell-command
-     "Telegram" nil "telegram-desktop"))
+    (start-process "Telegram" nil "telegram-desktop"))
 #+END_SRC
 
 *** MuseScore
@@ -1223,8 +1271,7 @@ I haven't figured out how to engrave in Emacs, so for now...
   (defun run-musescore ()
     "Start MuseScore."
     (interactive)
-    (start-process-shell-command
-     "MuseScore" nil "musescore"))
+    (start-process "MuseScore" nil "musescore"))
 #+END_SRC
 
 *** LibreOffice
@@ -1233,8 +1280,7 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
   (defun run-libreoffice ()
     "Start LibreOffice."
     (interactive)
-    (start-process-shell-command
-     "LibreOffice" nil "libreoffice"))
+    (start-process "LibreOffice" nil "libreoffice"))
 #+END_SRC
 
 *** Transmission
@@ -1242,8 +1288,7 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
   (defun run-transmission ()
     "Start Transmission."
     (interactive)
-    (start-process-shell-command
-     "Transmission" nil "transmission-gtk"))
+    (start-process "Transmission" nil "transmission-gtk"))
 #+END_SRC
 ** Keybindings
 *** Global binds to use across everything
@@ -1368,52 +1413,57 @@ This includes:
 #+END_SRC
 
 ** On startup
+*** Hide the cursor when typing
+This is just a point of personal preference. I tried not using it for a while and personally it just felt wrong.
+#+BEGIN_SRC emacs-lisp
+  (start-process "Hide Cursor" nil "xbanish")
+#+END_SRC
+
 *** Disable screen blanking
 I don't need my laptop's screen shutting off just because I'm sitting and watching a video too long.
 #+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Disable Blanking" nil "xset s off -dpms")
+  (start-process "Disable Blanking" nil "xset"
+                 "s off -dpms")
 #+END_SRC
 
 *** Disable the trackpad
 This thing is disgusting, and I prefer trackpoints way more.
 #+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Trackpad Setup" nil (concat "xinput disable "
-                                (shell-command-to-string
-                                 (concat "xinput | grep Synap | "
-                                         "head -n 1 | sed -r "
-                                         "'s/.*id=([0-9]+).*/\\1/' | "
-                                         "tr '\n' ' '"))))
+  (start-process "Trackpad Setup" nil "xinput"
+                 "disable" (shell-command-to-string
+                            (concat "xinput | grep Synap | "
+                                    "head -n 1 | sed -r "
+                                    "'s/.*id=([0-9]+).*/\\1/' | "
+                                    "tr '\n' ' '")))
 #+END_SRC
 
 *** Keyboard configuration
 This block sets the keyboard layout to US and give Caps Lock the functionality of Control. I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
 #+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Keyboard Layout" nil "setxkbmap us -option ctrl:nocaps")
+  (start-process "Keyboard Layout" nil "setxkbmap"
+                 "us -option ctrl:nocaps")
 #+END_SRC
 
 *** Start the compositor
 I don't need it, but having basic compositing is very nice.
 #+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Compositor" nil "xcompmgr")
+  (start-process "Compositor" nil "xcompmgr")
 #+END_SRC
 
 *** Set fallback cursor
 Some X windows will have weird cursors if this isn't done.
 #+BEGIN_SRC emacs-lisp
-  (start-process-shell-command
-   "Fallback Cursor" nil "xsetroot -cursor_name left_ptr")
+  (start-process "Fallback Cursor" nil "xsetroot"
+                 "-cursor_name left_ptr")
 #+END_SRC
 
 *** Start EXWM
 #+BEGIN_SRC emacs-lisp
-  (exwm-enable)
-  (exwm-config-ido)
   (exwm-systemtray-enable)
+  (exwm-config-ido)
+  (exwm-enable)
 #+END_SRC
+
 With that out of the way, we can close off this block and move on to the next section.
 #+BEGIN_SRC emacs-lisp
   )
@@ -1506,7 +1556,7 @@ Now using a keymap in place of that wonky as crap binding system. The new binds 
       ;; Refreshing various things
       (define-key map (kbd "r c") 'emms-player-mpd-update-all-reset-cache)
       (define-key map (kbd "r d") 'mpd/update-database)
-      ;; mpd specific functions
+      ;; `mpd'-specific functions
       (define-key map (kbd "d s") 'mpd/start-music-daemon)
       (define-key map (kbd "d q") 'mpd/kill-music-daemon)
       (define-key map (kbd "d u") 'mpd/update-database)
@@ -1838,7 +1888,8 @@ This search behavior is *SO* much nicer than the default.
 *** No backups or auto-saving
 I love living on the edge.
 #+BEGIN_SRC emacs-lisp
-  (setq make-backup-files nil
+  (setq backup-inhibited t
+        make-backup-files nil
         auto-save-default nil)
 #+END_SRC
 

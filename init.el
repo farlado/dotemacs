@@ -45,16 +45,68 @@
 (add-hook 'emacs-startup-hook 'startup/reset-gc)
 
 (setq custom-file "/dev/null"
-      package-selected-packages '(async use-package auto-package-update dashboard
-                                  leuven-theme spaceline diminish rainbow-mode
-                                  rainbow-delimiters exwm dmenu desktop-environment
-                                  system-packages exwm-mff exwm-edit emms
-                                  graphviz-dot-mode markdown-mode which-key
-                                  ido-vertical-mode smex buffer-move swiper
-                                  popup-kill-ring hungry-delete avy sudo-edit magit
-                                  company haskell-mode company-jedi flycheck
-                                  avy-flycheck org-bullets epresent vterm nov wttrin
-                                  yahtzee sudoku chess 2048-game))
+      package-selected-packages '(;; Core
+                                  async
+                                  use-package
+                                  auto-package-update
+
+                                  ;; Looks
+                                  dashboard
+                                  leuven-theme
+                                  spaceline
+                                  diminish
+                                  rainbow-mode
+                                  rainbow-delimiters
+
+                                  ;; Desktop environment
+                                  exwm
+                                  dmenu
+                                  minibuffer-line
+                                  desktop-environment
+                                  system-packages
+                                  exwm-edit
+                                  exwm-mff
+
+                                  ;; Multimedia
+                                  emms
+
+                                  ;; Extra major modes
+                                  graphviz-dot-mode
+                                  markdown-mode
+
+                                  ;; Functionality
+                                  which-key
+                                  ido-vertical-mode
+                                  smex
+                                  buffer-move
+                                  swiper
+                                  popup-kill-ring
+                                  hungry-delete
+                                  avy
+                                  sudo-edit
+
+                                  ;; Programming
+                                  magit
+                                  company
+                                  haskell-mode
+                                  company-jedi
+                                  flycheck
+                                  avy-flycheck
+
+                                  ;; org-mode
+                                  org-bullets
+                                  epresent
+
+                                  ;; Other
+                                  vterm
+                                  nov
+                                  wttrin
+
+                                  ;; Games
+                                  yahtzee
+                                  sudoku
+                                  chess
+                                  2048-game))
 
 (require 'package)
 (defun package--save-selected-packages (&rest opt) nil)
@@ -237,8 +289,7 @@
   :defer t
   :hook (prog-mode . rainbow-delimiters-mode))
 
-(when (and (eq window-system 'x)
-           (= (shell-command "wmctrl -m  1> /dev/null 2> /dev/null") 1))
+(when (getenv "_RUN_EXWM")
   (set-frame-parameter nil 'fullscreen 'fullboth)
 
 (use-package exwm
@@ -340,12 +391,13 @@
                     "VGA1")))
     (dolist (monitor possible)
       (if (member monitor monitors)
-          (start-process-shell-command
-           "xrandr" nil (concat "xrandr --output " monitor
-                                " --mode 1366x768 --pos 0x0 "))
-        (start-process-shell-command
-         "xrandr" nil (concat "xrandr --output "
-                              monitor " --off "))))))
+          (start-process "xrandr" nil "xrandr"
+                         "--output" monitor
+                         "--mode 1366x768"
+                         "--pos 0x0")
+        (start-process "xrandr" nil "xrandr"
+                       "--output" monitor
+                       "--off")))))
 
 (defun display-setup-w541 ()
   "Set up the connected monitors on a ThinkPad W541."
@@ -377,12 +429,16 @@
                                         (if (string= monitor "DP2-2")
                                             "1620x0 "
                                           "4500x0 ")))))
-            (start-process-shell-command
-             "xrandr" nil (concat "xrandr " output primary
-                                  mode scale rotate pos)))
-        (start-process-shell-command
-         "xrandr" nil (concat "xrandr --output "
-                              monitor " --off "))))))
+            (start-process "xrandr" nil "xrandr"
+                           (concat output
+                                   primary
+                                   mode
+                                   scale
+                                   rotate
+                                   pos)))
+        (start-process "xrandr" nil "xrandr"
+                       "--output" monitor
+                       "--off ")))))
 
 (defun peripheral-setup ()
   "Configure peripherals I connect to my dock."
@@ -392,17 +448,15 @@
                                "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
     (dolist (command '("'libinput Button Scrolling Button' 10"
                        "'libinput Scroll Method Enabled' 0 0 1"))
-      (start-process-shell-command
-       "Trackball Setup" nil (concat "xinput set-prop "
-                                     trackball-id
-                                     command)))
-    (start-process-shell-command
-     "Trackball Setup" nil (concat "xinput set-button-map "
-                                   trackball-id
-                                   "1 2 3 4 5 6 7 8 9 2 1 2")))
+      (start-process "Trackball Setup" nil "xinput"
+                     "set-prop" trackball-id
+                     command))
+    (start-process "Trackball Setup" nil "xinput"
+                   "set-button-map" trackball-id
+                   "1 2 3 4 5 6 7 8 9 2 1 2"))
   ;; Keyboard
-  (start-process-shell-command
-   "Keyboard Setup" nil "setxkbmap -option ctrl:nocaps"))
+  (start-process "Keyboard Setup" nil "setxkbmap"
+                 "-option ctrl:nocaps"))
 
 (defun display-and-dock-setup ()
   "Configure displays and dock if applicable."
@@ -442,6 +496,7 @@
                         (noconfirm . "--noconfirm"))))
     (setq system-packages-use-sudo nil
           system-packages-package-manager 'yay))
+  (setq system-packages-noconfirm t)
   :bind (("C-c p i" . system-packages-install)
          ("C-c p e" . system-packages-ensure)
          ("C-c p u" . system-packages-update)
@@ -538,21 +593,18 @@
 (defun monitor-settings ()
   "Open arandr to configure monitors."
   (interactive)
-  (start-process-shell-command
-   "Monitor Settings" nil "arandr"))
+  (start-process "Monitor Settings" nil "arandr"))
 
 (defun network-settings ()
   "Open a NetworkManager connection editor."
   (interactive)
-  (start-process-shell-command
-   "Network Settings" nil "nm-connection-editor")
-  (async-shell-command "nmcli dev wifi list"))
+  (start-process "Network Settings" nil "nm-connection-editor")
+  (async-shell-command "nmcli dev wifi list" "*Wi-Fi Networks*"))
 
 (defun volume-settings ()
   "Open pavucontrol to adjust volume."
   (interactive)
-  (start-process-shell-command
-   "Volume Mixer" nil "pavucontrol"))
+  (start-process "Volume Mixer" nil "pavucontrol"))
 
 (defun audio-loopback ()
   "Loop desktop audio into a null sink alongside the primary input."
@@ -571,8 +623,8 @@
   ;; Run `pavucontrol' and then unload the modules after it completes
   (start-process-shell-command
    "Audio Loop" nil (concat "pavucontrol && "
-                          "pacmd unload-module module-null-sink && "
-                          "pacmd unload-module module-loopback")))
+                            "pacmd unload-module module-null-sink && "
+                            "pacmd unload-module module-loopback")))
 
 (defgroup keyboard-layout nil
   "Keyboard layouts to cycle through."
@@ -757,50 +809,42 @@ Instead of just killing Emacs, shuts down the system."
 (defun run-gimp ()
   "Start GIMP."
   (interactive)
-  (start-process-shell-command
-   "GIMP" nil "gimp"))
+  (start-process "GIMP" nil "gimp"))
 
 (defun run-steam ()
   "Start Steam."
   (interactive)
-  (start-process-shell-command
-   "Steam" nil "steam"))
+  (start-process "Steam" nil "steam"))
 
 (defun run-firefox ()
   "Start Firefox."
   (interactive)
-  (start-process-shell-command
-   "Firefox" nil "firefox"))
+  (start-process "Firefox" nil "firefox"))
 
 (defun run-discord ()
   "Start Discord."
   (interactive)
-  (start-process-shell-command
-   "Discord" nil "discord"))
+  (start-process "Discord" nil "discord"))
 
 (defun run-telegram ()
   "Start Telegram."
   (interactive)
-  (start-process-shell-command
-   "Telegram" nil "telegram-desktop"))
+  (start-process "Telegram" nil "telegram-desktop"))
 
 (defun run-musescore ()
   "Start MuseScore."
   (interactive)
-  (start-process-shell-command
-   "MuseScore" nil "musescore"))
+  (start-process "MuseScore" nil "musescore"))
 
 (defun run-libreoffice ()
   "Start LibreOffice."
   (interactive)
-  (start-process-shell-command
-   "LibreOffice" nil "libreoffice"))
+  (start-process "LibreOffice" nil "libreoffice"))
 
 (defun run-transmission ()
   "Start Transmission."
   (interactive)
-  (start-process-shell-command
-   "Transmission" nil "transmission-gtk"))
+  (start-process "Transmission" nil "transmission-gtk"))
 
 (setq exwm-input-global-keys
       `(;; Switching workspace focus
@@ -904,29 +948,29 @@ Instead of just killing Emacs, shuts down the system."
                "C-c C-f"))
   (define-key exwm-mode-map (kbd key) nil))
 
-(start-process-shell-command
- "Disable Blanking" nil "xset s off -dpms")
+(start-process "Hide Cursor" nil "xbanish")
 
-(start-process-shell-command
- "Trackpad Setup" nil (concat "xinput disable "
-                              (shell-command-to-string
-                               (concat "xinput | grep Synap | "
-                                       "head -n 1 | sed -r "
-                                       "'s/.*id=([0-9]+).*/\\1/' | "
-                                       "tr '\n' ' '"))))
+(start-process "Disable Blanking" nil "xset"
+               "s off -dpms")
 
-(start-process-shell-command
- "Keyboard Layout" nil "setxkbmap us -option ctrl:nocaps")
+(start-process "Trackpad Setup" nil "xinput"
+               "disable" (shell-command-to-string
+                          (concat "xinput | grep Synap | "
+                                  "head -n 1 | sed -r "
+                                  "'s/.*id=([0-9]+).*/\\1/' | "
+                                  "tr '\n' ' '")))
 
-(start-process-shell-command
- "Compositor" nil "xcompmgr")
+(start-process "Keyboard Layout" nil "setxkbmap"
+               "us -option ctrl:nocaps")
 
-(start-process-shell-command
- "Fallback Cursor" nil "xsetroot -cursor_name left_ptr")
+(start-process "Compositor" nil "xcompmgr")
 
-(exwm-enable)
-(exwm-config-ido)
+(start-process "Fallback Cursor" nil "xsetroot"
+               "-cursor_name left_ptr")
+
 (exwm-systemtray-enable)
+(exwm-config-ido)
+(exwm-enable)
 
 )
 
@@ -993,7 +1037,7 @@ Instead of just killing Emacs, shuts down the system."
     ;; Refreshing various things
     (define-key map (kbd "r c") 'emms-player-mpd-update-all-reset-cache)
     (define-key map (kbd "r d") 'mpd/update-database)
-    ;; mpd specific functions
+    ;; `mpd'-specific functions
     (define-key map (kbd "d s") 'mpd/start-music-daemon)
     (define-key map (kbd "d q") 'mpd/kill-music-daemon)
     (define-key map (kbd "d u") 'mpd/update-database)
@@ -1193,7 +1237,8 @@ This function has been altered to accommodate `exwm-mode'."
   :defer t
   :bind ("C-s" . swiper))
 
-(setq make-backup-files nil
+(setq backup-inhibited t
+      make-backup-files nil
       auto-save-default nil)
 
 (global-auto-revert-mode 1)
