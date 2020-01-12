@@ -1445,7 +1445,7 @@ This thing is disgusting, and I prefer trackpoints way more.
 This block sets the keyboard layout to US and give Caps Lock the functionality of Control. I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
 #+BEGIN_SRC emacs-lisp
   (start-process "Keyboard Layout" nil "setxkbmap"
-                 "us" "-option" "ctrl:swapcaps")
+                 "us" "-option" "ctrl:nocaps")
 #+END_SRC
 
 *** Start the compositor

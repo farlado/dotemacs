@@ -964,7 +964,7 @@ Instead of just killing Emacs, shuts down the system."
                                   "tr '\n' ' ' | sed 's/ //'")))
 
 (start-process "Keyboard Layout" nil "setxkbmap"
-               "us" "-option" "ctrl:swapcaps")
+               "us" "-option" "ctrl:nocaps")
 
 (start-process "Compositor" nil "xcompmgr")
 
