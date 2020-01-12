@@ -412,7 +412,7 @@
       (if (and (member monitor connected-monitors)
                (not (and docked-p (string= "eDP1" monitor))))
           (progn
-            (start-process "xrandr" "*xrandr*" "xrandr"
+            (start-process "xrandr" nil "xrandr"
                            "--output" monitor
                            ;; Any enabled monitor needs a resolution.
                            "--mode" (if (string= "eDP1" monitor)
@@ -436,10 +436,10 @@
             ;; This is due to how `start-process' takes arguments.
             (when (or (string= "DP2-2" monitor)
                       (string= "eDP1" monitor))
-              (start-process "xrandr" "*xrandr*" "xrandr"
+              (start-process "xrandr" nil "xrandr"
                              "--output" monitor
                              "--primary")))
-        (start-process "xrandr" "*xrandr*" "xrandr"
+        (start-process "xrandr" nil "xrandr"
                        "--output" monitor
                        "--off")))))
 
