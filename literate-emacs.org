@@ -2126,6 +2126,62 @@ Since obviously dot snippets are purely harmless +as far as I know+, I just don'
   (setq org-confirm-babel-evaluate '(lambda (lang body) (not (string= lang "dot"))))
 #+end_src
 
+*** Shortcuts for various snippets
+First, we load ~org-tempo~, the extension that allows the old way of doing things. Then, we add shortcuts for the individual blocks of code. Finally, we can add shortcuts for other items that aren't blocks.
+#+begin_src emacs-lisp
+  (require 'org-tempo)
+
+  (setq org-structure-template-alist
+        '(;; General blocks
+          ("c"   . "center")
+          ("C"   . "comment")
+          ("e"   . "example")
+          ("q"   . "quote")
+          ("v"   . "verse")
+
+          ;; Export blocks
+          ("a"   . "export ascii")
+          ("h"   . "export html")
+          ("css" . "export css")
+          ("l"   . "export latex")
+
+          ;; Code blocks
+          ("s"   . "src")
+          ("el"  . "src emacs-lisp")
+          ("py"  . "src python")
+          ("dot" . "src dot :cmdline -Kdot -Tpng :file")
+          ("txt" . "src text :tangle")))
+
+  (setq org-tempo-keywords-alist
+        '(;; Title/subtitle
+          ("t"  . "title")
+          ("st" . "subtitle")
+
+          ;; Name/caption
+          ("n"  . "name")
+          ("ca" . "caption")
+
+          ;; Property/startup
+          ("p"  . "property")
+          ("su" . "startup")
+
+          ;; Other
+          ("L"  . "latex")
+          ("H"  . "html")
+          ("A"  . "ascii")
+          ("i"  . "index")))
+#+end_src
+
+*** Don't give angle brackets syntax
+For some reason, starting with ~org-mode~ 9.3 or so, all symbols that are brackets, i.e. ={}=, =()=, =<>=, are given syntax as pairs. This isn't a problem on its own (especially since it makes quotations and parentheses far easier to work with), but /angle brackets specifically/ cause issues since they specifically are inequality operators in my books and =<= is the prefix for the shortcuts provided by ~org-tempo~.
+#+begin_src emacs-lisp
+  (defun farl-org/disable-angle-bracket-syntax ()
+    "Disable the angle bracket syntax added to `org-mode' in versions 9.2 and above."
+    (modify-syntax-entry ?< ".")
+    (modify-syntax-entry ?> "."))
+  (add-hook 'org-mode-hook 'farl-org/disable-angle-bracket-syntax)
+#+end_src
+
 *** Agenda (only enabled if an agenda is found)
 I use =C-c M-a= and =C-c s-a= to do things related to my agenda. Only one of my systems actually has my agenda, so this only runs on that machine so I don't try any funny business on other machines.
 #+begin_src emacs-lisp
@@ -2139,34 +2195,6 @@ I use =C-c M-a= and =C-c s-a= to do things related to my agenda. Only one of my 
 
     (global-set-key (kbd "C-c M-a") 'org-agenda)
     (global-set-key (kbd "C-c s-a") 'open-agenda))
-#+end_src
-
-*** Shortcuts for various snippets in ~org-mode~ 9.2 and above
-#+begin_src emacs-lisp
-  (unless (< (string-to-number org-version) 9.2)
-#+end_src
-
-There are multiple items to handle here:
-1. Don't handle arrow brackets as enclosures in org-mode
-#+begin_src emacs-lisp
-  (defun farl-org/disable-angle-bracket-syntax ()
-    "Disable the angle bracket syntax added to `org-mode' in versions 9.2 and above."
-    (modify-syntax-entry ?< ".")
-    (modify-syntax-entry ?> "."))
-  (add-hook 'org-mode-hook 'farl-org/disable-angle-bracket-syntax)
-#+end_src
-2. Load ~org-tempo~, the extension that allows the old way of doing things.
-#+begin_src emacs-lisp
-  (require 'org-tempo)
-#+end_src
-3. Add block shortcuts
-#+begin_src emacs-lisp
-  (dolist (shortcut '(("el"  . "src emacs-lisp")
-                      ("py"  . "src python")
-                      ("dot" . "src dot :cmdline -Kdot -Tpng :file")
-                      ("txt" . "src text :tangle")
-                      ("css" . "src css")))
-    (add-to-list 'org-structure-template-alist shortcut))
 #+end_src
 
 *** Use the current window when editing source blocks
