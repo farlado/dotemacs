@@ -1345,6 +1345,11 @@ This function has been altered to accommodate `exwm-mode'."
   :bind (:map prog-mode-map
          ("C-c C-'" . avy-flycheck-goto-error)))
 
+(use-package org
+  :ensure org-plus-contrib
+  :defer t
+  :pin org)
+
 (use-package org-bullets
   :if window-system
   :ensure t

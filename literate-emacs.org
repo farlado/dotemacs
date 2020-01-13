@@ -2067,8 +2067,17 @@ This one is *SUPER COOL*. Being able to jump straight to a problem is really use
            ("C-c C-'" . avy-flycheck-goto-error)))
 #+END_SRC
 
-** Org-mode
+** ~org-mode~
 As I spend more time in Org-mode, the more I need from it.
+
+*** Always use newest ~org-mode~ version
+In order to better prepare for any changes coming to ~org-mode~, I need the newest package at all times.
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :ensure org-plus-contrib
+    :defer t
+    :pin org)
+#+END_SRC
 
 *** Fancier bullet points
 It's kinda slow, but bullet points are very nice, much better than asterisks.
