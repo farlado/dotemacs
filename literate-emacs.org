@@ -2071,7 +2071,7 @@ This one is *SUPER COOL*. Being able to jump straight to a problem is really use
 As I spend more time in Org-mode, the more I need from it.
 
 *** Fancier bullet points
-It's kinda slow, but bullet points are very very nice, much better than asterisks.
+It's kinda slow, but bullet points are very nice, much better than asterisks.
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
     :if window-system
@@ -2118,15 +2118,19 @@ Since obviously dot snippets are purely harmless +as far as I know+, I just don'
 #+END_SRC
 
 *** Shortcuts for various snippets in org-mode
-This will expand as I get into more and more languages and take more notes in classes with different snippets of different languages.
+This will expand as I get into more and more languages and take more notes in classes with different snippets of different languages. As of ~org-mode~ version 9.2, a +gigantic feature regression+ change to how shortcuts are formed was introduced. While I work out a solution to this +regression+ change, the block below is now limited to only pre-9.2 versions of ~org-mode~.
 #+BEGIN_SRC emacs-lisp
-  (dolist (shortcut
-           '(("el"  "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")
-             ("py"  "#+BEGIN_SRC python\n?\n#+END_SRC")
-             ("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC")
-             ("txt" "#+BEGIN_SRC text :tangle ?\n\n#+END_SRC")
-             ("css" "#+BEGIN_SRC css\n?\n#+END_SRC")))
-    (add-to-list 'org-structure-template-alist shortcut))
+  (when (< (string-to-number org-version) 9.2)
+    (dolist (shortcut
+             '(("t"   "#+TITLE: ?")
+               ("st"  "#+SUBTITLE: ?")
+               ("n"   "#+NAME: ?")
+               ("el"  "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")
+               ("py"  "#+BEGIN_SRC python\n?\n#+END_SRC")
+               ("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC")
+               ("txt" "#+BEGIN_SRC text :tangle ?\n\n#+END_SRC")
+               ("css" "#+BEGIN_SRC css\n?\n#+END_SRC")))
+      (add-to-list 'org-structure-template-alist shortcut)))
 #+END_SRC
 
 *** Agenda (only enabled if an agenda is found)

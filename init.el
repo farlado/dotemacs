@@ -1376,13 +1376,17 @@ This function has been altered to accommodate `exwm-mode'."
 (org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
 (setq org-confirm-babel-evaluate '(lambda (lang body) (not (eq lang "dot"))))
 
-(dolist (shortcut
-         '(("el"  "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")
-           ("py"  "#+BEGIN_SRC python\n?\n#+END_SRC")
-           ("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC")
-           ("txt" "#+BEGIN_SRC text :tangle ?\n\n#+END_SRC")
-           ("css" "#+BEGIN_SRC css\n?\n#+END_SRC")))
-  (add-to-list 'org-structure-template-alist shortcut))
+(when (< (string-to-number org-version) 9.2)
+  (dolist (shortcut
+           '(("t"   "#+TITLE: ?")
+             ("st"  "#+SUBTITLE: ?")
+             ("n"   "#+NAME: ?")
+             ("el"  "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")
+             ("py"  "#+BEGIN_SRC python\n?\n#+END_SRC")
+             ("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC")
+             ("txt" "#+BEGIN_SRC text :tangle ?\n\n#+END_SRC")
+             ("css" "#+BEGIN_SRC css\n?\n#+END_SRC")))
+    (add-to-list 'org-structure-template-alist shortcut)))
 
 (when (file-exists-p "~/agenda.org")
   (setq org-agenda-files '("~/agenda.org"))
