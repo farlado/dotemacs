@@ -32,6 +32,9 @@ This file is an attempt at a literate GNU Emacs (henceforth "Emacs") configurati
 ** Okay, that's pretty neat. Why though?
 The answer is rather simple. Before I used a fully literate, I had an ~init.el~ which tangled blocks from a ~config.org~ on the fly (read: on startup). It turns out this was abysmally slow, making for a startup time of around 4.5 seconds when loading into my desktop environment. Tangling blocks from a ~literate-emacs.org~ into an ~init.el~ cuts this time by about a third, around 2.8 seconds to load into my desktop environment. This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check both ~init.el~ and ~config.org~ when I thought I might have changed something for the worse.
 
+** About this branch
+With each new major version of Emacs, I will be making many massive changes to this configuration. Rather than try to manage keeping a single configuration with compatibility for every version of Emacs since the very beginning of the configuration's existence, I will instead branch when moving between major versions. The branches for the end of each major version will only be altered if issues and pull requests are made.
+
 ** Installation
 /Note: these instructions are for users of GNU/Linux or other *NIX systems. These instructions may not apply for users of Windows or macOS./
 1) Clone the repo into your home directory as ~.emacs.d~.
