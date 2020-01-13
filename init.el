@@ -12,112 +12,8 @@
 
 ;;; Code:
 
-(tooltip-mode -1)
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
 (setq use-dialog-box nil
       use-file-dialog nil)
-
-(setq load-prefer-newer t)
-
-(setq-default apropos-do-all t)
-
-(defvar startup/file-name-handler-alist file-name-handler-alist
-  "Temporary storage for `file-name-handler-alist' during startup.")
-
-(defun startup/revert-file-name-handler-alist ()
-  "Revert `file-name-handler-alist' to its default value after startup."
-  (setq file-name-handler-alist startup/file-name-handler-alist))
-
-(setq file-name-handler-alist nil)
-
-(add-hook 'emacs-startup-hook 'startup/revert-file-name-handler-alist)
-
-(setq gc-cons-threshold 402653184
-      gc-cons-percentage 0.6)
-
-(defun startup/reset-gc ()
-  "Return garbage collection to normal parameters after startup."
-  (setq gc-cons-threshold 16777216
-        gc-cons-percentage 0.1))
-
-(add-hook 'emacs-startup-hook 'startup/reset-gc)
-
-(setq custom-file "/dev/null"
-      package-selected-packages '(;; Core
-                                  async
-                                  use-package
-                                  auto-package-update
-
-                                  ;; Looks
-                                  dashboard
-                                  leuven-theme
-                                  spaceline
-                                  diminish
-                                  rainbow-mode
-                                  rainbow-delimiters
-
-                                  ;; Desktop environment
-                                  exwm
-                                  dmenu
-                                  minibuffer-line
-                                  desktop-environment
-                                  system-packages
-                                  exwm-edit
-                                  exwm-mff
-
-                                  ;; Multimedia
-                                  emms
-
-                                  ;; Extra major modes
-                                  graphviz-dot-mode
-                                  markdown-mode
-
-                                  ;; Functionality
-                                  which-key
-                                  ido-vertical-mode
-                                  smex
-                                  buffer-move
-                                  swiper
-                                  popup-kill-ring
-                                  hungry-delete
-                                  avy
-                                  sudo-edit
-
-                                  ;; Programming
-                                  magit
-                                  company
-                                  haskell-mode
-                                  company-jedi
-                                  flycheck
-                                  avy-flycheck
-
-                                  ;; org-mode
-                                  org-bullets
-                                  epresent
-
-                                  ;; Other
-                                  vterm
-                                  nov
-                                  wttrin
-
-                                  ;; Games
-                                  yahtzee
-                                  sudoku
-                                  chess
-                                  2048-game))
-
-(require 'package)
-(defun package--save-selected-packages (&rest opt) nil)
-
-(setq package-enable-at-startup nil
-      package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")
-                         ("org"   . "https://orgmode.org/elpa/")))
-
-(when (< emacs-major-version 27)
-  (package-initialize))
 
 (unless (package-installed-p 'async)
   (package-refresh-contents)
@@ -290,6 +186,7 @@
   :hook (prog-mode . rainbow-delimiters-mode))
 
 (when (getenv "_RUN_EXWM")
+  (setenv "_RUN_EXWM")
   (set-frame-parameter nil 'fullscreen 'fullboth)
 
 (use-package exwm
@@ -1345,11 +1242,6 @@ This function has been altered to accommodate `exwm-mode'."
   :bind (:map prog-mode-map
          ("C-c C-'" . avy-flycheck-goto-error)))
 
-(use-package org
-  :ensure org-plus-contrib
-  :defer t
-  :pin org)
-
 (use-package org-bullets
   :if window-system
   :ensure t
@@ -1382,6 +1274,7 @@ This function has been altered to accommodate `exwm-mode'."
 (setq org-confirm-babel-evaluate '(lambda (lang body) (not (string= lang "dot"))))
 
 (require 'org-tempo)
+(add-to-list 'org-modules 'org-tempo)
 (setq org-structure-template-alist '(;; General blocks
                                      ("c"   . "center")
                                      ("C"   . "comment")
