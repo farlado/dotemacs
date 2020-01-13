@@ -73,6 +73,8 @@
                                   markdown-mode
 
                                   ;; Functionality
+                                  company
+                                  company-emoji
                                   which-key
                                   ido-vertical-mode
                                   smex
@@ -85,7 +87,6 @@
 
                                   ;; Programming
                                   magit
-                                  company
                                   haskell-mode
                                   company-jedi
                                   flycheck
