@@ -116,8 +116,7 @@
                          ("melpa" . "https://melpa.org/packages/")
                          ("org"   . "https://orgmode.org/elpa/")))
 
-(when (< emacs-major-version 27)
-  (package-initialize))
+(package-initialize)
 
 (unless (package-installed-p 'async)
   (package-refresh-contents)
@@ -176,10 +175,6 @@
        (size (if (<= res 1366) 100
                180)))
   (set-face-attribute 'default nil :height size))
-
-(when (and (member "Noto Color Emoji" (font-family-list))
-           (not (< emacs-major-version 27)))
-  (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
 
 (use-package leuven-theme
   :if window-system

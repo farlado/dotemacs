@@ -299,8 +299,7 @@ Next, we have to configure a setting for sanity and add our repositories to the 
 *** Initialize package management
 Finally, we call ~package-initialize~. We only need to do this if we're running on Emacs 26 or below. Emacs 27 and beyond no longer require this call.
 #+BEGIN_SRC emacs-lisp
-  (when (< emacs-major-version 27)
-    (package-initialize))
+  (package-initialize)
 #+END_SRC
 
 *** Bootstrap ~async~
@@ -393,14 +392,6 @@ Next we need to determine what size to make the text. This is based on the width
          (size (if (<= res 1366) 100
                  180)))
     (set-face-attribute 'default nil :height size))
-#+END_SRC
-
-*** Getting emoji to work properly
-God does this one feel great to have. However, it only works if we're using Emacs 27 or later...
-#+BEGIN_SRC emacs-lisp
-  (when (and (member "Noto Color Emoji" (font-family-list))
-             (not (< emacs-major-version 27)))
-    (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
 #+END_SRC
 
 ** Theme
