@@ -2127,49 +2127,46 @@ Since obviously dot snippets are purely harmless +as far as I know+, I just don'
 #+end_src
 
 *** Shortcuts for various snippets
-First, we load ~org-tempo~, the extension that allows the old way of doing things. Then, we add shortcuts for the individual blocks of code. Finally, we can add shortcuts for other items that aren't blocks.
+First, we load ~org-tempo~, the extension that allows the old way of doing things. Then, we add shortcuts for the individual blocks of code. Finally, we can add shortcuts for other items that aren't blocks. I've grown somewhat fond of this way of organizing my shortcuts, because it separates the blocks from the one-liners.
 #+begin_src emacs-lisp
   (require 'org-tempo)
+  (setq org-structure-template-alist '(;; General blocks
+                                       ("c"   . "center")
+                                       ("C"   . "comment")
+                                       ("e"   . "example")
+                                       ("q"   . "quote")
+                                       ("v"   . "verse")
 
-  (setq org-structure-template-alist
-        '(;; General blocks
-          ("c"   . "center")
-          ("C"   . "comment")
-          ("e"   . "example")
-          ("q"   . "quote")
-          ("v"   . "verse")
+                                       ;; Export blocks
+                                       ("a"   . "export ascii")
+                                       ("h"   . "export html")
+                                       ("css" . "export css")
+                                       ("l"   . "export latex")
 
-          ;; Export blocks
-          ("a"   . "export ascii")
-          ("h"   . "export html")
-          ("css" . "export css")
-          ("l"   . "export latex")
+                                       ;; Code blocks
+                                       ("s"   . "src")
+                                       ("el"  . "src emacs-lisp")
+                                       ("py"  . "src python")
+                                       ("dot" . "src dot :cmdline -Kdot -Tpng :file")
+                                       ("txt" . "src text :tangle")))
 
-          ;; Code blocks
-          ("s"   . "src")
-          ("el"  . "src emacs-lisp")
-          ("py"  . "src python")
-          ("dot" . "src dot :cmdline -Kdot -Tpng :file")
-          ("txt" . "src text :tangle")))
+  (setq org-tempo-keywords-alist '(;; Title/subtitle
+                                   ("t"  . "title")
+                                   ("st" . "subtitle")
 
-  (setq org-tempo-keywords-alist
-        '(;; Title/subtitle
-          ("t"  . "title")
-          ("st" . "subtitle")
+                                   ;; Name/caption
+                                   ("n"  . "name")
+                                   ("ca" . "caption")
 
-          ;; Name/caption
-          ("n"  . "name")
-          ("ca" . "caption")
+                                   ;; Property/startup
+                                   ("p"  . "property")
+                                   ("su" . "startup")
 
-          ;; Property/startup
-          ("p"  . "property")
-          ("su" . "startup")
-
-          ;; Other
-          ("L"  . "latex")
-          ("H"  . "html")
-          ("A"  . "ascii")
-          ("i"  . "index")))
+                                   ;; Other
+                                   ("L"  . "latex")
+                                   ("H"  . "html")
+                                   ("A"  . "ascii")
+                                   ("i"  . "index")))
 #+end_src
 
 *** Don't give angle brackets syntax

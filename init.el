@@ -1382,46 +1382,43 @@ This function has been altered to accommodate `exwm-mode'."
 (setq org-confirm-babel-evaluate '(lambda (lang body) (not (string= lang "dot"))))
 
 (require 'org-tempo)
+(setq org-structure-template-alist '(;; General blocks
+                                     ("c"   . "center")
+                                     ("C"   . "comment")
+                                     ("e"   . "example")
+                                     ("q"   . "quote")
+                                     ("v"   . "verse")
 
-(setq org-structure-template-alist
-      '(;; General blocks
-        ("c"   . "center")
-        ("C"   . "comment")
-        ("e"   . "example")
-        ("q"   . "quote")
-        ("v"   . "verse")
+                                     ;; Export blocks
+                                     ("a"   . "export ascii")
+                                     ("h"   . "export html")
+                                     ("css" . "export css")
+                                     ("l"   . "export latex")
 
-        ;; Export blocks
-        ("a"   . "export ascii")
-        ("h"   . "export html")
-        ("css" . "export css")
-        ("l"   . "export latex")
+                                     ;; Code blocks
+                                     ("s"   . "src")
+                                     ("el"  . "src emacs-lisp")
+                                     ("py"  . "src python")
+                                     ("dot" . "src dot :cmdline -Kdot -Tpng :file")
+                                     ("txt" . "src text :tangle")))
 
-        ;; Code blocks
-        ("s"   . "src")
-        ("el"  . "src emacs-lisp")
-        ("py"  . "src python")
-        ("dot" . "src dot :cmdline -Kdot -Tpng :file")
-        ("txt" . "src text :tangle")))
+(setq org-tempo-keywords-alist '(;; Title/subtitle
+                                 ("t"  . "title")
+                                 ("st" . "subtitle")
 
-(setq org-tempo-keywords-alist
-      '(;; Title/subtitle
-        ("t"  . "title")
-        ("st" . "subtitle")
+                                 ;; Name/caption
+                                 ("n"  . "name")
+                                 ("ca" . "caption")
 
-        ;; Name/caption
-        ("n"  . "name")
-        ("ca" . "caption")
+                                 ;; Property/startup
+                                 ("p"  . "property")
+                                 ("su" . "startup")
 
-        ;; Property/startup
-        ("p"  . "property")
-        ("su" . "startup")
-
-        ;; Other
-        ("L"  . "latex")
-        ("H"  . "html")
-        ("A"  . "ascii")
-        ("i"  . "index")))
+                                 ;; Other
+                                 ("L"  . "latex")
+                                 ("H"  . "html")
+                                 ("A"  . "ascii")
+                                 ("i"  . "index")))
 
 (defun farl-org/disable-angle-bracket-syntax ()
   "Disable the angle bracket syntax added to `org-mode' in versions 9.2 and above."
