@@ -1379,19 +1379,7 @@ This function has been altered to accommodate `exwm-mode'."
       org-hide-emphasis-markers (when window-system t))
 
 (org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
-(setq org-confirm-babel-evaluate '(lambda (lang body) (not (eq lang "dot"))))
-
-(when (< (string-to-number org-version) 9.2)
-  (dolist (shortcut
-           '(("t"   "#+TITLE: ?")
-             ("st"  "#+SUBTITLE: ?")
-             ("n"   "#+NAME: ?")
-             ("el"  "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")
-             ("py"  "#+BEGIN_SRC python\n?\n#+END_SRC")
-             ("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC")
-             ("txt" "#+BEGIN_SRC text :tangle ?\n\n#+END_SRC")
-             ("css" "#+BEGIN_SRC css\n?\n#+END_SRC")))
-    (add-to-list 'org-structure-template-alist shortcut)))
+(setq org-confirm-babel-evaluate '(lambda (lang body) (not (string= lang "dot"))))
 
 (when (file-exists-p "~/agenda.org")
   (setq org-agenda-files '("~/agenda.org"))
@@ -1403,6 +1391,23 @@ This function has been altered to accommodate `exwm-mode'."
 
   (global-set-key (kbd "C-c M-a") 'org-agenda)
   (global-set-key (kbd "C-c s-a") 'open-agenda))
+
+(unless (< (string-to-number org-version) 9.2)
+
+(defun farl-org/disable-angle-bracket-syntax ()
+  "Disable the angle bracket syntax added to `org-mode' in versions 9.2 and above."
+  (modify-syntax-entry ?< ".")
+  (modify-syntax-entry ?> "."))
+(add-hook 'org-mode-hook 'farl-org/disable-angle-bracket-syntax)
+
+(require 'org-tempo)
+
+(dolist (shortcut '(("el"  . "src emacs-lisp")
+                    ("py"  . "src python")
+                    ("dot" . "src dot :cmdline -Kdot -Tpng :file")
+                    ("txt" . "src text :tangle")
+                    ("css" . "src css")))
+  (add-to-list 'org-structure-template-alist shortcut))
 
 (setq org-src-window-setup 'current-window)
 
