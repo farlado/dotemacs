@@ -1372,27 +1372,43 @@ This function has been altered to accommodate `exwm-mode'."
 (setq org-confirm-babel-evaluate '(lambda (lang body) (not (eq lang "dot"))))
 
 (setq org-structure-template-alist
-      '(("t"   "#+title: ")
+      '(;; Title/subtitle
+        ("t"   "#+title: ")
         ("st"  "#+subtitle: ")
+
+        ;; Name/caption
         ("n"   "#+name: ")
-        ("I"   "#+include: %file")
-        ("i"   "#+index: ")
+        ("ca"  "#+caption: ")
+
+        ;; Property/startup
+        ("p"   "#+property: ")
+        ("su"  "#+startup: ")
+
+        ;; Other one-liners
         ("A"   "#+ascii: ")
-        ("H"   "#+html: ")
         ("L"   "#+latex: ")
+        ("H"   "#+html: ")
+        ("i"   "#+index: ")
+        ("I"   "#+include: %file")
+
+        ;; General blocks
+        ("c"   "#+begin_center\n?\n#+end_center")
+        ("C"   "#+begin_comment\n?\n#+end_comment")
+        ("e"   "#+begin_example\n?\n#+end_example")
         ("q"   "#+begin_quote\n?\n#+end_quote")
         ("v"   "#+begin_verse\n?\n#+end_verse")
-        ("V"   "#+begin_verbatim\n?\n#+end_verbatim")
-        ("e"   "#+begin_example\n?\n#+end_example")
-        ("C"   "#+begin_comment\n?\n#+end_comment")
+
+        ;; Export blocks
+        ("css" "#+begin_export css\n?\n#+end_src")
+        ("htm" "#+begin_export html\n?\n#+end_export")
+        ("a"   "#+begin_export ascii\n?\n#+end_export")
+
+        ;; Code blocks
         ("s"   "#begin_src ?\n\n#+end_src")
-        ("txt" "#+begin_src text :tangle ?\n\n#+end_src")
         ("el"  "#+begin_src emacs-lisp\n?\n#+end_src")
         ("py"  "#+begin_src python\n?\n#+end_src")
         ("dot" "#+begin_src dot :file ?.png :cmdline -Kdot -Tpng\n\n#+end_src")
-        ("css" "#+begin_export css\n?\n#+end_src")
-        ("htm" "#+begin_export html\n?\n#+end_export")
-        ("a"   "#+begin_export ascii\n?\n#+end_export")))
+        ("txt" "#+begin_src text :tangle ?\n\n#+end_src")))
 
 (when (file-exists-p "~/agenda.org")
   (setq org-agenda-files '("~/agenda.org"))
