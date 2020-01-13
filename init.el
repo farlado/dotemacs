@@ -1377,10 +1377,10 @@ This function has been altered to accommodate `exwm-mode'."
 (setq org-confirm-babel-evaluate '(lambda (lang body) (not (eq lang "dot"))))
 
 (dolist (shortcut
-         '(("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")
-           ("py" "#+BEGIN_SRC python\n?\n#+END_SRC")
+         '(("el"  "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")
+           ("py"  "#+BEGIN_SRC python\n?\n#+END_SRC")
            ("dot" "#+BEGIN_SRC dot :file ?.png :cmdline -Kdot -Tpng\n\n#+END_SRC")
-           ("t" "#+BEGIN_SRC text :tangle ?\n\n#+END_SRC")
+           ("txt" "#+BEGIN_SRC text :tangle ?\n\n#+END_SRC")
            ("css" "#+BEGIN_SRC css\n?\n#+END_SRC")))
   (add-to-list 'org-structure-template-alist shortcut))
 
