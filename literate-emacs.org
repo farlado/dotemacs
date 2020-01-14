@@ -183,7 +183,6 @@ Either I want these configured as soon as possible, or they are related to Emacs
 *** Hide dumb stuff (Part 1)
 I want to get GUI elements out of my face as soon as I possibly can. They just take up space.
 #+begin_src emacs-lisp
-  (tooltip-mode -1)
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
@@ -324,6 +323,7 @@ These are other startup specific things, but they cannot be done until ~package-
 *** Hide dumb stuff (Part 2)
 These buggers won't properly set unless it's done after ~early-init.el~, which is a real bummer.
 #+begin_src emacs-lisp
+  (tooltip-mode -1)
   (setq use-dialog-box nil
         use-file-dialog nil)
 #+end_src

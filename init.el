@@ -12,6 +12,7 @@
 
 ;;; Code:
 
+(tooltip-mode -1)
 (setq use-dialog-box nil
       use-file-dialog nil)
 
