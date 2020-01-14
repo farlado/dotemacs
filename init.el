@@ -1026,6 +1026,8 @@ Instead of just killing Emacs, shuts down the system."
   :ensure t
   :defer t
   :init
+  (require 'ido)
+  (require 'ido-vertical-mode)
   (setq ido-everywhere t
         ido-max-prospects 10
         ido-enable-prefix nil
