@@ -74,9 +74,7 @@
                180)))
   (set-face-attribute 'default nil :height size))
 
-(when (and (member "Noto Color Emoji" (font-family-list))
-           (not (< emacs-major-version 27)))
-  (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
+(set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend)
 
 (use-package leuven-theme
   :if window-system
@@ -966,6 +964,26 @@ Instead of just killing Emacs, shuts down the system."
 (set-selection-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
 
+(use-package company
+  :ensure t
+  :defer t
+  :init
+  (setq company-idle-delay 0.75
+        company-minimum-prefix-length 3)
+  (global-company-mode 1)
+  :bind (:map company-active-map
+         ("M-n" . nil)
+         ("M-p" . nil)
+         ("C-n" . company-select-next)
+         ("C-p" . company-select-previous)
+         ("SPC" . company-abort)))
+
+(use-package company-emoji
+  :ensure t
+  :defer t
+  :init
+  (add-to-list 'company-backends 'company-emoji))
+
 (dolist (key '("C-x C-z"
                "C-z"))
   (global-unset-key (kbd key)))
@@ -1200,20 +1218,6 @@ This function has been altered to accommodate `exwm-mode'."
   :ensure t
   :defer t
   :bind ("C-c g" . magit-status))
-
-(use-package company
-  :ensure t
-  :defer t
-  :init
-  (setq company-idle-delay 0.75
-        company-minimum-prefix-length 3)
-  (global-company-mode 1)
-  :bind (:map company-active-map
-         ("M-n" . nil)
-         ("M-p" . nil)
-         ("C-n" . company-select-next)
-         ("C-p" . company-select-previous)
-         ("SPC" . company-abort)))
 
 (use-package haskell-mode
   :ensure t

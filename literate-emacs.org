@@ -269,6 +269,8 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
                                     markdown-mode
 
                                     ;; Functionality
+                                    company
+                                    company-emoji
                                     which-key
                                     ido-vertical-mode
                                     smex
@@ -281,7 +283,6 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
 
                                     ;; Programming
                                     magit
-                                    company
                                     haskell-mode
                                     company-jedi
                                     flycheck
@@ -419,11 +420,9 @@ Next we need to determine what size to make the text. This is based on the width
 #+end_src
 
 *** Getting emoji to work properly
-God does this one feel great to have. However, it only works if we're using Emacs 27 or later...
+God does this one feel great to have now that I use an Emacs version that can handle it!
 #+begin_src emacs-lisp
-  (when (and (member "Noto Color Emoji" (font-family-list))
-             (not (< emacs-major-version 27)))
-    (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
+  (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend)
 #+end_src
 
 ** Theme
@@ -1636,6 +1635,34 @@ This makes for a much easier time editing files and working with text.
   (prefer-coding-system 'utf-8)
 #+end_src
 
+*** Autocomplete backend
+This is the base package. I changed some key bindings to make it more pleasant to use. It's not just for programming anymore!
+#+begin_src emacs-lisp
+  (use-package company
+    :ensure t
+    :defer t
+    :init
+    (setq company-idle-delay 0.75
+          company-minimum-prefix-length 3)
+    (global-company-mode 1)
+    :bind (:map company-active-map
+           ("M-n" . nil)
+           ("M-p" . nil)
+           ("C-n" . company-select-next)
+           ("C-p" . company-select-previous)
+           ("SPC" . company-abort)))
+#+end_src
+
+*** Typing Emoji in Emacs
+Thanks to ~company~, this is possible now!
+#+begin_src emacs-lisp
+  (use-package company-emoji
+    :ensure t
+    :defer t
+    :init
+    (add-to-list 'company-backends 'company-emoji))
+#+end_src
+
 *** Disable suspending Emacs
 Why is this even something bound to begin with?
 #+begin_src emacs-lisp
@@ -2028,24 +2055,6 @@ I used to use a terminal for this, but holy crap this is a lot easier, a lot fas
     :ensure t
     :defer t
     :bind ("C-c g" . magit-status))
-#+end_src
-
-*** Autocomplete backend
-This is the base package. I changed some key bindings to make it more pleasant to use.
-#+begin_src emacs-lisp
-  (use-package company
-    :ensure t
-    :defer t
-    :init
-    (setq company-idle-delay 0.75
-          company-minimum-prefix-length 3)
-    (global-company-mode 1)
-    :bind (:map company-active-map
-           ("M-n" . nil)
-           ("M-p" . nil)
-           ("C-n" . company-select-next)
-           ("C-p" . company-select-previous)
-           ("SPC" . company-abort)))
 #+end_src
 
 *** ~haskell-mode~
