@@ -1283,11 +1283,11 @@ This function has been altered to accommodate `exwm-mode'."
 (require 'org-tempo)
 (add-to-list 'org-modules 'org-tempo)
 (setq org-structure-template-alist '(;; General blocks
-                                     ("c"   . "center")
-                                     ("C"   . "comment")
-                                     ("e"   . "example")
-                                     ("q"   . "quote")
-                                     ("v"   . "verse")
+                                     ("c" . "center")
+                                     ("C" . "comment")
+                                     ("e" . "example")
+                                     ("q" . "quote")
+                                     ("v" . "verse")
 
                                      ;; Export blocks
                                      ("a"   . "export ascii")
@@ -1301,7 +1301,6 @@ This function has been altered to accommodate `exwm-mode'."
                                      ("py"  . "src python")
                                      ("dot" . "src dot :cmdline -Kdot -Tpng :file")
                                      ("txt" . "src text :tangle")))
-
 (setq org-tempo-keywords-alist '(;; Title/subtitle
                                  ("t"  . "title")
                                  ("st" . "subtitle")
@@ -1315,10 +1314,10 @@ This function has been altered to accommodate `exwm-mode'."
                                  ("su" . "startup")
 
                                  ;; Other
-                                 ("L"  . "latex")
-                                 ("H"  . "html")
-                                 ("A"  . "ascii")
-                                 ("i"  . "index")))
+                                 ("L" . "latex")
+                                 ("H" . "html")
+                                 ("A" . "ascii")
+                                 ("i" . "index")))
 
 (defun farl-org/disable-angle-bracket-syntax ()
   "Disable the angle bracket syntax added to `org-mode' in versions 9.2 and above."
