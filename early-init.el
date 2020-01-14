@@ -6,6 +6,7 @@
 
 ;; This file has been automatically generated from `literate-emacs.org'.
 ;; If you don't have a copy of that file, it is best not to use this file!
+;; This is in spite of the fact so little is actually in this file.
 ;; All relevant commentary is in `literate-emacs.org', not here.
 ;; There may not be any comments past this point.
 ;; Abandon all hope, ye who enter here.

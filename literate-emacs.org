@@ -147,6 +147,7 @@ In order to make the files look at least somewhat decent, and to warn those who 
 
   ;; This file has been automatically generated from `literate-emacs.org'.
   ;; If you don't have a copy of that file, it is best not to use this file!
+  ;; This is in spite of the fact so little is actually in this file.
   ;; All relevant commentary is in `literate-emacs.org', not here.
   ;; There may not be any comments past this point.
   ;; Abandon all hope, ye who enter here.
@@ -2056,7 +2057,7 @@ I used to use a terminal for this, but holy crap this is a lot easier, a lot fas
   (use-package magit
     :ensure t
     :defer t
-    :bind ("C-c g" . magit-status))
+    :bind ("C-x g" . magit-status))
 #+end_src
 
 *** ~haskell-mode~
@@ -2288,11 +2289,10 @@ Picking a service to use for this was a pain. I ended up settling for wttrin bec
 ** Games
 To make running games easier, I set up a keymap to which I add the games.
 #+begin_src emacs-lisp
-  (defvar games-map
-    (make-sparse-keymap)
+  (defvar games-map (make-sparse-keymap)
     "A keymap to which games can be added.")
 
-  (global-set-key (kbd "C-M-g") games-map)
+  (global-set-key (kbd "C-c g") games-map)
 #+end_src
 
 *** Yahtzee

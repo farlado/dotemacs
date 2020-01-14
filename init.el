@@ -1219,7 +1219,7 @@ This function has been altered to accommodate `exwm-mode'."
 (use-package magit
   :ensure t
   :defer t
-  :bind ("C-c g" . magit-status))
+  :bind ("C-x g" . magit-status))
 
 (use-package haskell-mode
   :ensure t
@@ -1366,11 +1366,10 @@ This function has been altered to accommodate `exwm-mode'."
   (setq wttrin-default-cities '("Indianapolis"))
   :bind ("C-c w" . wttrin))
 
-(defvar games-map
-  (make-sparse-keymap)
+(defvar games-map (make-sparse-keymap)
   "A keymap to which games can be added.")
 
-(global-set-key (kbd "C-M-g") games-map)
+(global-set-key (kbd "C-c g") games-map)
 
 (use-package yahtzee
   :ensure t
