@@ -2233,6 +2233,7 @@ This is exactly what I was looking for lmao
 
 * Making Emacs =e x t e n d=
 If it isn't about editing text, playing music, or being my entire desktop environment, it will most likely be found in this section.
+
 ** Built-in features
 *** Calendar
 Weeks start on Monday.
@@ -2242,6 +2243,7 @@ Weeks start on Monday.
 #+end_src
 
 *** Calculator
+I imagine there's a lot I could configure about this, but I don't really care to.
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-c c") 'calc)
 #+end_src
