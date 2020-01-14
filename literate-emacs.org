@@ -2,7 +2,7 @@
 #+subtitle: A far-from-sane literate Emacs configuration
 #+language: en
 #+options: num:2 toc:2
-#+property: header-args :tangle (concat user-emacs-directory "init.el")
+#+property: header-args :tangle (expand-file-name "init.el" user-emacs-directory)
 
 #+begin_quote
 I use Emacs, which might be thought of as a thermonuclear word processor.
@@ -138,7 +138,7 @@ Like mentioned above, this file is supposed to tangle into everything in my git 
 In order to make the files look at least somewhat decent, and to warn those who are unfortunate enough to think they'll just mosey on into one of them if they want to understand the config, we create headers that tells people the reality of the files.
 
 *** ~early-init.el~
-#+begin_src emacs-lisp :tangle (concat user-emacs-directory "early-init.el")
+#+begin_src emacs-lisp :tangle (expand-file-name "early-init.el" user-emacs-directory)
   ;;; early-init.el --- Early Initialization of Farlado's Illiterate GNU Emacs
 
   ;; This file is not part of GNU Emacs.
@@ -177,7 +177,7 @@ Even with the "small" amount I ask of Emacs, it's a lot of beef to start up as f
 
 ** Do these ASAP
    :properties:
-   :header-args: :tangle (concat user-emacs-directory "early-init.el")
+   :header-args: :tangle (expand-file-name "early-init.el" user-emacs-directory)
    :end:
 Either I want these configured as soon as possible, or they are related to Emacs starting up. Which are which is left as an exercise to the reader. Regardless, all of this is placed in ~early-init.el~ for the sake of speed.
 
@@ -232,7 +232,7 @@ Garbage collection shouldn't happen during startup, as that will slow Emacs down
 
 ** Package management
    :properties:
-   :header-args: :tangle (concat user-emacs-directory "early-init.el")
+   :header-args: :tangle (expand-file-name "early-init.el" user-emacs-directory)
    :end:
    Because I am writing this configuration to be as portable as possible (e.g. I should be able to dump this onto any machine and run it), I manage all packages through Emacs. All of this also is run in ~early-init.el~ leading up to the call of ~package-initialize~ between that file and ~init.el~, which probably will make for faster loading.
 
@@ -2357,7 +2357,7 @@ A simple and fun game. Was a big deal when I was in high school. I still play it
 Since we gave files their headers, I see no reason not to give them footers.
 
 *** ~early-init.el~
-#+begin_src emacs-lisp :tangle (concat user-emacs-directory "early-init.el")
+#+begin_src emacs-lisp :tangle (expand-file-name "early-init.el" user-emacs-directory)
   ;;; early-init.el ends here
 #+end_src
 
