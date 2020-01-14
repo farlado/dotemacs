@@ -85,8 +85,6 @@
         leuven-scale-outline-headlines t)
   (load-theme 'leuven t))
 
-(set-face-background 'fringe (face-attribute 'default :background))
-
 (fringe-mode 10)
 
 (setq window-divider-default-right-width 3)
@@ -146,8 +144,6 @@
 
 (global-display-line-numbers-mode 1)
 (setq-default indicate-empty-lines t)
-
-(set-face-background 'line-number (face-attribute 'default :background))
 
 (dolist (hook '(Man-mode-hook
                 nov-mode-hook
@@ -250,14 +246,13 @@
                                     floating-mode-line nil
                                     floating t)))
 
-(setq exwm-workspace-index-map
-      (lambda (index)
-        (let ((named-workspaces ["1" "2" "3" "4" "5" "6"
-                                 "office" "discord"
-                                 "telegram" "games"]))
-          (if (< index (length named-workspaces))
-              (elt named-workspaces index)
-            (number-to-string index)))))
+(setq exwm-workspace-index-map (lambda (index)
+                                 (let ((named-workspaces ["1" "2" "3" "4" "5" "6"
+                                                          "office" "discord"
+                                                          "telegram" "games"]))
+                                   (if (< index (length named-workspaces))
+                                       (elt named-workspaces index)
+                                     (number-to-string index)))))
 
 (defun farl-exwm/list-workspaces ()
   "List EXWM workspaces."
@@ -746,84 +741,82 @@ Instead of just killing Emacs, shuts down the system."
   (interactive)
   (start-process "Transmission" nil "transmission-gtk"))
 
-(setq exwm-input-global-keys
-      `(;; Switching workspace focus
-        ;; 1 opens 0, 2 opens 1, etc.
-        ,@(mapcar
-           (lambda (i)
-             `(,(kbd (format "s-%d" (% (+ i 1) 10))) .
-               (lambda ()
-                 (interactive)
-                 (exwm-workspace-switch-create ,i))))
-           (number-sequence 0 9))
+(setq exwm-input-global-keys `(;; Switching workspace focus
+                               ;; 1 opens 0, 2 opens 1, etc.
+                               ,@(mapcar
+                                  (lambda (i)
+                                    `(,(kbd (format "s-%d" (% (+ i 1) 10))) .
+                                      (lambda ()
+                                        (interactive)
+                                        (exwm-workspace-switch-create ,i))))
+                                  (number-sequence 0 9))
 
-        ;; Other workspace management
-        ([?\s-q] . exwm-workspace-swap)
-        ([?\s-w] . exwm-workspace-switch)
-        ([?\s-e] . exwm-workspace-move-window)
+                               ;; Other workspace management
+                               ([?\s-q] . exwm-workspace-swap)
+                               ([?\s-w] . exwm-workspace-switch)
+                               ([?\s-e] . exwm-workspace-move-window)
 
-        ;; Window size adjustment
-        ([8388631] . enlarge-window) ; C-s-w
-        ([8388627] . shrink-window) ; C-s-s
-        ([8388609] . shrink-window-horizontally) ; C-s-a
-        ([8388612] . enlarge-window-horizontally) ; C-s-d
+                               ;; Window size adjustment
+                               ([8388631] . shrink-window) ; C-s-w
+                               ([8388627] . enlarge-window) ; C-s-s
+                               ([8388609] . shrink-window-horizontally) ; C-s-a
+                               ([8388612] . enlarge-window-horizontally) ; C-s-d
 
-        ;; Opening X applications
-        ([?\s-g]    . run-gimp)
-        ([?\s-s]    . run-steam)
-        ([?\s-f]    . run-firefox)
-        ([?\s-d]    . run-discord)
-        ([?\s-t]    . run-telegram)
-        ([?\s-m]    . run-musescore)
-        ([?\s-b]    . run-libreoffice)
-        ([?\s-o]    . run-transmission)
-        ([?\s-r]    . monitor-settings)
-        ([?\s-n]    . network-settings)
-        ([?\s-v]    . volume-settings)
-        ([s-return] . vterm)
-        ([XF86Calculator] . calc)
+                               ;; Opening X applications
+                               ([?\s-g]    . run-gimp)
+                               ([?\s-s]    . run-steam)
+                               ([?\s-f]    . run-firefox)
+                               ([?\s-d]    . run-discord)
+                               ([?\s-t]    . run-telegram)
+                               ([?\s-m]    . run-musescore)
+                               ([?\s-b]    . run-libreoffice)
+                               ([?\s-o]    . run-transmission)
+                               ([?\s-r]    . monitor-settings)
+                               ([?\s-n]    . network-settings)
+                               ([?\s-v]    . volume-settings)
+                               ([s-return] . vterm)
+                               ([XF86Calculator] . calc)
 
-        ;; Other desktop environment things
-        ([?\s-x]       . dmenu)
-        ([menu]        . smex)
-        ([?\s- ]       . cycle-keyboard-layout)
-        ([s-backspace] . cycle-keyboard-layout-reverse)
-        ([s-tab]       . audio-loopback)
+                               ;; Other desktop environment things
+                               ([?\s-x]       . dmenu)
+                               ([menu]        . smex)
+                               ([?\s- ]       . cycle-keyboard-layout)
+                               ([s-backspace] . cycle-keyboard-layout-reverse)
+                               ([s-tab]       . audio-loopback)
 
-        ;; Controlling EMMS
-        ([XF86AudioNext] . emms-next)
-        ([XF86AudioPrev] . emms-previous)
-        ([XF86AudioPlay] . emms-pause)
-        ([XF86AudioStop] . emms-stop)))
+                               ;; Controlling EMMS
+                               ([XF86AudioNext] . emms-next)
+                               ([XF86AudioPrev] . emms-previous)
+                               ([XF86AudioPlay] . emms-pause)
+                               ([XF86AudioStop] . emms-stop)))
 
-(setq exwm-input-simulation-keys
-      '(;; Navigation
-        ([?\C-b] . [left])
-        ([?\C-f] . [right])
-        ([?\C-p] . [up])
-        ([?\C-n] . [down])
+(setq exwm-input-simulation-keys '(;; Navigation
+                                   ([?\C-b] . [left])
+                                   ([?\C-f] . [right])
+                                   ([?\C-p] . [up])
+                                   ([?\C-n] . [down])
 
-        ([?\M-b] . [C-left])
-        ([?\M-f] . [C-right])
-        ([?\M-p] . [C-up])
-        ([?\M-n] . [C-down])
+                                   ([?\M-b] . [C-left])
+                                   ([?\M-f] . [C-right])
+                                   ([?\M-p] . [C-up])
+                                   ([?\M-n] . [C-down])
 
-        ([?\C-a] . [home])
-        ([?\C-e] . [end])
-        ([?\C-v] . [next])
-        ([?\M-v] . [prior])
+                                   ([?\C-a] . [home])
+                                   ([?\C-e] . [end])
+                                   ([?\C-v] . [next])
+                                   ([?\M-v] . [prior])
 
-        ;; Copy/Paste
-        ([?\C-w] . [?\C-x])
-        ([?\M-w] . [?\C-c])
-        ([?\C-y] . [?\C-v])
-        ([?\C-s] . [?\C-f])
-        ([?\C-\/] . [?\C-z])
+                                   ;; Copy/Paste
+                                   ([?\C-w] . [?\C-x])
+                                   ([?\M-w] . [?\C-c])
+                                   ([?\C-y] . [?\C-v])
+                                   ([?\C-s] . [?\C-f])
+                                   ([?\C-\/] . [?\C-z])
 
-        ;; Other
-        ([?\C-d] . [delete])
-        ([?\C-k] . [S-end delete])
-        ([?\C-g] . [escape])))
+                                   ;; Other
+                                   ([?\C-d] . [delete])
+                                   ([?\C-k] . [S-end delete])
+                                   ([?\C-g] . [escape])))
 
 ;; I can't do sequences above, so these are separate
 (defun farl-exwm/C-s ()
@@ -1298,8 +1291,8 @@ This function has been altered to accommodate `exwm-mode'."
                                      ("el"  . "src emacs-lisp")
                                      ("py"  . "src python")
                                      ("dot" . "src dot :cmdline -Kdot -Tpng :file")
-                                     ("txt" . "src text :tangle")))
-(setq org-tempo-keywords-alist '(;; Title/subtitle
+                                     ("txt" . "src text :tangle"))
+      org-tempo-keywords-alist '(;; Title/subtitle
                                  ("t"  . "title")
                                  ("st" . "subtitle")
 
