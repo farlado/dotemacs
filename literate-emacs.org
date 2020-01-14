@@ -2158,11 +2158,11 @@ First, we load ~org-tempo~, the extension that allows the old way of doing thing
   (require 'org-tempo)
   (add-to-list 'org-modules 'org-tempo)
   (setq org-structure-template-alist '(;; General blocks
-                                       ("c"   . "center")
-                                       ("C"   . "comment")
-                                       ("e"   . "example")
-                                       ("q"   . "quote")
-                                       ("v"   . "verse")
+                                       ("c" . "center")
+                                       ("C" . "comment")
+                                       ("e" . "example")
+                                       ("q" . "quote")
+                                       ("v" . "verse")
 
                                        ;; Export blocks
                                        ("a"   . "export ascii")
@@ -2176,7 +2176,6 @@ First, we load ~org-tempo~, the extension that allows the old way of doing thing
                                        ("py"  . "src python")
                                        ("dot" . "src dot :cmdline -Kdot -Tpng :file")
                                        ("txt" . "src text :tangle")))
-
   (setq org-tempo-keywords-alist '(;; Title/subtitle
                                    ("t"  . "title")
                                    ("st" . "subtitle")
@@ -2190,10 +2189,10 @@ First, we load ~org-tempo~, the extension that allows the old way of doing thing
                                    ("su" . "startup")
 
                                    ;; Other
-                                   ("L"  . "latex")
-                                   ("H"  . "html")
-                                   ("A"  . "ascii")
-                                   ("i"  . "index")))
+                                   ("L" . "latex")
+                                   ("H" . "html")
+                                   ("A" . "ascii")
+                                   ("i" . "index")))
 #+end_src
 
 *** Don't give angle brackets syntax
