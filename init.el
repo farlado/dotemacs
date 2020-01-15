@@ -775,9 +775,6 @@ Instead of just killing Emacs, shuts down the system."
                                         (exwm-workspace-move-window ,i))))
                                   (number-sequence 0 9))
 
-                               ;; Other workspace management
-                               ([?\s-q] . exwm-workspace-swap)
-
                                ;; Window size adjustment
                                ([8388631] . shrink-window) ; C-s-w
                                ([8388627] . enlarge-window) ; C-s-s
@@ -785,18 +782,18 @@ Instead of just killing Emacs, shuts down the system."
                                ([8388612] . enlarge-window-horizontally) ; C-s-d
 
                                ;; Opening X applications
-                               ([?\s-g]    . run-gimp)
-                               ([?\s-s]    . run-steam)
-                               ([?\s-f]    . run-firefox)
-                               ([?\s-d]    . run-discord)
-                               ([?\s-t]    . run-telegram)
-                               ([?\s-m]    . run-musescore)
-                               ([?\s-b]    . run-libreoffice)
-                               ([?\s-o]    . run-transmission)
-                               ([?\s-r]    . monitor-settings)
-                               ([?\s-n]    . network-settings)
-                               ([?\s-v]    . volume-settings)
-                               ([s-return] . vterm)
+                               ([?\s-g]          . run-gimp)
+                               ([?\s-s]          . run-steam)
+                               ([?\s-f]          . run-firefox)
+                               ([?\s-d]          . run-discord)
+                               ([?\s-t]          . run-telegram)
+                               ([?\s-m]          . run-musescore)
+                               ([?\s-b]          . run-libreoffice)
+                               ([?\s-o]          . run-transmission)
+                               ([?\s-r]          . monitor-settings)
+                               ([?\s-n]          . network-settings)
+                               ([?\s-v]          . volume-settings)
+                               ([s-return]       . vterm)
                                ([XF86Calculator] . calc)
 
                                ;; Other desktop environment things
