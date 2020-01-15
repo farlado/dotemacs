@@ -407,14 +407,12 @@ Originally I had this set up by means of ~custom-set-faces~, but frankly that is
 #+end_src
 
 *** Determining a good font size
-Next we need to determine what size to make the text. This is based on the width of the screens I regularly use. It uses shell commands for X window systems and built-in functions for Windows.
+Next we need to determine what size to make the text. This is based on the width of the screens I regularly use, primarily the largest one in use. It uses shell commands for X window systems and built-in functions for Windows.
 #+begin_src emacs-lisp
   (let* ((res (if (eq window-system 'x)
                   (string-to-number
                    (shell-command-to-string
-                    (concat "xrandr | grep \\* | "
-                            "cut -d x -f 1 | "
-                            "sort -n | head -n 1")))
+                    "xrandr | grep \\* | cut -d x -f 1 | sort -n | head -n 1"))
                 (/ (display-pixel-width) (display-screens))))
          (size (if (<= res 1366) 100
                  180)))
@@ -733,9 +731,9 @@ The first thing to do is set up a function to return a list of currently connect
 #+begin_src emacs-lisp
   (defun get-connected-monitors ()
     "Return a list of the currently connected monitors."
-    (split-string (shell-command-to-string (concat "xrandr | "
-                                                   "grep ' connected ' | "
-                                                   "awk '{print $1}'"))))
+    (split-string
+     (shell-command-to-string
+      "xrandr | grep ' connected ' | awk '{print $1}'")))
 #+end_src
 
 *** Configuring monitor arrangement on my X230
@@ -971,35 +969,63 @@ The functions which ~desktop-environment~ comes with are kinda garbage, so I mad
   (defun farl-de/desktop-environment-screenshot-clip ()
     "Take a screenshot and put it in the clipboard."
     (interactive)
-    (shell-command (concat desktop-environment-screenshot-command
-                           " && xclip $FILENAME -selection clipboard "
-                           "-t image/png &> /dev/null && rm $FILENAME"))
+    (shell-command
+     (concat desktop-environment-screenshot-command
+             " && xclip $FILENAME -selection clipboard "
+             "-t image/png &> /dev/null && rm $FILENAME"))
     (message "Screenshot copied to clipboard."))
 
   (defun farl-de/desktop-environment-screenshot-part-clip ()
     "Take a shot of a portion of the screen and put it in the clipboard."
     (interactive)
-    (shell-command (concat desktop-environment-screenshot-partial-command
-                           " && xclip $FILENAME -selection clipboard "
-                           "-t image/png &> /dev/null && rm $FILENAME"))
+    (shell-command
+     (concat desktop-environment-screenshot-partial-command
+             " && xclip $FILENAME -selection clipboard "
+             "-t image/png &> /dev/null && rm $FILENAME"))
     (message "Screenshot copied to clipboard."))
 #+end_src
 
 **** Lock screen
 Haha yes, this is very long and very very stupid.
 #+begin_src emacs-lisp
-  (setq desktop-environment-screenlock-command
-        (concat "i3lock -nmk --color=000000 --timecolor=ffffffff --datecolor=ffffffff "
-                "--wrongcolor=ffffffff --ringcolor=00000000 --insidecolor=00000000 "
-                "--keyhlcolor=00000000 --bshlcolor=00000000 --separatorcolor=00000000 "
-                "--ringvercolor=00000000 --insidevercolor=00000000 --linecolor=00000000 "
-                "--ringwrongcolor=00000000 --insidewrongcolor=00000000 --timestr=%H:%M "
-                "--datestr='%a %d %b' --time-font=Iosevka --date-font=Iosevka "
-                "--wrong-font=Iosevka --timesize=128 --datesize=64 --wrongsize=32 "
-                "--time-align 0 --date-align 0 --wrong-align 0 --indpos=-10:-10 "
-                "--timepos=200:125 --datepos=200:215 --wrongpos=200:155 --locktext='' "
-                "--lockfailedtext='' --noinputtext='' --radius 1 --ring-width 1 "
-                " --veriftext='' --wrongtext='WRONG' --force-clock"))
+  (setq desktop-environment-screenlock-command (concat "i3lock -nmk "
+                                                       "--color=000000 "
+                                                       "--timecolor=ffffffff "
+                                                       "--datecolor=ffffffff "
+                                                       "--wrongcolor=ffffffff "
+                                                       "--ringcolor=00000000 "
+                                                       "--insidecolor=00000000 "
+                                                       "--keyhlcolor=00000000 "
+                                                       "--bshlcolor=00000000 "
+                                                       "--separatorcolor=00000000 "
+                                                       "--ringvercolor=00000000 "
+                                                       "--insidevercolor=00000000 "
+                                                       "--linecolor=00000000 "
+                                                       "--ringwrongcolor=00000000 "
+                                                       "--insidewrongcolor=00000000 "
+                                                       "--timestr=%H:%M "
+                                                       "--datestr='%a %d %b' "
+                                                       "--time-font=Iosevka "
+                                                       "--date-font=Iosevka "
+                                                       "--wrong-font=Iosevka "
+                                                       "--timesize=128 "
+                                                       "--datesize=64 "
+                                                       "--wrongsize=32 "
+                                                       "--time-align 0 "
+                                                       "--date-align 0 "
+                                                       "--wrong-align 0 "
+                                                       "--indpos=-10:-10 "
+                                                       "--timepos=200:125 "
+                                                       "--datepos=200:215 "
+                                                       "--wrongpos=200:155 "
+                                                       "--locktext='' "
+                                                       "--lockfailedtext='' "
+                                                       "--noinputtext='' "
+                                                       " --veriftext='' "
+                                                       "--wrongtext='WRONG' "
+                                                       "--force-clock"
+                                                       "--radius 1 "
+                                                       "--ring-width 1 "))
 #+end_src
 
 *** Monitor settings
@@ -1036,17 +1062,19 @@ Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucon
   (defun audio-loopback ()
     "Loop desktop audio into a null sink alongside the primary input."
     (interactive)
-    ;; Create two modules: `loop' and `out'
-    (dolist (sink '("loop"
-                    "out"))
-      (shell-command (concat "pacmd load-module module-null-sink sink_name=" sink))
-      (shell-command (concat "pacmd update-sink-proplist "
-                             sink " device.description=" sink)))
-    ;; Loop `loop' to primary output, pipe it to `out', loop primary into to `out'
-    (dolist (command '("sink=out"
-                       "source=loop.monitor"
-                       "source=loop.monitor sink=out"))
-      (shell-command (concat "pacmd load-module module-loopback " command)))
+    (dolist (command '(;; Create null sink `loop'
+                       "pacmd load-module module-null-sink sink_name=loop"
+                       "pacmd update-sink-proplist loop device.description=loop"
+                       ;; Create null sink `out'
+                       "pacmd load-module module-null-sink sink_name=out"
+                       "pacmd update-sink-proplist out device.description=out"
+                       ;; Loop `loop' to primary output
+                       "pacmd load-module module-loopback source=loop.monitor"
+                       ;; Pipe it into `out'
+                       "pacmd load-module module-loopback source=loop.monitor sink=out"
+                       ;; Loop primary input into `out'
+                       "pacmd load-module module-loopback sink=out"))
+      (shell-command command))
     ;; Run `pavucontrol' and then unload the modules after it completes
     (start-process-shell-command
      "Audio Loop" nil (concat "pavucontrol && "
@@ -1057,30 +1085,20 @@ Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucon
 *** Keyboard layout selection
 This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
 #+begin_src emacs-lisp
-  (defgroup keyboard-layout nil
-    "Keyboard layouts to cycle through."
-    :group 'environment)
-
-  (defcustom keyboard-layout-1 "us"
+  (defvar keyboard-layout-1 "us"
     "The first of three keyboard layouts to cycle through.
 
-  Set to nil to have one less keyboard layout."
-    :group 'keyboard-layout
-    :type 'string)
+  Set to nil to have one less keyboard layout.")
 
-  (defcustom keyboard-layout-2 "epo"
+  (defvar keyboard-layout-2 "epo"
     "The second of three keyboard layouts to cycle through.
 
-  Set to nil to have one less keyboard layout."
-    :group 'keyboard-layout
-    :type 'string)
+  Set to nil to have one less keyboard layout.")
 
-  (defcustom keyboard-layout-3 "de"
+  (defvar keyboard-layout-3 "de"
     "The third of three keyboard layouts to cycle through.
 
-  Set to nil to have one less keyboard layout."
-    :group 'keyboard-layout
-    :type 'string)
+  Set to nil to have one less keyboard layout.")
 #+end_src
 
 Then, I use these functions to control setting and cycling the keyboard layout:
@@ -1088,9 +1106,7 @@ Then, I use these functions to control setting and cycling the keyboard layout:
   (defun get-keyboard-layout ()
     "Get the current keyboard layout."
     (shell-command-to-string
-     (concat "setxkbmap -query | "
-             "grep -oP 'layout:\\s*\\K(\\w+)' | "
-             "tr '\n' ' ' | sed 's/ //'")))
+     "setxkbmap -query | grep -oP 'layout:\\s*\\K(\\w+)' | tr '\n' ' ' | sed 's/ //'"))
 
   (defun set-keyboard-layout (&optional layout)
     "Set the keyboard layout to LAYOUT."
