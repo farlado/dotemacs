@@ -256,8 +256,8 @@
                                    "5"
                                    "6"
                                    "office"
-                                   "telegram"
                                    "discord"
+                                   "telegram"
                                    "games"]
   "The names assigned to workspaces through `exwm-workspace-index-map'.")
 
