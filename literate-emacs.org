@@ -360,12 +360,13 @@ I don't want to have to manually update my stuff. This solution is literally plo
     :defer t
     :init
     (setq auto-package-update-interval 2
+          auto-package-update-hide-results t
           auto-package-update-delete-old-versions t)
     (auto-package-update-maybe))
 #+end_src
 
 *** Start Emacs server
-Having the Emacs server running allows for a lot of neat integration with other parts of my destop environment. However, I don't want it to start too soon.
+Having the Emacs server running allows for a lot of neat integration with other parts of my desktop environment. However, I don't want it to start too soon.
 #+begin_src emacs-lisp
   (require 'server)
 
@@ -641,7 +642,9 @@ Since I'm using Emacs as a window manager, I need something comparable to ~rofi~
 #+begin_src emacs-lisp
   (use-package dmenu
     :ensure t
-    :defer t)
+    :defer t
+    :init
+    (setq dmenu-prompt-string "Run: "))
 #+end_src
 
 ** Workspace configuration
@@ -688,13 +691,19 @@ This section is only to ensure the proper workspaces are placed on the right mon
 *** Name workspaces a little more intuitively
 No clue why you have to do so much just to give workspaces names, but at least you can do it.
 #+begin_src emacs-lisp
-  (setq exwm-workspace-index-map (lambda (index)
-                                   (let ((named-workspaces ["1" "2" "3" "4" "5" "6"
-                                                            "office" "discord"
-                                                            "telegram" "games"]))
-                                     (if (< index (length named-workspaces))
-                                         (elt named-workspaces index)
-                                       (number-to-string index)))))
+  (defvar farl-exwm/workspace-names ["1"
+                                     "2"
+                                     "3"
+                                     "4"
+                                     "5"
+                                     "6"
+                                     "office"
+                                     "telegram"
+                                     "discord"
+                                     "games"]
+    "The names assigned to workspaces through `exwm-workspace-index-map'.")
+
+  (setq exwm-workspace-index-map (lambda (index) (elt farl-exwm/workspace-names index)))
 #+end_src
 
 *** Show a list of workspaces in the echo area
@@ -1316,22 +1325,35 @@ Shame me all you want. I'm still in introductory courses and haven't learned eno
 #+end_src
 ** Keybindings
 *** Global binds to use across everything
-Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into this area.
+Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into this area. Since I'm very lazy and don't feel like writing a whole bunch of lambdas for multiple workspaces, presented here are instead some ~mapcar~ calls, like the one in [[https://github.com/ch11ng/exwm/wiki/Configuration-Example][this example]].
 #+begin_src emacs-lisp
   (setq exwm-input-global-keys `(;; Switching workspace focus
-                                 ;; 1 opens 0, 2 opens 1, etc.
+                                 ;; s-1 for 1, s-2 for 2, etc...
                                  ,@(mapcar
                                     (lambda (i)
-                                      `(,(kbd (format "s-%d" (% (+ i 1) 10))) .
+                                      `(,(kbd (format "s-%d" (% (1+ i) 10))) .
                                         (lambda ()
                                           (interactive)
                                           (exwm-workspace-switch-create ,i))))
                                     (number-sequence 0 9))
 
+                                 ;; Switching window to a workspace
+                                 ;; This was annoying to get working
+                                 ;; s-! for 1, s-@ for 2, etc...
+                                 ,@(mapcar
+                                    (lambda (i)
+                                      `(,(kbd (format "s-%s" (nth i '("!" "@"
+                                                                      "#" "$"
+                                                                      "%" "^"
+                                                                      "&" "*"
+                                                                      "(" ")")))) .
+                                        (lambda ()
+                                          (interactive)
+                                          (exwm-workspace-move-window ,i))))
+                                    (number-sequence 0 9))
+
                                  ;; Other workspace management
                                  ([?\s-q] . exwm-workspace-swap)
-                                 ([?\s-w] . exwm-workspace-switch)
-                                 ([?\s-e] . exwm-workspace-move-window)
 
                                  ;; Window size adjustment
                                  ([8388631] . shrink-window) ; C-s-w

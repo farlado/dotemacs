@@ -35,6 +35,7 @@
   :defer t
   :init
   (setq auto-package-update-interval 2
+        auto-package-update-hide-results t
         auto-package-update-delete-old-versions t)
   (auto-package-update-maybe))
 
@@ -216,7 +217,9 @@
 
 (use-package dmenu
   :ensure t
-  :defer t)
+  :defer t
+  :init
+  (setq dmenu-prompt-string "Run: "))
 
 (setq exwm-workspace-number 10)
 
@@ -246,13 +249,19 @@
                                     floating-mode-line nil
                                     floating t)))
 
-(setq exwm-workspace-index-map (lambda (index)
-                                 (let ((named-workspaces ["1" "2" "3" "4" "5" "6"
-                                                          "office" "discord"
-                                                          "telegram" "games"]))
-                                   (if (< index (length named-workspaces))
-                                       (elt named-workspaces index)
-                                     (number-to-string index)))))
+(defvar farl-exwm/workspace-names ["1"
+                                   "2"
+                                   "3"
+                                   "4"
+                                   "5"
+                                   "6"
+                                   "office"
+                                   "telegram"
+                                   "discord"
+                                   "games"]
+  "The names assigned to workspaces through `exwm-workspace-index-map'.")
+
+(setq exwm-workspace-index-map (lambda (index) (elt farl-exwm/workspace-names index)))
 
 (defun farl-exwm/list-workspaces ()
   "List EXWM workspaces."
@@ -742,19 +751,32 @@ Instead of just killing Emacs, shuts down the system."
   (start-process "Transmission" nil "transmission-gtk"))
 
 (setq exwm-input-global-keys `(;; Switching workspace focus
-                               ;; 1 opens 0, 2 opens 1, etc.
+                               ;; s-1 for 1, s-2 for 2, etc...
                                ,@(mapcar
                                   (lambda (i)
-                                    `(,(kbd (format "s-%d" (% (+ i 1) 10))) .
+                                    `(,(kbd (format "s-%d" (% (1+ i) 10))) .
                                       (lambda ()
                                         (interactive)
                                         (exwm-workspace-switch-create ,i))))
                                   (number-sequence 0 9))
 
+                               ;; Switching window to a workspace
+                               ;; This was annoying to get working
+                               ;; s-! for 1, s-@ for 2, etc...
+                               ,@(mapcar
+                                  (lambda (i)
+                                    `(,(kbd (format "s-%s" (nth i '("!" "@"
+                                                                    "#" "$"
+                                                                    "%" "^"
+                                                                    "&" "*"
+                                                                    "(" ")")))) .
+                                      (lambda ()
+                                        (interactive)
+                                        (exwm-workspace-move-window ,i))))
+                                  (number-sequence 0 9))
+
                                ;; Other workspace management
                                ([?\s-q] . exwm-workspace-swap)
-                               ([?\s-w] . exwm-workspace-switch)
-                               ([?\s-e] . exwm-workspace-move-window)
 
                                ;; Window size adjustment
                                ([8388631] . shrink-window) ; C-s-w
