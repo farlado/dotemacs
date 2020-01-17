@@ -1275,6 +1275,12 @@ This function has been altered to accommodate `exwm-mode'."
   :bind (:map prog-mode-map
          ("C-c C-'" . avy-flycheck-goto-error)))
 
+(use-package toc-org
+  :ensure t
+  :defer t
+  :hook ((org-mode      . toc-org-mode)
+         (markdown-mode . toc-org-mode)))
+
 (use-package org-bullets
   :if window-system
   :ensure t
