@@ -24,11 +24,6 @@ an infinite number of monkeys typing into GNU emacs would never make a good prog
 -- [[https://www.kernel.org/doc/html/v4.10/process/coding-style.html][Linus Torvalds]]
 #+end_quote
 
-#+begin_quote
-What is VSCode, and how does it relate to Emacs development?
--- [[https://lists.gnu.org/archive/html/emacs-devel/2020-01/msg00127.html][Richard M. Stallman]]
-#+end_quote
-
 * Table of Contents :toc:quote:
 #+BEGIN_QUOTE
 - [[#about-this-configuration][About this configuration]]
