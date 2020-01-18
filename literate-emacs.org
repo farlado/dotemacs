@@ -861,11 +861,13 @@ Finally, I can make my generic display-and-dock setup function.
   (defun display-and-dock-setup ()
     "Configure displays and dock if applicable."
     (interactive)
-    (if (member "LVDS1" (get-connected-monitors))
-        (display-setup-x230)
-      (progn
-        (display-setup-w541)
-        (peripheral-setup))))
+    (unless (= (shell-command "pgrep arandr") 0)
+      (if (member "LVDS1" (get-connected-monitors))
+          (display-setup-x230)
+        (progn
+          (display-setup-w541)
+          (peripheral-setup))))
+    (message ""))
 #+end_src
 
 *** Start ~exwm-randr~

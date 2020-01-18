@@ -362,11 +362,13 @@
 (defun display-and-dock-setup ()
   "Configure displays and dock if applicable."
   (interactive)
-  (if (member "LVDS1" (get-connected-monitors))
-      (display-setup-x230)
-    (progn
-      (display-setup-w541)
-      (peripheral-setup))))
+  (unless (= (shell-command "pgrep arandr") 0)
+    (if (member "LVDS1" (get-connected-monitors))
+        (display-setup-x230)
+      (progn
+        (display-setup-w541)
+        (peripheral-setup))))
+  (message ""))
 
 (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
 (exwm-randr-enable)
