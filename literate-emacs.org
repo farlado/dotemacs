@@ -2,7 +2,7 @@
 #+subtitle: A far-from-sane literate Emacs configuration
 #+language: en
 #+options: num:nil toc:2
-#+property: header-args :tangle (expand-file-name "init.el" user-emacs-directory)
+#+property: header-args :tangle (user-emacs-file "init.el")
 
 #+begin_quote
 Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his workshop, I feel a realm of possibility open before me. I feel the comfort of an environment that has evolved over time to fit me perfectly – an assortment of packages and keybindings which help me bring ideas to life day after day.
@@ -17,41 +17,49 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
   - [[#dependencies][Dependencies]]
   - [[#license][License]]
   - [[#files-to-ignore][Files to ignore]]
-- [[#giving-files-headers][Giving files headers]]
-- [[#making-emacs-start-quickly-and-smoothly][Making Emacs start quickly and smoothly]]
-  - [[#do-these-asap][Do these ASAP]]
-  - [[#package-management][Package management]]
-  - [[#after-package-management][After package management]]
-- [[#making-emacs-significantly-less-ugly][Making Emacs significantly less ugly]]
+- [[#giving-files-their-headers][Giving files their headers]]
+- [[#making-emacs-start-quick-and-smooth][Making Emacs start quick and smooth]]
+  - [[#do-these-asap-early-initel][Do these ASAP (~early-init.el~)]]
+  - [[#package-management-early-packageel][Package management (~early-package.el~)]]
+  - [[#after-package-initialization-initel][After package initialization (~init.el~)]]
+  - [[#package-management-contd-init-packageel][Package management contd. (~init-package.el~)]]
+- [[#making-emacs-less-ugly-init-looksel][Making Emacs less ugly (~init-looks.el~)]]
   - [[#font][Font]]
   - [[#theme][Theme]]
   - [[#mode-line][Mode line]]
   - [[#in-buffers][In buffers]]
-- [[#making-emacs-a-desktop-environment][Making Emacs a desktop environment]]
-  - [[#window-management][Window management]]
-  - [[#workspace-configuration][Workspace configuration]]
-  - [[#multi-head-configuration][Multi-head configuration]]
-  - [[#desktop-environment-components][Desktop environment components]]
-  - [[#x-applications][X applications]]
-  - [[#keybindings][Keybindings]]
   - [[#on-startup][On startup]]
-- [[#making-emacs-organizeplay-music][Making Emacs organize/play music]]
-  - [[#installing-emms][Installing EMMS]]
-  - [[#daemon-functions][Daemon functions]]
-  - [[#binding-all-the-keys][Binding all the keys]]
-- [[#making-emacs-a-good-text-editor][Making Emacs a good text editor]]
-  - [[#additional-major-modes][Additional major modes]]
+- [[#making-emacs-comfortable-init-defaultsel][Making Emacs comfortable (~init-defaults.el~)]]
   - [[#general-functionality][General functionality]]
-  - [[#personal-save-hooks][Personal save hooks]]
   - [[#bufferswindows][Buffers/windows]]
+  - [[#configuration][Configuration]]
+  - [[#on-startup-1][On startup]]
+- [[#making-emacs-a-good-text-editor-init-editorel][Making Emacs a good text editor (~init-editor.el~)]]
+  - [[#additional-major-modes][Additional major modes]]
+  - [[#personal-save-hooks][Personal save hooks]]
   - [[#text-editing][Text editing]]
   - [[#programming][Programming]]
   - [[#org-mode][~org-mode~]]
-- [[#making-emacs-e-x-t-e-n-d][Making Emacs =e x t e n d=]]
+  - [[#on-startup-2][On startup]]
+- [[#making-emacs-a-desktop-environment-init-deel][Making Emacs a desktop environment (~init-de.el~)]]
+  - [[#window-management][Window management]]
+  - [[#workspace-configuration][Workspace configuration]]
+  - [[#multi-head-configuration][Multi-head configuration]]
+  - [[#x-applications][X applications]]
+  - [[#de-components][DE components]]
+  - [[#keybindings][Keybindings]]
+  - [[#on-startup-3][On startup]]
+- [[#making-emacs-a-media-player-init-mediael][Making Emacs a media player (~init-media.el~)]]
+  - [[#installing-emms][Installing EMMS]]
+  - [[#daemon-functions][Daemon functions]]
+  - [[#binding-all-the-keys][Binding all the keys]]
+  - [[#on-startup-4][On startup]]
+- [[#making-emacs-e-x-t-e-n-d-init-extendel][Making Emacs =e x t e n d= (~init-extend.el~)]]
   - [[#built-in-features][Built-in features]]
   - [[#not-built-in][Not built-in]]
   - [[#games][Games]]
-- [[#giving-files-footers][Giving files footers]]
+  - [[#on-startup-5][On startup]]
+- [[#giving-files-their-footers][Giving files their footers]]
 #+END_QUOTE
 
 * About this configuration
@@ -164,11 +172,11 @@ Like mentioned above, this file is supposed to tangle into everything in my git 
   url
 #+end_src
 
-* Giving files headers
+* Giving files their headers
 In order to make the files look at least somewhat decent, and to warn those who are unfortunate enough to think they'll just mosey on into one of them if they want to understand the config, we create headers that tells people the reality of the files.
 
 *** ~early-init.el~
-#+begin_src emacs-lisp :tangle (expand-file-name "early-init.el" user-emacs-directory)
+#+begin_src emacs-lisp :tangle (user-emacs-file "early-init.el")
   ;;; early-init.el --- Early Initialization of Farlado's Illiterate GNU Emacs
 
   ;; This file is not part of GNU Emacs.
@@ -177,7 +185,23 @@ In order to make the files look at least somewhat decent, and to warn those who 
 
   ;; This file has been automatically generated from `literate-emacs.org'.
   ;; If you don't have a copy of that file, it is best not to use this file!
-  ;; This is in spite of the fact so little is actually in this file.
+  ;; All relevant commentary is in `literate-emacs.org', not here.
+  ;; There may not be any comments past this point.
+  ;; Abandon all hope, ye who enter here.
+  
+  ;;; Code:
+#+end_src
+
+*** ~early-package.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/early-package.el")
+  ;;; early-package.el --- Package management
+
+  ;; This file is not part of GNU Emacs.
+  
+  ;;; Commentary:
+
+  ;; This file has been automatically generated from `literate-emacs.org'.
+  ;; If you don't have a copy of that file, it is best not to use this file!
   ;; All relevant commentary is in `literate-emacs.org', not here.
   ;; There may not be any comments past this point.
   ;; Abandon all hope, ye who enter here.
@@ -202,14 +226,133 @@ In order to make the files look at least somewhat decent, and to warn those who 
   ;;; Code:
 #+end_src
 
-* Making Emacs start quickly and smoothly
+*** ~init-package.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/init-package.el")
+  ;;; init-package.el --- Package management cont'd
+
+  ;; This file is not part of GNU Emacs.
+  
+  ;;; Commentary:
+
+  ;; This file has been automatically generated from `literate-emacs.org'.
+  ;; If you don't have a copy of that file, it is best not to use this file!
+  ;; All relevant commentary is in `literate-emacs.org', not here.
+  ;; There may not be any comments past this point.
+  ;; Abandon all hope, ye who enter here.
+  
+  ;;; Code:
+#+end_src
+
+*** ~init-looks.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/init-looks.el")
+  ;;; init-looks.el --- Making Emacs less ugly
+
+  ;; This file is not part of GNU Emacs.
+  
+  ;;; Commentary:
+
+  ;; This file has been automatically generated from `literate-emacs.org'.
+  ;; If you don't have a copy of that file, it is best not to use this file!
+  ;; All relevant commentary is in `literate-emacs.org', not here.
+  ;; There may not be any comments past this point.
+  ;; Abandon all hope, ye who enter here.
+  
+  ;;; Code:
+#+end_src
+
+*** ~init-defaults.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/init-defaults.el")
+  ;;; init-defaults.el --- Making Emacs comfortable
+
+  ;; This file is not part of GNU Emacs.
+  
+  ;;; Commentary:
+
+  ;; This file has been automatically generated from `literate-emacs.org'.
+  ;; If you don't have a copy of that file, it is best not to use this file!
+  ;; All relevant commentary is in `literate-emacs.org', not here.
+  ;; There may not be any comments past this point.
+  ;; Abandon all hope, ye who enter here.
+  
+  ;;; Code:
+#+end_src
+
+*** ~init-editor.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/init-editor.el")
+  ;;; init-editor.el --- Making Emacs a good text editor
+
+  ;; This file is not part of GNU Emacs.
+  
+  ;;; Commentary:
+
+  ;; This file has been automatically generated from `literate-emacs.org'.
+  ;; If you don't have a copy of that file, it is best not to use this file!
+  ;; All relevant commentary is in `literate-emacs.org', not here.
+  ;; There may not be any comments past this point.
+  ;; Abandon all hope, ye who enter here.
+  
+  ;;; Code:
+#+end_src
+
+*** ~init-de.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/init-de.el")
+  ;;; init-de.el --- Making Emacs a desktop environment
+
+  ;; This file is not part of GNU Emacs.
+  
+  ;;; Commentary:
+
+  ;; This file has been automatically generated from `literate-emacs.org'.
+  ;; If you don't have a copy of that file, it is best not to use this file!
+  ;; All relevant commentary is in `literate-emacs.org', not here.
+  ;; There may not be any comments past this point.
+  ;; Abandon all hope, ye who enter here.
+  
+  ;;; Code:
+#+end_src
+
+*** ~init-media.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/init-media.el")
+  ;;; init-media.el --- Making Emacs a media player
+
+  ;; This file is not part of GNU Emacs.
+  
+  ;;; Commentary:
+
+  ;; This file has been automatically generated from `literate-emacs.org'.
+  ;; If you don't have a copy of that file, it is best not to use this file!
+  ;; All relevant commentary is in `literate-emacs.org', not here.
+  ;; There may not be any comments past this point.
+  ;; Abandon all hope, ye who enter here.
+  
+  ;;; Code:
+#+end_src
+
+*** ~init-extend.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/init-extend.el")
+  ;;; init-extend.el --- Making Emacs EXTEND
+
+  ;; This file is not part of GNU Emacs.
+  
+  ;;; Commentary:
+
+  ;; This file has been automatically generated from `literate-emacs.org'.
+  ;; If you don't have a copy of that file, it is best not to use this file!
+  ;; All relevant commentary is in `literate-emacs.org', not here.
+  ;; There may not be any comments past this point.
+  ;; Abandon all hope, ye who enter here.
+  
+  ;;; Code:
+#+end_src
+
+* Making Emacs start quick and smooth
 Even with the "small" amount I ask of Emacs, it's a lot of beef to start up as fast as I demand it start up. This is, of course, everything I want to run at startup, but also a few other settings which make more sense to set here, instead of later.
 
-** Do these ASAP
+** Do these ASAP (~early-init.el~)
    :properties:
-   :header-args: :tangle (expand-file-name "early-init.el" user-emacs-directory)
+   :header-args: :tangle (user-emacs-file "early-init.el")
    :end:
-Either I want these configured as soon as possible, or they are related to Emacs starting up. Which are which is left as an exercise to the reader. Regardless, all of this is placed in ~early-init.el~ for the sake of speed.
+Emacs 27 introduced ~early-init.el~, allowing configuration of multiple items before Emacs has graphically loaded. Either I want these configured as soon as possible, or they are related to Emacs starting up. Which are which is left as an exercise to the reader.
 
 *** Hide dumb stuff (Part 1)
 I want to get GUI elements out of my face as soon as I possibly can. They just take up space.
@@ -246,7 +389,7 @@ For whatever reason, setting ~file-name-handler-alist~ to nil helps Emacs load f
   (add-hook 'emacs-startup-hook 'startup/revert-file-name-handler-alist)
 #+end_src
 
-*** Garbage collection postponing
+*** Garbage collection setup
 Garbage collection shouldn't happen during startup, as that will slow Emacs down. Do it later. This is also where more ideal garbage collection settings are chosen.
 #+begin_src emacs-lisp
   (setq gc-cons-threshold 402653184
@@ -260,11 +403,23 @@ Garbage collection shouldn't happen during startup, as that will slow Emacs down
   (add-hook 'emacs-startup-hook 'startup/reset-gc)
 #+end_src
 
-** Package management
+*** Add local files to ~load-path~
+Originally, this file tangled into only one or two Emacs Lisp files. Now there are multiple files tangled from this configuration, so we need to load them from their directory.
+#+begin_src emacs-lisp
+  (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+#+end_src
+
+*** Configure package management
+See below for what specifically this entails.
+#+begin_src emacs-lisp
+  (require 'init-package)
+#+end_src
+
+** Package management (~early-package.el~)
    :properties:
-   :header-args: :tangle (expand-file-name "early-init.el" user-emacs-directory)
+   :header-args: :tangle (user-emacs-file "lisp/early-package.el")
    :end:
-   Because I am writing this configuration to be as portable as possible (e.g. I should be able to dump this onto any machine and run it), I manage all packages through Emacs. All of this also is run in ~early-init.el~ leading up to the call of ~package-initialize~ between that file and ~init.el~, which probably will make for faster loading.
+Because I am writing this configuration to be as portable as possible (e.g. I should be able to dump this onto any machine and run it), I manage all packages through Emacs. All of this is done leading up to the call of ~package-initialize~ between that ~early-init.el~ and ~init.el~, which makes for faster loading.
 
 *** Disable ~customize~, keep ~package-autoremove~ working
 I /hate/ ~customize~. I configure everything in this file, so I don't need anything messing with my ~init.el~, much less changing settings on me. Even though I do not use ~customize~ but really like protecting packages used in my configuration from ~package-autoremove~, I need to still set ~package-selected-packages~ so that it'll work. Packages are listed in the order in which they are installed.
@@ -285,12 +440,12 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
 
                                     ;; Desktop environment
                                     exwm
-                                    dmenu
-                                    minibuffer-line
-                                    desktop-environment
-                                    system-packages
                                     exwm-edit
                                     exwm-mff
+                                    dmenu
+                                    minibuffer-line
+                                    system-packages
+                                    desktop-environment
 
                                     ;; Multimedia
                                     emms
@@ -320,6 +475,7 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
                                     avy-flycheck
 
                                     ;; org-mode
+                                    toc-org
                                     org-bullets
                                     epresent
 
@@ -349,8 +505,27 @@ Next, we have to add our repositories to the list. The GNU and MELPA repositorie
                            ("melpa" . "https://melpa.org/packages/")))
 #+end_src
 
-** After package management
+** After package initialization (~init.el~)
 These are other startup specific things, but they cannot be done until ~package-initialize~ has been called (e.g. once we finish up in ~early-init.el~).
+
+*** Start Emacs server
+Having the Emacs server running allows for a lot of neat integration with other parts of my desktop environment. However, I don't want it to start too soon.
+#+begin_src emacs-lisp
+  (require 'server)
+
+  (defun server-start-if-not-running ()
+    "Call `server-start' if `server-running-p' returns nil."
+    (unless (server-running-p)
+      (server-start)))
+
+  (add-hook 'after-init-hook 'server-start-if-not-running)
+#+end_src
+
+*** More package management
+See below for what specifically is loaded here.
+#+begin_src emacs-lisp
+  (require 'init-package)
+#+end_src
 
 *** Hide dumb stuff (Part 2)
 These buggers won't properly set unless it's done after ~early-init.el~, which is a real bummer.
@@ -360,8 +535,31 @@ These buggers won't properly set unless it's done after ~early-init.el~, which i
         use-file-dialog nil)
 #+end_src
 
+*** ~dashboard~ package (start screen)
+I like the default start screen, but it just doesn't cut it for me. I just use this to have a nice screen when I start Emacs or close all my buffers.
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :ensure t
+    :defer t
+    :init
+    (setq dashboard-set-footer nil
+          inhibit-startup-screen t
+          dashboard-items '((recents . 10))
+          dashboard-startup-banner 'official
+          initial-buffer-choice (lambda () (or (get-buffer "*dashboard*")
+                                               (get-buffer "*scratch*")))
+          dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
+    (dashboard-setup-startup-hook))
+#+end_src
+
+** Package management contd. (~init-package.el~)
+   :properties:
+   :header-args: :tangle (user-emacs-file "lisp/init-package.el")
+   :end:
+I use additional packages to make package management orders of magnitude easier.
+
 *** Bootstrap ~async~
-This package is super useful for making package installation significantly faster. It also allows for asynchronous ~dired~.
+This package is super useful for making package installation significantly faster. It also allows for asynchronous ~dired~ and asynchronous byte-compilation.
 #+begin_src emacs-lisp
   (unless (package-installed-p 'async)
     (package-refresh-contents)
@@ -373,7 +571,7 @@ This package is super useful for making package installation significantly faste
 #+end_src
 
 *** Bootstrap ~use-package~
-Since I manage all Emacs packages in Emacs via this file, ~use-package~ makes it much easier to install all the packages I need. It also means I can see what packages take the longest to load.
+Since I manage all Emacs packages in Emacs itself, ~use-package~ makes it much easier to install all the packages I need. It also means I can see what packages take the longest to load.
 #+begin_src emacs-lisp
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
@@ -395,37 +593,10 @@ I don't want to have to manually update my stuff. This solution is literally plo
     (auto-package-update-maybe))
 #+end_src
 
-*** Start Emacs server
-Having the Emacs server running allows for a lot of neat integration with other parts of my desktop environment. However, I don't want it to start too soon.
-#+begin_src emacs-lisp
-  (require 'server)
-
-  (defun server-start-if-not-running ()
-    "Call `server-start' if `server-running-p' returns nil."
-    (unless (server-running-p)
-      (server-start)))
-
-  (add-hook 'after-init-hook 'server-start-if-not-running)
-#+end_src
-
-*** dashboard package (replacement start screen)
-I like the default start screen, but it just doesn't cut it for me. I just use this to have a nice screen when I start Emacs or close all my buffers.
-#+begin_src emacs-lisp
-  (use-package dashboard
-    :ensure t
-    :defer t
-    :init
-    (setq dashboard-set-footer nil
-          inhibit-startup-screen t
-          dashboard-items '((recents . 10))
-          dashboard-startup-banner 'official
-          initial-buffer-choice (lambda () (or (get-buffer "*dashboard*")
-                                               (get-buffer "*scratch*")))
-          dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
-    (dashboard-setup-startup-hook))
-#+end_src
-
-* Making Emacs significantly less ugly
+* Making Emacs less ugly (~init-looks.el~)
+  :properties:
+  :header-args: :tangle (user-emacs-file "lisp/init-looks.el")
+  :end:
 Stock Emacs is /ugly/. Just straight up ugly. Suffice to say it leaves much to be desired.
 
 ** Font
@@ -452,12 +623,13 @@ Next we need to determine what size to make the text. This is based on the width
 *** Getting emoji to work properly
 God does this one feel great to have now that I use an Emacs version that can handle it!
 #+begin_src emacs-lisp
-  (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend)
+  (when (member "Noto Color Emoji" (font-family-list))
+    (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
 #+end_src
 
 ** Theme
 *** Leuven
-I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/. I spent almost two entire weeks trying to find a dark theme that comes anywhere close to being as comfortable as Leuven, and even Leuven's dark alternative doesn't cut it.
+I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/. I spent almost two entire weeks trying to find a dark theme that comes anywhere close to being as comfortable as Leuven, and even Leuven's dark alternative doesn't cut it. If we are using a pdump file, the theme is already loaded, so all we need to do is enable it.
 #+begin_src emacs-lisp
   (use-package leuven-theme
     :if window-system
@@ -470,8 +642,9 @@ I used to hate light themes. I'm not in that camp anymore. This theme is /elegan
 #+end_src
 
 *** Fringes
-Having fringes helps keep things looking good and gives the opportunity to have nice indicators on the edges of buffers.
+Having fringes helps keep things looking good and gives the opportunity to have nice indicators on the edges of buffers. I prefer when fringes are the same color as the rest of the window.
 #+begin_src emacs-lisp
+  (set-face-background 'fringe (face-attribute 'default :background))
   (fringe-mode 10)
 #+end_src
 
@@ -606,1084 +779,18 @@ It's subtle on my theme, but it still helps me keep track of my brackets and par
     :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
 
-* Making Emacs a desktop environment
-Yes, Emacs is my *entire desktop environment*. You should probably remove this stuff if you don't plan to use Emacs as your desktop environment. It's loaded right after the startup commands so that I can bind keys more easily later on. I sometimes have to run Emacs in Windows and on systems that have a desktop environment already, so I really don't want this part loaded in those cases. The original solution was to call ~wmctrl~ and see if it failed in a specific way. The new solution is to look for the environment variable ~_RUN_EXWM~ and start EXWM if it is set. This means setting this variable somewhere in your ~.xinitrc~ or in the =.desktop= file your display manager uses. When Emacs starts as a desktop environment, it will unset this environment variable in the weird off-chance you want to run Emacs in Emacs.
-#+begin_src emacs-lisp
-  (when (getenv "_RUN_EXWM")
-    (setenv "_RUN_EXWM")
-    (set-frame-parameter nil 'fullscreen 'fullboth)
-#+end_src
-
-** Window management
-*** Installing the base window manager
-This isn't actually where we do all the configuration, it's just where we install EXWM and load what we need to configure it. Usually it is best to configure packages inside of ~use-package~, but that would be a horrible idea due to just how many different things there are that need configuring. However, we can do one useful thing here: set an environment variable that lets Java applications know that EXWM is not a reparenting window manager. If we don't, some games lock up really bad when changing focus.
-#+begin_src emacs-lisp
-  (use-package exwm
-    :ensure t
-    :defer t
-    :init
-    (require 'exwm)
-    (require 'exwm-randr)
-    (require 'exwm-config)
-    (require 'exwm-systemtray)
-    (setenv "_JAVA_AWT_WM_NONREPARENTING" "1"))
-#+end_src
-
-*** Configure floating window borders
-Uses the same color as my mode line, uses the same width as window divider width.
-#+begin_src emacs-lisp
-  (setq exwm-floating-border-width 3
-        exwm-floating-border-color (face-attribute 'mode-line :background))
-#+end_src
-
-*** Name EXWM buffers after the window title
-This was annoying when I first installed EXWM. Thankfully this is a very easy fix.
-#+begin_src emacs-lisp
-  (defun farl-exwm/name-buffer-after-window-title ()
-    "Rename the current `exwm-mode' buffer after the X window's title."
-    (exwm-workspace-rename-buffer exwm-title))
-
-  (add-hook 'exwm-update-title-hook 'farl-exwm/name-buffer-after-window-title)
-#+end_src
-
-*** Edit text for an X window in Emacs
-At first I questioned why I would do this, but now that I know the advantages of this, it's too good to pass up. This allows me to edit text from an X window using an Emacs buffer.
-#+begin_src emacs-lisp
-  (use-package exwm-edit
-    :ensure t
-    :defer t
-    :init
-    (require 'exwm-edit))
-#+end_src
-
-*** Mouse follows on focus change
-This is a setting I had back when I used ~dwm~. I really wanted it back so I'm glad I found this. When focus changes, unless the mouse caused the focus change, warp the mouse to the center of the newly focused window.
-#+begin_src emacs-lisp
-  (use-package exwm-mff
-    :ensure t
-    :defer t
-    :hook (exwm-init . exwm-mff-mode))
-#+end_src
-
-*** Getting a ~rofi~ equivalent
-Since I'm using Emacs as a window manager, I need something comparable to ~rofi~ so I can open X windows I haven't bound to keys. It will be bound elsewhere. I really don't want one named after +a project made by Nazis+ a Suckless project, but laziness makes that hard.
-#+begin_src emacs-lisp
-  (use-package dmenu
-    :ensure t
-    :defer t
-    :init
-    (setq dmenu-prompt-string "Run: "))
-#+end_src
-
-** Workspace configuration
-*** Load all workspaces on startup
-I do not want to have to load all of them on my own...
-#+begin_src emacs-lisp
-  (setq exwm-workspace-number 10)
-#+end_src
-
-*** Assign workspaces to monitors
-This section is only to ensure the proper workspaces are placed on the right monitors when my W541 is docked.
-#+begin_src emacs-lisp
-  (setq exwm-randr-workspace-output-plist '(0 "DP2-2"
-                                            1 "DP2-1"
-                                            2 "DP2-3"
-                                            3 "DP2-2"
-                                            4 "DP2-1"
-                                            5 "DP2-3"
-                                            6 "DP2-2"
-                                            7 "DP2-1"
-                                            8 "DP2-3"
-                                            9 "DP2-2"))
-#+end_src
-
-*** Assign programs to workspaces
-...and also have some launch floating and/or without a mode line or borders.
-#+begin_src emacs-lisp
-  (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
-                                      floating-mode-line nil
-                                      workspace 9)
-                                     ((string= exwm-instance-name "telegram-desktop")
-                                      workspace 8)
-                                     ((string= exwm-class-name "discord")
-                                      workspace 7)
-                                     ((or (string-match-p "libreoffice" exwm-class-name)
-                                          (string= exwm-class-name "MuseScore3")
-                                          (string= exwm-class-name "Gimp"))
-                                      workspace 6)
-                                     ((string= exwm-title "Event Tester")
-                                      floating-mode-line nil
-                                      floating t)))
-#+end_src
-
-*** Name workspaces a little more intuitively
-No clue why you have to do so much just to give workspaces names, but at least you can do it.
-#+begin_src emacs-lisp
-  (defvar farl-exwm/workspace-names ["1"
-                                     "2"
-                                     "3"
-                                     "4"
-                                     "5"
-                                     "6"
-                                     "office"
-                                     "discord"
-                                     "telegram"
-                                     "games"]
-    "The names assigned to workspaces through `exwm-workspace-index-map'.")
-
-  (setq exwm-workspace-index-map (lambda (index) (elt farl-exwm/workspace-names index)))
-#+end_src
-
-*** Show a list of workspaces in the echo area
-Because I now use so many workspaces, I need to be able to see what workspace I am currently on. This makes it easier to do that. It's rather buggy at times, but it does what it needs to do.
-#+begin_src emacs-lisp
-  (defun farl-exwm/list-workspaces ()
-    "List EXWM workspaces."
-    (exwm-workspace--update-switch-history)
-    (elt exwm-workspace--switch-history
-         (exwm-workspace--position exwm-workspace--current)))
-
-  (use-package minibuffer-line
-    :ensure t
-    :defer t
-    :init
-    (minibuffer-line-mode 1)
-    (set-face-attribute 'minibuffer-line nil :inherit 'default)
-    (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
-    (add-hook 'exwm-workspace-switch-hook 'minibuffer-line--update))
-#+end_src
-
-** Multi-head configuration
-Thankfully, EXWM comes with hooks to handle when monitors are connected and disconnected, so I can do monitor configuration entirely in Emacs Lisp. I have two laptops: a ThinkPad X230 and a ThinkPad W541. Each has different displays and is used for different purposes. Due to recent updates to Arch Linux and the fact that the original code here was a dumpster fire, this section had to be reworked.
-
-*** Getting the currently connected monitors
-The first thing to do is set up a function to return a list of currently connected monitors.
-#+begin_src emacs-lisp
-  (defun get-connected-monitors ()
-    "Return a list of the currently connected monitors."
-    (split-string
-     (shell-command-to-string
-      "xrandr | grep ' connected ' | awk '{print $1}'")))
-#+end_src
-
-*** Configuring monitor arrangement on my X230
-This one is straightforward. I never do any kind of split-monitor setup on my ThinkPad X230, so every monitor looks over the same screen.
-#+begin_src emacs-lisp
-  (defun display-setup-x230 ()
-    "Set up the connected monitors on a ThinkPad X230."
-    (let ((monitors (get-connected-monitors))
-          (possible '("LVDS1"
-                      "VGA1")))
-      (dolist (monitor possible)
-        (if (member monitor monitors)
-            (start-process "xrandr" nil "xrandr"
-                           "--output" monitor
-                           "--mode" "1366x768"
-                           "--pos" "0x0")
-          (start-process "xrandr" nil "xrandr"
-                         "--output" monitor
-                         "--off")))))
-#+end_src
-
-*** Configuring monitor arrangement on my W541
-This is where it gets really fun. This ThinkPad /does/ get docked, so I handle very different outputs.
-#+begin_src emacs-lisp
-  (defun display-setup-w541 ()
-    "Set up the connected monitors on a ThinkPad W541."
-    (let* ((connected-monitors (get-connected-monitors))
-           (docked-p (member "DP2-1" connected-monitors))
-           (possible-monitors '("eDP1"
-                                "VGA1"
-                                "DP2-1"
-                                "DP2-2"
-                                "DP2-3")))
-      (dolist (monitor possible-monitors)
-        (if (and (member monitor connected-monitors)
-                 (not (and docked-p (string= "eDP1" monitor))))
-            (progn
-              (start-process "xrandr" nil "xrandr"
-                             "--output" monitor
-                             ;; Any enabled monitor needs a resolution.
-                             "--mode" (if (string= "eDP1" monitor)
-                                          "2880x1620"
-                                        "1920x1080")
-                             ;; Scale all monitor output to 3K.
-                             "--scale-from" "2880x1620"
-                             ;; DP2-1 and DP2-3 are rotated.
-                             "--rotate" (if (string= "DP2-1" monitor)
-                                            "left"
-                                          (if (string= "DP2-3" monitor)
-                                              "right"
-                                            "normal"))
-                             ;; Every enabled monitor needs a position.
-                             "--pos" (if (string-match-p "1" monitor)
-                                         "0x0"
-                                       (if (string= monitor "DP2-2")
-                                           "1620x0"
-                                         "4500x0")))
-              ;; Setting a monitor as primary occurs outside enabling it.
-              ;; This is due to how `start-process' takes arguments.
-              (when (or (string= "DP2-2" monitor)
-                        (string= "eDP1" monitor))
-                (start-process "xrandr" nil "xrandr"
-                               "--output" monitor
-                               "--primary")))
-          (start-process "xrandr" nil "xrandr"
-                         "--output" monitor
-                         "--off")))))
-#+end_src
-
-*** Configuring peripherals while docked
-Because I use a dock on my W541, there are some things I need to do alongside setting up my monitors.
-#+begin_src emacs-lisp
-  (defun peripheral-setup ()
-    "Configure peripherals I connect to my dock."
-    ;; Trackball
-    (let ((trackball-id (shell-command-to-string
-                         (concat "xinput | grep ELECOM | head -n 1 | sed -r "
-                                 "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
-      (dolist (command '("'libinput Button Scrolling Button' 10"
-                         "'libinput Scroll Method Enabled' 0 0 1"))
-        (start-process-shell-command
-         "Trackball Setup" nil (concat "xinput set-prop "
-                                       trackball-id command)))
-      (start-process-shell-command
-       "Trackball Setup" nil (concat "xinput set-button-map " trackball-id
-                                     "1 2 3 4 5 6 7 8 9 2 1 2")))
-    ;; Keyboard
-    (start-process "Keyboard Setup" nil "setxkbmap"
-                   "-option" "ctrl:nocaps"))
-#+end_src
-
-*** Bringing it all together
-Finally, I can make my generic display-and-dock setup function.
-#+begin_src emacs-lisp
-  (defun display-and-dock-setup ()
-    "Configure displays and dock if applicable."
-    (interactive)
-    (unless (= (shell-command "pgrep arandr") 0)
-      (if (member "LVDS1" (get-connected-monitors))
-          (display-setup-x230)
-        (progn
-          (display-setup-w541)
-          (peripheral-setup))))
-    (message ""))
-#+end_src
-
-*** Start ~exwm-randr~
-This is where the real magic happens.
-#+begin_src emacs-lisp
-  (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
-  (exwm-randr-enable)
-#+end_src
-
-** Desktop environment components
-*** System package management
-This one is a pleasant surprise to have honestly. Having Emacs handle system packages as well as its own makes life a million times easier. Since I use ~yay~ on Arch, I configure an entry for it and use it if it's installed.
-#+begin_src emacs-lisp
-  (use-package system-packages
-    :ensure t
-    :defer t
-    :init
-    (when (executable-find "yay")
-      (require 'system-packages)
-      (add-to-list 'system-packages-supported-package-managers
-                   '(yay .
-                         ((default-sudo . nil)
-                          (install . "yay -S")
-                          (search . "yay -Ss")
-                          (uninstall . "yay -Rs")
-                          (update . "yay -Syu")
-                          (clean-cache . "yay -Sc")
-                          (log . "car /var/log/pacman.log")
-                          (get-info . "yay -Qi")
-                          (get-info-remote . "yay -Si")
-                          (list-files-provided-by . "yay -Ql")
-                          (verify-all-packages . "yay -Qkk")
-                          (verify-all-dependencies . "yay -Dk")
-                          (remove-orphaned . "yay -Rns $(yay -Qtdq)")
-                          (list-installed-packages . "yay -Qe")
-                          (list-installed-packages-all . "yay -Q")
-                          (list-dependencies-of . "yay -Qi")
-                          (noconfirm . "--noconfirm"))))
-      (setq system-packages-use-sudo nil
-            system-packages-package-manager 'yay))
-    (setq system-packages-noconfirm t)
-    :bind (("C-c p i" . system-packages-install)
-           ("C-c p e" . system-packages-ensure)
-           ("C-c p u" . system-packages-update)
-           ("C-c p r" . system-packages-uninstall)
-           ("C-c p o" . system-packages-remove-orphaned)
-           ("C-c p c" . system-packages-clean-cache)
-           ("C-c p l" . system-packages-log)
-           ("C-c p s" . system-packages-search)
-           ("C-c p g" . system-packages-get-info)
-           ("C-c p d" . system-packages-list-dependencies-of)
-           ("C-c p f" . system-packages-list-files-provided-by)
-           ("C-c p p" . system-packages-list-installed-packages)
-           ("C-c p f" . system-packages-verify-all-dependencies)
-           ("C-c p v" . system-packages-verify-all-packages)))
-#+end_src
-
-*** ~desktop-environment-mode~
-Previously I had to define a lot of functions to do these things, now I just change settings within ~desktop-environment-mode~.
-#+begin_src emacs-lisp
-  (use-package desktop-environment
-    :ensure t
-    :defer t
-    :init
-    (desktop-environment-mode 1))
-#+end_src
-
-**** Volume adjustment
-The only things I really don't like about how ~desktop-environment~'s volume controlling is ~desktop-environment-toggle-mute~, which gives way too much output when you mute or unmute the speakers or microphone, so I set up basic scripts to give much more concise output.
-#+begin_src emacs-lisp
-  (setq desktop-environment-volume-toggle-command
-        (concat "[ \"$(amixer set Master toggle | grep off)\" ] "
-                "&& echo Volume is now muted. | tr '\n' ' ' "
-                "|| echo Volume is now unmuted. | tr '\n' ' '")
-        desktop-environment-volume-toggle-microphone-command
-        (concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
-                "&& echo Microphone is now muted. | tr '\n' ' ' "
-                "|| echo Microphone is now unmuted | tr '\n' ' '"))
-#+end_src
-
-**** Brightness adjustment
-This one all I needed to do was change the increment and decrement values.
-#+begin_src emacs-lisp
-  (setq desktop-environment-brightness-normal-increment "5%+"
-        desktop-environment-brightness-normal-decrement "5%-")
-#+end_src
-
-**** Screenshots
-This one was the least straightforward because the way it's implemented by ~desktop-environment~ is *SUPER* wonky. Here are the binds which will be relevant.
-#+begin_src emacs-lisp
-  ;; Storing to clipboard
-  (define-key desktop-environment-mode-map (kbd "<print>")
-    'farl-de/desktop-environment-screenshot-part-clip)
-  (define-key desktop-environment-mode-map (kbd "<S-print>")
-    'farl-de/desktop-environment-screenshot-clip)
-
-  ;; Storing to file
-  (define-key desktop-environment-mode-map (kbd "<C-print>")
-    'farl-de/desktop-environment-screenshot-part)
-  (define-key desktop-environment-mode-map (kbd "<C-S-print>")
-    'farl-de/desktop-environment-screenshot)
-#+end_src
-
-First, I set what directory to store screenshots in.
-#+begin_src emacs-lisp
-  (setq desktop-environment-screenshot-directory "~/screenshots")
-#+end_src
-
-Then, I can set the commands for taking a full or partial screenshot and saving it to a file.
-#+begin_src emacs-lisp
-  (setq desktop-environment-screenshot-command
-        "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
-        desktop-environment-screenshot-partial-command
-        "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
-#+end_src
-
-The functions which ~desktop-environment~ comes with are kinda garbage, so I made my own.
-#+begin_src emacs-lisp
-  (defun farl-de/desktop-environment-screenshot ()
-    "Take a screenshot and store it in a file."
-    (interactive)
-    (desktop-environment-screenshot)
-    (message "Screenshot saved in ~/screenshots."))
-
-  (defun farl-de/desktop-environment-screenshot-part ()
-    "Take a capture of a portion of the screen and store it in a file."
-    (interactive)
-    (desktop-environment-screenshot-part)
-    (message "Screenshot saved in ~/screenshots."))
-
-  (defun farl-de/desktop-environment-screenshot-clip ()
-    "Take a screenshot and put it in the clipboard."
-    (interactive)
-    (shell-command
-     (concat desktop-environment-screenshot-command
-             " && xclip $FILENAME -selection clipboard "
-             "-t image/png &> /dev/null && rm $FILENAME"))
-    (message "Screenshot copied to clipboard."))
-
-  (defun farl-de/desktop-environment-screenshot-part-clip ()
-    "Take a shot of a portion of the screen and put it in the clipboard."
-    (interactive)
-    (shell-command
-     (concat desktop-environment-screenshot-partial-command
-             " && xclip $FILENAME -selection clipboard "
-             "-t image/png &> /dev/null && rm $FILENAME"))
-    (message "Screenshot copied to clipboard."))
-#+end_src
-
-**** Lock screen
-Haha yes, this is very long and very very stupid.
-#+begin_src emacs-lisp
-  (setq desktop-environment-screenlock-command (concat "i3lock -nmk "
-                                                       "--color=000000 "
-                                                       "--timecolor=ffffffff "
-                                                       "--datecolor=ffffffff "
-                                                       "--wrongcolor=ffffffff "
-                                                       "--ringcolor=00000000 "
-                                                       "--insidecolor=00000000 "
-                                                       "--keyhlcolor=00000000 "
-                                                       "--bshlcolor=00000000 "
-                                                       "--separatorcolor=00000000 "
-                                                       "--ringvercolor=00000000 "
-                                                       "--insidevercolor=00000000 "
-                                                       "--linecolor=00000000 "
-                                                       "--ringwrongcolor=00000000 "
-                                                       "--insidewrongcolor=00000000 "
-                                                       "--timestr=%H:%M "
-                                                       "--datestr='%a %d %b' "
-                                                       "--time-font=Iosevka "
-                                                       "--date-font=Iosevka "
-                                                       "--wrong-font=Iosevka "
-                                                       "--timesize=128 "
-                                                       "--datesize=64 "
-                                                       "--wrongsize=32 "
-                                                       "--time-align 0 "
-                                                       "--date-align 0 "
-                                                       "--wrong-align 0 "
-                                                       "--indpos=-10:-10 "
-                                                       "--timepos=200:125 "
-                                                       "--datepos=200:215 "
-                                                       "--wrongpos=200:155 "
-                                                       "--locktext='' "
-                                                       "--lockfailedtext='' "
-                                                       "--noinputtext='' "
-                                                       " --veriftext='' "
-                                                       "--wrongtext='WRONG' "
-                                                       "--force-clock"
-                                                       "--radius 1 "
-                                                       "--ring-width 1 "))
-#+end_src
-
-*** Monitor settings
-Calling ~arandr~ to adjust monitors is useful when I am preparing to present something using my computer or need to adjust how monitors are set up in a unique way that isn't a preset from my dotfiles.
-#+begin_src emacs-lisp
-  (defun monitor-settings ()
-    "Open arandr to configure monitors."
-    (interactive)
-    (start-process "Monitor Settings" nil "arandr"))
-#+end_src
-
-*** Network settings
-This one uses two windows: one to open the NetworkManager connection editor, and another to list WiFi networks nearby.
-#+begin_src emacs-lisp
-  (defun network-settings ()
-    "Open a NetworkManager connection editor."
-    (interactive)
-    (start-process "Network Settings" nil "nm-connection-editor")
-    (async-shell-command "nmcli dev wifi list" "*Wi-Fi Networks*"))
-#+end_src
-
-*** Volume mixer
-For when you need to do volume mixing.
-#+begin_src emacs-lisp
-  (defun volume-settings ()
-    "Open pavucontrol to adjust volume."
-    (interactive)
-    (start-process "Volume Mixer" nil "pavucontrol"))
-#+end_src
-
-*** Audio loop-back
-Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucontrol~ to set up which programs to pass through to Discord.
-#+begin_src emacs-lisp
-  (defun audio-loopback ()
-    "Loop desktop audio into a null sink alongside the primary input."
-    (interactive)
-    (dolist (command '(;; Create null sink `loop'
-                       "pacmd load-module module-null-sink sink_name=loop"
-                       "pacmd update-sink-proplist loop device.description=loop"
-                       ;; Create null sink `out'
-                       "pacmd load-module module-null-sink sink_name=out"
-                       "pacmd update-sink-proplist out device.description=out"
-                       ;; Loop `loop' to primary output
-                       "pacmd load-module module-loopback source=loop.monitor"
-                       ;; Pipe it into `out'
-                       "pacmd load-module module-loopback source=loop.monitor sink=out"
-                       ;; Loop primary input into `out'
-                       "pacmd load-module module-loopback sink=out"))
-      (shell-command command))
-    ;; Run `pavucontrol' and then unload the modules after it completes
-    (start-process-shell-command
-     "Audio Loop" nil (concat "pavucontrol && "
-                              "pacmd unload-module module-null-sink && "
-                              "pacmd unload-module module-loopback")))
-#+end_src
-
-*** Keyboard layout selection
-This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
-#+begin_src emacs-lisp
-  (defvar keyboard-layout-1 "us"
-    "The first of three keyboard layouts to cycle through.
-
-  Set to nil to have one less keyboard layout.")
-
-  (defvar keyboard-layout-2 "epo"
-    "The second of three keyboard layouts to cycle through.
-
-  Set to nil to have one less keyboard layout.")
-
-  (defvar keyboard-layout-3 "de"
-    "The third of three keyboard layouts to cycle through.
-
-  Set to nil to have one less keyboard layout.")
-#+end_src
-
-Then, I use these functions to control setting and cycling the keyboard layout:
-#+begin_src emacs-lisp
-  (defun get-keyboard-layout ()
-    "Get the current keyboard layout."
-    (shell-command-to-string
-     "setxkbmap -query | grep -oP 'layout:\\s*\\K(\\w+)' | tr '\n' ' ' | sed 's/ //'"))
-
-  (defun set-keyboard-layout (&optional layout)
-    "Set the keyboard layout to LAYOUT."
-    (interactive)
-    (let ((layout (or layout (read-string "Enter keyboard layout: "))))
-      (shell-command (concat "setxkbmap " layout " -option ctrl:nocaps"))
-      (message "Keyboard layout is now: %s" layout)))
-
-  (defun cycle-keyboard-layout ()
-    "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3'."
-    (interactive)
-    (let* ((current-layout (get-keyboard-layout))
-           (new-layout (if (string= current-layout keyboard-layout-1)
-                           (or keyboard-layout-2 keyboard-layout-3)
-                         (if (string= current-layout keyboard-layout-2)
-                             (or keyboard-layout-3 keyboard-layout-1)
-                           (or keyboard-layout-1 keyboard-layout-2)))))
-      (if new-layout
-          (set-keyboard-layout new-layout)
-        (message "No keyboard layouts selected."))))
-
-  (defun cycle-keyboard-layout-reverse ()
-    "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3' in reverse."
-    (interactive)
-    (let* ((current-layout (get-keyboard-layout))
-           (new-layout (if (string= current-layout keyboard-layout-3)
-                           (or keyboard-layout-2 keyboard-layout-1)
-                         (if (string= current-layout keyboard-layout-2)
-                             (or keyboard-layout-1 keyboard-layout-3)
-                           (or keyboard-layout-3 keyboard-layout-2)))))
-      (if new-layout
-          (set-keyboard-layout new-layout)
-        (message "No keyboard layouts selected."))))
-#+end_src
-
-*** Suspending
-#+begin_src emacs-lisp
-  (defun suspend-computer ()
-    (interactive)
-    (and (yes-or-no-p "Really suspend? ")
-         (shell-command "systemctl suspend -i")))
-
-  (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
-#+end_src
-
-*** Rebooting
-I copied the function for quitting Emacs to handle reboot too.
-#+begin_src emacs-lisp
-  (defun save-buffers-reboot (&optional arg)
-    "Offer to save each buffer, then shut down the computer.
-  This function is literally just a copycat of `save-buffers-kill-emacs'.
-  With prefix ARG, silently save all file-visiting buffers without asking.
-  If there are active processes where `process-query-on-exit-flag'
-  returns non-nil and `confirm-kill-processes' is non-nil,
-  asks whether processes should be killed.
-  Runs the members of `kill-emacs-query-functions' in turn and stops
-  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
-  Instead of just killing Emacs, shuts down the system."
-    (interactive "P")
-    ;; Don't use save-some-buffers-default-predicate, because we want
-    ;; to ask about all the buffers before killing Emacs.
-    (save-some-buffers arg t)
-    (let ((confirm confirm-kill-emacs))
-      (and
-       (or (not (memq t (mapcar (function
-                                 (lambda (buf) (and (buffer-file-name buf)
-                                                    (buffer-modified-p buf))))
-                                (buffer-list))))
-           (progn (setq confirm nil)
-                  (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
-       (or (not (fboundp 'process-list))
-           ;; process-list is not defined on MSDOS.
-           (not confirm-kill-processes)
-           (let ((processes (process-list))
-                 active)
-             (while processes
-               (and (memq (process-status (car processes)) '(run stop open listen))
-                    (process-query-on-exit-flag (car processes))
-                    (setq active t))
-               (setq processes (cdr processes)))
-             (or (not active)
-                 (with-current-buffer-window
-                  (get-buffer-create "*Process List*") nil
-                  #'(lambda (window _value)
-                      (with-selected-window window
-                        (unwind-protect
-                            (progn
-                              (setq confirm nil)
-                              (yes-or-no-p (concat "Active processes exist; kill "
-                                                   "them and reboot anyway? ")))
-                          (when (window-live-p window)
-                            (quit-restore-window window 'kill)))))
-                  (list-processes t)))))
-       ;; Query the user for other things, perhaps.
-       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
-       (or (null confirm)
-           (funcall confirm "Really reboot? "))
-       (shell-command "reboot")
-       (kill-emacs))))
-
-  (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
-#+end_src
-
-*** Shutting down
-I copied the function for quitting Emacs to handle shutting down.
-#+begin_src emacs-lisp
-  (defun save-buffers-shut-down (&optional arg)
-    "Offer to save each buffer, then shut down the computer.
-  This function is literally just a copycat of `save-buffers-kill-emacs'.
-  With prefix ARG, silently save all file-visiting buffers without asking.
-  If there are active processes where `process-query-on-exit-flag'
-  returns non-nil and `confirm-kill-processes' is non-nil,
-  asks whether processes should be killed.
-  Runs the members of `kill-emacs-query-functions' in turn and stops
-  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
-  Instead of just killing Emacs, shuts down the system."
-    (interactive "P")
-    ;; Don't use save-some-buffers-default-predicate, because we want
-    ;; to ask about all the buffers before killing Emacs.
-    (save-some-buffers arg t)
-    (let ((confirm confirm-kill-emacs))
-      (and
-       (or (not (memq t (mapcar (function
-                                 (lambda (buf) (and (buffer-file-name buf)
-                                                    (buffer-modified-p buf))))
-                                (buffer-list))))
-           (progn (setq confirm nil)
-                  (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
-       (or (not (fboundp 'process-list))
-           ;; process-list is not defined on MSDOS.
-           (not confirm-kill-processes)
-           (let ((processes (process-list))
-                 active)
-             (while processes
-               (and (memq (process-status (car processes)) '(run stop open listen))
-                    (process-query-on-exit-flag (car processes))
-                    (setq active t))
-               (setq processes (cdr processes)))
-             (or (not active)
-                 (with-current-buffer-window
-                  (get-buffer-create "*Process List*") nil
-                  #'(lambda (window _value)
-                      (with-selected-window window
-                        (unwind-protect
-                            (progn
-                              (setq confirm nil)
-                              (yes-or-no-p (concat "Active processes exist; kill "
-                                                   "them and shut down anyway? ")))
-                          (when (window-live-p window)
-                            (quit-restore-window window 'kill)))))
-                  (list-processes t)))))
-       ;; Query the user for other things, perhaps.
-       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
-       (or (null confirm)
-           (funcall confirm "Really shut down? "))
-       (shell-command "shutdown now")
-       (kill-emacs))))
-
-  (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
-#+end_src
-
-** X applications
-*** GIMP
-Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
-#+begin_src emacs-lisp
-  (defun run-gimp ()
-    "Start GIMP."
-    (interactive)
-    (start-process "GIMP" nil "gimp"))
-#+end_src
-
-*** Steam
-Gaming is possible with EXWM, if you run games windowed. I used to run it floating, but honestly just having it tile is so much easier to manage.
-#+begin_src emacs-lisp
-  (defun run-steam ()
-    "Start Steam."
-    (interactive)
-    (start-process "Steam" nil "steam"))
-#+end_src
-
-*** Firefox
-Firefox has some unique abilities when it comes to how to make windows behave which work better for me. I don't use tabs, and I don't want anything to do with them, and Firefox lets me hide the tab bar and force all tabs to actually open as new windows. It's like Suckless Surf, but orders of magnitude better.
-#+begin_src emacs-lisp
-  (defun run-firefox ()
-    "Start Firefox."
-    (interactive)
-    (start-process "Firefox" nil "firefox"))
-#+end_src
-
-*** Discord
-Yeah, I also use the light theme for Discord. It looks comfy, even if Discord is a garbage application.
-#+begin_src emacs-lisp
-  (defun run-discord ()
-    "Start Discord."
-    (interactive)
-    (start-process "Discord" nil "discord"))
-#+end_src
-
-*** Telegram
-I have a painfully white theme which fits perfectly with my setup.
-#+begin_src emacs-lisp
-  (defun run-telegram ()
-    "Start Telegram."
-    (interactive)
-    (start-process "Telegram" nil "telegram-desktop"))
-#+end_src
-
-*** MuseScore
-I haven't figured out how to engrave in Emacs, so for now...
-#+begin_src emacs-lisp
-  (defun run-musescore ()
-    "Start MuseScore."
-    (interactive)
-    (start-process "MuseScore" nil "musescore"))
-#+end_src
-
-*** LibreOffice
-Shame me all you want. I'm still in introductory courses and haven't learned enough Org-mode to use it more meaningfully.
-#+begin_src emacs-lisp
-  (defun run-libreoffice ()
-    "Start LibreOffice."
-    (interactive)
-    (start-process "LibreOffice" nil "libreoffice"))
-#+end_src
-
-*** Transmission
-#+begin_src emacs-lisp
-  (defun run-transmission ()
-    "Start Transmission."
-    (interactive)
-    (start-process "Transmission" nil "transmission-gtk"))
-#+end_src
-** Keybindings
-*** Global binds to use across everything
-Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into this area. Since I'm very lazy and don't feel like writing a whole bunch of lambdas for multiple workspaces, presented here are instead some ~mapcar~ calls, like the one in [[https://github.com/ch11ng/exwm/wiki/Configuration-Example][this example]].
-#+begin_src emacs-lisp
-  (setq exwm-input-global-keys `(;; Switching workspace focus
-                                 ;; s-1 for 1, s-2 for 2, etc...
-                                 ,@(mapcar
-                                    (lambda (i)
-                                      `(,(kbd (format "s-%d" (% (1+ i) 10))) .
-                                        (lambda ()
-                                          (interactive)
-                                          (exwm-workspace-switch-create ,i))))
-                                    (number-sequence 0 9))
-
-                                 ;; Switching window to a workspace
-                                 ;; This was annoying to get working
-                                 ;; s-! for 1, s-@ for 2, etc...
-                                 ,@(mapcar
-                                    (lambda (i)
-                                      `(,(kbd (format "s-%s" (nth i '("!" "@"
-                                                                      "#" "$"
-                                                                      "%" "^"
-                                                                      "&" "*"
-                                                                      "(" ")")))) .
-                                        (lambda ()
-                                          (interactive)
-                                          (exwm-workspace-move-window ,i))))
-                                    (number-sequence 0 9))
-
-                                 ;; Window size adjustment
-                                 ([8388631] . shrink-window) ; C-s-w
-                                 ([8388627] . enlarge-window) ; C-s-s
-                                 ([8388609] . shrink-window-horizontally) ; C-s-a
-                                 ([8388612] . enlarge-window-horizontally) ; C-s-d
-
-                                 ;; Opening X applications
-                                 ([?\s-g]          . run-gimp)
-                                 ([?\s-s]          . run-steam)
-                                 ([?\s-f]          . run-firefox)
-                                 ([?\s-d]          . run-discord)
-                                 ([?\s-t]          . run-telegram)
-                                 ([?\s-m]          . run-musescore)
-                                 ([?\s-b]          . run-libreoffice)
-                                 ([?\s-o]          . run-transmission)
-                                 ([?\s-r]          . monitor-settings)
-                                 ([?\s-n]          . network-settings)
-                                 ([?\s-v]          . volume-settings)
-                                 ([s-return]       . vterm)
-                                 ([XF86Calculator] . calc)
-
-                                 ;; Other desktop environment things
-                                 ([?\s-x]       . dmenu)
-                                 ([menu]        . smex)
-                                 ([?\s- ]       . cycle-keyboard-layout)
-                                 ([s-backspace] . cycle-keyboard-layout-reverse)
-                                 ([s-tab]       . audio-loopback)
-
-                                 ;; Controlling EMMS
-                                 ([XF86AudioNext] . emms-next)
-                                 ([XF86AudioPrev] . emms-previous)
-                                 ([XF86AudioPlay] . emms-pause)
-                                 ([XF86AudioStop] . emms-stop)))
-#+end_src
-
-*** Emacs key bindings in X windows
-This is super nice, because I love these key bindings and they are just intuitive to me, and now they can carry over safely to other programs.
-#+begin_src emacs-lisp
-  (setq exwm-input-simulation-keys '(;; Navigation
-                                     ([?\C-b] . [left])
-                                     ([?\C-f] . [right])
-                                     ([?\C-p] . [up])
-                                     ([?\C-n] . [down])
-
-                                     ([?\M-b] . [C-left])
-                                     ([?\M-f] . [C-right])
-                                     ([?\M-p] . [C-up])
-                                     ([?\M-n] . [C-down])
-
-                                     ([?\C-a] . [home])
-                                     ([?\C-e] . [end])
-                                     ([?\C-v] . [next])
-                                     ([?\M-v] . [prior])
-
-                                     ;; Copy/Paste
-                                     ([?\C-w] . [?\C-x])
-                                     ([?\M-w] . [?\C-c])
-                                     ([?\C-y] . [?\C-v])
-                                     ([?\C-s] . [?\C-f])
-                                     ([?\C-\/] . [?\C-z])
-
-                                     ;; Other
-                                     ([?\C-d] . [delete])
-                                     ([?\C-k] . [S-end delete])
-                                     ([?\C-g] . [escape])))
-
-  ;; I can't do sequences above, so these are separate
-  (defun farl-exwm/C-s ()
-    "Pass C-s to the EXWM window."
-    (interactive)
-    (execute-kbd-macro (kbd "C-q C-s")))
-
-  (defun farl-exwm/C-k ()
-    "Pass C-k to the EXWM window."
-    (interactive)
-    (execute-kbd-macro (kbd "C-q C-k")))
-
-  (define-key exwm-mode-map (kbd "C-x C-s") 'farl-exwm/C-s)
-  (define-key exwm-mode-map (kbd "C-c C-l") 'farl-exwm/C-k)
-#+end_src
-
-*** Send a key verbatim more easily
-#+begin_src emacs-lisp
-  (define-key exwm-mode-map (kbd "C-c C-q") nil)
-  (define-key exwm-mode-map (kbd "C-q") 'exwm-input-send-next-key)
-#+end_src
-
-*** Inhibit things I don't use
-This includes:
-- Toggling fullscreen
-- Toggling floating
-- Toggling hiding
-- Toggling the mode line
-#+begin_src emacs-lisp
-  (dolist (key '("C-c C-t C-f"
-                 "C-c C-t C-v"
-                 "C-c C-t C-m"
-                 "C-c C-f"))
-    (define-key exwm-mode-map (kbd key) nil))
-#+end_src
-
 ** On startup
-*** Hide the cursor when typing
-This is just a point of personal preference. I tried not using it for a while and personally it just felt wrong.
-#+begin_src emacs-lisp
-  (start-process "Hide Cursor" nil "xbanish")
+#+begin_src emacs-lisp :tangle (user-emacs-file "init.el")
+  (require 'init-looks)
 #+end_src
 
-*** Disable screen blanking
-I don't need my laptop's screen shutting off just because I'm sitting and watching a video too long.
-#+begin_src emacs-lisp
-  (start-process "Disable Blanking" nil "xset"
-                 "s" "off" "-dpms")
-#+end_src
-
-*** Disable the trackpad
-This thing is disgusting, and I prefer trackpoints way more.
-#+begin_src emacs-lisp
-  (start-process "Trackpad Setup" nil "xinput"
-                 "disable" (shell-command-to-string
-                            (concat "xinput | grep Synap | head -n 1 | "
-                                    "sed -r 's/.*id=([0-9]+).*/\\1/' | "
-                                    "tr '\n' ' ' | sed 's/ //'")))
-#+end_src
-
-*** Keyboard configuration
-This block sets the keyboard layout to US and give Caps Lock the functionality of Control. I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
-#+begin_src emacs-lisp
-  (start-process "Keyboard Layout" nil "setxkbmap"
-                 "us" "-option" "ctrl:nocaps")
-#+end_src
-
-*** Start the compositor
-I don't need it, but having basic compositing is very nice.
-#+begin_src emacs-lisp
-  (start-process "Compositor" nil "xcompmgr")
-#+end_src
-
-*** Set fallback cursor
-Some X windows will have weird cursors if this isn't done.
-#+begin_src emacs-lisp
-  (start-process "Fallback Cursor" nil "xsetroot"
-                 "-cursor_name" "left_ptr")
-#+end_src
-
-*** Start EXWM
-#+begin_src emacs-lisp
-  (exwm-systemtray-enable)
-  (exwm-config-ido)
-  (exwm-enable)
-#+end_src
-
-With that out of the way, we can close off this block and move on to the next section.
-#+begin_src emacs-lisp
-  )
-#+end_src
-
-* Making Emacs organize/play music
-I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it. We only configure EMMS if ~mpd~ is found. When checking whether ~mpd~ is installed, a couple environment variables are also set.
-#+begin_src emacs-lisp
-  (when (executable-find "mpd")
-    (setenv "MPD_HOST" "localhost")
-    (setenv "MPD_PORT" "6601")
-#+end_src
-
-** Installing EMMS
-All I do here is configure EMMS. Binding keys is later.
-#+begin_src emacs-lisp
-  (use-package emms
-    :ensure t
-    :defer t
-    :init
-    (require 'emms-setup)
-    (require 'emms-player-mpd)
-    (emms-all)
-    (setq emms-seek-seconds 5
-          emms-player-list '(emms-player-mpd)
-          emms-info-functions '(emms-info mpd)
-          emms-player-mpd-server-name "localhost"
-          emms-player-mpd-server-port "6601"
-          mpc-host "localhost:6601"))
-#+end_src
-
-** Daemon functions
-*** Starting the daemon
-#+begin_src emacs-lisp
-  (defun mpd/start-music-daemon ()
-    "Start MPD, connect to it and sync the metadata cache"
-    (interactive)
-    (shell-command "mpd")
-    (mpd/update-database)
-    (emms-player-mpd-connect)
-    (emms-cache-set-from-mpd-all)
-    (message "MPD started!"))
-#+end_src
-
-*** Stopping the daemon
-#+begin_src emacs-lisp
-  (defun mpd/kill-music-daemon ()
-    "Stop playback and kill the music daemon."
-    (interactive)
-    (emms-stop)
-    (call-process "killall" nil nil nil "mpd")
-    (message "MPD killed!"))
-#+end_src
-
-*** Updating the database
-#+begin_src emacs-lisp
-  (defun mpd/update-database ()
-    "Update the MPD database synchronously."
-    (interactive)
-    (call-process "mpc" nil nil nil "update")
-    (message "MPD database updated!"))
-#+end_src
-
-*** Shuffling the playlist
-#+begin_src emacs-lisp
-  (defun farl-emms/shuffle-with-message ()
-    "Shuffle the playlist and say so in the echo area."
-    (interactive)
-    (emms-shuffle)
-    (message "Playlist has been shuffled."))
-#+end_src
-
-** Binding all the keys
-Now using a keymap in place of that wonky as crap binding system. The new binds let me use ~emms~ in a terminal.
-#+begin_src emacs-lisp
-  (defvar emms-map
-    (let ((map (make-sparse-keymap)))
-      ;; Opening playlist and music browser
-      (define-key map (kbd "v") 'emms)
-      (define-key map (kbd "b") 'emms-smart-browse)
-      ;; Track navigation
-      (define-key map (kbd "n n") 'emms-next)
-      (define-key map (kbd "n p") 'emms-previous)
-      (define-key map (kbd "p") 'emms-pause)
-      (define-key map (kbd "s") 'emms-stop)
-      ;; Repeat/shuffle
-      (define-key map (kbd "t C-r") 'emms-toggle-repeat-track)
-      (define-key map (kbd "t r") 'emms-toggle-repeat-playlist)
-      (define-key map (kbd "t s") 'farl-emms/shuffle-with-message)
-      ;; Refreshing various things
-      (define-key map (kbd "r c") 'emms-player-mpd-update-all-reset-cache)
-      (define-key map (kbd "r d") 'mpd/update-database)
-      ;; `mpd'-specific functions
-      (define-key map (kbd "d s") 'mpd/start-music-daemon)
-      (define-key map (kbd "d q") 'mpd/kill-music-daemon)
-      (define-key map (kbd "d u") 'mpd/update-database)
-      map)
-    "A keymap for controlling `emms'.")
-  (global-set-key (kbd "C-c a") emms-map)
-#+end_src
-
-With EMMS now configured, we can close off this block and move on.
-#+begin_src emacs-lisp
-  )
-#+end_src
-
-* Making Emacs a good text editor
-This used to be a mess of different sections, but I've been working to categorize these settings far better. So, much of what was previously elsewhere is now set up in here. Everything in here /should/ be about making Emacs pleasant to use for editing text of various kinds. If it isn't, I have failed.
-** Additional major modes
-These are modes that enable Emacs to edit different kinds of files differently. Programming major modes are further down, in the programming section.
-
-*** ~graphviz-dot-mode~ (diagram creation)
-A nice way to make diagrams.
-#+begin_src emacs-lisp
-  (use-package graphviz-dot-mode
-    :ensure t
-    :defer t
-    :init
-    (require 'graphviz-dot-mode))
-#+end_src
-
-*** ~markdown-mode~ (bootleg org-mode for GitHub)
-I really don't like markdown but I have to use it for school, so...
-#+begin_src emacs-lisp
-  (use-package markdown-mode
-    :ensure t
-    :defer t)
-#+end_src
+* Making Emacs comfortable (~init-defaults.el~)
+  :properties:
+  :header-args: :tangle (user-emacs-file "lisp/init-defaults.el")
+  :end:
+Anyone who has used Emacs for any period of time can attest to the fact it takes a lot to make Emacs comfortable for one's use. That is not to say that Emacs is /bad/, but it definitely isn't the most usable piece of software out of the box.
 
 ** General functionality
-These settings are changes to core functionality more than they are changes that affect editing files.
-
 *** Use UTF-8 encoding
 This makes for a much easier time editing files and working with text.
 #+begin_src emacs-lisp
@@ -1694,6 +801,13 @@ This makes for a much easier time editing files and working with text.
   (set-keyboard-coding-system 'utf-8)
   (set-selection-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
+#+end_src
+
+*** No suspending Emacs
+Why is this even something bound to begin with?
+#+begin_src emacs-lisp
+  (global-unset-key (kbd "C-x C-z"))
+  (global-unset-key (kbd "C-z"))
 #+end_src
 
 *** Autocomplete backend
@@ -1724,14 +838,6 @@ Thanks to ~company~, this is possible now!
     (add-to-list 'company-backends 'company-emoji))
 #+end_src
 
-*** Disable suspending Emacs
-Why is this even something bound to begin with?
-#+begin_src emacs-lisp
-  (dolist (key '("C-x C-z"
-                 "C-z"))
-    (global-unset-key (kbd key)))
-#+end_src
-
 *** Always confirm closing Emacs
 I constantly kill Emacs on accident when running it in terminals, so this prevents me from doing that +as easily+.
 #+begin_src emacs-lisp
@@ -1744,8 +850,7 @@ Since this thing is changing all the time, I really like having it available on 
   (defun config-visit ()
     "Open the configuration file."
     (interactive)
-    (find-file (expand-file-name "literate-emacs.org"
-                                 user-emacs-directory)))
+    (find-file (user-emacs-file "literate-emacs.org")))
 
   (global-set-key (kbd "C-c e") 'config-visit)
 #+end_src
@@ -1823,22 +928,6 @@ I /love/ ~ido-mode~. However, I /HATE/ ~ido-mode~ right out of the box. A vertic
       :defer t
       :bind (("M-x"    . smex)
              ("<menu>" . smex))))
-#+end_src
-
-** Personal save hooks
-When I save a file, sometimes I want specific things to be done.
-
-*** Tangle literate programming files
-I've gotten really into literate programming lately, so this makes it much easier to tangle files.
-#+begin_src emacs-lisp
-  (defun tangle-literate-program ()
-    "Tangle a file if it's a literate programming file."
-    (interactive)
-    (when (and (equal major-mode 'org-mode)
-               (string-match-p "literate" (buffer-file-name)))
-      (org-babel-tangle)))
-
-  (add-hook 'after-save-hook 'tangle-literate-program)
 #+end_src
 
 ** Buffers/windows
@@ -1973,6 +1062,65 @@ Just another point of personal convenience.
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-x b") 'ibuffer)
   (global-unset-key (kbd "C-x C-b"))
+#+end_src
+
+** Configuration
+These are settings specifically pertaining to configuring Emacs.
+
+*** Easily reference a file in ~user-emacs-directory~
+Since I so often will reference files in my ~user-emacs-directory~, I find it worthwhile to create a macro specifically for that.
+#+begin_src emacs-lisp
+  (defmacro user-emacs-file (file)
+    "Find FILE in `user-emacs-directory'."
+    (expand-file-name file user-emacs-directory))
+#+end_src
+
+** On startup
+#+begin_src emacs-lisp :tangle (user-emacs-file "init.el")
+  (require 'init-defaults)
+#+end_src
+
+* Making Emacs a good text editor (~init-editor.el~)
+  :properties:
+  :header-args: :tangle (user-emacs-file "lisp/init-editor.el")
+  :end:
+This used to be a mess of different sections, but I've been working to categorize these settings far better. So, much of what was previously elsewhere is now set up in here. Everything in here /should/ be about making Emacs pleasant to use for editing text of various kinds. If it isn't, I have failed.
+
+** Additional major modes
+These are modes that enable Emacs to edit different kinds of files differently. Programming major modes are further down, in the programming section.
+
+*** ~graphviz-dot-mode~ (diagram creation)
+A nice way to make diagrams.
+#+begin_src emacs-lisp
+  (use-package graphviz-dot-mode
+    :ensure t
+    :defer t
+    :init
+    (require 'graphviz-dot-mode))
+#+end_src
+
+*** ~markdown-mode~ (bootleg org-mode for GitHub)
+I really don't like markdown but I have to use it for school, so...
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :ensure t
+    :defer t)
+#+end_src
+
+** Personal save hooks
+When I save a file, sometimes I want specific things to be done.
+
+*** Tangle literate programming files
+I've gotten really into literate programming lately, so this makes it much easier to tangle files.
+#+begin_src emacs-lisp
+  (defun tangle-literate-program ()
+    "Tangle a file if it's a literate programming file."
+    (interactive)
+    (when (and (equal major-mode 'org-mode)
+               (string-match-p "literate" (buffer-file-name)))
+      (org-babel-tangle)))
+
+  (add-hook 'after-save-hook 'tangle-literate-program)
 #+end_src
 
 ** Text editing
@@ -2301,7 +1449,1077 @@ This is exactly what I was looking for lmao
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
 #+end_src
 
-* Making Emacs =e x t e n d=
+** On startup
+#+begin_src emacs-lisp :tangle (user-emacs-file "init.el")
+  (require 'init-editor)
+#+end_src
+
+* Making Emacs a desktop environment (~init-de.el~)
+  :properties:
+  :header-args: :tangle (user-emacs-file "lisp/init-de.el")
+  :end:
+Yes, Emacs is my *entire desktop environment*. You should probably remove this section if you don't plan to use Emacs as your desktop environment.
+
+** Window management
+*** Installing the base window manager
+This isn't actually where we do all the configuration, it's just where we install EXWM and load what we need to configure it. Usually it is best to configure packages inside of ~use-package~, but that would be a horrible idea due to just how many different things there are that need configuring. However, we can do one useful thing here: set an environment variable that lets Java applications know that EXWM is not a reparenting window manager. If we don't, some games lock up really bad when changing focus.
+#+begin_src emacs-lisp
+  (use-package exwm
+    :ensure t
+    :defer t
+    :init
+    (require 'exwm)
+    (require 'exwm-randr)
+    (require 'exwm-config)
+    (require 'exwm-systemtray)
+    (setenv "_JAVA_AWT_WM_NONREPARENTING" "1"))
+#+end_src
+
+*** Configure floating window borders
+Uses the same color as my mode line, uses the same width as window divider width.
+#+begin_src emacs-lisp
+  (setq exwm-floating-border-width 3
+        exwm-floating-border-color (face-attribute 'mode-line :background))
+#+end_src
+
+*** Name EXWM buffers after the window title
+This was annoying when I first installed EXWM. Thankfully this is a very easy fix.
+#+begin_src emacs-lisp
+  (defun farl-exwm/name-buffer-after-window-title ()
+    "Rename the current `exwm-mode' buffer after the X window's title."
+    (exwm-workspace-rename-buffer exwm-title))
+
+  (add-hook 'exwm-update-title-hook 'farl-exwm/name-buffer-after-window-title)
+#+end_src
+
+*** Edit text for an X window in Emacs
+At first I questioned why I would do this, but now that I know the advantages of this, it's too good to pass up. This allows me to edit text from an X window using an Emacs buffer.
+#+begin_src emacs-lisp
+  (use-package exwm-edit
+    :ensure t
+    :defer t
+    :init
+    (require 'exwm-edit))
+#+end_src
+
+*** Mouse follows on focus change
+This is a setting I had back when I used ~dwm~. I really wanted it back so I'm glad I found this. When focus changes, unless the mouse caused the focus change, warp the mouse to the center of the newly focused window.
+#+begin_src emacs-lisp
+  (use-package exwm-mff
+    :ensure t
+    :defer t
+    :hook (exwm-init . exwm-mff-mode))
+#+end_src
+
+*** Getting a ~rofi~ equivalent
+Since I'm using Emacs as a window manager, I need something comparable to ~rofi~ so I can open X windows I haven't bound to keys. It will be bound elsewhere. I really don't want one named after +a project made by Nazis+ a Suckless project, but laziness makes that hard. At some point I will make my own function.
+#+begin_src emacs-lisp
+  (use-package dmenu
+    :ensure t
+    :defer t
+    :init
+    (setq dmenu-prompt-string "Run: "))
+#+end_src
+
+** Workspace configuration
+*** Load all workspaces on startup
+I do not want to have to load all of them on my own...
+#+begin_src emacs-lisp
+  (setq exwm-workspace-number 10)
+#+end_src
+
+*** Assign workspaces to monitors
+This section is only to ensure the proper workspaces are placed on the right monitors when my W541 is docked.
+#+begin_src emacs-lisp
+  (setq exwm-randr-workspace-output-plist '(0 "DP2-2"
+                                            1 "DP2-1"
+                                            2 "DP2-3"
+                                            3 "DP2-2"
+                                            4 "DP2-1"
+                                            5 "DP2-3"
+                                            6 "DP2-2"
+                                            7 "DP2-1"
+                                            8 "DP2-3"
+                                            9 "DP2-2"))
+#+end_src
+
+*** Assign programs to workspaces
+...and also have some launch floating and/or without a mode line or borders.
+#+begin_src emacs-lisp
+  (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
+                                      floating-mode-line nil
+                                      workspace 9)
+                                     ((string= exwm-instance-name "telegram-desktop")
+                                      workspace 8)
+                                     ((string= exwm-class-name "discord")
+                                      workspace 7)
+                                     ((or (string-match-p "libreoffice" exwm-class-name)
+                                          (string= exwm-class-name "MuseScore3")
+                                          (string= exwm-class-name "Gimp"))
+                                      workspace 6)
+                                     ((string= exwm-title "Event Tester")
+                                      floating-mode-line nil
+                                      floating t)))
+#+end_src
+
+*** Name workspaces a little more intuitively
+No clue why you have to do so much just to give workspaces names, but at least you can do it.
+#+begin_src emacs-lisp
+  (defvar farl-exwm/workspace-names ["1"
+                                     "2"
+                                     "3"
+                                     "4"
+                                     "5"
+                                     "6"
+                                     "office"
+                                     "discord"
+                                     "telegram"
+                                     "games"]
+    "The names assigned to workspaces through `exwm-workspace-index-map'.")
+
+  (setq exwm-workspace-index-map (lambda (index) (elt farl-exwm/workspace-names index)))
+#+end_src
+
+*** Show a list of workspaces in the echo area
+Because I now use so many workspaces, I need to be able to see what workspace I am currently on. This makes it easier to do that. It's rather buggy at times, but it does what it needs to do.
+#+begin_src emacs-lisp
+  (defun farl-exwm/list-workspaces ()
+    "List EXWM workspaces."
+    (exwm-workspace--update-switch-history)
+    (elt exwm-workspace--switch-history
+         (exwm-workspace--position exwm-workspace--current)))
+
+  (use-package minibuffer-line
+    :ensure t
+    :defer t
+    :init
+    (minibuffer-line-mode 1)
+    (set-face-attribute 'minibuffer-line nil :inherit 'default)
+    (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
+    (add-hook 'exwm-workspace-switch-hook 'minibuffer-line--update))
+#+end_src
+
+** Multi-head configuration
+Thankfully, EXWM comes with hooks to handle when monitors are connected and disconnected, so I can do monitor configuration entirely in Emacs Lisp. I have two laptops: a ThinkPad X230 and a ThinkPad W541. Each has different displays and is used for different purposes. Due to recent updates to Arch Linux and the fact that the original code here was a dumpster fire, this section had to be reworked.
+
+*** Getting the currently connected monitors
+The first thing to do is set up a function to return a list of currently connected monitors.
+#+begin_src emacs-lisp
+  (defun get-connected-monitors ()
+    "Return a list of the currently connected monitors."
+    (split-string
+     (shell-command-to-string
+      "xrandr | grep ' connected ' | awk '{print $1}'")))
+#+end_src
+
+*** Configuring monitor arrangement on my X230
+This one is straightforward. I never do any kind of split-monitor setup on my ThinkPad X230, so every monitor looks over the same screen.
+#+begin_src emacs-lisp
+  (defun display-setup-x230 ()
+    "Set up the connected monitors on a ThinkPad X230."
+    (let ((monitors (get-connected-monitors))
+          (possible '("LVDS1"
+                      "VGA1")))
+      (dolist (monitor possible)
+        (if (member monitor monitors)
+            (start-process "xrandr" nil "xrandr"
+                           "--output" monitor
+                           "--mode" "1366x768"
+                           "--pos" "0x0")
+          (start-process "xrandr" nil "xrandr"
+                         "--output" monitor
+                         "--off")))))
+#+end_src
+
+*** Configuring monitor arrangement on my W541
+This is where it gets really fun. This ThinkPad /does/ get docked, so I handle very different outputs.
+#+begin_src emacs-lisp
+  (defun display-setup-w541 ()
+    "Set up the connected monitors on a ThinkPad W541."
+    (let* ((connected-monitors (get-connected-monitors))
+           (docked-p (member "DP2-1" connected-monitors))
+           (possible-monitors '("eDP1"
+                                "VGA1"
+                                "DP2-1"
+                                "DP2-2"
+                                "DP2-3")))
+      (dolist (monitor possible-monitors)
+        (if (and (member monitor connected-monitors)
+                 (not (and docked-p (string= "eDP1" monitor))))
+            (progn
+              (start-process "xrandr" nil "xrandr"
+                             "--output" monitor
+                             ;; Any enabled monitor needs a resolution.
+                             "--mode" (if (string= "eDP1" monitor)
+                                          "2880x1620"
+                                        "1920x1080")
+                             ;; Scale all monitor output to 3K.
+                             "--scale-from" "2880x1620"
+                             ;; DP2-1 and DP2-3 are rotated.
+                             "--rotate" (if (string= "DP2-1" monitor)
+                                            "left"
+                                          (if (string= "DP2-3" monitor)
+                                              "right"
+                                            "normal"))
+                             ;; Every enabled monitor needs a position.
+                             "--pos" (if (string-match-p "1" monitor)
+                                         "0x0"
+                                       (if (string= monitor "DP2-2")
+                                           "1620x0"
+                                         "4500x0")))
+              ;; Setting a monitor as primary occurs outside enabling it.
+              ;; This is due to how `start-process' takes arguments.
+              (when (or (string= "DP2-2" monitor)
+                        (string= "eDP1" monitor))
+                (start-process "xrandr" nil "xrandr"
+                               "--output" monitor
+                               "--primary")))
+          (start-process "xrandr" nil "xrandr"
+                         "--output" monitor
+                         "--off")))))
+#+end_src
+
+*** Configuring peripherals while docked
+Because I use a dock on my W541, there are some things I need to do alongside setting up my monitors.
+#+begin_src emacs-lisp
+  (defun peripheral-setup ()
+    "Configure peripherals I connect to my dock."
+    ;; Trackball
+    (let ((trackball-id (shell-command-to-string
+                         (concat "xinput | grep ELECOM | head -n 1 | sed -r "
+                                 "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
+      (dolist (command '("'libinput Button Scrolling Button' 10"
+                         "'libinput Scroll Method Enabled' 0 0 1"))
+        (start-process-shell-command
+         "Trackball Setup" nil (concat "xinput set-prop "
+                                       trackball-id command)))
+      (start-process-shell-command
+       "Trackball Setup" nil (concat "xinput set-button-map " trackball-id
+                                     "1 2 3 4 5 6 7 8 9 2 1 2")))
+    ;; Keyboard
+    (start-process "Keyboard Setup" nil "setxkbmap"
+                   "-option" "ctrl:nocaps"))
+#+end_src
+
+*** Bringing it all together
+Finally, I can make my generic display-and-dock setup function.
+#+begin_src emacs-lisp
+  (defun display-and-dock-setup ()
+    "Configure displays and dock if applicable."
+    (interactive)
+    (if (member "LVDS1" (get-connected-monitors))
+        (display-setup-x230)
+      (progn
+        (display-setup-w541)
+        (peripheral-setup))))
+#+end_src
+
+*** Start ~exwm-randr~
+This is where the real magic happens.
+#+begin_src emacs-lisp
+  (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
+  (exwm-randr-enable)
+#+end_src
+
+** X applications
+*** GIMP
+Until GIMP's functionality gets merged into Emacs, guess I'm stuck having it.
+#+begin_src emacs-lisp
+  (defun run-gimp ()
+    "Start GIMP."
+    (interactive)
+    (start-process "GIMP" nil "gimp"))
+#+end_src
+
+*** Steam
+Gaming is possible with EXWM, if you run games windowed. I used to run it floating, but honestly just having it tile is so much easier to manage.
+#+begin_src emacs-lisp
+  (defun run-steam ()
+    "Start Steam."
+    (interactive)
+    (start-process "Steam" nil "steam"))
+#+end_src
+
+*** Firefox
+Firefox has some unique abilities when it comes to how to make windows behave which work better for me. I don't use tabs, and I don't want anything to do with them, and Firefox lets me hide the tab bar and force all tabs to actually open as new windows. It's like Suckless Surf, but orders of magnitude better.
+#+begin_src emacs-lisp
+  (defun run-firefox ()
+    "Start Firefox."
+    (interactive)
+    (start-process "Firefox" nil "firefox"))
+#+end_src
+
+*** Discord
+Yeah, I also use the light theme for Discord. It looks comfy, even if Discord is a garbage application.
+#+begin_src emacs-lisp
+  (defun run-discord ()
+    "Start Discord."
+    (interactive)
+    (start-process "Discord" nil "discord"))
+#+end_src
+
+*** Telegram
+I have a painfully white theme which fits perfectly with my setup.
+#+begin_src emacs-lisp
+  (defun run-telegram ()
+    "Start Telegram."
+    (interactive)
+    (start-process "Telegram" nil "telegram-desktop"))
+#+end_src
+
+*** MuseScore
+I haven't figured out how to engrave in Emacs, so for now...
+#+begin_src emacs-lisp
+  (defun run-musescore ()
+    "Start MuseScore."
+    (interactive)
+    (start-process "MuseScore" nil "musescore"))
+#+end_src
+
+*** LibreOffice
+Shame me all you want. I'm still in introductory courses and haven't learned enough Org-mode to use it more meaningfully.
+#+begin_src emacs-lisp
+  (defun run-libreoffice ()
+    "Start LibreOffice."
+    (interactive)
+    (start-process "LibreOffice" nil "libreoffice"))
+#+end_src
+
+*** Transmission
+#+begin_src emacs-lisp
+  (defun run-transmission ()
+    "Start Transmission."
+    (interactive)
+    (start-process "Transmission" nil "transmission-gtk"))
+#+end_src
+
+** DE components
+*** System package management
+This one is a pleasant surprise to have honestly. Having Emacs handle system packages as well as its own makes life a million times easier. Since I use ~yay~ on Arch, I configure an entry for it and use it if it's installed.
+#+begin_src emacs-lisp
+  (use-package system-packages
+    :ensure t
+    :defer t
+    :init
+    (when (executable-find "yay")
+      (require 'system-packages)
+      (add-to-list 'system-packages-supported-package-managers
+                   '(yay .
+                         ((default-sudo . nil)
+                          (install . "yay -S")
+                          (search . "yay -Ss")
+                          (uninstall . "yay -Rs")
+                          (update . "yay -Syu")
+                          (clean-cache . "yay -Sc")
+                          (log . "car /var/log/pacman.log")
+                          (get-info . "yay -Qi")
+                          (get-info-remote . "yay -Si")
+                          (list-files-provided-by . "yay -Ql")
+                          (verify-all-packages . "yay -Qkk")
+                          (verify-all-dependencies . "yay -Dk")
+                          (remove-orphaned . "yay -Rns $(yay -Qtdq)")
+                          (list-installed-packages . "yay -Qe")
+                          (list-installed-packages-all . "yay -Q")
+                          (list-dependencies-of . "yay -Qi")
+                          (noconfirm . "--noconfirm"))))
+      (setq system-packages-use-sudo nil
+            system-packages-package-manager 'yay))
+    (setq system-packages-noconfirm t)
+    :bind (("C-c p i" . system-packages-install)
+           ("C-c p e" . system-packages-ensure)
+           ("C-c p u" . system-packages-update)
+           ("C-c p r" . system-packages-uninstall)
+           ("C-c p o" . system-packages-remove-orphaned)
+           ("C-c p c" . system-packages-clean-cache)
+           ("C-c p l" . system-packages-log)
+           ("C-c p s" . system-packages-search)
+           ("C-c p g" . system-packages-get-info)
+           ("C-c p d" . system-packages-list-dependencies-of)
+           ("C-c p f" . system-packages-list-files-provided-by)
+           ("C-c p p" . system-packages-list-installed-packages)
+           ("C-c p f" . system-packages-verify-all-dependencies)
+           ("C-c p v" . system-packages-verify-all-packages)))
+#+end_src
+
+*** ~desktop-environment-mode~
+Previously I had to define a lot of functions to do these things, now I just change settings within ~desktop-environment-mode~.
+#+begin_src emacs-lisp
+  (use-package desktop-environment
+    :ensure t
+    :defer t
+    :init
+    (desktop-environment-mode 1))
+#+end_src
+
+**** Brightness adjustment
+This one is the simplest: all I needed to do was change the increment and decrement values.
+#+begin_src emacs-lisp
+  (setq desktop-environment-brightness-normal-increment "5%+"
+        desktop-environment-brightness-normal-decrement "5%-")
+#+end_src
+
+**** Volume adjustment
+The only things I really don't like about how ~desktop-environment~'s volume controlling is ~desktop-environment-toggle-mute~, which gives way too much output when you mute or unmute the speakers or microphone, so I set up basic scripts to give much more concise output.
+#+begin_src emacs-lisp
+  (setq desktop-environment-volume-toggle-command
+        (concat "[ \"$(amixer set Master toggle | grep off)\" ] "
+                "&& echo Volume is now muted. | tr '\n' ' ' "
+                "|| echo Volume is now unmuted. | tr '\n' ' '")
+        desktop-environment-volume-toggle-microphone-command
+        (concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
+                "&& echo Microphone is now muted. | tr '\n' ' ' "
+                "|| echo Microphone is now unmuted | tr '\n' ' '"))
+#+end_src
+
+**** Lock screen
+Haha yes, this is very long and very very stupid.
+#+begin_src emacs-lisp
+  (setq desktop-environment-screenlock-command (concat "i3lock -nmk "
+                                                       "--color=000000 "
+                                                       "--timecolor=ffffffff "
+                                                       "--datecolor=ffffffff "
+                                                       "--wrongcolor=ffffffff "
+                                                       "--ringcolor=00000000 "
+                                                       "--insidecolor=00000000 "
+                                                       "--keyhlcolor=00000000 "
+                                                       "--bshlcolor=00000000 "
+                                                       "--separatorcolor=00000000 "
+                                                       "--ringvercolor=00000000 "
+                                                       "--insidevercolor=00000000 "
+                                                       "--linecolor=00000000 "
+                                                       "--ringwrongcolor=00000000 "
+                                                       "--insidewrongcolor=00000000 "
+                                                       "--timestr=%H:%M "
+                                                       "--datestr='%a %d %b' "
+                                                       "--time-font=Iosevka "
+                                                       "--date-font=Iosevka "
+                                                       "--wrong-font=Iosevka "
+                                                       "--timesize=128 "
+                                                       "--datesize=64 "
+                                                       "--wrongsize=32 "
+                                                       "--time-align 0 "
+                                                       "--date-align 0 "
+                                                       "--wrong-align 0 "
+                                                       "--indpos=-10:-10 "
+                                                       "--timepos=200:125 "
+                                                       "--datepos=200:215 "
+                                                       "--wrongpos=200:155 "
+                                                       "--locktext='' "
+                                                       "--lockfailedtext='' "
+                                                       "--noinputtext='' "
+                                                       " --veriftext='' "
+                                                       "--wrongtext='WRONG' "
+                                                       "--force-clock"
+                                                       "--radius 1 "
+                                                       "--ring-width 1 "))
+#+end_src
+
+**** Screenshots
+This one was the least straightforward because the way it's implemented by ~desktop-environment~ is *SUPER* wonky. Here are the binds which will be relevant.
+#+begin_src emacs-lisp
+  ;; Storing to clipboard
+  (define-key desktop-environment-mode-map (kbd "<print>")
+    'farl-de/desktop-environment-screenshot-part-clip)
+  (define-key desktop-environment-mode-map (kbd "<S-print>")
+    'farl-de/desktop-environment-screenshot-clip)
+
+  ;; Storing to file
+  (define-key desktop-environment-mode-map (kbd "<C-print>")
+    'farl-de/desktop-environment-screenshot-part)
+  (define-key desktop-environment-mode-map (kbd "<C-S-print>")
+    'farl-de/desktop-environment-screenshot)
+#+end_src
+
+First, I set what directory to store screenshots in.
+#+begin_src emacs-lisp
+  (setq desktop-environment-screenshot-directory "~/screenshots")
+#+end_src
+
+Then, I can set the commands for taking a full or partial screenshot and saving it to a file.
+#+begin_src emacs-lisp
+  (setq desktop-environment-screenshot-command
+        "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
+        desktop-environment-screenshot-partial-command
+        "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
+#+end_src
+
+The functions which ~desktop-environment~ comes with are kinda garbage, so I made my own.
+#+begin_src emacs-lisp
+  (defun farl-de/desktop-environment-screenshot ()
+    "Take a screenshot and store it in a file."
+    (interactive)
+    (desktop-environment-screenshot)
+    (message "Screenshot saved in ~/screenshots."))
+
+  (defun farl-de/desktop-environment-screenshot-part ()
+    "Take a capture of a portion of the screen and store it in a file."
+    (interactive)
+    (desktop-environment-screenshot-part)
+    (message "Screenshot saved in ~/screenshots."))
+
+  (defun farl-de/desktop-environment-screenshot-clip ()
+    "Take a screenshot and put it in the clipboard."
+    (interactive)
+    (shell-command
+     (concat desktop-environment-screenshot-command
+             " && xclip $FILENAME -selection clipboard "
+             "-t image/png &> /dev/null && rm $FILENAME"))
+    (message "Screenshot copied to clipboard."))
+
+  (defun farl-de/desktop-environment-screenshot-part-clip ()
+    "Take a shot of a portion of the screen and put it in the clipboard."
+    (interactive)
+    (shell-command
+     (concat desktop-environment-screenshot-partial-command
+             " && xclip $FILENAME -selection clipboard "
+             "-t image/png &> /dev/null && rm $FILENAME"))
+    (message "Screenshot copied to clipboard."))
+#+end_src
+
+*** Monitor settings
+Calling ~arandr~ to adjust monitors is useful when I am preparing to present something using my computer or need to adjust how monitors are set up in a unique way that isn't a preset from my dotfiles.
+#+begin_src emacs-lisp
+  (defun monitor-settings ()
+    "Open arandr to configure monitors."
+    (interactive)
+    (start-process "Monitor Settings" nil "arandr"))
+#+end_src
+
+*** Network settings
+This one uses two windows: one to open the NetworkManager connection editor, and another to list WiFi networks nearby.
+#+begin_src emacs-lisp
+  (defun network-settings ()
+    "Open a NetworkManager connection editor."
+    (interactive)
+    (start-process "Network Settings" nil "nm-connection-editor")
+    (async-shell-command "nmcli dev wifi list" "*Wi-Fi Networks*"))
+#+end_src
+
+*** Volume mixer
+For when you need to do volume mixing.
+#+begin_src emacs-lisp
+  (defun volume-settings ()
+    "Open pavucontrol to adjust volume."
+    (interactive)
+    (start-process "Volume Mixer" nil "pavucontrol"))
+#+end_src
+
+*** Audio loop-back
+Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucontrol~ to set up which programs to pass through to Discord.
+#+begin_src emacs-lisp
+  (defun audio-loopback ()
+    "Loop desktop audio into a null sink alongside the primary input."
+    (interactive)
+    (dolist (command '(;; Create null sink `loop'
+                       "pacmd load-module module-null-sink sink_name=loop"
+                       "pacmd update-sink-proplist loop device.description=loop"
+                       ;; Create null sink `out'
+                       "pacmd load-module module-null-sink sink_name=out"
+                       "pacmd update-sink-proplist out device.description=out"
+                       ;; Loop `loop' to primary output
+                       "pacmd load-module module-loopback source=loop.monitor"
+                       ;; Pipe it into `out'
+                       "pacmd load-module module-loopback source=loop.monitor sink=out"
+                       ;; Loop primary input into `out'
+                       "pacmd load-module module-loopback sink=out"))
+      (shell-command command))
+    ;; Run `pavucontrol' and then unload the modules after it completes
+    (start-process-shell-command
+     "Audio Loop" nil (concat "pavucontrol && "
+                              "pacmd unload-module module-null-sink && "
+                              "pacmd unload-module module-loopback")))
+#+end_src
+
+*** Keyboard layout selection
+This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
+#+begin_src emacs-lisp
+  (defvar keyboard-layout-1 "us"
+    "The first of three keyboard layouts to cycle through.
+
+  Set to nil to have one less keyboard layout.")
+
+  (defvar keyboard-layout-2 "epo"
+    "The second of three keyboard layouts to cycle through.
+
+  Set to nil to have one less keyboard layout.")
+
+  (defvar keyboard-layout-3 "de"
+    "The third of three keyboard layouts to cycle through.
+
+  Set to nil to have one less keyboard layout.")
+#+end_src
+
+Then, I use these functions to control setting and cycling the keyboard layout:
+#+begin_src emacs-lisp
+  (defun get-keyboard-layout ()
+    "Get the current keyboard layout."
+    (shell-command-to-string
+     "setxkbmap -query | grep -oP 'layout:\\s*\\K(\\w+)' | tr '\n' ' ' | sed 's/ //'"))
+
+  (defun set-keyboard-layout (&optional layout)
+    "Set the keyboard layout to LAYOUT."
+    (interactive)
+    (let ((layout (or layout (read-string "Enter keyboard layout: "))))
+      (shell-command (concat "setxkbmap " layout " -option ctrl:nocaps"))
+      (message "Keyboard layout is now: %s" layout)))
+
+  (defun cycle-keyboard-layout ()
+    "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3'."
+    (interactive)
+    (let* ((current-layout (get-keyboard-layout))
+           (new-layout (if (string= current-layout keyboard-layout-1)
+                           (or keyboard-layout-2 keyboard-layout-3)
+                         (if (string= current-layout keyboard-layout-2)
+                             (or keyboard-layout-3 keyboard-layout-1)
+                           (or keyboard-layout-1 keyboard-layout-2)))))
+      (if new-layout
+          (set-keyboard-layout new-layout)
+        (message "No keyboard layouts selected."))))
+
+  (defun cycle-keyboard-layout-reverse ()
+    "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3' in reverse."
+    (interactive)
+    (let* ((current-layout (get-keyboard-layout))
+           (new-layout (if (string= current-layout keyboard-layout-3)
+                           (or keyboard-layout-2 keyboard-layout-1)
+                         (if (string= current-layout keyboard-layout-2)
+                             (or keyboard-layout-1 keyboard-layout-3)
+                           (or keyboard-layout-3 keyboard-layout-2)))))
+      (if new-layout
+          (set-keyboard-layout new-layout)
+        (message "No keyboard layouts selected."))))
+#+end_src
+
+*** Suspending
+#+begin_src emacs-lisp
+  (defun suspend-computer ()
+    (interactive)
+    (and (yes-or-no-p "Really suspend? ")
+         (shell-command "systemctl suspend -i")))
+
+  (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
+#+end_src
+
+*** Rebooting
+I copied the function for quitting Emacs to handle reboot too.
+#+begin_src emacs-lisp
+  (defun save-buffers-reboot (&optional arg)
+    "Offer to save each buffer, then shut down the computer.
+  This function is literally just a copycat of `save-buffers-kill-emacs'.
+  With prefix ARG, silently save all file-visiting buffers without asking.
+  If there are active processes where `process-query-on-exit-flag'
+  returns non-nil and `confirm-kill-processes' is non-nil,
+  asks whether processes should be killed.
+  Runs the members of `kill-emacs-query-functions' in turn and stops
+  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
+  Instead of just killing Emacs, shuts down the system."
+    (interactive "P")
+    ;; Don't use save-some-buffers-default-predicate, because we want
+    ;; to ask about all the buffers before killing Emacs.
+    (save-some-buffers arg t)
+    (let ((confirm confirm-kill-emacs))
+      (and
+       (or (not (memq t (mapcar (function
+                                 (lambda (buf) (and (buffer-file-name buf)
+                                                    (buffer-modified-p buf))))
+                                (buffer-list))))
+           (progn (setq confirm nil)
+                  (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
+       (or (not (fboundp 'process-list))
+           ;; process-list is not defined on MSDOS.
+           (not confirm-kill-processes)
+           (let ((processes (process-list))
+                 active)
+             (while processes
+               (and (memq (process-status (car processes)) '(run stop open listen))
+                    (process-query-on-exit-flag (car processes))
+                    (setq active t))
+               (setq processes (cdr processes)))
+             (or (not active)
+                 (with-current-buffer-window
+                  (get-buffer-create "*Process List*") nil
+                  #'(lambda (window _value)
+                      (with-selected-window window
+                        (unwind-protect
+                            (progn
+                              (setq confirm nil)
+                              (yes-or-no-p (concat "Active processes exist; kill "
+                                                   "them and reboot anyway? ")))
+                          (when (window-live-p window)
+                            (quit-restore-window window 'kill)))))
+                  (list-processes t)))))
+       ;; Query the user for other things, perhaps.
+       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
+       (or (null confirm)
+           (funcall confirm "Really reboot? "))
+       (shell-command "reboot")
+       (kill-emacs))))
+
+  (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
+#+end_src
+
+*** Shutting down
+I copied the function for quitting Emacs to handle shutting down.
+#+begin_src emacs-lisp
+  (defun save-buffers-shut-down (&optional arg)
+    "Offer to save each buffer, then shut down the computer.
+  This function is literally just a copycat of `save-buffers-kill-emacs'.
+  With prefix ARG, silently save all file-visiting buffers without asking.
+  If there are active processes where `process-query-on-exit-flag'
+  returns non-nil and `confirm-kill-processes' is non-nil,
+  asks whether processes should be killed.
+  Runs the members of `kill-emacs-query-functions' in turn and stops
+  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
+  Instead of just killing Emacs, shuts down the system."
+    (interactive "P")
+    ;; Don't use save-some-buffers-default-predicate, because we want
+    ;; to ask about all the buffers before killing Emacs.
+    (save-some-buffers arg t)
+    (let ((confirm confirm-kill-emacs))
+      (and
+       (or (not (memq t (mapcar (function
+                                 (lambda (buf) (and (buffer-file-name buf)
+                                                    (buffer-modified-p buf))))
+                                (buffer-list))))
+           (progn (setq confirm nil)
+                  (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
+       (or (not (fboundp 'process-list))
+           ;; process-list is not defined on MSDOS.
+           (not confirm-kill-processes)
+           (let ((processes (process-list))
+                 active)
+             (while processes
+               (and (memq (process-status (car processes)) '(run stop open listen))
+                    (process-query-on-exit-flag (car processes))
+                    (setq active t))
+               (setq processes (cdr processes)))
+             (or (not active)
+                 (with-current-buffer-window
+                  (get-buffer-create "*Process List*") nil
+                  #'(lambda (window _value)
+                      (with-selected-window window
+                        (unwind-protect
+                            (progn
+                              (setq confirm nil)
+                              (yes-or-no-p (concat "Active processes exist; kill "
+                                                   "them and shut down anyway? ")))
+                          (when (window-live-p window)
+                            (quit-restore-window window 'kill)))))
+                  (list-processes t)))))
+       ;; Query the user for other things, perhaps.
+       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
+       (or (null confirm)
+           (funcall confirm "Really shut down? "))
+       (shell-command "shutdown now")
+       (kill-emacs))))
+
+  (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
+#+end_src
+
+** Keybindings
+*** Global binds to use across everything
+Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into this area. Since I'm very lazy and don't feel like writing a whole bunch of lambdas for multiple workspaces, presented here are instead some ~mapcar~ calls, like the one in [[https://github.com/ch11ng/exwm/wiki/Configuration-Example][this example]].
+#+begin_src emacs-lisp
+  (setq exwm-input-global-keys `(;; Switching workspace focus
+                                 ;; s-1 for 1, s-2 for 2, etc...
+                                 ,@(mapcar
+                                    (lambda (i)
+                                      `(,(kbd (format "s-%d" (% (1+ i) 10))) .
+                                        (lambda ()
+                                          (interactive)
+                                          (exwm-workspace-switch-create ,i))))
+                                    (number-sequence 0 9))
+
+                                 ;; Switching window to a workspace
+                                 ;; This was annoying to get working
+                                 ;; s-! for 1, s-@ for 2, etc...
+                                 ,@(mapcar
+                                    (lambda (i)
+                                      `(,(kbd (format "s-%s" (nth i '("!" "@"
+                                                                      "#" "$"
+                                                                      "%" "^"
+                                                                      "&" "*"
+                                                                      "(" ")")))) .
+                                        (lambda ()
+                                          (interactive)
+                                          (exwm-workspace-move-window ,i))))
+                                    (number-sequence 0 9))
+
+                                 ;; Window size adjustment
+                                 (,(kbd "C-s-w") . shrink-window)
+                                 (,(kbd "C-s-s") . enlarge-window)
+                                 (,(kbd "C-s-a") . shrink-window-horizontally)
+                                 (,(kbd "C-s-d") . enlarge-window-horizontally)
+
+                                 ;; Opening programs
+                                 ([XF86Calculator] . calc)
+                                 ([s-return]       . vterm)
+                                 ([?\s-g]          . run-gimp)
+                                 ([?\s-s]          . run-steam)
+                                 ([?\s-f]          . run-firefox)
+                                 ([?\s-d]          . run-discord)
+                                 ([?\s-t]          . run-telegram)
+                                 ([?\s-m]          . run-musescore)
+                                 ([?\s-b]          . run-libreoffice)
+                                 ([?\s-o]          . run-transmission)
+                                 ([?\s-r]          . monitor-settings)
+                                 ([?\s-n]          . network-settings)
+                                 ([?\s-v]          . volume-settings)
+
+                                 ;; Other desktop environment things
+                                 ([menu]            . smex)
+                                 ([?\s-x]           . dmenu)
+                                 ([s-tab]           . audio-loopback)
+                                 ([?\s- ]           . cycle-keyboard-layout)
+                                 ([s-backspace]     . cycle-keyboard-layout-reverse)
+                                 ([XF86ScreenSaver] . desktop-environment-lock-screen)
+
+                                 ;; Controlling EMMS
+                                 ([XF86AudioNext] . emms-next)
+                                 ([XF86AudioPrev] . emms-previous)
+                                 ([XF86AudioPlay] . emms-pause)
+                                 ([XF86AudioStop] . emms-stop)))
+#+end_src
+
+*** Emacs key bindings in X windows
+This is super nice, because I love these key bindings and they are just intuitive to me, and now they can carry over safely to other programs.
+#+begin_src emacs-lisp
+  (setq exwm-input-simulation-keys '(;; Navigation
+                                     ([?\C-b] . [left])
+                                     ([?\C-f] . [right])
+                                     ([?\C-p] . [up])
+                                     ([?\C-n] . [down])
+
+                                     ([?\M-b] . [C-left])
+                                     ([?\M-f] . [C-right])
+                                     ([?\M-p] . [C-up])
+                                     ([?\M-n] . [C-down])
+
+                                     ([?\C-a] . [home])
+                                     ([?\C-e] . [end])
+                                     ([?\C-v] . [next])
+                                     ([?\M-v] . [prior])
+
+                                     ;; Copy/Paste
+                                     ([?\C-w] . [?\C-x])
+                                     ([?\M-w] . [?\C-c])
+                                     ([?\C-y] . [?\C-v])
+                                     ([?\C-s] . [?\C-f])
+                                     ([?\C-\/] . [?\C-z])
+
+                                     ;; Other
+                                     ([?\C-d] . [delete])
+                                     ([?\C-k] . [S-end delete])
+                                     ([?\C-g] . [escape])))
+
+  ;; I can't do sequences above, so these are separate
+  (defun farl-exwm/C-s ()
+    "Pass C-s to the EXWM window."
+    (interactive)
+    (execute-kbd-macro (kbd "C-q C-s")))
+
+  (defun farl-exwm/C-k ()
+    "Pass C-k to the EXWM window."
+    (interactive)
+    (execute-kbd-macro (kbd "C-q C-k")))
+
+  (define-key exwm-mode-map (kbd "C-x C-s") 'farl-exwm/C-s)
+  (define-key exwm-mode-map (kbd "C-c C-l") 'farl-exwm/C-k)
+#+end_src
+
+*** Send a key verbatim more easily
+#+begin_src emacs-lisp
+  (define-key exwm-mode-map (kbd "C-c C-q") nil)
+  (define-key exwm-mode-map (kbd "C-q") 'exwm-input-send-next-key)
+#+end_src
+
+*** Inhibit keys I don't use
+This includes:
+- Toggling fullscreen
+- Toggling floating
+- Toggling hiding
+- Toggling the mode line
+#+begin_src emacs-lisp
+  (define-key exwm-mode-map (kbd "C-c C-t C-f") nil)
+  (define-key exwm-mode-map (kbd "C-c C-t C-v") nil)
+  (define-key exwm-mode-map (kbd "C-c C-t C-m") nil)
+  (define-key exwm-mode-map (kbd "C-c C-f") nil)
+#+end_src
+
+** On startup
+   :properties:
+   :header-args: :tangle (user-emacs-file "init.el")
+   :end:
+At this point we can step out of the separate file and back into ~init.el~ to wrap up starting EXWM. I sometimes have to run Emacs in Windows and on systems that have a desktop environment already, so I really don't want this part loaded in those cases. The original solution was to call ~wmctrl~ and see if it failed in a specific way. The new solution is to look for the environment variable ~_RUN_EXWM~ and start EXWM if it is set. This means setting this variable somewhere in your ~.xinitrc~ or in the =.desktop= file your display manager uses. When Emacs starts as a desktop environment, it will unset this environment variable in the weird off-chance you want to run Emacs in Emacs.
+#+begin_src emacs-lisp
+  (when (getenv "_RUN_EXWM")
+    (setenv "_RUN_EXWM")
+    (set-frame-parameter nil 'fullscreen 'fullboth)
+    (require 'init-de)
+#+end_src
+
+*** Hide the cursor when typing
+This is just a point of personal preference. I tried not using it for a while and personally it just felt wrong.
+#+begin_src emacs-lisp
+  (start-process "Hide Cursor" nil "xbanish")
+#+end_src
+
+*** Disable screen blanking
+I don't need my laptop's screen shutting off just because I'm sitting and watching a video too long.
+#+begin_src emacs-lisp
+  (start-process "Disable Blanking" nil "xset"
+                 "s" "off" "-dpms")
+#+end_src
+
+*** Disable the trackpad
+This thing is disgusting, and I prefer trackpoints way more.
+#+begin_src emacs-lisp
+  (start-process "Trackpad Setup" nil "xinput"
+                 "disable" (shell-command-to-string
+                            (concat "xinput | grep Synap | head -n 1 | "
+                                    "sed -r 's/.*id=([0-9]+).*/\\1/' | "
+                                    "tr '\n' ' ' | sed 's/ //'")))
+#+end_src
+
+*** Keyboard configuration
+This block sets the keyboard layout to US and give Caps Lock the functionality of Control. I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
+#+begin_src emacs-lisp
+  (start-process "Keyboard Layout" nil "setxkbmap"
+                 "us" "-option" "ctrl:nocaps")
+#+end_src
+
+*** Start the compositor
+I don't need it, but having basic compositing is very nice.
+#+begin_src emacs-lisp
+  (start-process "Compositor" nil "xcompmgr")
+#+end_src
+
+*** Set fallback cursor
+Some X windows will have weird cursors if this isn't done.
+#+begin_src emacs-lisp
+  (start-process "Fallback Cursor" nil "xsetroot"
+                 "-cursor_name" "left_ptr")
+#+end_src
+
+*** Start EXWM
+#+begin_src emacs-lisp
+  (exwm-systemtray-enable)
+  (exwm-config-ido)
+  (exwm-enable)
+#+end_src
+
+With that out of the way, we can close off the block and move on to the next section.
+#+begin_src emacs-lisp
+  )
+#+end_src
+
+* Making Emacs a media player (~init-media.el~)
+  :properties:
+  :header-args: :tangle (user-emacs-file "lisp/init-media.el")
+  :end:
+I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it.
+
+** Installing EMMS
+All I do here is configure EMMS. Binding keys is later.
+#+begin_src emacs-lisp
+  (use-package emms
+    :ensure t
+    :defer t
+    :init
+    (require 'emms-setup)
+    (require 'emms-player-mpd)
+    (emms-all)
+    (setq emms-seek-seconds 5
+          emms-player-list '(emms-player-mpd)
+          emms-info-functions '(emms-info mpd)
+          emms-player-mpd-server-name "localhost"
+          emms-player-mpd-server-port "6601"
+          mpc-host "localhost:6601"))
+#+end_src
+
+** Daemon functions
+*** Starting the daemon
+#+begin_src emacs-lisp
+  (defun mpd/start-music-daemon ()
+    "Start MPD, connect to it and sync the metadata cache"
+    (interactive)
+    (shell-command "mpd")
+    (mpd/update-database)
+    (emms-player-mpd-connect)
+    (emms-cache-set-from-mpd-all)
+    (message "MPD started!"))
+#+end_src
+
+*** Stopping the daemon
+#+begin_src emacs-lisp
+  (defun mpd/kill-music-daemon ()
+    "Stop playback and kill the music daemon."
+    (interactive)
+    (emms-stop)
+    (call-process "killall" nil nil nil "mpd")
+    (message "MPD killed!"))
+#+end_src
+
+*** Updating the database
+#+begin_src emacs-lisp
+  (defun mpd/update-database ()
+    "Update the MPD database synchronously."
+    (interactive)
+    (call-process "mpc" nil nil nil "update")
+    (message "MPD database updated!"))
+#+end_src
+
+*** Shuffling the playlist
+#+begin_src emacs-lisp
+  (defun farl-emms/shuffle-with-message ()
+    "Shuffle the playlist and say so in the echo area."
+    (interactive)
+    (emms-shuffle)
+    (message "Playlist has been shuffled."))
+#+end_src
+
+** Binding all the keys
+Now using a keymap in place of that wonky as crap binding system. The new binds let me use ~emms~ in a terminal.
+#+begin_src emacs-lisp
+  (defvar emms-map
+    (let ((map (make-sparse-keymap)))
+      ;; Opening playlist and music browser
+      (define-key map (kbd "v") 'emms)
+      (define-key map (kbd "b") 'emms-smart-browse)
+      ;; Track navigation
+      (define-key map (kbd "n n") 'emms-next)
+      (define-key map (kbd "n p") 'emms-previous)
+      (define-key map (kbd "p") 'emms-pause)
+      (define-key map (kbd "s") 'emms-stop)
+      ;; Repeat/shuffle
+      (define-key map (kbd "t C-r") 'emms-toggle-repeat-track)
+      (define-key map (kbd "t r") 'emms-toggle-repeat-playlist)
+      (define-key map (kbd "t s") 'farl-emms/shuffle-with-message)
+      ;; Refreshing various things
+      (define-key map (kbd "r c") 'emms-player-mpd-update-all-reset-cache)
+      (define-key map (kbd "r d") 'mpd/update-database)
+      ;; `mpd'-specific functions
+      (define-key map (kbd "d s") 'mpd/start-music-daemon)
+      (define-key map (kbd "d q") 'mpd/kill-music-daemon)
+      (define-key map (kbd "d u") 'mpd/update-database)
+      map)
+    "A keymap for controlling `emms'.")
+  (global-set-key (kbd "C-c a") emms-map)
+#+end_src
+
+** On startup
+We only configure EMMS if ~mpd~ is found. When checking whether ~mpd~ is installed, a couple environment variables are also set. T
+#+begin_src emacs-lisp :tangle (user-emacs-file "init.el")
+  (when (executable-find "mpd")
+    (setenv "MPD_HOST" "localhost")
+    (setenv "MPD_PORT" "6601")
+    (require 'init-media))
+#+end_src
+
+* Making Emacs =e x t e n d= (~init-extend.el~)
+  :properties:
+  :header-args: :tangle (user-emacs-file "lisp/init-extend.el")
+  :end:
 If it isn't about editing text, playing music, or being my entire desktop environment, it will most likely be found in this section.
 
 ** Built-in features
@@ -2423,15 +2641,78 @@ A simple and fun game. Was a big deal when I was in high school. I still play it
     :bind (:map games-map
            ("2" . 2048-game)))
 #+end_src
-* Giving files footers
+
+** On startup
+#+begin_src emacs-lisp :tangle (user-emacs-file "init.el")
+  (require 'init-extend)
+#+end_src
+
+* Giving files their footers
 Since we gave files their headers, I see no reason not to give them footers.
 
 *** ~early-init.el~
-#+begin_src emacs-lisp :tangle (expand-file-name "early-init.el" user-emacs-directory)
+#+begin_src emacs-lisp :tangle (user-emacs-file "early-init.el")
   ;;; early-init.el ends here
+#+end_src
+
+*** ~early-package.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/early-package.el")
+  (provide 'early-package)
+
+  ;;; early-package.el ends here
 #+end_src
 
 *** ~init.el~
 #+begin_src emacs-lisp
   ;;; init.el ends here
 #+end_src
+
+*** ~init-package.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/init-package.el")
+  (provide 'init-package)
+
+  ;;; init-package.el ends here
+#+end_src
+
+*** ~init-looks.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/init-looks.el")
+  (provide 'init-looks)
+
+  ;;; init-looks.el ends here
+#+end_src
+
+*** ~init-defaults.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/init-defaults.el")
+  (provide 'init-defaults)
+
+  ;;; init-defaults.el ends here
+#+end_src
+
+*** ~init-editor.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/init-editor.el")
+  (provide 'init-editor)
+
+  ;;; init-editor.el ends here
+#+end_src
+
+*** ~init-de.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/init-de.el")
+  (provide 'init-de)
+
+  ;;; init-de.el ends here
+#+end_src
+
+*** ~init-media.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/init-media.el")
+  (provide 'init-media)
+
+  ;;; init-media.el ends here
+#+end_src
+
+*** ~init-extend.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/init-extend.el")
+  (provide 'init-extend)
+
+  ;;; init-extend.el ends here
+#+end_src
+

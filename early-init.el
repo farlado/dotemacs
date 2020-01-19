@@ -6,7 +6,6 @@
 
 ;; This file has been automatically generated from `literate-emacs.org'.
 ;; If you don't have a copy of that file, it is best not to use this file!
-;; This is in spite of the fact so little is actually in this file.
 ;; All relevant commentary is in `literate-emacs.org', not here.
 ;; There may not be any comments past this point.
 ;; Abandon all hope, ye who enter here.
@@ -42,75 +41,8 @@
 
 (add-hook 'emacs-startup-hook 'startup/reset-gc)
 
-(setq custom-file "/dev/null"
-      package-selected-packages '(;; Core
-                                  async
-                                  use-package
-                                  auto-package-update
+(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 
-                                  ;; Looks
-                                  dashboard
-                                  leuven-theme
-                                  spaceline
-                                  diminish
-                                  rainbow-mode
-                                  rainbow-delimiters
-
-                                  ;; Desktop environment
-                                  exwm
-                                  dmenu
-                                  minibuffer-line
-                                  desktop-environment
-                                  system-packages
-                                  exwm-edit
-                                  exwm-mff
-
-                                  ;; Multimedia
-                                  emms
-
-                                  ;; Extra major modes
-                                  graphviz-dot-mode
-                                  markdown-mode
-
-                                  ;; Functionality
-                                  company
-                                  company-emoji
-                                  which-key
-                                  ido-vertical-mode
-                                  smex
-                                  buffer-move
-                                  swiper
-                                  popup-kill-ring
-                                  hungry-delete
-                                  avy
-                                  sudo-edit
-
-                                  ;; Programming
-                                  magit
-                                  haskell-mode
-                                  company-jedi
-                                  flycheck
-                                  avy-flycheck
-
-                                  ;; org-mode
-                                  org-bullets
-                                  epresent
-
-                                  ;; Other
-                                  vterm
-                                  nov
-                                  wttrin
-
-                                  ;; Games
-                                  yahtzee
-                                  sudoku
-                                  chess
-                                  2048-game))
-
-(require 'package)
-(defun package--save-selected-packages (&rest opt) nil)
-
-(setq package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")))
+(require 'init-package)
 
 ;;; early-init.el ends here
