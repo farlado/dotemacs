@@ -336,7 +336,7 @@
                                                      "--noinputtext='' "
                                                      " --veriftext='' "
                                                      "--wrongtext='WRONG' "
-                                                     "--force-clock"
+                                                     "--force-clock "
                                                      "--radius 1 "
                                                      "--ring-width 1 "))
 

@@ -92,6 +92,9 @@
     "Minor modes to diminish using `diminish-minor-modes'.")
   (add-hook 'after-init-hook 'diminish-minor-modes))
 
+(line-number-mode 1)
+(column-number-mode 1)
+
 (global-page-break-lines-mode 1)
 
 (global-display-line-numbers-mode 1)

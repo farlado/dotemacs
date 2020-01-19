@@ -412,7 +412,7 @@ Originally, this file tangled into only one or two Emacs Lisp files. Now there a
 *** Configure package management
 See below for what specifically this entails.
 #+begin_src emacs-lisp
-  (require 'init-package)
+  (require 'early-package)
 #+end_src
 
 ** Package management (~early-package.el~)
@@ -716,6 +716,13 @@ Works very nicely, makes the mode line far comfier. I set its installation as a 
                                       compilation-shell-minor-mode)
       "Minor modes to diminish using `diminish-minor-modes'.")
     (add-hook 'after-init-hook 'diminish-minor-modes))
+#+end_src
+
+*** Show line and column numbers on the mode line
+Why isn't this enabled by default on a /text editor/?
+#+begin_src emacs-lisp
+  (line-number-mode 1)
+  (column-number-mode 1)
 #+end_src
 
 ** In buffers
@@ -1909,7 +1916,7 @@ Haha yes, this is very long and very very stupid.
                                                        "--noinputtext='' "
                                                        " --veriftext='' "
                                                        "--wrongtext='WRONG' "
-                                                       "--force-clock"
+                                                       "--force-clock "
                                                        "--radius 1 "
                                                        "--ring-width 1 "))
 #+end_src
