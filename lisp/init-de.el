@@ -48,7 +48,7 @@
   :ensure t
   :defer t
   :init
-  (setq dmenu-prompt-string "Run: "))
+  (setq dmenu-prompt-string "s-x "))
 
 (setq exwm-workspace-number 10)
 
