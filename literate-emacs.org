@@ -1080,6 +1080,14 @@ Since I have started to work on a literate dotfiles configuration, it makes sens
     (expand-file-name file (getenv "HOME")))
 #+end_src
 
+*** Easily reference a file in =$XDG_CONFIG_HOME=
+This is also crucial for my literate dotfiles, since I am maximizing the compliance of my dotfiles with the XDG Base Directory Specification
+#+begin_src emacs-lisp
+  (defmacro user-config-file (file)
+    "Find a FILE in the user's $XDG_CONFIG_HOME"
+    (expand-file-name file (getenv "XDG_CONFIG_HOME")))
+#+end_src
+
 *** Open dotfiles configuration with =C-c M-e=
 ...if the file exists, of course. My [[https://github.com/farlado/dotfiles][dotfiles]] are literate, defined by this file.
 #+begin_src emacs-lisp

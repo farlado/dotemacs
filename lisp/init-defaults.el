@@ -187,6 +187,10 @@ This function has been altered to accommodate `exwm-mode'."
   "Find FILE in the user's home directory."
   (expand-file-name file (getenv "HOME")))
 
+(defmacro user-config-file (file)
+  "Find a FILE in the user's $XDG_CONFIG_HOME"
+  (expand-file-name file (getenv "XDG_CONFIG_HOME")))
+
 (when (file-exists-p (user-home-file ".config/literate-dotfiles.org"))
   (defun literate-dotfiles-visit ()
     "Open the literate dotfiles."
