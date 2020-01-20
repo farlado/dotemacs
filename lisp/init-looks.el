@@ -68,7 +68,8 @@
   (enable-theme 'dracula)
   (farl-init/fringes-theme)
   (farl-init/window-divider-theme)
-  (farl-init/line-numbers-theme))
+  (farl-init/line-numbers-theme)
+  (farl-init/transparency))
 
 (use-package mood-line
   :ensure t
