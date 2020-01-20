@@ -73,6 +73,8 @@
   :ensure t
   :defer t
   :init
+  (unless pdumper-dumped
+    (require 'ido-vertical-mode))
   (setq ido-everywhere t
         ido-max-prospects 10
         ido-enable-prefix nil
