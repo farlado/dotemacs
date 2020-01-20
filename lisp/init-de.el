@@ -193,7 +193,7 @@
 (defun set-wallpaper ()
   "Set the wallpaper."
   (start-process "Wallpaper" nil "feh"
-                 "--no-febg" "--bg-fill"
+                 "--no-fehbg" "--bg-fill"
                  (user-home-file ".wallpaper.png")))
 
 (defun display-and-dock-setup ()
