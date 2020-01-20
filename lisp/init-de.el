@@ -23,7 +23,7 @@
     (require 'exwm-systemtray))
   (setenv "_JAVA_AWT_WM_NONREPARENTING" "1"))
 
-(setq exwm-floating-border-width 3
+(setq exwm-floating-border-width window-divider-default-right-width
       exwm-floating-border-color (face-attribute 'mode-line :background))
 
 (defun farl-exwm/name-buffer-after-window-title ()

@@ -12,9 +12,6 @@
 
 ;;; Code:
 
-(unless (file-exists-p (expand-file-name "early-init.elc" user-emacs-directory))
-  (byte-recompile-directory user-emacs-directory 0))
-
 (defvar pdumper-dumped nil
   "Non-nil if a custom dump image was loaded.")
 

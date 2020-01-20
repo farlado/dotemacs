@@ -437,13 +437,6 @@ Even with the "small" amount I ask of Emacs, it's a lot of beef to start up as f
    :end:
 Emacs 27 introduced ~early-init.el~, allowing configuration of multiple items before Emacs has graphically loaded. Either I want these configured as soon as possible, or they are related to Emacs starting up. Which are which is left as an exercise to the reader.
 
-*** Byte-compile on first run
-If we don't find a byte-compiled ~early-init.el~, it probably means we'll have to compile everything.
-#+begin_src emacs-lisp
-  (unless (file-exists-p (expand-file-name "early-init.elc" user-emacs-directory))
-    (byte-recompile-directory user-emacs-directory 0))
-#+end_src
-
 *** Handling portable dumping
 For some reason, the portable dumper has odd behaviors. This block is supposed to:
 1. Recover ~load-path~ from the dump image
@@ -470,8 +463,7 @@ I want to get GUI elements out of my face as soon as I possibly can. They just t
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
-  (when window-system
-    (set-face-background 'default "#282a36"))
+  (set-face-background 'default "#282a36")
 #+end_src
 
 *** Load newest bytecode
@@ -760,7 +752,8 @@ I used to hate light themes. I'm not in that camp anymore. This theme is /elegan
     :ensure t
     :defer t
     :init
-    (unless pdumper-dumped
+    (unless (or pdumper-dumped
+		(not window-system))
       (load-theme 'dracula t t)))
 #+end_src
 
@@ -778,7 +771,14 @@ Windows dividers make Emacs look far less sloppy. The color is grabbed from the 
 #+begin_src emacs-lisp
   (defun farl-init/window-divider-theme ()
     "Make window dividers match the theme."
-    (setq window-divider-default-right-width 3)
+    (let* ((res (if (eq window-system 'x)
+                    (string-to-number
+                     (shell-command-to-string
+                      "xrandr | grep \\* | cut -d x -f 1 | sort -n | head -n 1"))
+                  (/ (display-pixel-width) (display-screens))))
+           (size (if (<= res 1366) 3
+                   5)))
+      (setq window-divider-default-right-width size))
     (dolist (face '(window-divider-first-pixel
                     window-divider-last-pixel
                     window-divider))
@@ -1707,7 +1707,7 @@ This isn't actually where we do all the configuration, it's just where we instal
 *** Configure floating window borders
 Uses the same color as my mode line, uses the same width as window divider width.
 #+begin_src emacs-lisp
-  (setq exwm-floating-border-width 3
+  (setq exwm-floating-border-width window-divider-default-right-width
         exwm-floating-border-color (face-attribute 'mode-line :background))
 #+end_src
 
