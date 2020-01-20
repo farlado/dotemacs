@@ -18,14 +18,10 @@
 (when (member "Iosevka" (font-family-list))
   (set-face-attribute 'default nil :font "Iosevka"))
 
-(let* ((res (if (eq window-system 'x)
-                (string-to-number
-                 (shell-command-to-string
-                  "xrandr | grep \\* | cut -d x -f 1 | sort -n | head -n 1"))
-              (/ (display-pixel-width) (display-screens))))
-       (size (if (<= res 1366) 100
-               180)))
-  (set-face-attribute 'default nil :height size))
+(set-face-attribute 'default nil
+                    :height (if (<= (display-pixel-width) 1366)
+                                100
+                              180))
 
 (when (member "Noto Color Emoji" (font-family-list))
   (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))

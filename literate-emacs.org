@@ -720,16 +720,12 @@ Originally I had this set up by means of ~custom-set-faces~, but frankly that is
 #+end_src
 
 *** Determining a good font size
-Next we need to determine what size to make the text. This is based on the width of the screens I regularly use, primarily the largest one in use. It uses shell commands for X window systems and built-in functions for Windows.
+Next we need to determine what size to make the text. I originally used an ~xrandr~ script here, but it was taking a surprising amount of time.
 #+begin_src emacs-lisp
-  (let* ((res (if (eq window-system 'x)
-                  (string-to-number
-                   (shell-command-to-string
-                    "xrandr | grep \\* | cut -d x -f 1 | sort -n | head -n 1"))
-                (/ (display-pixel-width) (display-screens))))
-         (size (if (<= res 1366) 100
-                 180)))
-    (set-face-attribute 'default nil :height size))
+  (set-face-attribute 'default nil
+                      :height (if (<= (display-pixel-width) 1366)
+                                  100
+                                180))
 #+end_src
 
 *** Getting emoji to work properly
