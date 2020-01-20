@@ -29,7 +29,14 @@
              (string-match-p "literate" (buffer-file-name)))
     (org-babel-tangle)))
 
-(add-hook 'after-save-hook 'tangle-literate-program)
+(add-hook 'after-save-hook 'tangle-literate-program -100)
+
+(defun byte-compile-config-files ()
+  "Byte-compile Emacs configuration files."
+  (when (string-match-p "literate-emacs.org" (buffer-file-name))
+    (byte-recompile-directory user-emacs-directory 0)))
+
+(add-hook 'after-save-hook 'byte-compile-config-files 100)
 
 (when (executable-find "aspell")
   (require 'flyspell)
@@ -115,7 +122,7 @@
   :init
   (setq haskell-stylish-on-save t)
   :hook ((haskell-mode . interactive-haskell-mode)
-         (haskell-mode . turn-on-haskell-doc-mode)
+         (haskell-mode . haskell-doc-mode)
          (haskell-mode . haskell-indentation-mode)
          (haskell-mode . haskell-auto-insert-module-template)))
 

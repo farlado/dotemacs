@@ -167,6 +167,7 @@ Like mentioned above, this file is supposed to tangle into everything in my git 
   ido.last
   recentf
   eshell
+  *.elc
   tramp
   elpa
   emms
@@ -354,6 +355,13 @@ Even with the "small" amount I ask of Emacs, it's a lot of beef to start up as f
    :header-args: :tangle (user-emacs-file "early-init.el")
    :end:
 Emacs 27 introduced ~early-init.el~, allowing configuration of multiple items before Emacs has graphically loaded. Either I want these configured as soon as possible, or they are related to Emacs starting up. Which are which is left as an exercise to the reader.
+
+*** Byte-compile on first run
+If we don't find a byte-compiled ~early-init.el~, it probably means we'll have to compile everything.
+#+begin_src emacs-lisp
+  (unless (file-exists-p (expand-file-name "early-init.elc" user-emacs-directory))
+    (byte-recompile-directory user-emacs-directory 0))
+#+end_src
 
 *** Hide dumb stuff (Part 1)
 I want to get GUI elements out of my face as soon as I possibly can. They just take up space.
@@ -578,6 +586,7 @@ Since I manage all Emacs packages in Emacs itself, ~use-package~ makes it much e
     (package-refresh-contents)
     (package-install 'use-package))
 
+  (require 'use-package)
   (setq use-package-compute-statistics t)
 #+end_src
 
@@ -1156,7 +1165,18 @@ I've gotten really into literate programming lately, so this makes it much easie
                (string-match-p "literate" (buffer-file-name)))
       (org-babel-tangle)))
 
-  (add-hook 'after-save-hook 'tangle-literate-program)
+  (add-hook 'after-save-hook 'tangle-literate-program -100)
+#+end_src
+
+*** Automatically byte-compile Emacs files
+This should make Emacs start marginally faster.
+#+begin_src emacs-lisp
+  (defun byte-compile-config-files ()
+    "Byte-compile Emacs configuration files."
+    (when (string-match-p "literate-emacs.org" (buffer-file-name))
+      (byte-recompile-directory user-emacs-directory 0)))
+
+  (add-hook 'after-save-hook 'byte-compile-config-files 100)
 #+end_src
 
 ** Text editing
@@ -1311,7 +1331,7 @@ I have started to mess around with Haskell, so I needed to grab a mode for that.
     :init
     (setq haskell-stylish-on-save t)
     :hook ((haskell-mode . interactive-haskell-mode)
-           (haskell-mode . turn-on-haskell-doc-mode)
+           (haskell-mode . haskell-doc-mode)
            (haskell-mode . haskell-indentation-mode)
            (haskell-mode . haskell-auto-insert-module-template)))
 #+end_src
@@ -1586,16 +1606,16 @@ I do not want to have to load all of them on my own...
 *** Assign workspaces to monitors
 This section is only to ensure the proper workspaces are placed on the right monitors when my W541 is docked.
 #+begin_src emacs-lisp
-  (setq exwm-randr-workspace-output-plist '(0 "DP2-2"
-                                            1 "DP2-1"
-                                            2 "DP2-3"
-                                            3 "DP2-2"
-                                            4 "DP2-1"
-                                            5 "DP2-3"
-                                            6 "DP2-2"
-                                            7 "DP2-1"
-                                            8 "DP2-3"
-                                            9 "DP2-2"))
+  (setq exwm-randr-workspace-monitor-plist '(0 "DP2-2"
+                                             1 "DP2-1"
+                                             2 "DP2-3"
+                                             3 "DP2-2"
+                                             4 "DP2-1"
+                                             5 "DP2-3"
+                                             6 "DP2-2"
+                                             7 "DP2-1"
+                                             8 "DP2-3"
+                                             9 "DP2-2"))
 #+end_src
 
 *** Assign programs to workspaces

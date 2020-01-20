@@ -50,16 +50,16 @@
 
 (setq exwm-workspace-number 10)
 
-(setq exwm-randr-workspace-output-plist '(0 "DP2-2"
-                                          1 "DP2-1"
-                                          2 "DP2-3"
-                                          3 "DP2-2"
-                                          4 "DP2-1"
-                                          5 "DP2-3"
-                                          6 "DP2-2"
-                                          7 "DP2-1"
-                                          8 "DP2-3"
-                                          9 "DP2-2"))
+(setq exwm-randr-workspace-monitor-plist '(0 "DP2-2"
+                                           1 "DP2-1"
+                                           2 "DP2-3"
+                                           3 "DP2-2"
+                                           4 "DP2-1"
+                                           5 "DP2-3"
+                                           6 "DP2-2"
+                                           7 "DP2-1"
+                                           8 "DP2-3"
+                                           9 "DP2-2"))
 
 (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
                                     floating-mode-line nil
