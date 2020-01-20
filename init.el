@@ -22,11 +22,11 @@
 
 (add-hook 'after-init-hook 'server-start-if-not-running)
 
-(require 'init-package)
-
 (tooltip-mode -1)
 (setq use-dialog-box nil
       use-file-dialog nil)
+
+(require 'init-package)
 
 (use-package dashboard
   :ensure t

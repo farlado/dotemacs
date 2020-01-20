@@ -32,6 +32,7 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+(set-face-background 'default "#282a36")
 
 (setq load-prefer-newer t)
 

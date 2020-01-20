@@ -464,12 +464,13 @@ For some reason, the portable dumper has odd behaviors. This block is supposed t
                   (switch-to-buffer "*scratch*")
                   (lisp-interaction-mode)))))
 #+end_src
-*** Hide dumb stuff (Part 1)
-I want to get GUI elements out of my face as soon as I possibly can. They just take up space.
+*** Prepare GUI (Part 1)
+I want to get GUI elements out of my face as soon as I possibly can. They just take up space. I also need to set the background to the theme's background so it'll appear sane.
 #+begin_src emacs-lisp
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
+  (set-face-background 'default "#282a36")
 #+end_src
 
 *** Load newest bytecode
@@ -632,13 +633,7 @@ Having the Emacs server running allows for a lot of neat integration with other 
   (add-hook 'after-init-hook 'server-start-if-not-running)
 #+end_src
 
-*** More package management
-See below for what specifically is loaded here.
-#+begin_src emacs-lisp
-  (require 'init-package)
-#+end_src
-
-*** Hide dumb stuff (Part 2)
+*** Prepare GUI (Part 2)
 These buggers won't properly set unless it's done after ~early-init.el~, which is a real bummer.
 #+begin_src emacs-lisp
   (tooltip-mode -1)
@@ -646,7 +641,13 @@ These buggers won't properly set unless it's done after ~early-init.el~, which i
         use-file-dialog nil)
 #+end_src
 
-*** ~dashboard~ package (start screen)
+*** More package management
+See below for what specifically is loaded here.
+#+begin_src emacs-lisp
+  (require 'init-package)
+#+end_src
+
+*** Alternative start screen
 I like the default start screen, but it just doesn't cut it for me. I just use this to have a nice screen when I start Emacs or close all my buffers.
 #+begin_src emacs-lisp
   (use-package dashboard
@@ -815,7 +816,7 @@ This main function is called in ~init.el~ to load the theme proper.
 #+end_src
 
 ** Mode line
-*** ~mood-line~ package (mode line replacement)
+*** ~mood-line~ package (alternate mode line)
 What a /MOOD/. With my theme, this bar is gorgeous.
 #+begin_src emacs-lisp
   (use-package mood-line
@@ -2960,3 +2961,4 @@ Since we gave files their headers, I see no reason not to give them footers.
 #+begin_src emacs-lisp :tangle (user-emacs-file "lisp/pdumper.el")
   ;;; pdumper.el ends here
 #+end_src
+
