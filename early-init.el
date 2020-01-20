@@ -15,6 +15,20 @@
 (unless (file-exists-p (expand-file-name "early-init.elc" user-emacs-directory))
   (byte-recompile-directory user-emacs-directory 0))
 
+(defvar pdumper-dumped nil
+  "Non-nil if a custom dump image was loaded.")
+
+(when pdumper-dumped
+  (setq load-path pdumper-load-path)
+  (global-font-lock-mode)
+  (transient-mark-mode)
+  (blink-cursor-mode)
+  (add-hook 'after-init-hook
+            (lambda ()
+              (save-excursion
+                (switch-to-buffer "*scratch*")
+                (lisp-interaction-mode)))))
+
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)

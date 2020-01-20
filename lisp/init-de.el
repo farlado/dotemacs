@@ -16,10 +16,11 @@
   :ensure t
   :defer t
   :init
-  (require 'exwm)
-  (require 'exwm-randr)
-  (require 'exwm-config)
-  (require 'exwm-systemtray)
+  (unless pdumper-dumped
+    (require 'exwm)
+    (require 'exwm-randr)
+    (require 'exwm-config)
+    (require 'exwm-systemtray))
   (setenv "_JAVA_AWT_WM_NONREPARENTING" "1"))
 
 (setq exwm-floating-border-width 3
@@ -35,7 +36,8 @@
   :ensure t
   :defer t
   :init
-  (require 'exwm-edit))
+  (unless pdumper-dumped
+    (require 'exwm-edit)))
 
 (use-package exwm-mff
   :ensure t
@@ -188,6 +190,12 @@
   (start-process "Keyboard Setup" nil "setxkbmap"
                  "-option" "ctrl:nocaps"))
 
+(defun set-wallpaper ()
+  "Set the wallpaper."
+  (start-process "Wallpaper" nil "feh"
+                 "--no-febg" "--bg-fill"
+                 (user-home-file ".wallpaper.png")))
+
 (defun display-and-dock-setup ()
   "Configure displays and dock if applicable."
   (interactive)
@@ -195,7 +203,8 @@
       (display-setup-x230)
     (progn
       (display-setup-w541)
-      (peripheral-setup))))
+      (peripheral-setup)))
+  (set-wallpaper))
 
 (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
 (exwm-randr-enable)

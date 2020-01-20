@@ -12,6 +12,9 @@
 
 ;;; Code:
 
+(defun farl-init/set-font ()
+  "Set the font at startup."
+
 (when (member "Iosevka" (font-family-list))
   (set-face-attribute 'default nil :font "Iosevka"))
 
@@ -27,38 +30,51 @@
 (when (member "Noto Color Emoji" (font-family-list))
   (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
 
-(use-package leuven-theme
-  :if window-system
+)
+
+(use-package dracula-theme
   :ensure t
   :defer t
   :init
-  (setq leuven-scale-org-agenda-structure t
-        leuven-scale-outline-headlines t)
-  (load-theme 'leuven t))
+  (unless pdumper-dumped
+    (load-theme 'dracula t t)))
 
-(set-face-background 'fringe (face-attribute 'default :background))
-(fringe-mode 10)
+(defun farl-init/fringes-theme ()
+  "Make fringes match the color theme."
+  (set-face-background 'fringe (face-attribute 'default :background))
+  (fringe-mode 10))
 
-(setq window-divider-default-right-width 3)
-(dolist (face '(window-divider-first-pixel
-                window-divider-last-pixel
-                window-divider))
-  (set-face-foreground face (face-attribute 'mode-line :background)))
-(window-divider-mode 1)
+(defun farl-init/window-divider-theme ()
+  "Make window dividers match the theme."
+  (setq window-divider-default-right-width 3)
+  (dolist (face '(window-divider-first-pixel
+                  window-divider-last-pixel
+                  window-divider))
+    (set-face-foreground face (face-attribute 'mode-line :background)))
+  (window-divider-mode 1))
 
-(use-package spaceline
+(defun farl-init/line-numbers-theme ()
+  "Make line numbers match the theme."
+  (set-face-background 'line-number (face-attribute 'default :background)))
+
+(defun farl-init/transparency ()
+  "Apply transparency to the frame."
+  (dolist (frame (frame-list))
+    (set-frame-parameter frame 'alpha 90))
+  (add-to-list 'default-frame-alist '(alpha . 90)))
+
+(defun farl-init/theme ()
+  "Enable theme at startup, providing customizations for consistency."
+  (enable-theme 'dracula)
+  (farl-init/fringes-theme)
+  (farl-init/window-divider-theme)
+  (farl-init/line-numbers-theme))
+
+(use-package mood-line
   :ensure t
   :defer t
   :init
-  (require 'spaceline-config)
-  (setq powerline-default-separator 'wave
-        spaceline-buffer-encoding-abbrev-p nil
-        spaceline-buffer-size-p nil
-        spaceline-line-column-p t
-        column-number-indicator-zero-based nil)
-  (if window-system
-      (spaceline-emacs-theme)
-    (spaceline-spacemacs-theme)))
+  (mood-line-mode 1))
 
 (setq display-time-24hr-format t)
 (display-time-mode 1)
@@ -122,18 +138,14 @@
       show-paren-delay 0)
 
 (use-package rainbow-mode
-  :if window-system
   :ensure t
   :defer t
   :init
-  (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode)
-  (global-rainbow-mode 1))
+  (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode))
 
 (use-package rainbow-delimiters
-  :if window-system
   :ensure t
-  :defer t
-  :hook (prog-mode . rainbow-delimiters-mode))
+  :defer t)
 
 (provide 'init-looks)
 

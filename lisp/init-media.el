@@ -16,9 +16,8 @@
   :ensure t
   :defer t
   :init
-  (require 'emms-setup)
-  (require 'emms-player-mpd)
-  (emms-all)
+  (unless pdumper-dumped
+    (require 'emms-setup))
   (setq emms-seek-seconds 5
         emms-player-list '(emms-player-mpd)
         emms-info-functions '(emms-info mpd)

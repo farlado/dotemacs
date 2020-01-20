@@ -19,6 +19,7 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
   - [[#license][License]]
   - [[#files-to-ignore][Files to ignore]]
 - [[#giving-files-their-headers][Giving files their headers]]
+- [[#starting-emacs-fast-pdumperel][Starting Emacs /FAST/ (~pdumper.el~)]]
 - [[#making-emacs-start-quick-and-smooth][Making Emacs start quick and smooth]]
   - [[#do-these-asap-early-initel][Do these ASAP (~early-init.el~)]]
   - [[#package-management-early-packageel][Package management (~early-package.el~)]]
@@ -38,7 +39,7 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
 - [[#making-emacs-a-good-text-editor-init-editorel][Making Emacs a good text editor (~init-editor.el~)]]
   - [[#additional-major-modes][Additional major modes]]
   - [[#personal-save-hooks][Personal save hooks]]
-  - [[#text-editing][Text editing]]
+  - [[#general-editing][General editing]]
   - [[#programming][Programming]]
   - [[#org-mode][~org-mode~]]
   - [[#on-startup-2][On startup]]
@@ -67,7 +68,7 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
 This file is an attempt at a literate GNU Emacs (henceforth "Emacs") configuration. Admittedly, much of the "documentation" in here is more commentary I provide about my choices and personal feelings about certain things in Emacs based on my admittedly very limited opinion of the program than honest-to-god documentation of what this file contains. Regardless, the idea is that this file, when tangled, generates everything in my git repository, from ~LICENSE~ to ~.gitignore~. I would /highly/ recommend you *NOT* try to read the ~.el~ files on their own. It's a jungle, especially since all of the commentary regarding the configuration is in this file and this file alone.
 
 ** Okay, that's pretty neat. Why though?
-The answer is rather simple. Before I used a fully literate file, I had an ~init.el~ which tangled blocks from a ~config.org~ on the fly (read: on startup). It turns out this was abysmally slow, making for a startup time of around 4.5 seconds when loading into my desktop environment. Tangling blocks from a ~literate-emacs.org~ into an ~early-init.el~ and ~init.el~ cuts this time by about a fourth, to around 2.6 seconds to load into my desktop environment. This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check multiple files when I thought I might have changed something for the worse.
+The answer is rather simple. Before I used a fully literate file, I had an ~init.el~ which tangled blocks from a ~config.org~ on the fly (read: on startup). It turns out this was abysmally slow, making for a startup time of around 4.5 seconds when loading into my desktop environment. Tangling blocks from a ~literate-emacs.org~ into byte-compiled ~early-init.el~ and ~init.el~ alongside the use of portable dumping (plus multiple other efficiency improvements, of course) cuts this time down to around 1.5 seconds to load into my desktop environment. This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check multiple files when I thought I might have changed something for the worse.
 
 ** Installation
 /Note: these instructions are for users of GNU/Linux or other *NIX systems. These instructions may not apply for users of Windows or macOS./
@@ -163,6 +164,7 @@ Like mentioned above, this file is supposed to tangle into everything in my git 
   dmenu-items
   smex-items
   nov-places
+  emacs.pdmp
   transient
   ido.last
   recentf
@@ -347,6 +349,85 @@ In order to make the files look at least somewhat decent, and to warn those who 
   ;;; Code:
 #+end_src
 
+*** ~pdumper.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/pdumper.el")
+  ;;; pdumper.el --- Starting Emacs FAST
+
+  ;; This file is not part of GNU Emacs.
+  
+  ;;; Commentary:
+
+  ;; This file has been automatically generated from `literate-emacs.org'.
+  ;; If you don't have a copy of that file, it is best not to use this file!
+  ;; All relevant commentary is in `literate-emacs.org', not here.
+  ;; There may not be any comments past this point.
+  ;; Abandon all hope, ye who enter here.
+  
+  ;;; Code:
+#+end_src
+
+* Starting Emacs /FAST/ (~pdumper.el~)
+  :properties:
+  :header-args: :tangle (user-emacs-file "lisp/pdumper.el")
+  :end:
+The portable dumper is an amazing thing. This is just a minimal setup for utilizing the portable dumper to make Emacs load faster. Every single ~require~ that doesn't create Lisp objects incompatible with the portable dumper can now be skipped while loading. Before I started using the portable dumper, I saw start times of around 2.5 seconds. Now I am down to 1.5 seconds, having cut a whole 40% of the start time out.
+
+*** Load package management
+No need to go overboard here, just load package management.
+#+begin_src emacs-lisp
+  (require 'package)
+  (package-initialize)
+#+end_src
+
+*** Store ~load-path
+For some reason, the dump image doesn't store ~load-path~, so it needs to be stored here.
+#+begin_src emacs-lisp
+  (setq pdumper-load-path load-path
+        pdumper-dumped t)
+#+end_src
+
+*** ~require~ essentials
+This will save much time later down the line.
+#+begin_src emacs-lisp
+  (dolist (package `(;; Packages that don't cause problems
+                     ,@(remove 'vterm
+                               (remove 'exwm
+                                       (remove 'emms package-selected-packages)))
+
+                     ;; Core
+                     server
+
+                     ;; Functionality
+                     flyspell
+
+                     ;; `org-mode'
+                     org
+                     org-tempo
+
+                     ;; Desktop environment
+                     exwm
+                     exwm-randr
+                     exwm-config
+                     exwm-systemtray
+
+                     ;; Media player
+                     emms
+                     emms-setup))
+    (require package))
+#+end_src
+
+*** Pre-load the theme
+This saves a lot of time.
+#+begin_src emacs-lisp
+  (load-theme 'dracula t t)
+#+end_src
+
+*** Write the dump image
+This is where the magic happens.
+#+begin_src emacs-lisp
+  (dump-emacs-portable (expand-file-name "emacs.pdmp" user-emacs-directory))
+#+end_src
+
 * Making Emacs start quick and smooth
 Even with the "small" amount I ask of Emacs, it's a lot of beef to start up as fast as I demand it start up. This is, of course, everything I want to run at startup, but also a few other settings which make more sense to set here, instead of later.
 
@@ -363,6 +444,26 @@ If we don't find a byte-compiled ~early-init.el~, it probably means we'll have t
     (byte-recompile-directory user-emacs-directory 0))
 #+end_src
 
+*** Handling portable dumping
+For some reason, the portable dumper has odd behaviors. This block is supposed to:
+1. Recover ~load-path~ from the dump image
+2. Restore modes not preserved in the dump image
+3. Fix the scratch buffer
+#+begin_src emacs-lisp
+  (defvar pdumper-dumped nil
+    "Non-nil if a custom dump image was loaded.")
+
+  (when pdumper-dumped
+    (setq load-path pdumper-load-path)
+    (global-font-lock-mode)
+    (transient-mark-mode)
+    (blink-cursor-mode)
+    (add-hook 'after-init-hook
+              (lambda ()
+                (save-excursion
+                  (switch-to-buffer "*scratch*")
+                  (lisp-interaction-mode)))))
+#+end_src
 *** Hide dumb stuff (Part 1)
 I want to get GUI elements out of my face as soon as I possibly can. They just take up space.
 #+begin_src emacs-lisp
@@ -441,8 +542,8 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
 
                                     ;; Looks
                                     dashboard
-                                    leuven-theme
-                                    spaceline
+                                    dracula-theme
+                                    mood-line
                                     diminish
                                     rainbow-mode
                                     rainbow-delimiters
@@ -520,7 +621,8 @@ These are other startup specific things, but they cannot be done until ~package-
 *** Start Emacs server
 Having the Emacs server running allows for a lot of neat integration with other parts of my desktop environment. However, I don't want it to start too soon.
 #+begin_src emacs-lisp
-  (require 'server)
+  (unless pdumper-dumped
+    (require 'server))
 
   (defun server-start-if-not-running ()
     "Call `server-start' if `server-running-p' returns nil."
@@ -610,6 +712,12 @@ I don't want to have to manually update my stuff. This solution is literally plo
 Stock Emacs is /ugly/. Just straight up ugly. Suffice to say it leaves much to be desired.
 
 ** Font
+This is a function called in ~init.el~ to load the font in a window system.
+#+begin_src emacs-lisp
+  (defun farl-init/set-font ()
+    "Set the font at startup."
+#+end_src
+
 *** Setting the font style
 Originally I had this set up by means of ~custom-set-faces~, but frankly that is less easily configured than this method. First, we determine whether my preferred font is present on the system and set it if present. Otherwise, keep whatever default font Emacs chooses.
 #+begin_src emacs-lisp
@@ -637,55 +745,83 @@ God does this one feel great to have now that I use an Emacs version that can ha
     (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
 #+end_src
 
-** Theme
-*** Leuven
-I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/. I spent almost two entire weeks trying to find a dark theme that comes anywhere close to being as comfortable as Leuven, and even Leuven's dark alternative doesn't cut it. If we are using a pdump file, the theme is already loaded, so all we need to do is enable it.
+With this out of the way, we can safely close the block.
 #+begin_src emacs-lisp
-  (use-package leuven-theme
-    :if window-system
+  )
+#+end_src
+
+** Theme
+*** Dracula
+I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/. I spent almost two entire weeks trying to find a dark theme that comes anywhere close to being as comfortable as Leuven, and even Leuven's dark alternative doesn't cut it. The theme is installed here, but isn't loaded until later.
+#+begin_src emacs-lisp
+  (use-package dracula-theme
     :ensure t
     :defer t
     :init
-    (setq leuven-scale-org-agenda-structure t
-          leuven-scale-outline-headlines t)
-    (load-theme 'leuven t))
+    (unless pdumper-dumped
+      (load-theme 'dracula t t)))
 #+end_src
 
 *** Fringes
 Having fringes helps keep things looking good and gives the opportunity to have nice indicators on the edges of buffers. I prefer when fringes are the same color as the rest of the window.
 #+begin_src emacs-lisp
-  (set-face-background 'fringe (face-attribute 'default :background))
-  (fringe-mode 10)
+  (defun farl-init/fringes-theme ()
+    "Make fringes match the color theme."
+    (set-face-background 'fringe (face-attribute 'default :background))
+    (fringe-mode 10))
 #+end_src
 
 *** Window dividers
 Windows dividers make Emacs look far less sloppy. The color is grabbed from the mode line for consistency.
 #+begin_src emacs-lisp
-  (setq window-divider-default-right-width 3)
-  (dolist (face '(window-divider-first-pixel
-                  window-divider-last-pixel
-                  window-divider))
-    (set-face-foreground face (face-attribute 'mode-line :background)))
-  (window-divider-mode 1)
+  (defun farl-init/window-divider-theme ()
+    "Make window dividers match the theme."
+    (setq window-divider-default-right-width 3)
+    (dolist (face '(window-divider-first-pixel
+                    window-divider-last-pixel
+                    window-divider))
+      (set-face-foreground face (face-attribute 'mode-line :background)))
+    (window-divider-mode 1))
+#+end_src
+
+*** Line numbers
+For some reason, some themes like to give line numbers a different background from the rest of a window. I hate that.
+#+begin_src emacs-lisp
+  (defun farl-init/line-numbers-theme ()
+    "Make line numbers match the theme."
+    (set-face-background 'line-number (face-attribute 'default :background)))
+#+end_src
+
+*** Transparency
+If there's a gimmick I can't get enough of, it's having a transparent frame.
+#+begin_src emacs-lisp
+  (defun farl-init/transparency ()
+    "Apply transparency to the frame."
+    (dolist (frame (frame-list))
+      (set-frame-parameter frame 'alpha 90))
+    (add-to-list 'default-frame-alist '(alpha . 90)))
+#+end_src
+
+*** On startup
+This main function is called in ~init.el~ to load the theme proper.
+#+begin_src emacs-lisp
+  (defun farl-init/theme ()
+    "Enable theme at startup, providing customizations for consistency."
+    (enable-theme 'dracula)
+    (farl-init/fringes-theme)
+    (farl-init/window-divider-theme)
+    (farl-init/line-numbers-theme))
 #+end_src
 
 ** Mode line
-*** Use the mode line from Spacemacs
-I *hate* the default mode line. The mode line from Spacemacs, ~spaceline~, is much less sucky. I also show and hide specific things when setting it up. In terminals, ~spaceline-emacs-theme~ just looks wrong, so I don't use it unless I'm in a graphical environment.
+*** ~mood-line~ package (mode line replacement)
+What a /MOOD/. With my theme, this bar is gorgeous.
 #+begin_src emacs-lisp
-  (use-package spaceline
+  (use-package mood-line
     :ensure t
     :defer t
     :init
-    (require 'spaceline-config)
-    (setq powerline-default-separator 'wave
-          spaceline-buffer-encoding-abbrev-p nil
-          spaceline-buffer-size-p nil
-          spaceline-line-column-p t
-          column-number-indicator-zero-based nil)
-    (if window-system
-        (spaceline-emacs-theme)
-      (spaceline-spacemacs-theme)))
+    (mood-line-mode 1))
 #+end_src
 
 *** Show clock and battery level on mode line
@@ -778,27 +914,30 @@ For those moments where I can't figure out what is going on with the parentheses
 I don't use it too much, but it's nice to have it around.
 #+begin_src emacs-lisp
   (use-package rainbow-mode
-    :if window-system
     :ensure t
     :defer t
     :init
-    (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode)
-    (global-rainbow-mode 1))
+    (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode))
 #+end_src
 
 *** Change the color of various delimiters based on how deep they go
 It's subtle on my theme, but it still helps me keep track of my brackets and parentheses.
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
-    :if window-system
     :ensure t
-    :defer t
-    :hook (prog-mode . rainbow-delimiters-mode))
+    :defer t)
 #+end_src
 
 ** On startup
+Previously, just loading ~init-looks~ was supposed to also load everything depending on whether we're in a window system or not. It's probably smarter to have that in ~init.el~ instead, where everything that happens is all in one place
 #+begin_src emacs-lisp :tangle (user-emacs-file "init.el")
   (require 'init-looks)
+
+  (when window-system
+    (farl-init/theme)
+    (farl-init/set-font)
+    (global-rainbow-mode 1)
+    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 #+end_src
 
 * Making Emacs comfortable (~init-defaults.el~)
@@ -1179,14 +1318,15 @@ This should make Emacs start marginally faster.
   (add-hook 'after-save-hook 'byte-compile-config-files 100)
 #+end_src
 
-** Text editing
-These settings are specifically about editing text and making that easier.
+** General editing
+These settings are specifically about editing text in general and making that easier.
 
 *** Spell-checking
 Just a useful little tool to check spelling while editing a buffer. Only configured if ~aspell~ is installed. It's not super great, but it does the trick well enough for me.
 #+begin_src emacs-lisp
   (when (executable-find "aspell")
-    (require 'flyspell)
+    (unless pdumper-dumped
+      (require 'flyspell))
 
     (setq ispell-program-name "aspell"
           ispell-dictionary "american")
@@ -1382,17 +1522,14 @@ This automates creating the table of contents for an ~org-mode~ document. It als
 It's kinda slow, but bullet points are very nice, much better than asterisks.
 #+begin_src emacs-lisp
   (use-package org-bullets
-    :if window-system
     :ensure t
-    :defer t
-    :hook (org-mode . org-bullets-mode))
+    :defer t)
 #+end_src
 
 *** Presentations in Emacs
 It's gonna need more polish, but it works.
 #+begin_src emacs-lisp
   (use-package epresent
-    :if window-system
     :ensure t
     :defer t
     :bind (:map org-mode-map
@@ -1413,9 +1550,7 @@ These are just quick things that make ~org-mode~ much easier to use.
         org-agenda-skip-scheduled-if-done t
         org-fontify-quote-and-verse-blocks t
         org-src-window-setup 'current-window
-        org-highlight-latex-and-related '(latex)
-        org-ellipsis (if window-system "⤵" "...")
-        org-hide-emphasis-markers (when window-system t))
+        org-highlight-latex-and-related '(latex))
 #+end_src
 
 *** Evaluating Graphviz blocks
@@ -1441,7 +1576,8 @@ Since obviously dot snippets are purely harmless +as far as I know+, I just don'
 *** Shortcuts for various snippets
 First, we load ~org-tempo~, the extension that allows the old way of doing things, and add it to ~org-modules~. Then, we add shortcuts for the individual blocks of code. Finally, we can add shortcuts for other items that aren't blocks. I've grown somewhat fond of this way of organizing my shortcuts, because it separates the blocks from the one-liners.
 #+begin_src emacs-lisp
-  (require 'org-tempo)
+  (unless pdumper-dumped
+    (require 'org-tempo))
   (add-to-list 'org-modules 'org-tempo)
   (setq org-structure-template-alist '(;; General blocks
                                        ("c" . "center")
@@ -1525,8 +1661,22 @@ This is exactly what I was looking for lmao
 #+end_src
 
 ** On startup
-#+begin_src emacs-lisp :tangle (user-emacs-file "init.el")
+   :properties:
+   :header-args: :tangle (user-emacs-file "init.el")
+   :end:
+#+begin_src emacs-lisp
   (require 'init-editor)
+#+end_src
+
+*** For ~org-mode~
+There are some settings which need to be set for ~org-mode~ related to window systems that otherwise will not load properly.
+#+begin_src emacs-lisp
+  (when window-system
+    (add-hook 'org-mode-hook 'org-bullets-mode)
+    (define-key org-mode-map (kbd "C-c r") 'epresent-run))
+
+  (setq org-ellipsis (if window-system "⤵" "...")
+        org-hide-emphasis-markers (when window-system t))
 #+end_src
 
 * Making Emacs a desktop environment (~init-de.el~)
@@ -1543,10 +1693,11 @@ This isn't actually where we do all the configuration, it's just where we instal
     :ensure t
     :defer t
     :init
-    (require 'exwm)
-    (require 'exwm-randr)
-    (require 'exwm-config)
-    (require 'exwm-systemtray)
+    (unless pdumper-dumped
+      (require 'exwm)
+      (require 'exwm-randr)
+      (require 'exwm-config)
+      (require 'exwm-systemtray))
     (setenv "_JAVA_AWT_WM_NONREPARENTING" "1"))
 #+end_src
 
@@ -1574,7 +1725,8 @@ At first I questioned why I would do this, but now that I know the advantages of
     :ensure t
     :defer t
     :init
-    (require 'exwm-edit))
+    (unless pdumper-dumped
+      (require 'exwm-edit)))
 #+end_src
 
 *** Mouse follows on focus change
@@ -1776,6 +1928,16 @@ Because I use a dock on my W541, there are some things I need to do alongside se
                    "-option" "ctrl:nocaps"))
 #+end_src
 
+*** Setting the wallpaper with ~feh~
+This is where it all comes together. In [[https://github.com/farlado/dotfiles][my dotfiles]] I have a wallpaper, which is set by this process.
+#+begin_src emacs-lisp
+  (defun set-wallpaper ()
+    "Set the wallpaper."
+    (start-process "Wallpaper" nil "feh"
+                   "--no-febg" "--bg-fill"
+                   (user-home-file ".wallpaper.png")))
+#+end_src
+
 *** Bringing it all together
 Finally, I can make my generic display-and-dock setup function.
 #+begin_src emacs-lisp
@@ -1786,7 +1948,8 @@ Finally, I can make my generic display-and-dock setup function.
         (display-setup-x230)
       (progn
         (display-setup-w541)
-        (peripheral-setup))))
+        (peripheral-setup)))
+    (set-wallpaper))
 #+end_src
 
 *** Start ~exwm-randr~
@@ -2501,9 +2664,8 @@ All I do here is configure EMMS. Binding keys is later.
     :ensure t
     :defer t
     :init
-    (require 'emms-setup)
-    (require 'emms-player-mpd)
-    (emms-all)
+    (unless pdumper-dumped
+      (require 'emms-setup))
     (setq emms-seek-seconds 5
           emms-player-list '(emms-player-mpd)
           emms-info-functions '(emms-info mpd)
@@ -2588,7 +2750,9 @@ We only configure EMMS if ~mpd~ is found. When checking whether ~mpd~ is install
   (when (executable-find "mpd")
     (setenv "MPD_HOST" "localhost")
     (setenv "MPD_PORT" "6601")
-    (require 'init-media))
+    (require 'init-media)
+    (require 'emms-player-mpd)
+    (emms-all))
 #+end_src
 
 * Making Emacs =e x t e n d= (~init-extend.el~)
@@ -2791,3 +2955,7 @@ Since we gave files their headers, I see no reason not to give them footers.
   ;;; init-extend.el ends here
 #+end_src
 
+*** ~pdumper.el~
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/pdumper.el")
+  ;;; pdumper.el ends here
+#+end_src

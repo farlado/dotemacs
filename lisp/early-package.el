@@ -20,8 +20,8 @@
 
                                   ;; Looks
                                   dashboard
-                                  leuven-theme
-                                  spaceline
+                                  dracula-theme
+                                  mood-line
                                   diminish
                                   rainbow-mode
                                   rainbow-delimiters

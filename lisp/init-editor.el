@@ -39,7 +39,8 @@
 (add-hook 'after-save-hook 'byte-compile-config-files 100)
 
 (when (executable-find "aspell")
-  (require 'flyspell)
+  (unless pdumper-dumped
+    (require 'flyspell))
 
   (setq ispell-program-name "aspell"
         ispell-dictionary "american")
@@ -151,13 +152,10 @@
          (markdown-mode . toc-org-mode)))
 
 (use-package org-bullets
-  :if window-system
   :ensure t
-  :defer t
-  :hook (org-mode . org-bullets-mode))
+  :defer t)
 
 (use-package epresent
-  :if window-system
   :ensure t
   :defer t
   :bind (:map org-mode-map
@@ -174,9 +172,7 @@
       org-agenda-skip-scheduled-if-done t
       org-fontify-quote-and-verse-blocks t
       org-src-window-setup 'current-window
-      org-highlight-latex-and-related '(latex)
-      org-ellipsis (if window-system "⤵" "...")
-      org-hide-emphasis-markers (when window-system t))
+      org-highlight-latex-and-related '(latex))
 
 (org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
 
@@ -190,7 +186,8 @@
                                        (string-match-p "org"
                                                        (buffer-file-name)))))))
 
-(require 'org-tempo)
+(unless pdumper-dumped
+  (require 'org-tempo))
 (add-to-list 'org-modules 'org-tempo)
 (setq org-structure-template-alist '(;; General blocks
                                      ("c" . "center")

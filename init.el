@@ -12,7 +12,8 @@
 
 ;;; Code:
 
-(require 'server)
+(unless pdumper-dumped
+  (require 'server))
 
 (defun server-start-if-not-running ()
   "Call `server-start' if `server-running-p' returns nil."
@@ -42,9 +43,22 @@
 
 (require 'init-looks)
 
+(when window-system
+  (farl-init/theme)
+  (farl-init/set-font)
+  (global-rainbow-mode 1)
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+
 (require 'init-defaults)
 
 (require 'init-editor)
+
+(when window-system
+  (add-hook 'org-mode-hook 'org-bullets-mode)
+  (define-key org-mode-map (kbd "C-c r") 'epresent-run))
+
+(setq org-ellipsis (if window-system "⤵" "...")
+      org-hide-emphasis-markers (when window-system t))
 
 (when (getenv "_RUN_EXWM")
   (setenv "_RUN_EXWM")
@@ -79,7 +93,9 @@
 (when (executable-find "mpd")
   (setenv "MPD_HOST" "localhost")
   (setenv "MPD_PORT" "6601")
-  (require 'init-media))
+  (require 'init-media)
+  (require 'emms-player-mpd)
+  (emms-all))
 
 (require 'init-extend)
 
