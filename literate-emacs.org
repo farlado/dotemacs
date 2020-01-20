@@ -1,5 +1,6 @@
 #+title: Farlado's Illiterate GNU Emacs
 #+subtitle: A far-from-sane literate Emacs configuration
+#+author: Farlado
 #+language: en
 #+options: num:nil toc:2
 #+property: header-args :tangle (user-emacs-file "init.el")
@@ -138,7 +139,7 @@ Everything has different dependencies so make sure you have what you need. The q
 
 ** License
 Because I +am a lazy piece of shit who doesn't like long licenses+ do not think much harm could come from using a pushover license for an Emacs configuration, I am publishing this literate Emacs configuration under the WTFPL.
-#+begin_src text :tangle LICENSE
+#+begin_src text :tangle (user-emacs-file "LICENSE")
   DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
   Version 2, December 2004
 
@@ -156,7 +157,7 @@ Because I +am a lazy piece of shit who doesn't like long licenses+ do not think 
 
 ** Files to ignore
 Like mentioned above, this file is supposed to tangle into everything in my git repository. That includes ~.gitignore~
-#+begin_src text :tangle .gitignore
+#+begin_src text :tangle (user-emacs-file ".gitignore")
   .last-package-update-day
   auto-save-list
   dmenu-items
@@ -851,17 +852,6 @@ I constantly kill Emacs on accident when running it in terminals, so this preven
   (setq confirm-kill-emacs 'yes-or-no-p)
 #+end_src
 
-*** Open configuration with =C-c e=
-Since this thing is changing all the time, I really like having it available on a shortcut.
-#+begin_src emacs-lisp
-  (defun config-visit ()
-    "Open the configuration file."
-    (interactive)
-    (find-file (user-emacs-file "literate-emacs.org")))
-
-  (global-set-key (kbd "C-c e") 'config-visit)
-#+end_src
-
 *** Don't unload fonts when not in use
 This solves a number of hanging issues related to a number of different packages and symbols.
 #+begin_src emacs-lisp
@@ -1072,7 +1062,7 @@ Just another point of personal convenience.
 #+end_src
 
 ** Configuration
-These are settings specifically pertaining to configuring Emacs.
+These are settings specifically pertaining to configuring Emacs or my user environment in general.
 
 *** Easily reference a file in ~user-emacs-directory~
 Since I so often will reference files in my ~user-emacs-directory~, I find it worthwhile to create a macro specifically for that.
@@ -1080,6 +1070,37 @@ Since I so often will reference files in my ~user-emacs-directory~, I find it wo
   (defmacro user-emacs-file (file)
     "Find FILE in `user-emacs-directory'."
     (expand-file-name file user-emacs-directory))
+#+end_src
+
+*** Easily reference a file in the home directory
+Since I have started to work on a literate dotfiles configuration, it makes sense to use a macro for readability.
+#+begin_src emacs-lisp
+  (defmacro user-home-file (file)
+    "Find FILE in the user's home directory."
+    (expand-file-name file (getenv "HOME")))
+#+end_src
+
+*** Open dotfiles configuration with =C-c M-e=
+...if the file exists, of course. My [[https://github.com/farlado/dotfiles][dotfiles]] are literate, defined by this file.
+#+begin_src emacs-lisp
+  (when (file-exists-p (user-home-file ".config/literate-dotfiles.org"))
+    (defun literate-dotfiles-visit ()
+      "Open the literate dotfiles."
+      (interactive)
+      (find-file (user-home-file ".config/literate-dotfiles.org")))
+
+    (global-set-key (kbd "C-c M-e") 'literate-dotfiles-visit))
+#+end_src
+
+*** Open Emacs configuration with =C-c e=
+Since this thing is changing all the time, I really like having it available on a shortcut.
+#+begin_src emacs-lisp
+  (defun config-visit ()
+    "Open the configuration file."
+    (interactive)
+    (find-file (user-emacs-file "literate-emacs.org")))
+
+  (global-set-key (kbd "C-c e") 'config-visit)
 #+end_src
 
 ** On startup
@@ -1396,20 +1417,26 @@ First, we load ~org-tempo~, the extension that allows the old way of doing thing
 
                                        ;; Code blocks
                                        ("s"   . "src")
+                                       ("sh"  . "src sh")
                                        ("el"  . "src emacs-lisp")
                                        ("py"  . "src python")
                                        ("dot" . "src dot :cmdline -Kdot -Tpng :file")
                                        ("txt" . "src text :tangle"))
-        org-tempo-keywords-alist '(;; Title/subtitle
+        org-tempo-keywords-alist '(;; Title/subtitle/author
                                    ("t"  . "title")
                                    ("st" . "subtitle")
+                                   ("au" . "author")
+
+                                   ;; Language
+                                   ("la" . "language")
 
                                    ;; Name/caption
                                    ("n"  . "name")
                                    ("ca" . "caption")
 
-                                   ;; Property/startup
+                                   ;; Property/options/startup
                                    ("p"  . "property")
+                                   ("o"  . "options")
                                    ("su" . "startup")
 
                                    ;; Other

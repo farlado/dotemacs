@@ -45,13 +45,6 @@
 
 (setq confirm-kill-emacs 'yes-or-no-p)
 
-(defun config-visit ()
-  "Open the configuration file."
-  (interactive)
-  (find-file (user-emacs-file "literate-emacs.org")))
-
-(global-set-key (kbd "C-c e") 'config-visit)
-
 (setq inhibit-compacting-font-caches t)
 
 (setq scroll-margin 0
@@ -189,6 +182,25 @@ This function has been altered to accommodate `exwm-mode'."
 (defmacro user-emacs-file (file)
   "Find FILE in `user-emacs-directory'."
   (expand-file-name file user-emacs-directory))
+
+(defmacro user-home-file (file)
+  "Find FILE in the user's home directory."
+  (expand-file-name file (getenv "HOME")))
+
+(when (file-exists-p (user-home-file ".config/literate-dotfiles.org"))
+  (defun literate-dotfiles-visit ()
+    "Open the literate dotfiles."
+    (interactive)
+    (find-file (user-home-file ".config/literate-dotfiles.org")))
+
+  (global-set-key (kbd "C-c M-e") 'literate-dotfiles-visit))
+
+(defun config-visit ()
+  "Open the configuration file."
+  (interactive)
+  (find-file (user-emacs-file "literate-emacs.org")))
+
+(global-set-key (kbd "C-c e") 'config-visit)
 
 (provide 'init-defaults)
 

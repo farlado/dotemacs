@@ -191,20 +191,26 @@
 
                                      ;; Code blocks
                                      ("s"   . "src")
+                                     ("sh"  . "src sh")
                                      ("el"  . "src emacs-lisp")
                                      ("py"  . "src python")
                                      ("dot" . "src dot :cmdline -Kdot -Tpng :file")
                                      ("txt" . "src text :tangle"))
-      org-tempo-keywords-alist '(;; Title/subtitle
+      org-tempo-keywords-alist '(;; Title/subtitle/author
                                  ("t"  . "title")
                                  ("st" . "subtitle")
+                                 ("au" . "author")
+
+                                 ;; Language
+                                 ("la" . "language")
 
                                  ;; Name/caption
                                  ("n"  . "name")
                                  ("ca" . "caption")
 
-                                 ;; Property/startup
+                                 ;; Property/options/startup
                                  ("p"  . "property")
+                                 ("o"  . "options")
                                  ("su" . "startup")
 
                                  ;; Other
