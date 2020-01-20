@@ -172,7 +172,16 @@
       org-hide-emphasis-markers (when window-system t))
 
 (org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
-(setq org-confirm-babel-evaluate '(lambda (lang body) (not (string= lang "dot"))))
+
+(setq org-confirm-babel-evaluate '(lambda (lang body)
+                                    (not
+                                     (or
+                                      (string= lang "dot")
+                                      (and
+                                       (string-match-p "literate"
+                                                       (buffer-file-name))
+                                       (string-match-p "org"
+                                                       (buffer-file-name)))))))
 
 (require 'org-tempo)
 (add-to-list 'org-modules 'org-tempo)

@@ -1394,7 +1394,20 @@ These are just quick things that make ~org-mode~ much easier to use.
 Since obviously dot snippets are purely harmless +as far as I know+, I just don't bother with having to confirm evaluation every time I try to update a graphic.
 #+begin_src emacs-lisp
   (org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
-  (setq org-confirm-babel-evaluate '(lambda (lang body) (not (string= lang "dot"))))
+#+end_src
+
+*** Execute some code without having to confirm
+Since obviously dot snippets are purely harmless +as far as I know+, I just don't bother with having to confirm evaluation every time I try to update a graphic. I also don't need to confirm evaluation of snippets in use in my literate files.
+#+begin_src emacs-lisp
+  (setq org-confirm-babel-evaluate '(lambda (lang body)
+                                      (not
+                                       (or
+                                        (string= lang "dot")
+                                        (and
+                                         (string-match-p "literate"
+                                                         (buffer-file-name))
+                                         (string-match-p "org"
+                                                         (buffer-file-name)))))))
 #+end_src
 
 *** Shortcuts for various snippets
