@@ -47,14 +47,7 @@
 
 (defun farl-init/window-divider-theme ()
   "Make window dividers match the theme."
-  (let* ((res (if (eq window-system 'x)
-                  (string-to-number
-                   (shell-command-to-string
-                    "xrandr | grep \\* | cut -d x -f 1 | sort -n | head -n 1"))
-                (/ (display-pixel-width) (display-screens))))
-         (size (if (<= res 1366) 3
-                 5)))
-    (setq window-divider-default-right-width size))
+  (setq window-divider-default-right-width 3)
   (dolist (face '(window-divider-first-pixel
                   window-divider-last-pixel
                   window-divider))
