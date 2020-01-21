@@ -1943,13 +1943,8 @@ Finally, I can make my generic display-and-dock setup function.
         (display-setup-w541)
         (peripheral-setup)))
     (set-wallpaper))
-#+end_src
 
-*** Start ~exwm-randr~
-This is where the real magic happens.
-#+begin_src emacs-lisp
   (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
-  (exwm-randr-enable)
 #+end_src
 
 ** X applications
@@ -2635,6 +2630,7 @@ Some X windows will have weird cursors if this isn't done.
 *** Start EXWM
 #+begin_src emacs-lisp
   (exwm-systemtray-enable)
+  (exwm-randr-enable)
   (exwm-config-ido)
   (exwm-enable)
 #+end_src

@@ -207,7 +207,6 @@
   (set-wallpaper))
 
 (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
-(exwm-randr-enable)
 
 (defun run-gimp ()
   "Start GIMP."
