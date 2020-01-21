@@ -2629,10 +2629,10 @@ Some X windows will have weird cursors if this isn't done.
 
 *** Start EXWM
 #+begin_src emacs-lisp
-  (exwm-systemtray-enable)
-  (exwm-randr-enable)
-  (exwm-config-ido)
   (exwm-enable)
+  (exwm-config-ido)
+  (exwm-randr-enable)
+  (exwm-systemtray-enable)
 #+end_src
 
 With that out of the way, we can close off the block and move on to the next section.

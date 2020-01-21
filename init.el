@@ -84,10 +84,10 @@
 (start-process "Fallback Cursor" nil "xsetroot"
                "-cursor_name" "left_ptr")
 
-(exwm-systemtray-enable)
-(exwm-randr-enable)
-(exwm-config-ido)
 (exwm-enable)
+(exwm-config-ido)
+(exwm-randr-enable)
+(exwm-systemtray-enable)
 
 )
 
