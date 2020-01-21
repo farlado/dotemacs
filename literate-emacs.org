@@ -71,14 +71,14 @@ This file is an attempt at a literate GNU Emacs (henceforth "Emacs") configurati
 The answer is rather simple. Before I used a fully literate file, I had an ~init.el~ which tangled blocks from a ~config.org~ on the fly (read: on startup). It turns out this was abysmally slow, making for a startup time of around 4.5 seconds when loading into my desktop environment. Tangling blocks from a ~literate-emacs.org~ into byte-compiled ~early-init.el~ and ~init.el~ alongside the use of portable dumping (plus multiple other efficiency improvements, of course) cuts this time down to around 1.5 seconds to load into my desktop environment. This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check multiple files when I thought I might have changed something for the worse.
 
 ** Installation
-/Note: these instructions are for users of GNU/Linux or other *NIX systems. These instructions may not apply for users of Windows or macOS./
-1) Clone the repo into your home directory as ~.emacs.d~.
+1) Clone the repo into where you store your Emacs configuration.
 2) Make sure you have all the right dependencies. See below for more details.
 3) If using Emacs as a desktop environment, it may take a couple restarts to work right.
 
 ** Dependencies
-*THIS CONFIGURATION IS MEANT FOR EMACS 27 AND 28 AND WILL NOT LOAD PROPERLY ON EMACS 26. THE BRANCH FOR EMACS 26 IS [[https://github.com/farlado/dotemacs/tree/emacs26-end][HERE]].*
-
+#+begin_center
+*THIS CONFIGURATION IS MEANT FOR EMACS 27 AND 28 AND WILL /NOT/ LOAD PROPERLY ON EMACS 26. THE BRANCH FOR EMACS 26 IS [[https://github.com/farlado/dotemacs/tree/emacs26-end][HERE]].*
+#+end_center
 
 Everything has different dependencies so make sure you have what you need. The quick and dirty route to getting all these dependencies installed and configured is to deploy [[https://github.com/farlado/dotfiles][my dotfiles]]:
 #+begin_src sh :tangle no
@@ -2586,7 +2586,7 @@ This includes:
    :properties:
    :header-args: :tangle (user-emacs-file "init.el")
    :end:
-At this point we can step out of the separate file and back into ~init.el~ to wrap up starting EXWM. I sometimes have to run Emacs in Windows and on systems that have a desktop environment already, so I really don't want this part loaded in those cases. The original solution was to call ~wmctrl~ and see if it failed in a specific way. The new solution is to look for the environment variable ~_RUN_EXWM~ and start EXWM if it is set. This means setting this variable somewhere in your ~.xinitrc~ or in the =.desktop= file your display manager uses. When Emacs starts as a desktop environment, it will unset this environment variable in the weird off-chance you want to run Emacs in Emacs.
+I sometimes have to run Emacs in Windows and on systems that have a desktop environment already, so I really don't want this part loaded in those cases. The original solution was to call ~wmctrl~ and see if it failed in a specific way. The new solution is to look for the environment variable ~_RUN_EXWM~ and start EXWM if it is set. This means setting this variable somewhere in your ~.xinitrc~ or in the =.desktop= file your display manager uses. When Emacs starts as a desktop environment, it will unset this environment variable in the weird off-chance you want to run Emacs in Emacs.
 #+begin_src emacs-lisp
   (when (getenv "_RUN_EXWM")
     (setenv "_RUN_EXWM")
