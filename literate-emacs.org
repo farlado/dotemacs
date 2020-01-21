@@ -1598,6 +1598,7 @@ First, we load ~org-tempo~, the extension that allows the old way of doing thing
                                        ("s"   . "src")
                                        ("sh"  . "src sh")
                                        ("cu"  . "src conf-unix")
+                                       ("cs"  . "src conf-space")
                                        ("el"  . "src emacs-lisp")
                                        ("py"  . "src python")
                                        ("dot" . "src dot :cmdline -Kdot -Tpng :file")

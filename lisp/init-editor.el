@@ -206,6 +206,7 @@
                                      ("s"   . "src")
                                      ("sh"  . "src sh")
                                      ("cu"  . "src conf-unix")
+                                     ("cs"  . "src conf-space")
                                      ("el"  . "src emacs-lisp")
                                      ("py"  . "src python")
                                      ("dot" . "src dot :cmdline -Kdot -Tpng :file")
