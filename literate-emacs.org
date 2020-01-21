@@ -1241,11 +1241,11 @@ This is also crucial for my literate dotfiles, since I am maximizing the complia
 *** Open dotfiles configuration with =C-c M-e=
 ...if the file exists, of course. My [[https://github.com/farlado/dotfiles][dotfiles]] are literate, defined by this file.
 #+begin_src emacs-lisp
-  (when (file-exists-p (user-home-file ".config/literate-dotfiles.org"))
+  (when (file-exists-p (user-config-file "literate-dotfiles.org"))
     (defun literate-dotfiles-visit ()
       "Open the literate dotfiles."
       (interactive)
-      (find-file (user-home-file ".config/literate-dotfiles.org")))
+      (find-file (user-config-file "literate-dotfiles.org")))
 
     (global-set-key (kbd "C-c M-e") 'literate-dotfiles-visit))
 #+end_src
