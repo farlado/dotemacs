@@ -205,6 +205,7 @@
                                      ;; Code blocks
                                      ("s"   . "src")
                                      ("sh"  . "src sh")
+                                     ("cu"  . "src conf-unix")
                                      ("el"  . "src emacs-lisp")
                                      ("py"  . "src python")
                                      ("dot" . "src dot :cmdline -Kdot -Tpng :file")

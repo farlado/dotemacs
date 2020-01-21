@@ -12,6 +12,11 @@
 
 ;;; Code:
 
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(set-face-background 'default "#282a36")
+
 (defvar pdumper-dumped nil
   "Non-nil if a custom dump image was loaded.")
 
@@ -26,10 +31,10 @@
                 (switch-to-buffer "*scratch*")
                 (lisp-interaction-mode)))))
 
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-(set-face-background 'default "#282a36")
+(unless (file-exists-p (user-emacs-file "init.elc"))
+  (add-hook 'after-init-hook
+            (lambda ()
+              (byte-recompile-directory user-emacs-directory t))))
 
 (setq load-prefer-newer t)
 

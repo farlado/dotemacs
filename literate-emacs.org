@@ -372,7 +372,7 @@ In order to make the files look at least somewhat decent, and to warn those who 
   :end:
 The portable dumper is an amazing thing. This is just a minimal setup for utilizing the portable dumper to make Emacs load faster. Every single ~require~ that doesn't create Lisp objects incompatible with the portable dumper can now be skipped while loading. Before I started using the portable dumper, I saw start times of around 2.5 seconds. Now I am down to 1.5 seconds, having cut a whole 40% of the start time out.
 
-*** Initialize package management
+*** Load packages
 No need to go overboard here, just load package management.
 #+begin_src emacs-lisp
   (require 'package)
@@ -386,7 +386,7 @@ For some reason, the dump image doesn't store ~load-path~, so it needs to be sto
         pdumper-dumped t)
 #+end_src
 
-*** ~require~ essentials
+*** ~require~ packages
 This will save much time later down the line.
 #+begin_src emacs-lisp
   (dolist (package `(;; Packages that don't cause problems
@@ -435,6 +435,15 @@ Even with the "small" amount I ask of Emacs, it's a lot of beef to start up as f
    :end:
 Emacs 27 introduced ~early-init.el~, allowing configuration of multiple items before Emacs has graphically loaded. Either I want these configured as soon as possible, or they are related to Emacs starting up. Which are which is left as an exercise to the reader.
 
+*** Prepare GUI (Part 1)
+I want to get GUI elements out of my face as soon as I possibly can. They just take up space. I also need to set the background to the theme's background so it'll appear sane.
+#+begin_src emacs-lisp
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (set-face-background 'default "#282a36")
+#+end_src
+
 *** Handling portable dumping
 For some reason, the portable dumper has odd behaviors. This block is supposed to:
 1. Recover ~load-path~ from the dump image
@@ -455,13 +464,13 @@ For some reason, the portable dumper has odd behaviors. This block is supposed t
                   (switch-to-buffer "*scratch*")
                   (lisp-interaction-mode)))))
 #+end_src
-*** Prepare GUI (Part 1)
-I want to get GUI elements out of my face as soon as I possibly can. They just take up space. I also need to set the background to the theme's background so it'll appear sane.
+*** Byte-compile on first run
+It's done after ~after-init-hook~ so that we don't actually do it in the middle of loading files. That would be disastrous.
 #+begin_src emacs-lisp
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  (set-face-background 'default "#282a36")
+  (unless (file-exists-p (user-emacs-file "init.elc"))
+    (add-hook 'after-init-hook
+              (lambda ()
+                (byte-recompile-directory user-emacs-directory t))))
 #+end_src
 
 *** Load newest bytecode
@@ -1261,7 +1270,7 @@ Since this thing is changing all the time, I really like having it available on 
   :properties:
   :header-args: :tangle (user-emacs-file "lisp/init-editor.el")
   :end:
-This used to be a mess of different sections, but I've been working to categorize these settings far better. So, much of what was previously elsewhere is now set up in here. Everything in here /should/ be about making Emacs pleasant to use for editing text of various kinds. If it isn't, I have failed.
+Emacs /is/ a text editor... right? This used to be a +much bigger+ mess of different sections, but I've been working to categorize these settings far better. So, much of what was previously elsewhere is now set up in here. Everything in here /should/ be about making Emacs pleasant to use for editing text of various kinds. If it isn't, I have failed.
 
 ** Additional major modes
 These are modes that enable Emacs to edit different kinds of files differently. Programming major modes are further down, in the programming section.
@@ -1301,7 +1310,7 @@ I've gotten really into literate programming lately, so this makes it much easie
 #+end_src
 
 *** Automatically byte-compile Emacs files
-This should make Emacs start marginally faster.
+This is meant to happen when I save my Emacs configuration, so that all bytecode is up to date.
 #+begin_src emacs-lisp
   (defun byte-compile-config-files ()
     "Byte-compile Emacs configuration files."
@@ -1588,6 +1597,7 @@ First, we load ~org-tempo~, the extension that allows the old way of doing thing
                                        ;; Code blocks
                                        ("s"   . "src")
                                        ("sh"  . "src sh")
+                                       ("cu"  . "src conf-unix")
                                        ("el"  . "src emacs-lisp")
                                        ("py"  . "src python")
                                        ("dot" . "src dot :cmdline -Kdot -Tpng :file")
