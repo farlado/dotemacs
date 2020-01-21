@@ -370,7 +370,7 @@ In order to make the files look at least somewhat decent, and to warn those who 
   :properties:
   :header-args: :tangle (user-emacs-file "lisp/pdumper.el")
   :end:
-The portable dumper is an amazing thing. This is just a minimal setup for utilizing the portable dumper to make Emacs load faster. Every single ~require~ that doesn't create Lisp objects incompatible with the portable dumper can now be skipped while loading. Before I started using the portable dumper, I saw start times of around 2.5 seconds. Now I am down to 1.5 seconds, having cut a whole 40% of the start time out.
+Even with the "small" amount I ask of Emacs, it's a lot of beef to start up as fast as I demand it start up. The portable dumper is an amazing thing. This is just a minimal setup for utilizing the portable dumper to make Emacs load faster. Every single ~require~ that doesn't create Lisp objects incompatible with the portable dumper can now be skipped while loading. Before I started using the portable dumper, I saw start times of around 2.5 seconds. Now I am down to 1.5 seconds, having cut a whole 40% of the start time out.
 
 *** Load packages
 No need to go overboard here, just load package management.
@@ -427,7 +427,7 @@ This is where the magic happens.
 #+end_src
 
 * Making Emacs start quick and smooth
-Even with the "small" amount I ask of Emacs, it's a lot of beef to start up as fast as I demand it start up. This is, of course, everything I want to run at startup, but also a few other settings which make more sense to set here, instead of later.
+This is, of course, everything I want to run at startup, but also a few other settings which make more sense to set here, instead of later.
 
 ** Do these ASAP (~early-init.el~)
    :properties:
@@ -1245,9 +1245,7 @@ Now that I have a literate(!) system configuration as well, it needs a bind if t
     (defun sys-config-visit ()
       "Open the literate system configuration"
       (interactive)
-      (let ((text-mode-hook (remove 'flyspell-mode text-mode-hook)))
-        (find-file (concat "/sudo:root@localhost:"
-                           (user-config-file "literate-sysconfig.org")))))
+      (find-file (user-config-file "literate-sysconfig.org")))
     (global-set-key (kbd "C-c C-M-e") 'sys-config-visit))
 #+end_src
 
@@ -1952,7 +1950,7 @@ This is where it all comes together. In [[https://github.com/farlado/dotfiles][m
     "Set the wallpaper."
     (start-process "Wallpaper" nil "feh"
                    "--no-fehbg" "--bg-fill"
-                   (user-home-file ".wallpaper.png")))
+                   (user-config-file ".wallpaper.png")))
 #+end_src
 
 *** Bringing it all together

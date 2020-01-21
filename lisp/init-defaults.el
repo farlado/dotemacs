@@ -197,9 +197,7 @@ This function has been altered to accommodate `exwm-mode'."
   (defun sys-config-visit ()
     "Open the literate system configuration"
     (interactive)
-    (let ((text-mode-hook (remove 'flyspell-mode text-mode-hook)))
-      (find-file (concat "/sudo:root@localhost:"
-                         (user-config-file "literate-sysconfig.org")))))
+    (find-file (user-config-file "literate-sysconfig.org")))
   (global-set-key (kbd "C-c C-M-e") 'sys-config-visit))
 
 (when (file-exists-p (user-config-file "literate-dotfiles.org"))

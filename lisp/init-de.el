@@ -194,7 +194,7 @@
   "Set the wallpaper."
   (start-process "Wallpaper" nil "feh"
                  "--no-fehbg" "--bg-fill"
-                 (user-home-file ".wallpaper.png")))
+                 (user-config-file ".wallpaper.png")))
 
 (defun display-and-dock-setup ()
   "Configure displays and dock if applicable."
