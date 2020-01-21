@@ -19,9 +19,9 @@
       pdumper-dumped t)
 
 (dolist (package `(;; Packages that don't cause problems
-                   ,@(remove 'vterm
-                             (remove 'exwm
-                                     (remove 'emms package-selected-packages)))
+                   ,@(remove
+                      'vterm
+                      package-selected-packages)
 
                    ;; Core
                    server
@@ -34,13 +34,11 @@
                    org-tempo
 
                    ;; Desktop environment
-                   exwm
                    exwm-randr
                    exwm-config
                    exwm-systemtray
 
                    ;; Media player
-                   emms
                    emms-setup))
   (require package))
 

@@ -372,7 +372,7 @@ In order to make the files look at least somewhat decent, and to warn those who 
   :end:
 The portable dumper is an amazing thing. This is just a minimal setup for utilizing the portable dumper to make Emacs load faster. Every single ~require~ that doesn't create Lisp objects incompatible with the portable dumper can now be skipped while loading. Before I started using the portable dumper, I saw start times of around 2.5 seconds. Now I am down to 1.5 seconds, having cut a whole 40% of the start time out.
 
-*** Load package management
+*** Initialize package management
 No need to go overboard here, just load package management.
 #+begin_src emacs-lisp
   (require 'package)
@@ -390,9 +390,9 @@ For some reason, the dump image doesn't store ~load-path~, so it needs to be sto
 This will save much time later down the line.
 #+begin_src emacs-lisp
   (dolist (package `(;; Packages that don't cause problems
-                     ,@(remove 'vterm
-                               (remove 'exwm
-                                       (remove 'emms package-selected-packages)))
+                     ,@(remove
+                        'vterm
+                        package-selected-packages)
 
                      ;; Core
                      server
@@ -405,13 +405,11 @@ This will save much time later down the line.
                      org-tempo
 
                      ;; Desktop environment
-                     exwm
                      exwm-randr
                      exwm-config
                      exwm-systemtray
 
                      ;; Media player
-                     emms
                      emms-setup))
     (require package))
 #+end_src
@@ -813,6 +811,7 @@ What a /MOOD/. With my theme, this bar is gorgeous.
     :ensure t
     :defer t
     :init
+    (setq mood-line-show-encoding-information t)
     (mood-line-mode 1))
 #+end_src
 
