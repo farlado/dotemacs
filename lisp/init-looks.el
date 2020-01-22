@@ -32,8 +32,7 @@
   :ensure t
   :defer t
   :init
-  (unless (or pdumper-dumped
-	      (not window-system))
+  (unless pdumper-dumped
     (load-theme 'dracula t t)))
 
 (defun farl-init/fringes-theme ()

@@ -468,7 +468,7 @@ For some reason, the portable dumper has odd behaviors. This block is supposed t
 *** Byte-compile on first run
 It's done after ~after-init-hook~ so that we don't actually do it in the middle of loading files. That would be disastrous.
 #+begin_src emacs-lisp
-  (unless (file-exists-p (user-emacs-file "init.elc"))
+  (unless (file-exists-p (expand-file-name "init.elc" user-emacs-directory))
     (add-hook 'after-init-hook
               (lambda ()
                 (byte-recompile-directory user-emacs-directory t))))
@@ -755,8 +755,7 @@ For a long time, I used Leuven for my theme. Nowadays, I don't. It was a brillia
     :ensure t
     :defer t
     :init
-    (unless (or pdumper-dumped
-		(not window-system))
+    (unless pdumper-dumped
       (load-theme 'dracula t t)))
 #+end_src
 
@@ -1061,8 +1060,7 @@ I /love/ ~ido-mode~. However, I /HATE/ ~ido-mode~ right out of the box. A vertic
     :ensure t
     :defer t
     :init
-    (unless pdumper-dumped
-      (require 'ido-vertical-mode))
+    (require 'ido-vertical-mode)
     (setq ido-everywhere t
           ido-max-prospects 10
           ido-enable-prefix nil

@@ -32,7 +32,7 @@
                 (switch-to-buffer "*scratch*")
                 (lisp-interaction-mode)))))
 
-(unless (file-exists-p (user-emacs-file "init.elc"))
+(unless (file-exists-p (expand-file-name "init.elc" user-emacs-directory))
   (add-hook 'after-init-hook
             (lambda ()
               (byte-recompile-directory user-emacs-directory t))))
