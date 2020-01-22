@@ -66,7 +66,7 @@
 (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
                                     floating-mode-line nil
                                     workspace 9)
-                                   ((string= exwm-instance-name "telegram-desktop")
+                                   ((string-match-p "[Tt]elegram" exwm-class-name)
                                     workspace 8)
                                    ((string= exwm-class-name "discord")
                                     workspace 7)
