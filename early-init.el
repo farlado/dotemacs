@@ -15,7 +15,7 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-(when window-system
+(when (= (shell-command "pgrep xinit") 0)
   (set-face-background 'default "#282a36"))
 
 (defvar pdumper-dumped nil
