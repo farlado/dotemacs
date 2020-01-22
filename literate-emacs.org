@@ -748,7 +748,6 @@ With this out of the way, we can safely close the block.
 #+end_src
 
 ** Theme
-*** Dracula
 For a long time, I used Leuven for my theme. Nowadays, I don't. It was a brilliant theme, but just didn't work when I needed a new mode line.
 #+begin_src emacs-lisp
   (use-package dracula-theme
