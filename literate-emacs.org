@@ -441,7 +441,8 @@ I want to get GUI elements out of my face as soon as I possibly can. They just t
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
-  (set-face-background 'default "#282a36")
+  (when window-system
+    (set-face-background 'default "#282a36"))
 #+end_src
 
 *** Handling portable dumping
@@ -805,10 +806,13 @@ This main function is called in ~init.el~ to load the theme proper.
   (defun farl-init/theme ()
     "Enable theme at startup, providing customizations for consistency."
     (enable-theme 'dracula)
-    (farl-init/fringes-theme)
-    (farl-init/window-divider-theme)
-    (farl-init/line-numbers-theme)
-    (farl-init/transparency))
+    (when window-system
+      (farl-init/fringes-theme)
+      (farl-init/line-numbers-theme)
+      (farl-init/window-divider-theme)
+      (farl-init/transparency)
+      (global-rainbow-mode 1)
+      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
 #+end_src
 
 ** Mode line
@@ -932,11 +936,10 @@ Previously, just loading ~init-looks~ was supposed to also load everything depen
 #+begin_src emacs-lisp :tangle (user-emacs-file "init.el")
   (require 'init-looks)
 
+  (farl-init/theme)
+
   (when window-system
-    (farl-init/theme)
-    (farl-init/set-font)
-    (global-rainbow-mode 1)
-    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+    (farl-init/set-font))
 #+end_src
 
 * Making Emacs comfortable (~init-defaults.el~)

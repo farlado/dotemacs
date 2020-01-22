@@ -43,11 +43,10 @@
 
 (require 'init-looks)
 
+(farl-init/theme)
+
 (when window-system
-  (farl-init/theme)
-  (farl-init/set-font)
-  (global-rainbow-mode 1)
-  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+  (farl-init/set-font))
 
 (require 'init-defaults)
 

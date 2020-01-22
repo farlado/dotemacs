@@ -15,7 +15,8 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-(set-face-background 'default "#282a36")
+(when window-system
+  (set-face-background 'default "#282a36"))
 
 (defvar pdumper-dumped nil
   "Non-nil if a custom dump image was loaded.")

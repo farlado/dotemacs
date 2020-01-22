@@ -63,10 +63,13 @@
 (defun farl-init/theme ()
   "Enable theme at startup, providing customizations for consistency."
   (enable-theme 'dracula)
-  (farl-init/fringes-theme)
-  (farl-init/window-divider-theme)
-  (farl-init/line-numbers-theme)
-  (farl-init/transparency))
+  (when window-system
+    (farl-init/fringes-theme)
+    (farl-init/line-numbers-theme)
+    (farl-init/window-divider-theme)
+    (farl-init/transparency)
+    (global-rainbow-mode 1)
+    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
 
 (use-package mood-line
   :ensure t
