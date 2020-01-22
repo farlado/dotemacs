@@ -749,7 +749,7 @@ With this out of the way, we can safely close the block.
 
 ** Theme
 *** Dracula
-I used to hate light themes. I'm not in that camp anymore. This theme is /elegant/. I spent almost two entire weeks trying to find a dark theme that comes anywhere close to being as comfortable as Leuven, and even Leuven's dark alternative doesn't cut it. The theme is installed here, but isn't loaded until later.
+For a long time, I used Leuven for my theme. Nowadays, I don't. It was a brilliant theme, but just didn't work when I needed a new mode line.
 #+begin_src emacs-lisp
   (use-package dracula-theme
     :ensure t
