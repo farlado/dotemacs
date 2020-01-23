@@ -582,6 +582,7 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
                                     ;; Programming
                                     magit
                                     haskell-mode
+                                    highlight-indent-guides
                                     company-jedi
                                     flycheck
                                     avy-flycheck
@@ -1493,6 +1494,17 @@ I have started to mess around with Haskell, so I needed to grab a mode for that.
            (haskell-mode . haskell-doc-mode)
            (haskell-mode . haskell-indentation-mode)
            (haskell-mode . haskell-auto-insert-module-template)))
+#+end_src
+
+*** Indent guides
+This is really nice to have, because I get indentation screwed up all the time.
+#+begin_src emacs-lisp
+  (use-package highlight-indent-guides
+    :ensure t
+    :defer t
+    :hook (prog-mode . highlight-indent-guides-mode)
+    :init
+    (setq highlight-indent-guides-method 'character))
 #+end_src
 
 *** Python autocomplete

@@ -127,6 +127,13 @@
          (haskell-mode . haskell-indentation-mode)
          (haskell-mode . haskell-auto-insert-module-template)))
 
+(use-package highlight-indent-guides
+  :ensure t
+  :defer t
+  :hook (prog-mode . highlight-indent-guides-mode)
+  :init
+  (setq highlight-indent-guides-method 'character))
+
 (use-package company-jedi
   :ensure t
   :defer t

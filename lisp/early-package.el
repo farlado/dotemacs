@@ -58,6 +58,7 @@
                                   ;; Programming
                                   magit
                                   haskell-mode
+                                  highlight-indent-guides
                                   company-jedi
                                   flycheck
                                   avy-flycheck
