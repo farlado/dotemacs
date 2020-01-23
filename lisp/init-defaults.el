@@ -45,6 +45,8 @@
 
 (setq confirm-kill-emacs 'yes-or-no-p)
 
+(setq make-pointer-invisible nil)
+
 (setq inhibit-compacting-font-caches t)
 
 (setq scroll-margin 0

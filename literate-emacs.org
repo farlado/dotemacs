@@ -1001,6 +1001,12 @@ I constantly kill Emacs on accident when running it in terminals, so this preven
   (setq confirm-kill-emacs 'yes-or-no-p)
 #+end_src
 
+*** Don't hide the cursor by default
+This is for when I'm using Emacs outside its role as my desktop environment. I need to know where my cursor is.
+#+begin_src emacs-lisp
+  (setq make-pointer-invisible nil)
+#+end_src
+
 *** Don't unload fonts when not in use
 This solves a number of hanging issues related to a number of different packages and symbols.
 #+begin_src emacs-lisp
