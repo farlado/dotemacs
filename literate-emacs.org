@@ -1729,6 +1729,14 @@ Uses the same color as my mode line, uses the same width as window divider width
         exwm-floating-border-color (face-attribute 'mode-line :background))
 #+end_src
 
+*** Hide coding system from mode line in EXWM
+Thankfully, it's easy.
+#+begin_src emacs-lisp
+  (add-hook 'exwm-mode-hook
+            (lambda ()
+              (setq-local mood-line-show-encoding-information nil)))
+#+end_src
+
 *** Name EXWM buffers after the window title
 This was annoying when I first installed EXWM. Thankfully this is a very easy fix.
 #+begin_src emacs-lisp
