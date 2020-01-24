@@ -212,6 +212,7 @@
                                      ;; Code blocks
                                      ("s"   . "src")
                                      ("sh"  . "src sh")
+                                     ("cf"  . "src conf")
                                      ("cu"  . "src conf-unix")
                                      ("cs"  . "src conf-space")
                                      ("cx"  . "src conf-xdefaults")

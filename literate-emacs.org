@@ -1617,6 +1617,7 @@ First, we load ~org-tempo~, the extension that allows the old way of doing thing
                                        ;; Code blocks
                                        ("s"   . "src")
                                        ("sh"  . "src sh")
+                                       ("cf"  . "src conf")
                                        ("cu"  . "src conf-unix")
                                        ("cs"  . "src conf-space")
                                        ("cx"  . "src conf-xdefaults")
