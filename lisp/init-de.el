@@ -148,11 +148,7 @@
             (start-process "xrandr" nil "xrandr"
                            "--output" monitor
                            ;; Any enabled monitor needs a resolution.
-                           "--mode" (if (string= "eDP1" monitor)
-                                        "2880x1620"
-                                      "1920x1080")
-                           ;; Scale all monitor output to 3K.
-                           "--scale-from" "2880x1620"
+                           "--mode" "1920x1080"
                            ;; DP2-1 and DP2-3 are rotated.
                            "--rotate" (if (string= "DP2-1" monitor)
                                           "left"
@@ -163,8 +159,8 @@
                            "--pos" (if (string-match-p "1" monitor)
                                        "0x0"
                                      (if (string= monitor "DP2-2")
-                                         "1620x0"
-                                       "4500x0")))
+                                         "1080x0"
+                                       "3000x0")))
             ;; Setting a monitor as primary occurs outside enabling it.
             ;; This is due to how `start-process' takes arguments.
             (when (or (string= "DP2-2" monitor)

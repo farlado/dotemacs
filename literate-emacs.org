@@ -722,19 +722,10 @@ This is a function called in ~init.el~ to load the font in a window system.
 #+end_src
 
 *** Setting the font style
-Originally I had this set up by means of ~custom-set-faces~, but frankly that is less easily configured than this method. First, we determine whether my preferred font is present on the system and set it if present. Otherwise, keep whatever default font Emacs chooses.
+Originally I had this set up by means of ~custom-set-faces~, but frankly that is less easily configured than this method. First, we determine whether my preferred font is present on the system and set it if present. Otherwise, keep whatever default font Emacs chooses. We also set the font size here.
 #+begin_src emacs-lisp
   (when (member "Iosevka" (font-family-list))
-    (set-face-attribute 'default nil :font "Iosevka"))
-#+end_src
-
-*** Determining a good font size
-Next we need to determine what size to make the text. I originally used an ~xrandr~ script here, but it was taking a surprising amount of time.
-#+begin_src emacs-lisp
-  (set-face-attribute 'default nil
-                      :height (if (<= (display-pixel-width) 1366)
-                                  100
-                                180))
+    (set-face-attribute 'default nil :font "Iosevka" :height 100))
 #+end_src
 
 *** Getting emoji to work properly
@@ -1919,11 +1910,7 @@ This is where it gets really fun. This ThinkPad /does/ get docked, so I handle v
               (start-process "xrandr" nil "xrandr"
                              "--output" monitor
                              ;; Any enabled monitor needs a resolution.
-                             "--mode" (if (string= "eDP1" monitor)
-                                          "2880x1620"
-                                        "1920x1080")
-                             ;; Scale all monitor output to 3K.
-                             "--scale-from" "2880x1620"
+                             "--mode" "1920x1080"
                              ;; DP2-1 and DP2-3 are rotated.
                              "--rotate" (if (string= "DP2-1" monitor)
                                             "left"
@@ -1934,8 +1921,8 @@ This is where it gets really fun. This ThinkPad /does/ get docked, so I handle v
                              "--pos" (if (string-match-p "1" monitor)
                                          "0x0"
                                        (if (string= monitor "DP2-2")
-                                           "1620x0"
-                                         "4500x0")))
+                                           "1080x0"
+                                         "3000x0")))
               ;; Setting a monitor as primary occurs outside enabling it.
               ;; This is due to how `start-process' takes arguments.
               (when (or (string= "DP2-2" monitor)

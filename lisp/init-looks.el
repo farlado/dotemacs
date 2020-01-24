@@ -16,12 +16,7 @@
   "Set the font at startup."
 
 (when (member "Iosevka" (font-family-list))
-  (set-face-attribute 'default nil :font "Iosevka"))
-
-(set-face-attribute 'default nil
-                    :height (if (<= (display-pixel-width) 1366)
-                                100
-                              180))
+  (set-face-attribute 'default nil :font "Iosevka" :height 100))
 
 (when (member "Noto Color Emoji" (font-family-list))
   (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
