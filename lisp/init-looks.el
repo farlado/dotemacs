@@ -69,7 +69,6 @@
   :ensure t
   :defer t
   :init
-  (setq mood-line-show-encoding-information t)
   (mood-line-mode 1))
 
 (setq display-time-24hr-format t)

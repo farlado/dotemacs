@@ -194,18 +194,19 @@ This function has been altered to accommodate `exwm-mode'."
   "Find a FILE in the user's $XDG_CONFIG_HOME"
   (expand-file-name file (getenv "XDG_CONFIG_HOME")))
 
-(when (file-exists-p (user-config-file "literate-sysconfig.org"))
+(when (file-exists-p (user-config-file "dotfiles/literate-sysconfig.org"))
   (defun sys-config-visit ()
     "Open the literate system configuration"
     (interactive)
-    (find-file (user-config-file "literate-sysconfig.org")))
+    (find-file (user-config-file "dotfiles/literate-sysconfig.org")))
+
   (global-set-key (kbd "C-c C-M-e") 'sys-config-visit))
 
-(when (file-exists-p (user-config-file "literate-dotfiles.org"))
+(when (file-exists-p (user-config-file "dotfiles/literate-dotfiles.org"))
   (defun literate-dotfiles-visit ()
     "Open the literate dotfiles."
     (interactive)
-    (find-file (user-config-file "literate-dotfiles.org")))
+    (find-file (user-config-file "dotfiles/literate-dotfiles.org")))
 
   (global-set-key (kbd "C-c M-e") 'literate-dotfiles-visit))
 

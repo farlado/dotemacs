@@ -814,7 +814,6 @@ What a /MOOD/. With my theme, this bar is gorgeous.
     :ensure t
     :defer t
     :init
-    (setq mood-line-show-encoding-information t)
     (mood-line-mode 1))
 #+end_src
 
@@ -1239,22 +1238,23 @@ This is also crucial for my literate dotfiles, since I am maximizing the complia
 *** Open system configuration with =C-c C-M-e=
 Now that I have a literate(!) system configuration as well, it needs a bind if the file is found.
 #+begin_src emacs-lisp
-  (when (file-exists-p (user-config-file "literate-sysconfig.org"))
+  (when (file-exists-p (user-config-file "dotfiles/literate-sysconfig.org"))
     (defun sys-config-visit ()
       "Open the literate system configuration"
       (interactive)
-      (find-file (user-config-file "literate-sysconfig.org")))
+      (find-file (user-config-file "dotfiles/literate-sysconfig.org")))
+
     (global-set-key (kbd "C-c C-M-e") 'sys-config-visit))
 #+end_src
 
 *** Open dotfiles configuration with =C-c M-e=
 ...if the file exists, of course. My [[https://github.com/farlado/dotfiles][dotfiles]] are literate, defined by this file.
 #+begin_src emacs-lisp
-  (when (file-exists-p (user-config-file "literate-dotfiles.org"))
+  (when (file-exists-p (user-config-file "dotfiles/literate-dotfiles.org"))
     (defun literate-dotfiles-visit ()
       "Open the literate dotfiles."
       (interactive)
-      (find-file (user-config-file "literate-dotfiles.org")))
+      (find-file (user-config-file "dotfiles/literate-dotfiles.org")))
 
     (global-set-key (kbd "C-c M-e") 'literate-dotfiles-visit))
 #+end_src
@@ -1732,14 +1732,6 @@ Uses the same color as my mode line, uses the same width as window divider width
 #+begin_src emacs-lisp
   (setq exwm-floating-border-width window-divider-default-right-width
         exwm-floating-border-color (face-attribute 'mode-line :background))
-#+end_src
-
-*** Hide coding system from mode line in EXWM
-Thankfully, it's easy.
-#+begin_src emacs-lisp
-  (add-hook 'exwm-mode-hook
-            (lambda ()
-              (setq-local mood-line-show-encoding-information nil)))
 #+end_src
 
 *** Name EXWM buffers after the window title
