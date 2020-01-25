@@ -2621,6 +2621,15 @@ I sometimes have to run Emacs in Windows and on systems that have a desktop envi
     (require 'init-de)
 #+end_src
 
+*** XDG compliance settings
+I have to set a few environment variables for the sake of compliance with various XDG specifications, most notably the XDG Base Directory specification.
+#+begin_src emacs-lisp
+  (dolist (var `(("XDG_CURRENT_DESKTOP" "emacs")
+                  ("GTK2_RC_FILES" ,(user-config-file "gtk-2.0/gtkrc"))
+                  ("QT_QPA_PLATFORMTHEME" "gtk2")))
+    (setenv (car var) (car (last var))))
+#+end_src
+
 *** Hide the cursor when typing
 This is just a point of personal preference. I tried not using it for a while and personally it just felt wrong.
 #+begin_src emacs-lisp
