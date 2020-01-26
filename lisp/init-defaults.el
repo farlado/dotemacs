@@ -71,25 +71,21 @@
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(use-package ido-vertical-mode
+(require 'ido)
+(setq ido-everywhere t
+      ido-max-prospects 10
+      ido-enable-prefix nil
+      ido-enable-flex-matching t
+      ido-use-filename-at-point nil
+      ido-create-new-buffer 'always)
+(define-key ido-common-completion-map (kbd "C-n") 'ido-next-match)
+(define-key ido-common-completion-map (kbd "C-p") 'ido-prev-match)
+(ido-mode 1)
+(use-package smex
   :ensure t
   :defer t
-  :init
-  (require 'ido-vertical-mode)
-  (setq ido-everywhere t
-        ido-max-prospects 10
-        ido-enable-prefix nil
-        ido-enable-flex-matching t
-        ido-use-filename-at-point nil
-        ido-create-new-buffer 'always
-        ido-vertical-define-keys 'C-n-and-C-p-only)
-  (ido-mode 1)
-  (ido-vertical-mode 1)
-  (use-package smex
-    :ensure t
-    :defer t
-    :bind (("M-x"    . smex)
-           ("<menu>" . smex))))
+  :bind (("M-x"    . smex)
+         ("<menu>" . smex)))
 
 (setq focus-follows-mouse t
       mouse-autoselect-window t)

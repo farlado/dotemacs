@@ -46,7 +46,6 @@
                                   company
                                   company-emoji
                                   which-key
-                                  ido-vertical-mode
                                   smex
                                   buffer-move
                                   swiper
