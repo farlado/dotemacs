@@ -2784,9 +2784,11 @@ Now using a keymap in place of that wonky as crap binding system. The new binds 
 #+end_src
 
 ** On startup
-We only configure EMMS if ~mpd~ is found.
+We only configure EMMS if ~mpd~ is found. When checking whether ~mpd~ is installed, a couple environment variables are also set.
 #+begin_src emacs-lisp :tangle (user-emacs-file "init.el")
   (when (executable-find "mpd")
+    (setenv "MPD_HOST" "localhost")
+    (setenv "MPD_PORT" "6601")
     (require 'init-media)
     (require 'emms-player-mpd)
     (emms-all))
