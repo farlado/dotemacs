@@ -16,7 +16,8 @@
   :ensure t
   :defer t
   :init
-  (require 'graphviz-dot-mode))
+  (unless pdumper-dumped
+    (require 'graphviz-dot-mode)))
 
 (use-package markdown-mode
   :ensure t

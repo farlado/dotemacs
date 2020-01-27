@@ -24,7 +24,8 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(require 'use-package)
+(unless pdumper-dumped
+  (require 'use-package))
 (setq use-package-compute-statistics t)
 
 (use-package auto-package-update

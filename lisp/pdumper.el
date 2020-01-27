@@ -18,29 +18,78 @@
 (setq pdumper-load-path load-path
       pdumper-dumped t)
 
-(dolist (package `(;; Packages that don't cause problems
-                   ,@(remove
-                      'vterm
-                      package-selected-packages)
-
-                   ;; Core
+(dolist (package `(;; Core
+                   async
+                   use-package
                    server
+                   auto-package-update
+
+                   ;; Looks
+                   dashboard
+                   dracula-theme
+                   mood-line
+                   rainbow-mode
+                   rainbow-delimiters
 
                    ;; Functionality
+                   company
+                   company-emoji
+                   which-key
+                   ido
+                   smex
+                   buffer-move
+
+                   ;; Editing
+                   graphviz-dot-mode
+                   markdown-mode
                    flyspell
+                   swiper
+                   popup-kill-ring
+                   hungry-delete
+                   avy
+                   sudo-edit
+
+                   ;; Programming
+                   haskell-mode
+                   highlight-indent-guides
+                   company-jedi
+                   flycheck
+                   avy-flycheck
 
                    ;; `org-mode'
                    org
+                   toc-org
+                   org-bullets
+                   epresent
                    org-tempo
 
-                   ;; Desktop environment
+                   ;; Desktop Environment
+                   exwm
                    exwm-randr
                    exwm-config
                    exwm-systemtray
+                   exwm-edit
+                   exwm-mff
+                   dmenu
+                   minibuffer-line
+                   system-packages
+                   desktop-environment
 
-                   ;; Media player
-                   emms-setup))
-  (require package))
+                   ;; Media
+                   emms
+                   emms-setup
+
+                   ;; Other
+                   nov
+                   wttrin
+
+                   ;; games
+                   yahtzee
+                   sudoku
+                   tetris
+                   chess
+                   2048-game))
+    (require package))
 
 (load-theme 'dracula t t)
 

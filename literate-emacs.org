@@ -68,7 +68,7 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
 This file is an attempt at a literate GNU Emacs (henceforth "Emacs") configuration. Admittedly, much of the "documentation" in here is more commentary I provide about my choices and personal feelings about certain things in Emacs based on my admittedly very limited opinion of the program than honest-to-god documentation of what this file contains. Regardless, the idea is that this file, when tangled, generates everything in my git repository, from ~LICENSE~ to ~.gitignore~. I would /highly/ recommend you *NOT* try to read the ~.el~ files on their own. It's a jungle, especially since all of the commentary regarding the configuration is in this file and this file alone.
 
 ** Okay, that's pretty neat. Why though?
-The answer is rather simple. Before I used a fully literate file, I had an ~init.el~ which tangled blocks from a ~config.org~ on the fly (read: on startup). It turns out this was abysmally slow, making for a startup time of around 4.5 seconds when loading into my desktop environment. Tangling blocks from a ~literate-emacs.org~ into byte-compiled ~early-init.el~ and ~init.el~ alongside the use of portable dumping (plus multiple other efficiency improvements, of course) cuts this time down to around 1.5 seconds to load into my desktop environment. This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check multiple files when I thought I might have changed something for the worse.
+The answer is rather simple. Before I used a fully literate file, I had an ~init.el~ which tangled blocks from a ~config.org~ on the fly (read: on startup). It turns out this was abysmally slow, making for a startup time of around 4.5 seconds when loading into my desktop environment. Tangling blocks from a ~literate-emacs.org~ into byte-compiled ~early-init.el~ and ~init.el~ alongside the use of portable dumping (plus multiple other efficiency improvements, of course) cuts this time down to around 1.2 seconds to load into my desktop environment. This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check multiple files when I thought I might have changed something for the worse.
 
 ** Installation
 1) Clone the repo into where you store your Emacs configuration.
@@ -370,7 +370,7 @@ In order to make the files look at least somewhat decent, and to warn those who 
   :properties:
   :header-args: :tangle (user-emacs-file "lisp/pdumper.el")
   :end:
-Even with the "small" amount I ask of Emacs, it's a lot of beef to start up as fast as I demand it start up. The portable dumper is an amazing thing. This is just a minimal setup for utilizing the portable dumper to make Emacs load faster. Every single ~require~ that doesn't create Lisp objects incompatible with the portable dumper can now be skipped while loading. Before I started using the portable dumper, I saw start times of around 2.5 seconds. Now I am down to 1.5 seconds, having cut a whole 40% of the start time out.
+Even with the "small" amount I ask of Emacs, it's a lot of beef to start up as fast as I demand it start up. The portable dumper is an amazing thing. This is just a minimal setup for utilizing the portable dumper to make Emacs load faster. Every single ~require~ that doesn't create Lisp objects incompatible with the portable dumper can now be skipped while loading. Before I started using the portable dumper, I saw start times of around 2.5 seconds. Now I am down to 1.2 seconds, having cut about half of the start time out.
 
 *** Load packages
 No need to go overboard here, just load package management.
@@ -389,29 +389,78 @@ For some reason, the dump image doesn't store ~load-path~, so it needs to be sto
 *** ~require~ packages
 This will save much time later down the line.
 #+begin_src emacs-lisp
-  (dolist (package `(;; Packages that don't cause problems
-                     ,@(remove
-                        'vterm
-                        package-selected-packages)
-
-                     ;; Core
+  (dolist (package `(;; Core
+                     async
+                     use-package
                      server
+                     auto-package-update
+
+                     ;; Looks
+                     dashboard
+                     dracula-theme
+                     mood-line
+                     rainbow-mode
+                     rainbow-delimiters
 
                      ;; Functionality
+                     company
+                     company-emoji
+                     which-key
+                     ido
+                     smex
+                     buffer-move
+
+                     ;; Editing
+                     graphviz-dot-mode
+                     markdown-mode
                      flyspell
+                     swiper
+                     popup-kill-ring
+                     hungry-delete
+                     avy
+                     sudo-edit
+
+                     ;; Programming
+                     haskell-mode
+                     highlight-indent-guides
+                     company-jedi
+                     flycheck
+                     avy-flycheck
 
                      ;; `org-mode'
                      org
+                     toc-org
+                     org-bullets
+                     epresent
                      org-tempo
 
-                     ;; Desktop environment
+                     ;; Desktop Environment
+                     exwm
                      exwm-randr
                      exwm-config
                      exwm-systemtray
+                     exwm-edit
+                     exwm-mff
+                     dmenu
+                     minibuffer-line
+                     system-packages
+                     desktop-environment
 
-                     ;; Media player
-                     emms-setup))
-    (require package))
+                     ;; Media
+                     emms
+                     emms-setup
+
+                     ;; Other
+                     nov
+                     wttrin
+
+                     ;; games
+                     yahtzee
+                     sudoku
+                     tetris
+                     chess
+                     2048-game))
+      (require package))
 #+end_src
 
 *** Pre-load the theme
@@ -546,25 +595,8 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
                                     dashboard
                                     dracula-theme
                                     mood-line
-                                    diminish
                                     rainbow-mode
                                     rainbow-delimiters
-
-                                    ;; Desktop environment
-                                    exwm
-                                    exwm-edit
-                                    exwm-mff
-                                    dmenu
-                                    minibuffer-line
-                                    system-packages
-                                    desktop-environment
-
-                                    ;; Multimedia
-                                    emms
-
-                                    ;; Extra major modes
-                                    graphviz-dot-mode
-                                    markdown-mode
 
                                     ;; Functionality
                                     company
@@ -572,6 +604,10 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
                                     which-key
                                     smex
                                     buffer-move
+
+                                    ;; Text Editing
+                                    graphviz-dot-mode
+                                    markdown-mode
                                     swiper
                                     popup-kill-ring
                                     hungry-delete
@@ -586,12 +622,22 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
                                     flycheck
                                     avy-flycheck
 
-                                    ;; org-mode
+                                    ;; `org-mode'
                                     toc-org
                                     org-bullets
                                     epresent
 
+                                    ;; Desktop Environment
+                                    exwm
+                                    exwm-edit
+                                    exwm-mff
+                                    dmenu
+                                    minibuffer-line
+                                    system-packages
+                                    desktop-environment
+
                                     ;; Other
+                                    emms
                                     vterm
                                     nov
                                     wttrin
@@ -690,7 +736,8 @@ Since I manage all Emacs packages in Emacs itself, ~use-package~ makes it much e
     (package-refresh-contents)
     (package-install 'use-package))
 
-  (require 'use-package)
+  (unless pdumper-dumped
+    (require 'use-package))
   (setq use-package-compute-statistics t)
 #+end_src
 
@@ -822,38 +869,6 @@ I use 24-hour time on all my clocks. I used to use ~fancy-battery~ for battery l
   (setq display-time-24hr-format t)
   (display-time-mode 1)
   (display-battery-mode 1)
-#+end_src
-
-*** Hide various minor modes from the mode line
-Works very nicely, makes the mode line far comfier. I set its installation as a hook so that I can keep the look section up a little higher.
-#+begin_src emacs-lisp
-  (use-package diminish
-    :ensure t
-    :defer t
-    :init
-    (defun diminish-minor-modes ()
-      "Diminish the minor modes in the list `minor-modes-to-diminish'."
-      (dolist (mode minor-modes-to-diminish)
-        (diminish mode)))
-    (defvar minor-modes-to-diminish '(eldoc-mode
-                                      subword-mode
-                                      company-mode
-                                      rainbow-mode
-                                      flycheck-mode
-                                      flyspell-mode
-                                      which-key-mode
-                                      auto-revert-mode
-                                      visual-line-mode
-                                      haskell-doc-mode
-                                      flyspell-prog-mode
-                                      hungry-delete-mode
-                                      page-break-lines-mode
-                                      desktop-environment-mode
-                                      haskell-indentation-mode
-                                      interactive-haskell-mode
-                                      compilation-shell-minor-mode)
-      "Minor modes to diminish using `diminish-minor-modes'.")
-    (add-hook 'after-init-hook 'diminish-minor-modes))
 #+end_src
 
 *** Show line and column numbers on the mode line
@@ -1052,7 +1067,8 @@ Beauty in brevity.
 *** Enable ~ido-mode~, install ~smex~
 I /love/ ~ido-mode~.  Default =M-x= behavior doesn't use ~ido-mode~, so we install a package which gives it ~ido-mode~ capabilities. Since Emacs 27 broke the newest version of ~ido-vertical-mode~, I guess I'm SOL. Some other relevant binds are included.
 #+begin_src emacs-lisp
-  (require 'ido)
+  (unless pdumper-dumped
+    (require 'ido))
   (setq ido-everywhere t
         ido-max-prospects 10
         ido-enable-prefix nil
@@ -1286,7 +1302,8 @@ A nice way to make diagrams.
     :ensure t
     :defer t
     :init
-    (require 'graphviz-dot-mode))
+    (unless pdumper-dumped
+      (require 'graphviz-dot-mode)))
 #+end_src
 
 *** ~markdown-mode~ (bootleg org-mode for GitHub)
@@ -2767,7 +2784,7 @@ Now using a keymap in place of that wonky as crap binding system. The new binds 
 #+end_src
 
 ** On startup
-We only configure EMMS if ~mpd~ is found. When checking whether ~mpd~ is installed, a couple environment variables are also set. T
+We only configure EMMS if ~mpd~ is found. When checking whether ~mpd~ is installed, a couple environment variables are also set.
 #+begin_src emacs-lisp :tangle (user-emacs-file "init.el")
   (when (executable-find "mpd")
     (setenv "MPD_HOST" "localhost")

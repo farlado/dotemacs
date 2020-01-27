@@ -71,7 +71,8 @@
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(require 'ido)
+(unless pdumper-dumped
+  (require 'ido))
 (setq ido-everywhere t
       ido-max-prospects 10
       ido-enable-prefix nil

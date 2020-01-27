@@ -22,25 +22,8 @@
                                   dashboard
                                   dracula-theme
                                   mood-line
-                                  diminish
                                   rainbow-mode
                                   rainbow-delimiters
-
-                                  ;; Desktop environment
-                                  exwm
-                                  exwm-edit
-                                  exwm-mff
-                                  dmenu
-                                  minibuffer-line
-                                  system-packages
-                                  desktop-environment
-
-                                  ;; Multimedia
-                                  emms
-
-                                  ;; Extra major modes
-                                  graphviz-dot-mode
-                                  markdown-mode
 
                                   ;; Functionality
                                   company
@@ -48,6 +31,10 @@
                                   which-key
                                   smex
                                   buffer-move
+
+                                  ;; Text Editing
+                                  graphviz-dot-mode
+                                  markdown-mode
                                   swiper
                                   popup-kill-ring
                                   hungry-delete
@@ -62,12 +49,22 @@
                                   flycheck
                                   avy-flycheck
 
-                                  ;; org-mode
+                                  ;; `org-mode'
                                   toc-org
                                   org-bullets
                                   epresent
 
+                                  ;; Desktop Environment
+                                  exwm
+                                  exwm-edit
+                                  exwm-mff
+                                  dmenu
+                                  minibuffer-line
+                                  system-packages
+                                  desktop-environment
+
                                   ;; Other
+                                  emms
                                   vterm
                                   nov
                                   wttrin

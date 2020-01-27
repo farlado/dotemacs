@@ -75,34 +75,6 @@
 (display-time-mode 1)
 (display-battery-mode 1)
 
-(use-package diminish
-  :ensure t
-  :defer t
-  :init
-  (defun diminish-minor-modes ()
-    "Diminish the minor modes in the list `minor-modes-to-diminish'."
-    (dolist (mode minor-modes-to-diminish)
-      (diminish mode)))
-  (defvar minor-modes-to-diminish '(eldoc-mode
-                                    subword-mode
-                                    company-mode
-                                    rainbow-mode
-                                    flycheck-mode
-                                    flyspell-mode
-                                    which-key-mode
-                                    auto-revert-mode
-                                    visual-line-mode
-                                    haskell-doc-mode
-                                    flyspell-prog-mode
-                                    hungry-delete-mode
-                                    page-break-lines-mode
-                                    desktop-environment-mode
-                                    haskell-indentation-mode
-                                    interactive-haskell-mode
-                                    compilation-shell-minor-mode)
-    "Minor modes to diminish using `diminish-minor-modes'.")
-  (add-hook 'after-init-hook 'diminish-minor-modes))
-
 (line-number-mode 1)
 (column-number-mode 1)
 
