@@ -96,8 +96,6 @@
 )
 
 (when (executable-find "mpd")
-  (setenv "MPD_HOST" "localhost")
-  (setenv "MPD_PORT" "6601")
   (require 'init-media)
   (require 'emms-player-mpd)
   (emms-all))

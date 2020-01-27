@@ -50,17 +50,17 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
   - [[#x-applications][X applications]]
   - [[#de-components][DE components]]
   - [[#keybindings][Keybindings]]
-  - [[#on-startup-3][On startup]]
+  - [[#on-startup-de-start][On startup <<de-start>>]]
 - [[#making-emacs-a-media-player-init-mediael][Making Emacs a media player (~init-media.el~)]]
   - [[#installing-emms][Installing EMMS]]
   - [[#daemon-functions][Daemon functions]]
   - [[#binding-all-the-keys][Binding all the keys]]
-  - [[#on-startup-4][On startup]]
+  - [[#on-startup-3][On startup]]
 - [[#making-emacs-e-x-t-e-n-d-init-extendel][Making Emacs =e x t e n d= (~init-extend.el~)]]
   - [[#built-in-features][Built-in features]]
   - [[#not-built-in][Not built-in]]
   - [[#games][Games]]
-  - [[#on-startup-5][On startup]]
+  - [[#on-startup-4][On startup]]
 - [[#giving-files-their-footers][Giving files their footers]]
 #+END_QUOTE
 
@@ -485,12 +485,12 @@ This is, of course, everything I want to run at startup, but also a few other se
 Emacs 27 introduced ~early-init.el~, allowing configuration of multiple items before Emacs has graphically loaded. Either I want these configured as soon as possible, or they are related to Emacs starting up. Which are which is left as an exercise to the reader.
 
 *** Prepare GUI (Part 1)
-I want to get GUI elements out of my face as soon as I possibly can. They just take up space. I also need to set the background to the theme's background so it'll appear sane.
+I want to get GUI elements out of my face as soon as I possibly can. They just take up space. I also need to set the background to the theme's background so it'll appear sane, but only do so when starting as a desktop environment. (See [[de-start][below]] for more information.)
 #+begin_src emacs-lisp
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
-  (when (= (shell-command "pgrep xinit") 0)
+  (when (getenv "_RUN_EXWM")
     (set-face-background 'default "#282a36"))
 #+end_src
 
@@ -2613,7 +2613,7 @@ This includes:
   (define-key exwm-mode-map (kbd "C-c C-f") nil)
 #+end_src
 
-** On startup
+** On startup <<de-start>>
    :properties:
    :header-args: :tangle (user-emacs-file "init.el")
    :end:
@@ -2784,11 +2784,9 @@ Now using a keymap in place of that wonky as crap binding system. The new binds 
 #+end_src
 
 ** On startup
-We only configure EMMS if ~mpd~ is found. When checking whether ~mpd~ is installed, a couple environment variables are also set.
+We only configure EMMS if ~mpd~ is found.
 #+begin_src emacs-lisp :tangle (user-emacs-file "init.el")
   (when (executable-find "mpd")
-    (setenv "MPD_HOST" "localhost")
-    (setenv "MPD_PORT" "6601")
     (require 'init-media)
     (require 'emms-player-mpd)
     (emms-all))
