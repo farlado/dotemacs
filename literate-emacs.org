@@ -490,7 +490,7 @@ I want to get GUI elements out of my face as soon as I possibly can. They just t
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
-  (when (getenv "_RUN_EXWM")
+  (when (string= (getenv "TERM") "dumb")
     (set-face-background 'default "#282a36"))
 #+end_src
 
@@ -1596,15 +1596,15 @@ Since obviously dot snippets are purely harmless +as far as I know+, I just don'
 *** Execute some code without having to confirm
 Since obviously dot snippets are purely harmless +as far as I know+, I just don't bother with having to confirm evaluation every time I try to update a graphic. I also don't need to confirm evaluation of snippets in use in my literate files.
 #+begin_src emacs-lisp
-  (setq org-confirm-babel-evaluate '(lambda (lang body)
-                                      (not
-                                       (or
-                                        (string= lang "dot")
-                                        (and
-                                         (string-match-p "literate"
-                                                         (buffer-file-name))
-                                         (string-match-p "org"
-                                                         (buffer-file-name)))))))
+  (setq org-confirm-babel-evaluate (lambda (lang body)
+                                     (not
+                                      (or
+                                       (string= lang "dot")
+                                       (and
+                                        (string-match-p "literate"
+                                                        (buffer-file-name))
+                                        (string-match-p "org"
+                                                        (buffer-file-name)))))))
 #+end_src
 
 *** Shortcuts for various snippets

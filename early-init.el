@@ -15,7 +15,7 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-(when (getenv "_RUN_EXWM")
+(when (string= (getenv "TERM") "dumb")
   (set-face-background 'default "#282a36"))
 
 (defvar pdumper-dumped nil
