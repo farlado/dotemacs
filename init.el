@@ -35,7 +35,7 @@
   (setq dashboard-set-footer nil
         inhibit-startup-screen t
         dashboard-items '((recents . 10))
-        dashboard-startup-banner 'official
+        dashboard-startup-banner 'logo
         initial-buffer-choice (lambda () (or (get-buffer "*dashboard*")
                                              (get-buffer "*scratch*")))
         dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")

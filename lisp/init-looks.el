@@ -54,6 +54,19 @@
     (set-frame-parameter frame 'alpha 90))
   (add-to-list 'default-frame-alist '(alpha . 90)))
 
+(defun farl-init/org-theme ()
+  "Customize elements in `org-mode'."
+  ;; Load `org-mode' if it isn't dumped
+  (unless pdumper-dumped
+    (require 'org))
+  ;; Title
+  (set-face-attribute 'org-document-title nil
+                      :weight 'extra-bold :height 1.8)
+  ;; Headers
+  (set-face-attribute 'org-level-1 nil :height 1.3)
+  (set-face-attribute 'org-level-2 nil :height 1.2)
+  (set-face-attribute 'org-level-3 nil :height 1.1))
+
 (defun farl-init/theme ()
   "Enable theme at startup, providing customizations for consistency."
   (enable-theme 'dracula)
@@ -62,6 +75,7 @@
     (farl-init/line-numbers-theme)
     (farl-init/window-divider-theme)
     (farl-init/transparency)
+    (farl-init/org-theme)
     (global-rainbow-mode 1)
     (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
 
@@ -69,6 +83,8 @@
   :ensure t
   :defer t
   :init
+  (set-face-attribute 'mode-line nil :box nil)
+  (set-face-attribute 'mode-line-inactive nil :box nil)
   (mood-line-mode 1))
 
 (setq display-time-24hr-format t)

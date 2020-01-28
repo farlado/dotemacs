@@ -704,7 +704,7 @@ I like the default start screen, but it just doesn't cut it for me. I just use t
     (setq dashboard-set-footer nil
           inhibit-startup-screen t
           dashboard-items '((recents . 10))
-          dashboard-startup-banner 'official
+          dashboard-startup-banner 'logo
           initial-buffer-choice (lambda () (or (get-buffer "*dashboard*")
                                                (get-buffer "*scratch*")))
           dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
@@ -837,6 +837,23 @@ If there's a gimmick I can't get enough of, it's having a transparent frame.
     (add-to-list 'default-frame-alist '(alpha . 90)))
 #+end_src
 
+*** Headers in ~org-mode~
+For some reason, theme creators don't really think of scaling headers in ~org-mode~, so I have instead taken matters into my own hands. This way, I can use whatever color scheme I want with some peace of mind that at the least I don't have to look for ~org~-aware themes.
+#+begin_src emacs-lisp
+  (defun farl-init/org-theme ()
+    "Customize elements in `org-mode'."
+    ;; Load `org-mode' if it isn't dumped
+    (unless pdumper-dumped
+      (require 'org))
+    ;; Title
+    (set-face-attribute 'org-document-title nil
+                        :weight 'extra-bold :height 1.8)
+    ;; Headers
+    (set-face-attribute 'org-level-1 nil :height 1.3)
+    (set-face-attribute 'org-level-2 nil :height 1.2)
+    (set-face-attribute 'org-level-3 nil :height 1.1))
+#+end_src
+
 *** On startup
 This main function is called in ~init.el~ to load the theme proper.
 #+begin_src emacs-lisp
@@ -848,18 +865,21 @@ This main function is called in ~init.el~ to load the theme proper.
       (farl-init/line-numbers-theme)
       (farl-init/window-divider-theme)
       (farl-init/transparency)
+      (farl-init/org-theme)
       (global-rainbow-mode 1)
       (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
 #+end_src
 
 ** Mode line
 *** ~mood-line~ package (alternate mode line)
-What a /MOOD/. With my theme, this bar is gorgeous.
+What a /MOOD/. This mode line is gorgeous and when configured properly is just great to use.
 #+begin_src emacs-lisp
   (use-package mood-line
     :ensure t
     :defer t
     :init
+    (set-face-attribute 'mode-line nil :box nil)
+    (set-face-attribute 'mode-line-inactive nil :box nil)
     (mood-line-mode 1))
 #+end_src
 
