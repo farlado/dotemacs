@@ -64,8 +64,8 @@
                       :weight 'extra-bold :height 1.8)
   ;; Headers
   (set-face-attribute 'org-level-1 nil :height 1.3)
-  (set-face-attribute 'org-level-2 nil :height 1.2)
-  (set-face-attribute 'org-level-3 nil :height 1.1))
+  (set-face-attribute 'org-level-2 nil :height 1.1)
+  (set-face-attribute 'org-level-3 nil :height 1.0))
 
 (defun farl-init/theme ()
   "Enable theme at startup, providing customizations for consistency."

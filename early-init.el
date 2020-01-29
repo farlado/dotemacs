@@ -15,8 +15,7 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-(when (string= (getenv "TERM") "dumb")
-  (set-face-background 'default "#282a36"))
+(set-face-background 'default "#282a36")
 
 (defvar pdumper-dumped nil
   "Non-nil if a custom dump image was loaded.")
@@ -35,7 +34,7 @@
 (unless (file-exists-p (expand-file-name "init.elc" user-emacs-directory))
   (add-hook 'after-init-hook
             (lambda ()
-              (byte-recompile-directory user-emacs-directory t))))
+              (byte-recompile-directory user-emacs-directory 0))))
 
 (setq load-prefer-newer t)
 
