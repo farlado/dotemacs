@@ -116,9 +116,14 @@
                 package-menu-mode-hook))
   (add-hook hook (lambda () (display-line-numbers-mode -1))))
 
-(show-paren-mode 1)
-(setq show-paren-style 'parenthesis
-      show-paren-delay 0)
+(defun farl-init/show-paren ()
+  "Enable and customize `show-paren-mode'."
+  (show-paren-mode 1)
+  (set-face-attribute 'show-paren-match nil
+                      :weight 'extra-bold
+                      :underline t)
+  (setq show-paren-style 'parentheses
+        show-paren-delay 0))
 
 (use-package rainbow-mode
   :ensure t

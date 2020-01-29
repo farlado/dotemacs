@@ -46,7 +46,8 @@
 (farl-init/theme)
 
 (when window-system
-  (farl-init/set-font))
+  (farl-init/set-font)
+  (farl-init/show-paren))
 
 (require 'init-defaults)
 

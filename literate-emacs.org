@@ -934,9 +934,14 @@ I like having line numbers and indicators for lines past the EOF. However, I don
 *** Highlight matching parentheses
 For those moments where I can't figure out what is going on with the parentheses...
 #+begin_src emacs-lisp
-  (show-paren-mode 1)
-  (setq show-paren-style 'parenthesis
-        show-paren-delay 0)
+  (defun farl-init/show-paren ()
+    "Enable and customize `show-paren-mode'."
+    (show-paren-mode 1)
+    (set-face-attribute 'show-paren-match nil
+                        :weight 'extra-bold
+                        :underline t)
+    (setq show-paren-style 'parentheses
+          show-paren-delay 0))
 #+end_src
 
 *** Color the background of text based on the color/hex typed
@@ -965,7 +970,8 @@ Previously, just loading ~init-looks~ was supposed to also load everything depen
   (farl-init/theme)
 
   (when window-system
-    (farl-init/set-font))
+    (farl-init/set-font)
+    (farl-init/show-paren))
 #+end_src
 
 * Making Emacs comfortable (~init-defaults.el~)
