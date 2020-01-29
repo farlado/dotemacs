@@ -65,10 +65,9 @@
   (set-frame-parameter nil 'fullscreen 'fullboth)
   (require 'init-de)
 
-(dolist (var `(("XDG_CURRENT_DESKTOP" "emacs")
-                ("GTK2_RC_FILES" ,(user-config-file "gtk-2.0/gtkrc"))
-                ("QT_QPA_PLATFORMTHEME" "gtk2")))
-  (setenv (car var) (car (last var))))
+(setenv "XDG_CURRENT_DESKTOP" "emacs")
+(setenv "GTK2_RC_FILES" (user-config-file "gtk-2.0/gtkrc"))
+(setenv "QT_QPA_PLATFORMTHEME" "gtk2")
 
 (start-process "Hide Cursor" nil "xbanish")
 

@@ -174,11 +174,12 @@
   (let ((trackball-id (shell-command-to-string
                        (concat "xinput | grep ELECOM | head -n 1 | sed -r "
                                "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
-    (dolist (command '("'libinput Button Scrolling Button' 10"
-                       "'libinput Scroll Method Enabled' 0 0 1"))
-      (start-process-shell-command
-       "Trackball Setup" nil (concat "xinput set-prop "
-                                     trackball-id command)))
+    (start-process-shell-command
+     "Trackball Setup" nil (concat "xinput set-prop " trackball-id
+                                   "'libinput Button Scrolling Button' 10"))
+    (start-process-shell-command
+     "Trackball Setup" nil (concat "xinput set-prop " trackball-id
+                                   "'libinput Scroll Method Enabled' 0 0 1"))
     (start-process-shell-command
      "Trackball Setup" nil (concat "xinput set-button-map " trackball-id
                                    "1 2 3 4 5 6 7 8 9 2 1 2")))
@@ -427,8 +428,8 @@
     (shell-command command))
   ;; Run `pavucontrol' and then unload the modules after it completes
   (start-process-shell-command
-   "Audio Loop" nil (concat "pavucontrol && "
-                            "pacmd unload-module module-null-sink && "
+   "Audio Loop" nil (concat "pavucontrol;"
+                            "pacmd unload-module module-null-sink;"
                             "pacmd unload-module module-loopback")))
 
 (defvar keyboard-layout-1 "us"
@@ -455,7 +456,8 @@ Set to nil to have one less keyboard layout.")
   "Set the keyboard layout to LAYOUT."
   (interactive)
   (let ((layout (or layout (read-string "Enter keyboard layout: "))))
-    (shell-command (concat "setxkbmap " layout " -option ctrl:nocaps"))
+    (start-process "Keyboard layout" nil "setxkbmap"
+                   layout "-option" "ctrl:nocaps")
     (message "Keyboard layout is now: %s" layout)))
 
 (defun cycle-keyboard-layout ()
@@ -487,7 +489,8 @@ Set to nil to have one less keyboard layout.")
 (defun suspend-computer ()
   (interactive)
   (and (yes-or-no-p "Really suspend? ")
-       (shell-command "systemctl suspend -i")))
+       (start-process "Suspend" nil "systemctl"
+                      "suspend" "-i")))
 
 (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
 

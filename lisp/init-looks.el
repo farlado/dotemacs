@@ -38,10 +38,10 @@
 (defun farl-init/window-divider-theme ()
   "Make window dividers match the theme."
   (setq window-divider-default-right-width 3)
-  (dolist (face '(window-divider-first-pixel
-                  window-divider-last-pixel
-                  window-divider))
-    (set-face-foreground face (face-attribute 'mode-line :background)))
+  (let ((color (face-attribute 'mode-line :background)))
+    (set-face-foreground 'window-divider-first-pixel color)
+    (set-face-foreground 'window-divider-last-pixel color)
+    (set-face-foreground 'window-divider color))
   (window-divider-mode 1))
 
 (defun farl-init/line-numbers-theme ()
