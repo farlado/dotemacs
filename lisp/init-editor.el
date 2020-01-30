@@ -27,7 +27,7 @@
   "Tangle a file if it's a literate programming file."
   (interactive)
   (when (and (equal major-mode 'org-mode)
-             (string-match-p "literate" (buffer-file-name)))
+             (buffer-file-match "literate"))
     (org-babel-tangle)))
 
 (add-hook 'after-save-hook 'tangle-literate-program -100)
@@ -60,6 +60,7 @@
       auto-save-default nil)
 
 (global-auto-revert-mode 1)
+
 (setq global-auto-revert-non-file-buffers t
       auto-revert-remote-files t
       auto-revert-verbose nil)
@@ -131,9 +132,9 @@
 (use-package highlight-indent-guides
   :ensure t
   :defer t
-  :hook (prog-mode . highlight-indent-guides-mode)
   :init
-  (setq highlight-indent-guides-method 'character))
+  (setq highlight-indent-guides-method 'character)
+  :hook (prog-mode . highlight-indent-guides-mode))
 
 (use-package company-jedi
   :ensure t
@@ -185,14 +186,8 @@
 (org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
 
 (setq org-confirm-babel-evaluate (lambda (lang body)
-                                   (not
-                                    (or
-                                     (string= lang "dot")
-                                     (and
-                                      (string-match-p "literate"
-                                                      (buffer-file-name))
-                                      (string-match-p "org"
-                                                      (buffer-file-name)))))))
+                                   (not (or (string= lang "dot")
+                                            (buffer-file-match "literate.*.org$")))))
 
 (unless pdumper-dumped
   (require 'org-tempo))

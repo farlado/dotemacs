@@ -73,14 +73,17 @@
 
 (unless pdumper-dumped
   (require 'ido))
+
 (setq ido-everywhere t
       ido-max-prospects 10
       ido-enable-prefix nil
       ido-enable-flex-matching t
       ido-use-filename-at-point nil
       ido-create-new-buffer 'always)
+
 (define-key ido-common-completion-map (kbd "C-n") 'ido-next-match)
 (define-key ido-common-completion-map (kbd "C-p") 'ido-prev-match)
+
 (ido-mode 1)
 (use-package smex
   :ensure t
@@ -178,6 +181,10 @@ This function has been altered to accommodate `exwm-mode'."
 
 (global-set-key (kbd "C-x b") 'ibuffer)
 (global-unset-key (kbd "C-x C-b"))
+
+(defun buffer-file-match (string)
+  "Find STRING in `buffer-file-name'."
+  (string-match-p string (buffer-file-name)))
 
 (defmacro user-emacs-file (file)
   "Find FILE in `user-emacs-directory'."

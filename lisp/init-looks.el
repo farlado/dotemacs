@@ -14,14 +14,10 @@
 
 (defun farl-init/set-font ()
   "Set the font at startup."
-
-(when (member "Iosevka" (font-family-list))
-  (set-face-attribute 'default nil :font "Iosevka" :height 100))
-
-(when (member "Noto Color Emoji" (font-family-list))
-  (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
-
-)
+  (when (member "Iosevka" (font-family-list))
+    (set-face-attribute 'default nil :font "Iosevka" :height 100))
+  (when (member "Noto Color Emoji" (font-family-list))
+    (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend)))
 
 (use-package dracula-theme
   :ensure t

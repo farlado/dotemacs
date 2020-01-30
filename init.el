@@ -64,36 +64,26 @@
   (setenv "_RUN_EXWM")
   (set-frame-parameter nil 'fullscreen 'fullboth)
   (require 'init-de)
-
-(setenv "XDG_CURRENT_DESKTOP" "emacs")
-(setenv "GTK2_RC_FILES" (user-config-file "gtk-2.0/gtkrc"))
-(setenv "QT_QPA_PLATFORMTHEME" "gtk2")
-
-(start-process "Hide Cursor" nil "xbanish")
-
-(start-process "Disable Blanking" nil "xset"
-               "s" "off" "-dpms")
-
-(start-process "Trackpad Setup" nil "xinput"
-               "disable" (shell-command-to-string
-                          (concat "xinput | grep Synap | head -n 1 | "
-                                  "sed -r 's/.*id=([0-9]+).*/\\1/' | "
-                                  "tr '\n' ' ' | sed 's/ //'")))
-
-(start-process "Keyboard Layout" nil "setxkbmap"
-               "us" "-option" "ctrl:nocaps")
-
-(start-process "Compositor" nil "xcompmgr")
-
-(start-process "Fallback Cursor" nil "xsetroot"
-               "-cursor_name" "left_ptr")
-
-(exwm-enable)
-(exwm-config-ido)
-(exwm-randr-enable)
-(exwm-systemtray-enable)
-
-)
+  (setenv "XDG_CURRENT_DESKTOP" "emacs")
+  (setenv "GTK2_RC_FILES" (user-config-file "gtk-2.0/gtkrc"))
+  (setenv "QT_QPA_PLATFORMTHEME" "gtk2")
+  (start-process "Hide Cursor" nil "xbanish")
+  (start-process "Disable Blanking" nil "xset"
+                 "s" "off" "-dpms")
+  (start-process "Trackpad Setup" nil "xinput"
+                 "disable" (shell-command-to-string
+                            (concat "xinput | grep Synap | head -n 1 | "
+                                    "sed -r 's/.*id=([0-9]+).*/\\1/' | "
+                                    "tr '\n' ' ' | sed 's/ //'")))
+  (start-process "Keyboard Layout" nil "setxkbmap"
+                 "us" "-option" "ctrl:nocaps")
+  (start-process "Compositor" nil "xcompmgr")
+  (start-process "Fallback Cursor" nil "xsetroot"
+                 "-cursor_name" "left_ptr")
+  (exwm-enable)
+  (exwm-config-ido)
+  (exwm-randr-enable)
+  (exwm-systemtray-enable))
 
 (when (executable-find "mpd")
   (setenv "MPD_HOST" "localhost")

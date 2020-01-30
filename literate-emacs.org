@@ -763,28 +763,27 @@ Stock Emacs is /ugly/. Just straight up ugly. Suffice to say it leaves much to b
 
 ** Font
 This is a function called in ~init.el~ to load the font in a window system.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb yes
   (defun farl-init/set-font ()
     "Set the font at startup."
+    <<mainfont>>
+    <<emojifont>>)
 #+end_src
 
 *** Setting the font style
 Originally I had this set up by means of ~custom-set-faces~, but frankly that is less easily configured than this method. First, we determine whether my preferred font is present on the system and set it if present. Otherwise, keep whatever default font Emacs chooses. We also set the font size here.
-#+begin_src emacs-lisp
+#+name: mainfont
+#+begin_src emacs-lisp :tangle no
   (when (member "Iosevka" (font-family-list))
     (set-face-attribute 'default nil :font "Iosevka" :height 100))
 #+end_src
 
 *** Getting emoji to work properly
 God does this one feel great to have now that I use an Emacs version that can handle it!
-#+begin_src emacs-lisp
+#+name: emojifont
+#+begin_src emacs-lisp :tangle no
   (when (member "Noto Color Emoji" (font-family-list))
     (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
-#+end_src
-
-With this out of the way, we can safely close the block.
-#+begin_src emacs-lisp
-  )
 #+end_src
 
 ** Theme
@@ -1096,14 +1095,17 @@ I /love/ ~ido-mode~.  Default =M-x= behavior doesn't use ~ido-mode~, so we insta
 #+begin_src emacs-lisp
   (unless pdumper-dumped
     (require 'ido))
+
   (setq ido-everywhere t
         ido-max-prospects 10
         ido-enable-prefix nil
         ido-enable-flex-matching t
         ido-use-filename-at-point nil
         ido-create-new-buffer 'always)
+
   (define-key ido-common-completion-map (kbd "C-n") 'ido-next-match)
   (define-key ido-common-completion-map (kbd "C-p") 'ido-prev-match)
+
   (ido-mode 1)
   (use-package smex
     :ensure t
@@ -1249,6 +1251,14 @@ Just another point of personal convenience.
 ** Configuration
 These are settings specifically pertaining to configuring Emacs or my user environment in general.
 
+*** Easily find a string in a buffer's file name
+Since I'm starting to really mess with this, I should probably keep a macro around.
+#+begin_src emacs-lisp
+  (defun buffer-file-match (string)
+    "Find STRING in `buffer-file-name'."
+    (string-match-p string (buffer-file-name)))
+#+end_src
+
 *** Easily reference a file in ~user-emacs-directory~
 Since I so often will reference files in my ~user-emacs-directory~, I find it worthwhile to create a macro specifically for that.
 #+begin_src emacs-lisp
@@ -1272,7 +1282,6 @@ This is also crucial for my literate dotfiles, since I am maximizing the complia
     "Find a FILE in the user's $XDG_CONFIG_HOME"
     (expand-file-name file (getenv "XDG_CONFIG_HOME")))
 #+end_src
-
 *** Open system configuration with =C-c C-M-e=
 Now that I have a literate(!) system configuration as well, it needs a bind if the file is found.
 #+begin_src emacs-lisp
@@ -1351,7 +1360,7 @@ I've gotten really into literate programming lately, so this makes it much easie
     "Tangle a file if it's a literate programming file."
     (interactive)
     (when (and (equal major-mode 'org-mode)
-               (string-match-p "literate" (buffer-file-name)))
+               (buffer-file-match "literate"))
       (org-babel-tangle)))
 
   (add-hook 'after-save-hook 'tangle-literate-program -100)
@@ -1407,6 +1416,7 @@ I love living on the edge.
 This way if files get modified in the middle of editing them, I don't overwrite the changes. This can also change ~dired~ and ~ibuffer~ buffers if I am not mistaken. However, I don't need to hear every last thing about it.
 #+begin_src emacs-lisp
   (global-auto-revert-mode 1)
+
   (setq global-auto-revert-non-file-buffers t
         auto-revert-remote-files t
         auto-revert-verbose nil)
@@ -1532,9 +1542,9 @@ This is really nice to have, because I get indentation screwed up all the time.
   (use-package highlight-indent-guides
     :ensure t
     :defer t
-    :hook (prog-mode . highlight-indent-guides-mode)
     :init
-    (setq highlight-indent-guides-method 'character))
+    (setq highlight-indent-guides-method 'character)
+    :hook (prog-mode . highlight-indent-guides-mode))
 #+end_src
 
 *** Python autocomplete
@@ -1624,14 +1634,8 @@ Since obviously dot snippets are purely harmless +as far as I know+, I just don'
 Since obviously dot snippets are purely harmless +as far as I know+, I just don't bother with having to confirm evaluation every time I try to update a graphic. I also don't need to confirm evaluation of snippets in use in my literate files.
 #+begin_src emacs-lisp
   (setq org-confirm-babel-evaluate (lambda (lang body)
-                                     (not
-                                      (or
-                                       (string= lang "dot")
-                                       (and
-                                        (string-match-p "literate"
-                                                        (buffer-file-name))
-                                        (string-match-p "org"
-                                                        (buffer-file-name)))))))
+                                     (not (or (string= lang "dot")
+                                              (buffer-file-match "literate.*.org$")))))
 #+end_src
 
 *** Shortcuts for various snippets
@@ -2648,16 +2652,25 @@ This includes:
    :header-args: :tangle (user-emacs-file "init.el")
    :end:
 I sometimes have to run Emacs in Windows and on systems that have a desktop environment already, so I really don't want this part loaded in those cases. The original solution was to call ~wmctrl~ and see if it failed in a specific way. The new solution is to look for the environment variable ~_RUN_EXWM~ and start EXWM if it is set. This means setting this variable somewhere in your ~.xinitrc~ or in the =.desktop= file your display manager uses. When Emacs starts as a desktop environment, it will unset this environment variable in the weird off-chance you want to run Emacs in Emacs.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb yes
   (when (getenv "_RUN_EXWM")
     (setenv "_RUN_EXWM")
     (set-frame-parameter nil 'fullscreen 'fullboth)
     (require 'init-de)
+    <<xdg>>
+    <<xbanish>>
+    <<screen>>
+    <<trackpad>>
+    <<keyboard>>
+    <<xcompmgr>>
+    <<cursor>>
+    <<exwm>>)
 #+end_src
 
 *** XDG compliance settings
 I have to set a few environment variables for the sake of compliance with various XDG specifications, most notably the XDG Base Directory specification.
-#+begin_src emacs-lisp
+#+name: xdg
+#+begin_src emacs-lisp :tangle no
   (setenv "XDG_CURRENT_DESKTOP" "emacs")
   (setenv "GTK2_RC_FILES" (user-config-file "gtk-2.0/gtkrc"))
   (setenv "QT_QPA_PLATFORMTHEME" "gtk2")
@@ -2665,20 +2678,23 @@ I have to set a few environment variables for the sake of compliance with variou
 
 *** Hide the cursor when typing
 This is just a point of personal preference. I tried not using it for a while and personally it just felt wrong.
-#+begin_src emacs-lisp
+#+name: xbanish
+#+begin_src emacs-lisp :tangle no
   (start-process "Hide Cursor" nil "xbanish")
 #+end_src
 
 *** Disable screen blanking
 I don't need my laptop's screen shutting off just because I'm sitting and watching a video too long.
-#+begin_src emacs-lisp
+#+name: screen
+#+begin_src emacs-lisp :tangle no
   (start-process "Disable Blanking" nil "xset"
                  "s" "off" "-dpms")
 #+end_src
 
 *** Disable the trackpad
 This thing is disgusting, and I prefer trackpoints way more.
-#+begin_src emacs-lisp
+#+name: trackpad
+#+begin_src emacs-lisp :tangle no
   (start-process "Trackpad Setup" nil "xinput"
                  "disable" (shell-command-to-string
                             (concat "xinput | grep Synap | head -n 1 | "
@@ -2688,35 +2704,34 @@ This thing is disgusting, and I prefer trackpoints way more.
 
 *** Keyboard configuration
 This block sets the keyboard layout to US and give Caps Lock the functionality of Control. I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
-#+begin_src emacs-lisp
+#+name: keyboard
+#+begin_src emacs-lisp :tangle no
   (start-process "Keyboard Layout" nil "setxkbmap"
                  "us" "-option" "ctrl:nocaps")
 #+end_src
 
 *** Start the compositor
 I don't need it, but having basic compositing is very nice.
-#+begin_src emacs-lisp
+#+name: xcompmgr
+#+begin_src emacs-lisp :tangle no
   (start-process "Compositor" nil "xcompmgr")
 #+end_src
 
 *** Set fallback cursor
 Some X windows will have weird cursors if this isn't done.
-#+begin_src emacs-lisp
+#+name: cursor
+#+begin_src emacs-lisp :tangle no
   (start-process "Fallback Cursor" nil "xsetroot"
                  "-cursor_name" "left_ptr")
 #+end_src
 
 *** Start EXWM
-#+begin_src emacs-lisp
+#+name: exwm
+#+begin_src emacs-lisp :tangle no
   (exwm-enable)
   (exwm-config-ido)
   (exwm-randr-enable)
   (exwm-systemtray-enable)
-#+end_src
-
-With that out of the way, we can close off the block and move on to the next section.
-#+begin_src emacs-lisp
-  )
 #+end_src
 
 * Making Emacs a media player (~init-media.el~)
