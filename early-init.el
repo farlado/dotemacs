@@ -28,8 +28,7 @@
   (blink-cursor-mode)
   (add-hook 'after-init-hook
             (lambda ()
-              (save-excursion
-                (switch-to-buffer "*scratch*")
+              (with-current-buffer "*scratch*"
                 (lisp-interaction-mode)))))
 
 (unless (file-exists-p (expand-file-name "init.elc" user-emacs-directory))

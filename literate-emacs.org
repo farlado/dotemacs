@@ -509,8 +509,7 @@ For some reason, the portable dumper has odd behaviors. This block is supposed t
     (blink-cursor-mode)
     (add-hook 'after-init-hook
               (lambda ()
-                (save-excursion
-                  (switch-to-buffer "*scratch*")
+                (with-current-buffer "*scratch*"
                   (lisp-interaction-mode)))))
 #+end_src
 *** Byte-compile on first run
