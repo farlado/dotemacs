@@ -1,5 +1,5 @@
 #+title: Farlado's Illiterate GNU Emacs 🐉
-#+subtitle: A far-from-sane literate Emacs configuration
+#+subtitle: A far-from-sane literate GNU Emacs configuration
 #+author: Farlado
 #+language: en
 #+options: num:nil toc:2
