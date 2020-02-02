@@ -1073,13 +1073,19 @@ This function has been altered to accommodate `exwm-mode'."
                               "pacmd unload-module module-null-sink;"
                               "pacmd unload-module module-loopback")))
   (defvar keyboard-layout-1 "us"
-    "The first of three keyboard layouts to cycle through.")
+    "The first of three keyboard layouts to cycle through.
+  
+  Set to nil for one less keyboard layout.")
   
   (defvar keyboard-layout-2 "epo"
-    "The second of three keyboard layouts to cycle through.")
+    "The second of three keyboard layouts to cycle through.
+  
+  Set to nil for one less keyboard layout.")
   
   (defvar keyboard-layout-3 "de"
-    "The third of three keyboard layouts to cycle through.")
+    "The third of three keyboard layouts to cycle through.
+  
+  Set to nil for one less keyboard layout.")
   (defun get-keyboard-layout ()
     "Get the current keyboard layout."
     (shell-command-to-string

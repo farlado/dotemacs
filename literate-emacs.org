@@ -51,7 +51,7 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
   - [[#de-components][DE components]]
   - [[#keybindings][Keybindings]]
   - [[#on-startup][On startup]]
-- [[#making-emacs-play-music-via-mpd][Making Emacs play music via ~mpd~]]
+- [[#making-emacs-an-mpd-based-music-player][Making Emacs an ~mpd~-based music player]]
   - [[#loading][Loading]]
   - [[#functions][Functions]]
   - [[#keybindings-1][Keybindings]]
@@ -2291,13 +2291,19 @@ Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucon
 This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
 #+begin_src emacs-lisp
   (defvar keyboard-layout-1 "us"
-    "The first of three keyboard layouts to cycle through.")
+    "The first of three keyboard layouts to cycle through.
+
+  Set to nil for one less keyboard layout.")
 
   (defvar keyboard-layout-2 "epo"
-    "The second of three keyboard layouts to cycle through.")
+    "The second of three keyboard layouts to cycle through.
+
+  Set to nil for one less keyboard layout.")
 
   (defvar keyboard-layout-3 "de"
-    "The third of three keyboard layouts to cycle through.")
+    "The third of three keyboard layouts to cycle through.
+
+  Set to nil for one less keyboard layout.")
 #+end_src
 
 Then, I use these functions to control setting and cycling the keyboard layout:
@@ -2680,7 +2686,7 @@ Some X windows will have weird cursors if this isn't done.
   (exwm-systemtray-enable)
 #+end_src
 
-* Making Emacs play music via ~mpd~
+* Making Emacs an ~mpd~-based music player
 I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it. We only configure EMMS if ~mpd~ is found. Environment variables are set here as well.
 #+begin_src emacs-lisp :noweb yes :tangle (user-emacs-file "init.el")
   (use-package emms
