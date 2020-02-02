@@ -19,7 +19,7 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
   - [[#files-to-ignore][Files to ignore]]
 - [[#giving-files-their-headers][Giving files their headers]]
 - [[#making-emacs-start-quickly][Making Emacs start quickly]]
-  - [[#starting-emacs-fast][Starting Emacs /FAST/]]
+  - [[#starting-emacs-fast][Starting Emacs FAST]]
   - [[#do-these-things-asap][Do these things ASAP]]
   - [[#early-package-management][Early package management]]
   - [[#later-package-management][Later package management]]
@@ -38,7 +38,7 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
   - [[#personal-save-hooks][Personal save hooks]]
   - [[#general-editing][General editing]]
   - [[#programming][Programming]]
-  - [[#org-mode][~org-mode~]]
+  - [[#org-mode][Org-mode]]
 - [[#making-emacs-more-than-an-editor][Making Emacs more than an editor]]
   - [[#not-built-in][Not built-in]]
   - [[#built-in][Built-in]]
@@ -229,7 +229,7 @@ In order to make the files look at least somewhat decent for documentation linte
 * Making Emacs start quickly
 This is everything related to starting Emacs quickly. First things first is setting up a batch script used to create a custom portable dump image, followed by what to execute at startup to make initialization faster.
 
-** Starting Emacs /FAST/
+** Starting Emacs FAST
   :properties:
   :header-args: :tangle (user-emacs-file "pdumper.el")
   :end:
@@ -1405,7 +1405,7 @@ This one is *SUPER COOL*. Being able to jump straight to a problem is really use
            ("C-c C-'" . avy-flycheck-goto-error)))
 #+end_src
 
-** ~org-mode~
+** Org-mode
 As I spend more time in Org-mode, the more I need from it.
 
 *** Table of Contents
