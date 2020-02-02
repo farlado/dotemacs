@@ -858,12 +858,13 @@ This function has been altered to accommodate `exwm-mode'."
   (defun display-and-dock-setup ()
     "Configure displays and dock if applicable."
     (interactive)
-    (if (member "LVDS1" (get-connected-monitors))
-        (display-setup-x230)
-      (progn
-        (display-setup-w541)
-        (peripheral-setup)))
-    (set-wallpaper))
+    (unless (get-process "Monitor Settings")
+      (if (member "LVDS1" (get-connected-monitors))
+          (display-setup-x230)
+        (progn
+          (display-setup-w541)
+          (peripheral-setup))))
+      (set-wallpaper))
   
   (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
   (defun run-gimp ()
