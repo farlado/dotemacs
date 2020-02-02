@@ -15,6 +15,7 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+
 (when (getenv "_RUN_EXWM")
   (set-face-background 'default "#282a36"))
 
@@ -61,8 +62,73 @@
 
 (add-hook 'emacs-startup-hook 'startup/reset-gc)
 
-(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+(setq custom-file "/dev/null"
+      package-selected-packages '(;; Core
+                                  async
+                                  use-package
+                                  auto-package-update
 
-(require 'early-package)
+                                  ;; Looks
+                                  dashboard
+                                  dracula-theme
+                                  mood-line
+                                  rainbow-mode
+                                  rainbow-delimiters
+
+                                  ;; Functionality
+                                  company
+                                  company-emoji
+                                  which-key
+                                  smex
+                                  buffer-move
+
+                                  ;; Text Editing
+                                  graphviz-dot-mode
+                                  markdown-mode
+                                  swiper
+                                  popup-kill-ring
+                                  hungry-delete
+                                  avy
+                                  sudo-edit
+
+                                  ;; Programming
+                                  magit
+                                  haskell-mode
+                                  highlight-indent-guides
+                                  company-jedi
+                                  flycheck
+                                  avy-flycheck
+
+                                  ;; `org-mode'
+                                  toc-org
+                                  org-bullets
+                                  epresent
+
+                                  ;; Desktop Environment
+                                  exwm
+                                  exwm-edit
+                                  exwm-mff
+                                  dmenu
+                                  minibuffer-line
+                                  system-packages
+                                  desktop-environment
+
+                                  ;; Other
+                                  emms
+                                  vterm
+                                  nov
+                                  wttrin
+
+                                  ;; Games
+                                  yahtzee
+                                  sudoku
+                                  chess
+                                  2048-game))
+
+(require 'package)
+(defun package--save-selected-packages (&rest opt) nil)
+
+(setq package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")))
 
 ;;; early-init.el ends here

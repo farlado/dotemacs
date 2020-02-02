@@ -1,4 +1,4 @@
-;;; pdumper.el --- Starting Emacs FAST
+;;; pdumper.el --- Making a portable dump image
 
 ;; This file is not part of GNU Emacs.
 
