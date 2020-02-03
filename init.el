@@ -49,6 +49,7 @@
 (add-hook 'after-init-hook 'server-start-if-not-running)
 
 (tooltip-mode -1)
+
 (setq use-dialog-box nil
       use-file-dialog nil)
 
@@ -60,8 +61,9 @@
         inhibit-startup-screen t
         dashboard-items '((recents . 10))
         dashboard-startup-banner 'logo
-        initial-buffer-choice (lambda () (or (get-buffer "*dashboard*")
-                                             (get-buffer "*scratch*")))
+        initial-buffer-choice (lambda ()
+                                (or (get-buffer "*dashboard*")
+                                    (get-buffer "*scratch*")))
         dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
   (dashboard-setup-startup-hook))
 
@@ -134,7 +136,8 @@
                 epresent-mode-hook
                 dashboard-mode-hook
                 package-menu-mode-hook))
-  (add-hook hook (lambda () (display-line-numbers-mode -1))))
+  (add-hook hook (lambda ()
+                   (display-line-numbers-mode -1))))
 
 (show-paren-mode 1)
 (set-face-attribute 'show-paren-match nil
@@ -759,7 +762,8 @@ This function has been altered to accommodate `exwm-mode'."
                                      "games"]
     "The names assigned to workspaces through `exwm-workspace-index-map'.")
   
-  (setq exwm-workspace-index-map (lambda (index) (elt farl-exwm/workspace-names index)))
+  (setq exwm-workspace-index-map (lambda (index)
+                                   (elt farl-exwm/workspace-names index)))
   (defun farl-exwm/list-workspaces ()
     "List EXWM workspaces."
     (exwm-workspace--update-switch-history)

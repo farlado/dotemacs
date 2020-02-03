@@ -582,6 +582,7 @@ Having the Emacs server running allows for a lot of neat integration with other 
 These buggers won't properly set unless it's done after ~early-init.el~, which is a real bummer.
 #+begin_src emacs-lisp
   (tooltip-mode -1)
+
   (setq use-dialog-box nil
         use-file-dialog nil)
 #+end_src
@@ -597,8 +598,9 @@ I like the default start screen, but it just doesn't cut it for me. I just use t
           inhibit-startup-screen t
           dashboard-items '((recents . 10))
           dashboard-startup-banner 'logo
-          initial-buffer-choice (lambda () (or (get-buffer "*dashboard*")
-                                               (get-buffer "*scratch*")))
+          initial-buffer-choice (lambda ()
+                                  (or (get-buffer "*dashboard*")
+                                      (get-buffer "*scratch*")))
           dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
     (dashboard-setup-startup-hook))
 #+end_src
@@ -770,7 +772,8 @@ I like having line numbers and indicators for lines past the EOF. However, I don
                   epresent-mode-hook
                   dashboard-mode-hook
                   package-menu-mode-hook))
-    (add-hook hook (lambda () (display-line-numbers-mode -1))))
+    (add-hook hook (lambda ()
+                     (display-line-numbers-mode -1))))
 #+end_src
 
 *** Highlight matching parentheses
@@ -1822,7 +1825,8 @@ No clue why you have to do so much just to give workspaces names, but at least y
                                      "games"]
     "The names assigned to workspaces through `exwm-workspace-index-map'.")
 
-  (setq exwm-workspace-index-map (lambda (index) (elt farl-exwm/workspace-names index)))
+  (setq exwm-workspace-index-map (lambda (index)
+                                   (elt farl-exwm/workspace-names index)))
 #+end_src
 
 *** Show a list of workspaces in the echo area
