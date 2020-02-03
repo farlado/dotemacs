@@ -2576,6 +2576,7 @@ This is super nice, because I love these key bindings and they are just intuitiv
 
                                      ;; Other
                                      ([?\C-d] . [delete])
+                                     ([?\M-d] . [C-delete])
                                      ([?\C-k] . [S-end delete])
                                      ([?\C-g] . [escape])))
 

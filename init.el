@@ -1326,6 +1326,7 @@ This function has been altered to accommodate `exwm-mode'."
   
                                      ;; Other
                                      ([?\C-d] . [delete])
+                                     ([?\M-d] . [C-delete])
                                      ([?\C-k] . [S-end delete])
                                      ([?\C-g] . [escape])))
   
