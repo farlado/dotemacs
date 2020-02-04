@@ -1115,7 +1115,7 @@ This function has been altered to accommodate `exwm-mode'."
                            (or keyboard-layout-1 keyboard-layout-2)))))
       (if new-layout
           (set-keyboard-layout new-layout)
-        (message "No keyboard layouts selected."))))
+        (message "No keyboard layouts set."))))
   
   (defun cycle-keyboard-layout-reverse ()
     "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3' in reverse."
@@ -1128,7 +1128,7 @@ This function has been altered to accommodate `exwm-mode'."
                            (or keyboard-layout-3 keyboard-layout-2)))))
       (if new-layout
           (set-keyboard-layout new-layout)
-        (message "No keyboard layouts selected."))))
+        (message "No keyboard layouts set."))))
   (defun suspend-computer ()
     (interactive)
     (and (yes-or-no-p "Really suspend? ")

@@ -2337,7 +2337,7 @@ Then, I use these functions to control setting and cycling the keyboard layout:
                            (or keyboard-layout-1 keyboard-layout-2)))))
       (if new-layout
           (set-keyboard-layout new-layout)
-        (message "No keyboard layouts selected."))))
+        (message "No keyboard layouts set."))))
 
   (defun cycle-keyboard-layout-reverse ()
     "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3' in reverse."
@@ -2350,7 +2350,7 @@ Then, I use these functions to control setting and cycling the keyboard layout:
                            (or keyboard-layout-3 keyboard-layout-2)))))
       (if new-layout
           (set-keyboard-layout new-layout)
-        (message "No keyboard layouts selected."))))
+        (message "No keyboard layouts set."))))
 #+end_src
 
 *** Suspending
