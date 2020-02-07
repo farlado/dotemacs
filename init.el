@@ -24,8 +24,7 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(unless pdumper-dumped
-  (require 'use-package))
+(pdumper-require 'use-package)
 (setq use-package-compute-statistics t)
 
 (use-package auto-package-update
@@ -37,8 +36,7 @@
         auto-package-update-delete-old-versions t)
   (auto-package-update-maybe))
 
-(unless pdumper-dumped
-  (require 'server))
+(pdumper-require 'server)
 
 (defun server-start-if-not-running ()
   "Call `server-start' if `server-running-p' returns nil."
@@ -93,8 +91,7 @@
     (set-frame-parameter frame 'alpha 90))
   (add-to-list 'default-frame-alist '(alpha . 90))
   ;; Load `org-mode' if it isn't dumped
-  (unless pdumper-dumped
-    (require 'org))
+  (pdumper-require 'org)
   ;; Title
   (set-face-attribute 'org-document-title nil
                       :weight 'extra-bold :height 1.8)
@@ -218,8 +215,7 @@
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(unless pdumper-dumped
-  (require 'ido))
+(pdumper-require 'ido)
 
 (setq ido-everywhere t
       ido-max-prospects 10
@@ -373,8 +369,7 @@ This function has been altered to accommodate `exwm-mode'."
   :ensure t
   :defer t
   :init
-  (unless pdumper-dumped
-    (require 'graphviz-dot-mode)))
+  (pdumper-require 'graphviz-dot-mode))
 
 (use-package markdown-mode
   :ensure t
@@ -397,8 +392,7 @@ This function has been altered to accommodate `exwm-mode'."
 (add-hook 'after-save-hook 'byte-compile-config-files 100)
 
 (when (executable-find "aspell")
-  (unless pdumper-dumped
-    (require 'flyspell))
+  (pdumper-require 'flyspell)
 
   (setq ispell-program-name "aspell"
         ispell-dictionary "american")
@@ -551,8 +545,7 @@ This function has been altered to accommodate `exwm-mode'."
                                    (not (or (string= lang "dot")
                                             (buffer-file-match "literate.*.org$")))))
 
-(unless pdumper-dumped
-  (require 'org-tempo))
+(pdumper-require 'org-tempo)
 (add-to-list 'org-modules 'org-tempo)
 (setq org-structure-template-alist '(;; General blocks
                                      ("c" . "center")
@@ -698,11 +691,10 @@ This function has been altered to accommodate `exwm-mode'."
   :defer t
   :init
   (setenv "_RUN_EXWM")
-  (unless pdumper-dumped
-    (require 'exwm)
-    (require 'exwm-randr)
-    (require 'exwm-config)
-    (require 'exwm-systemtray))
+  (pdumper-require 'exwm)
+  (pdumper-require 'exwm-randr)
+  (pdumper-require 'exwm-config)
+  (pdumper-require 'exwm-systemtray)
   (setq exwm-floating-border-width window-divider-default-right-width
         exwm-floating-border-color (face-attribute 'mode-line :background))
   (defun farl-exwm/name-buffer-after-window-title ()
@@ -714,8 +706,7 @@ This function has been altered to accommodate `exwm-mode'."
     :ensure t
     :defer t
     :init
-    (unless pdumper-dumped
-      (require 'exwm-edit))
+    (pdumper-require 'exwm-edit)
     :hook ((exwm-edit-compose . text-mode)))
   (use-package dmenu
     :ensure t
@@ -1376,8 +1367,7 @@ This function has been altered to accommodate `exwm-mode'."
   :ensure t
   :defer t
   :init
-  (unless pdumper-dumped
-    (require 'emms-setup))
+  (pdumper-require 'emms-setup)
   (require 'emms-player-mpd)
   (emms-all)
   (setq emms-seek-seconds 5

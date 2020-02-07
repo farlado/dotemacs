@@ -22,6 +22,13 @@
 (defvar pdumper-dumped nil
   "Non-nil if a custom dump image was loaded.")
 
+(defun pdumper-require (feature &optional filename noerror)
+  "Call `require' to load FEATURE if `pdumper-dumped' is nil.
+
+FILENAME and NOERROR are also passed to `require'."
+  (unless pdumper-dumped
+    (require feature filename noerror)))
+
 (when pdumper-dumped
   (setq load-path pdumper-load-path)
   (global-font-lock-mode)

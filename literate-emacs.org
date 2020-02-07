@@ -363,9 +363,17 @@ For some reason, the portable dumper has odd behaviors. This block is supposed t
 1. Recover ~load-path~ from the dump image
 2. Restore modes not preserved in the dump image
 3. Fix the scratch buffer
+4. Create a macro to ~require~ a feature only if ~pdumper-dumped~ is nil
 #+begin_src emacs-lisp
   (defvar pdumper-dumped nil
     "Non-nil if a custom dump image was loaded.")
+
+  (defun pdumper-require (feature &optional filename noerror)
+    "Call `require' to load FEATURE if `pdumper-dumped' is nil.
+
+  FILENAME and NOERROR are also passed to `require'."
+    (unless pdumper-dumped
+      (require feature filename noerror)))
 
   (when pdumper-dumped
     (setq load-path pdumper-load-path)
@@ -538,8 +546,7 @@ Since I manage all Emacs packages in Emacs itself, ~use-package~ makes it much e
     (package-refresh-contents)
     (package-install 'use-package))
 
-  (unless pdumper-dumped
-    (require 'use-package))
+  (pdumper-require 'use-package)
   (setq use-package-compute-statistics t)
 #+end_src
 
@@ -565,8 +572,7 @@ These are other startup specific things to be done after package management is f
 *** Start Emacs server
 Having the Emacs server running allows for a lot of neat integration with other parts of my desktop environment. However, I don't want it to start too soon.
 #+begin_src emacs-lisp
-  (unless pdumper-dumped
-    (require 'server))
+  (pdumper-require 'server)
 
   (defun server-start-if-not-running ()
     "Call `server-start' if `server-running-p' returns nil."
@@ -678,8 +684,7 @@ If there's a gimmick I can't get enough of, it's having a transparent frame.
 For some reason, theme creators don't really think of formatting ~org-mode~ past colors, so I have instead taken matters into my own hands. This way, I can use whatever color scheme I want with some peace of mind that at the least I don't have to look for ~org~-aware themes. +It also means I can override some of the dumber choices of ~org~-aware themes!+
 #+begin_src emacs-lisp :noweb-ref org-headers
   ;; Load `org-mode' if it isn't dumped
-  (unless pdumper-dumped
-    (require 'org))
+  (pdumper-require 'org)
   ;; Title
   (set-face-attribute 'org-document-title nil
                       :weight 'extra-bold :height 1.8)
@@ -687,22 +692,6 @@ For some reason, theme creators don't really think of formatting ~org-mode~ past
   (set-face-attribute 'org-level-1 nil :height 1.3)
   (set-face-attribute 'org-level-2 nil :height 1.1)
   (set-face-attribute 'org-level-3 nil :height 1.0)
-#+end_src
-
-*** On startup
-This main function is called in ~init.el~ to load the theme proper.
-#+begin_src emacs-lisp
-  (defun farl-init/theme ()
-    "Enable theme at startup, providing customizations for consistency."
-    (enable-theme 'dracula)
-    (when window-system
-      (farl-init/fringes-theme)
-      (farl-init/line-numbers-theme)
-      (farl-init/window-divider-theme)
-      (farl-init/transparency)
-      (farl-init/org-theme)
-      (global-rainbow-mode 1)
-      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
 #+end_src
 
 ** Mode line
@@ -928,8 +917,7 @@ Beauty in brevity.
 *** Enable ~ido-mode~, install ~smex~
 I /love/ ~ido-mode~.  Default =M-x= behavior doesn't use ~ido-mode~, so we install a package which gives it ~ido-mode~ capabilities. Since Emacs 27 broke the newest version of ~ido-vertical-mode~, I guess I'm SOL. Some other relevant binds are included.
 #+begin_src emacs-lisp
-  (unless pdumper-dumped
-    (require 'ido))
+  (pdumper-require 'ido)
 
   (setq ido-everywhere t
         ido-max-prospects 10
@@ -1169,8 +1157,7 @@ A nice way to make diagrams.
     :ensure t
     :defer t
     :init
-    (unless pdumper-dumped
-      (require 'graphviz-dot-mode)))
+    (pdumper-require 'graphviz-dot-mode))
 #+end_src
 
 *** ~markdown-mode~ (bootleg org-mode for GitHub)
@@ -1215,8 +1202,7 @@ These settings are specifically about editing text in general and making that ea
 Just a useful little tool to check spelling while editing a buffer. Only configured if ~aspell~ is installed. It's not super great, but it does the trick well enough for me.
 #+begin_src emacs-lisp
   (when (executable-find "aspell")
-    (unless pdumper-dumped
-      (require 'flyspell))
+    (pdumper-require 'flyspell)
 
     (setq ispell-program-name "aspell"
           ispell-dictionary "american")
@@ -1477,8 +1463,7 @@ Since obviously dot snippets are purely harmless +as far as I know+, I just don'
 *** Shortcuts for various snippets
 First, we load ~org-tempo~, the extension that allows the old way of doing things, and add it to ~org-modules~. Then, we add shortcuts for the individual blocks of code. Finally, we can add shortcuts for other items that aren't blocks. I've grown somewhat fond of this way of organizing my shortcuts, because it separates the blocks from the one-liners.
 #+begin_src emacs-lisp
-  (unless pdumper-dumped
-    (require 'org-tempo))
+  (pdumper-require 'org-tempo)
   (add-to-list 'org-modules 'org-tempo)
   (setq org-structure-template-alist '(;; General blocks
                                        ("c" . "center")
@@ -1700,11 +1685,10 @@ Yes, Emacs is my *entire desktop environment*. You should probably remove this e
     :defer t
     :init
     (setenv "_RUN_EXWM")
-    (unless pdumper-dumped
-      (require 'exwm)
-      (require 'exwm-randr)
-      (require 'exwm-config)
-      (require 'exwm-systemtray))
+    (pdumper-require 'exwm)
+    (pdumper-require 'exwm-randr)
+    (pdumper-require 'exwm-config)
+    (pdumper-require 'exwm-systemtray)
     <<window-management>>
     <<workspaces>>
     <<multihead>>
@@ -1743,8 +1727,7 @@ At first I questioned why I would do this, but now that I know the advantages of
     :ensure t
     :defer t
     :init
-    (unless pdumper-dumped
-      (require 'exwm-edit))
+    (pdumper-require 'exwm-edit)
     :hook ((exwm-edit-compose . text-mode)))
 #+end_src
 
@@ -2714,8 +2697,7 @@ I am big on doing as much in Emacs as possible. Having my music player moved to 
 ** Loading
 This loads the necessary files to ensure ~emms~ starts properly.
 #+begin_src emacs-lisp :noweb-ref emms-load
-  (unless pdumper-dumped
-    (require 'emms-setup))
+  (pdumper-require 'emms-setup)
   (require 'emms-player-mpd)
   (emms-all)
 #+end_src
