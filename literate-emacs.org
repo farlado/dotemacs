@@ -51,6 +51,7 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
   - [[#de-components][DE components]]
   - [[#keybindings][Keybindings]]
   - [[#on-startup][On startup]]
+  - [[#on-logout][On logout]]
 - [[#making-emacs-an-mpd-based-music-player][Making Emacs an ~mpd~-based music player]]
   - [[#loading][Loading]]
   - [[#functions][Functions]]
@@ -1710,7 +1711,8 @@ Yes, Emacs is my *entire desktop environment*. You should probably remove this e
     <<x-applications>>
     <<desktop-environment>>
     <<de-keys>>
-    <<init>>)
+    <<init>>
+    <<logout>>)
 #+end_src
 
 ** Window management
@@ -2680,6 +2682,19 @@ Some X windows will have weird cursors if this isn't done.
   (exwm-config-ido)
   (exwm-randr-enable)
   (exwm-systemtray-enable)
+#+end_src
+
+** On logout
+When exiting, these are things I want done.
+#+begin_src emacs-lisp :noweb yes :noweb-ref logout
+  (add-hook 'kill-emacs-hook (lambda ()
+                               <<on-logout>>))
+#+end_src
+
+*** Black out the root window
+This way, it looks good when exiting Emacs.
+#+begin_src emacs-lisp :noweb-ref on-logout
+  (shell-command "hsetroot -solid '#000000'")
 #+end_src
 
 * Making Emacs an ~mpd~-based music player

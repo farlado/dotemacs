@@ -1367,7 +1367,9 @@ This function has been altered to accommodate `exwm-mode'."
   (exwm-enable)
   (exwm-config-ido)
   (exwm-randr-enable)
-  (exwm-systemtray-enable))
+  (exwm-systemtray-enable)
+  (add-hook 'kill-emacs-hook (lambda ()
+                               (shell-command "hsetroot -solid '#000000'"))))
 
 (use-package emms
   :if (executable-find "mpd")
