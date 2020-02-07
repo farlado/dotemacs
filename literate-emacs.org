@@ -306,7 +306,6 @@ This will save much time later down the line.
                      exwm-config
                      exwm-systemtray
                      exwm-edit
-                     exwm-mff
                      dmenu
                      minibuffer-line
                      system-packages
@@ -481,7 +480,6 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
                                     ;; Desktop Environment
                                     exwm
                                     exwm-edit
-                                    exwm-mff
                                     dmenu
                                     minibuffer-line
                                     system-packages
@@ -1744,16 +1742,8 @@ At first I questioned why I would do this, but now that I know the advantages of
     :defer t
     :init
     (unless pdumper-dumped
-      (require 'exwm-edit)))
-#+end_src
-
-*** Mouse follows on focus change
-This is a setting I had back when I used ~dwm~. I really wanted it back so I'm glad I found this. When focus changes, unless the mouse caused the focus change, warp the mouse to the center of the newly focused window.
-#+begin_src emacs-lisp
-  (use-package exwm-mff
-    :ensure t
-    :defer t
-    :hook (exwm-init . exwm-mff-mode))
+      (require 'exwm-edit))
+    :hook ((exwm-edit-compose . text-mode)))
 #+end_src
 
 *** Getting a ~rofi~ equivalent

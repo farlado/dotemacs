@@ -107,7 +107,6 @@
                                   ;; Desktop Environment
                                   exwm
                                   exwm-edit
-                                  exwm-mff
                                   dmenu
                                   minibuffer-line
                                   system-packages

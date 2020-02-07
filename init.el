@@ -715,11 +715,8 @@ This function has been altered to accommodate `exwm-mode'."
     :defer t
     :init
     (unless pdumper-dumped
-      (require 'exwm-edit)))
-  (use-package exwm-mff
-    :ensure t
-    :defer t
-    :hook (exwm-init . exwm-mff-mode))
+      (require 'exwm-edit))
+    :hook ((exwm-edit-compose . text-mode)))
   (use-package dmenu
     :ensure t
     :defer t
