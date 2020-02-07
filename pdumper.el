@@ -69,7 +69,6 @@
                    exwm-config
                    exwm-systemtray
                    exwm-edit
-                   exwm-mff
                    dmenu
                    minibuffer-line
                    system-packages

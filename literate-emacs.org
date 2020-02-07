@@ -51,6 +51,7 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
   - [[#de-components][DE components]]
   - [[#keybindings][Keybindings]]
   - [[#on-startup][On startup]]
+  - [[#on-logout][On logout]]
 - [[#making-emacs-an-mpd-based-music-player][Making Emacs an ~mpd~-based music player]]
   - [[#loading][Loading]]
   - [[#functions][Functions]]
@@ -306,7 +307,6 @@ This will save much time later down the line.
                      exwm-config
                      exwm-systemtray
                      exwm-edit
-                     exwm-mff
                      dmenu
                      minibuffer-line
                      system-packages
@@ -363,9 +363,17 @@ For some reason, the portable dumper has odd behaviors. This block is supposed t
 1. Recover ~load-path~ from the dump image
 2. Restore modes not preserved in the dump image
 3. Fix the scratch buffer
+4. Create a function to ~require~ a feature only if ~pdumper-dumped~ is nil
 #+begin_src emacs-lisp
   (defvar pdumper-dumped nil
     "Non-nil if a custom dump image was loaded.")
+
+  (defun pdumper-require (feature &optional filename noerror)
+    "Call `require' to load FEATURE if `pdumper-dumped' is nil.
+
+  FILENAME and NOERROR are also passed to `require'."
+    (unless pdumper-dumped
+      (require feature filename noerror)))
 
   (when pdumper-dumped
     (setq load-path pdumper-load-path)
@@ -481,7 +489,6 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
                                     ;; Desktop Environment
                                     exwm
                                     exwm-edit
-                                    exwm-mff
                                     dmenu
                                     minibuffer-line
                                     system-packages
@@ -539,8 +546,7 @@ Since I manage all Emacs packages in Emacs itself, ~use-package~ makes it much e
     (package-refresh-contents)
     (package-install 'use-package))
 
-  (unless pdumper-dumped
-    (require 'use-package))
+  (pdumper-require 'use-package)
   (setq use-package-compute-statistics t)
 #+end_src
 
@@ -566,8 +572,7 @@ These are other startup specific things to be done after package management is f
 *** Start Emacs server
 Having the Emacs server running allows for a lot of neat integration with other parts of my desktop environment. However, I don't want it to start too soon.
 #+begin_src emacs-lisp
-  (unless pdumper-dumped
-    (require 'server))
+  (pdumper-require 'server)
 
   (defun server-start-if-not-running ()
     "Call `server-start' if `server-running-p' returns nil."
@@ -582,6 +587,7 @@ Having the Emacs server running allows for a lot of neat integration with other 
 These buggers won't properly set unless it's done after ~early-init.el~, which is a real bummer.
 #+begin_src emacs-lisp
   (tooltip-mode -1)
+
   (setq use-dialog-box nil
         use-file-dialog nil)
 #+end_src
@@ -597,8 +603,9 @@ I like the default start screen, but it just doesn't cut it for me. I just use t
           inhibit-startup-screen t
           dashboard-items '((recents . 10))
           dashboard-startup-banner 'logo
-          initial-buffer-choice (lambda () (or (get-buffer "*dashboard*")
-                                               (get-buffer "*scratch*")))
+          initial-buffer-choice (lambda ()
+                                  (or (get-buffer "*dashboard*")
+                                      (get-buffer "*scratch*")))
           dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
     (dashboard-setup-startup-hook))
 #+end_src
@@ -677,8 +684,7 @@ If there's a gimmick I can't get enough of, it's having a transparent frame.
 For some reason, theme creators don't really think of formatting ~org-mode~ past colors, so I have instead taken matters into my own hands. This way, I can use whatever color scheme I want with some peace of mind that at the least I don't have to look for ~org~-aware themes. +It also means I can override some of the dumber choices of ~org~-aware themes!+
 #+begin_src emacs-lisp :noweb-ref org-headers
   ;; Load `org-mode' if it isn't dumped
-  (unless pdumper-dumped
-    (require 'org))
+  (pdumper-require 'org)
   ;; Title
   (set-face-attribute 'org-document-title nil
                       :weight 'extra-bold :height 1.8)
@@ -686,22 +692,6 @@ For some reason, theme creators don't really think of formatting ~org-mode~ past
   (set-face-attribute 'org-level-1 nil :height 1.3)
   (set-face-attribute 'org-level-2 nil :height 1.1)
   (set-face-attribute 'org-level-3 nil :height 1.0)
-#+end_src
-
-*** On startup
-This main function is called in ~init.el~ to load the theme proper.
-#+begin_src emacs-lisp
-  (defun farl-init/theme ()
-    "Enable theme at startup, providing customizations for consistency."
-    (enable-theme 'dracula)
-    (when window-system
-      (farl-init/fringes-theme)
-      (farl-init/line-numbers-theme)
-      (farl-init/window-divider-theme)
-      (farl-init/transparency)
-      (farl-init/org-theme)
-      (global-rainbow-mode 1)
-      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
 #+end_src
 
 ** Mode line
@@ -770,7 +760,8 @@ I like having line numbers and indicators for lines past the EOF. However, I don
                   epresent-mode-hook
                   dashboard-mode-hook
                   package-menu-mode-hook))
-    (add-hook hook (lambda () (display-line-numbers-mode -1))))
+    (add-hook hook (lambda ()
+                     (display-line-numbers-mode -1))))
 #+end_src
 
 *** Highlight matching parentheses
@@ -926,8 +917,7 @@ Beauty in brevity.
 *** Enable ~ido-mode~, install ~smex~
 I /love/ ~ido-mode~.  Default =M-x= behavior doesn't use ~ido-mode~, so we install a package which gives it ~ido-mode~ capabilities. Since Emacs 27 broke the newest version of ~ido-vertical-mode~, I guess I'm SOL. Some other relevant binds are included.
 #+begin_src emacs-lisp
-  (unless pdumper-dumped
-    (require 'ido))
+  (pdumper-require 'ido)
 
   (setq ido-everywhere t
         ido-max-prospects 10
@@ -1167,8 +1157,7 @@ A nice way to make diagrams.
     :ensure t
     :defer t
     :init
-    (unless pdumper-dumped
-      (require 'graphviz-dot-mode)))
+    (pdumper-require 'graphviz-dot-mode))
 #+end_src
 
 *** ~markdown-mode~ (bootleg org-mode for GitHub)
@@ -1213,8 +1202,7 @@ These settings are specifically about editing text in general and making that ea
 Just a useful little tool to check spelling while editing a buffer. Only configured if ~aspell~ is installed. It's not super great, but it does the trick well enough for me.
 #+begin_src emacs-lisp
   (when (executable-find "aspell")
-    (unless pdumper-dumped
-      (require 'flyspell))
+    (pdumper-require 'flyspell)
 
     (setq ispell-program-name "aspell"
           ispell-dictionary "american")
@@ -1476,8 +1464,7 @@ Since obviously dot snippets are purely harmless +as far as I know+, I just don'
 *** Shortcuts for various snippets
 First, we load ~org-tempo~, the extension that allows the old way of doing things, and add it to ~org-modules~. Then, we add shortcuts for the individual blocks of code. Finally, we can add shortcuts for other items that aren't blocks. I've grown somewhat fond of this way of organizing my shortcuts, because it separates the blocks from the one-liners.
 #+begin_src emacs-lisp
-  (unless pdumper-dumped
-    (require 'org-tempo))
+  (pdumper-require 'org-tempo)
   (add-to-list 'org-modules 'org-tempo)
   (setq org-structure-template-alist '(;; General blocks
                                        ("c" . "center")
@@ -1700,18 +1687,18 @@ Yes, Emacs is my *entire desktop environment*. You should probably remove this e
     :defer t
     :init
     (setenv "_RUN_EXWM")
-    (unless pdumper-dumped
-      (require 'exwm)
-      (require 'exwm-randr)
-      (require 'exwm-config)
-      (require 'exwm-systemtray))
+    (pdumper-require 'exwm)
+    (pdumper-require 'exwm-randr)
+    (pdumper-require 'exwm-config)
+    (pdumper-require 'exwm-systemtray)
     <<window-management>>
     <<workspaces>>
     <<multihead>>
     <<x-applications>>
     <<desktop-environment>>
     <<de-keys>>
-    <<init>>)
+    <<init>>
+    <<logout>>)
 #+end_src
 
 ** Window management
@@ -1742,17 +1729,8 @@ At first I questioned why I would do this, but now that I know the advantages of
     :ensure t
     :defer t
     :init
-    (unless pdumper-dumped
-      (require 'exwm-edit)))
-#+end_src
-
-*** Mouse follows on focus change
-This is a setting I had back when I used ~dwm~. I really wanted it back so I'm glad I found this. When focus changes, unless the mouse caused the focus change, warp the mouse to the center of the newly focused window.
-#+begin_src emacs-lisp
-  (use-package exwm-mff
-    :ensure t
-    :defer t
-    :hook (exwm-init . exwm-mff-mode))
+    (pdumper-require 'exwm-edit)
+    :hook ((exwm-edit-compose . text-mode)))
 #+end_src
 
 *** Getting a ~rofi~ equivalent
@@ -1824,7 +1802,8 @@ No clue why you have to do so much just to give workspaces names, but at least y
                                      "games"]
     "The names assigned to workspaces through `exwm-workspace-index-map'.")
 
-  (setq exwm-workspace-index-map (lambda (index) (elt farl-exwm/workspace-names index)))
+  (setq exwm-workspace-index-map (lambda (index)
+                                   (elt farl-exwm/workspace-names index)))
 #+end_src
 
 *** Show a list of workspaces in the echo area
@@ -1850,7 +1829,7 @@ Because I now use so many workspaces, I need to be able to see what workspace I 
    :properties:
    :header-args: :noweb-ref multihead
    :end:
-Thankfully, EXWM comes with hooks to handle when monitors are connected and disconnected, so I can do monitor configuration entirely in Emacs Lisp. I have two laptops: a ThinkPad X230 and a ThinkPad W541. Each has different displays and is used for different purposes. Due to recent updates to Arch Linux and the fact that the original code here was a dumpster fire, this section had to be reworked.
+Thankfully, EXWM comes with hooks to handle when monitors are connected and disconnected, so I can do monitor configuration entirely in Emacs Lisp. I have two laptops: a ThinkPad X230 and a ThinkPad W541. Each has different displays and is used for different purposes. Due to now not-so-recent updates to Arch Linux and the fact that the original code here was a dumpster fire, this section had to be reworked.
 
 *** Getting the currently connected monitors
 The first thing to do is set up a function to return a list of currently connected monitors.
@@ -2335,7 +2314,7 @@ Then, I use these functions to control setting and cycling the keyboard layout:
                            (or keyboard-layout-1 keyboard-layout-2)))))
       (if new-layout
           (set-keyboard-layout new-layout)
-        (message "No keyboard layouts selected."))))
+        (message "No keyboard layouts set."))))
 
   (defun cycle-keyboard-layout-reverse ()
     "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3' in reverse."
@@ -2348,7 +2327,7 @@ Then, I use these functions to control setting and cycling the keyboard layout:
                            (or keyboard-layout-3 keyboard-layout-2)))))
       (if new-layout
           (set-keyboard-layout new-layout)
-        (message "No keyboard layouts selected."))))
+        (message "No keyboard layouts set."))))
 #+end_src
 
 *** Suspending
@@ -2574,6 +2553,7 @@ This is super nice, because I love these key bindings and they are just intuitiv
 
                                      ;; Other
                                      ([?\C-d] . [delete])
+                                     ([?\M-d] . [C-delete])
                                      ([?\C-k] . [S-end delete])
                                      ([?\C-g] . [escape])))
 
@@ -2689,6 +2669,19 @@ Some X windows will have weird cursors if this isn't done.
   (exwm-systemtray-enable)
 #+end_src
 
+** On logout
+When exiting, these are things I want done.
+#+begin_src emacs-lisp :noweb yes :noweb-ref logout
+  (add-hook 'kill-emacs-hook (lambda ()
+                               <<on-logout>>))
+#+end_src
+
+*** Black out the root window
+This way, it looks good when exiting Emacs.
+#+begin_src emacs-lisp :noweb-ref on-logout
+  (shell-command "hsetroot -solid '#000000'")
+#+end_src
+
 * Making Emacs an ~mpd~-based music player
 I am big on doing as much in Emacs as possible. Having my music player moved to Emacs was a HUGE step. When I first started using it, it was weird, but now I have come to absolutely love it. We only configure EMMS if ~mpd~ is found. Environment variables are set here as well.
 #+begin_src emacs-lisp :noweb yes :tangle (user-emacs-file "init.el")
@@ -2706,8 +2699,7 @@ I am big on doing as much in Emacs as possible. Having my music player moved to 
 ** Loading
 This loads the necessary files to ensure ~emms~ starts properly.
 #+begin_src emacs-lisp :noweb-ref emms-load
-  (unless pdumper-dumped
-    (require 'emms-setup))
+  (pdumper-require 'emms-setup)
   (require 'emms-player-mpd)
   (emms-all)
 #+end_src

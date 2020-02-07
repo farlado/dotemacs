@@ -24,8 +24,7 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(unless pdumper-dumped
-  (require 'use-package))
+(pdumper-require 'use-package)
 (setq use-package-compute-statistics t)
 
 (use-package auto-package-update
@@ -37,8 +36,7 @@
         auto-package-update-delete-old-versions t)
   (auto-package-update-maybe))
 
-(unless pdumper-dumped
-  (require 'server))
+(pdumper-require 'server)
 
 (defun server-start-if-not-running ()
   "Call `server-start' if `server-running-p' returns nil."
@@ -49,6 +47,7 @@
 (add-hook 'after-init-hook 'server-start-if-not-running)
 
 (tooltip-mode -1)
+
 (setq use-dialog-box nil
       use-file-dialog nil)
 
@@ -60,8 +59,9 @@
         inhibit-startup-screen t
         dashboard-items '((recents . 10))
         dashboard-startup-banner 'logo
-        initial-buffer-choice (lambda () (or (get-buffer "*dashboard*")
-                                             (get-buffer "*scratch*")))
+        initial-buffer-choice (lambda ()
+                                (or (get-buffer "*dashboard*")
+                                    (get-buffer "*scratch*")))
         dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
   (dashboard-setup-startup-hook))
 
@@ -91,8 +91,7 @@
     (set-frame-parameter frame 'alpha 90))
   (add-to-list 'default-frame-alist '(alpha . 90))
   ;; Load `org-mode' if it isn't dumped
-  (unless pdumper-dumped
-    (require 'org))
+  (pdumper-require 'org)
   ;; Title
   (set-face-attribute 'org-document-title nil
                       :weight 'extra-bold :height 1.8)
@@ -134,7 +133,8 @@
                 epresent-mode-hook
                 dashboard-mode-hook
                 package-menu-mode-hook))
-  (add-hook hook (lambda () (display-line-numbers-mode -1))))
+  (add-hook hook (lambda ()
+                   (display-line-numbers-mode -1))))
 
 (show-paren-mode 1)
 (set-face-attribute 'show-paren-match nil
@@ -215,8 +215,7 @@
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(unless pdumper-dumped
-  (require 'ido))
+(pdumper-require 'ido)
 
 (setq ido-everywhere t
       ido-max-prospects 10
@@ -370,8 +369,7 @@ This function has been altered to accommodate `exwm-mode'."
   :ensure t
   :defer t
   :init
-  (unless pdumper-dumped
-    (require 'graphviz-dot-mode)))
+  (pdumper-require 'graphviz-dot-mode))
 
 (use-package markdown-mode
   :ensure t
@@ -394,8 +392,7 @@ This function has been altered to accommodate `exwm-mode'."
 (add-hook 'after-save-hook 'byte-compile-config-files 100)
 
 (when (executable-find "aspell")
-  (unless pdumper-dumped
-    (require 'flyspell))
+  (pdumper-require 'flyspell)
 
   (setq ispell-program-name "aspell"
         ispell-dictionary "american")
@@ -549,8 +546,7 @@ This function has been altered to accommodate `exwm-mode'."
                                    (not (or (string= lang "dot")
                                             (buffer-file-match "literate.*.org$")))))
 
-(unless pdumper-dumped
-  (require 'org-tempo))
+(pdumper-require 'org-tempo)
 (add-to-list 'org-modules 'org-tempo)
 (setq org-structure-template-alist '(;; General blocks
                                      ("c" . "center")
@@ -697,11 +693,10 @@ This function has been altered to accommodate `exwm-mode'."
   :defer t
   :init
   (setenv "_RUN_EXWM")
-  (unless pdumper-dumped
-    (require 'exwm)
-    (require 'exwm-randr)
-    (require 'exwm-config)
-    (require 'exwm-systemtray))
+  (pdumper-require 'exwm)
+  (pdumper-require 'exwm-randr)
+  (pdumper-require 'exwm-config)
+  (pdumper-require 'exwm-systemtray)
   (setq exwm-floating-border-width window-divider-default-right-width
         exwm-floating-border-color (face-attribute 'mode-line :background))
   (defun farl-exwm/name-buffer-after-window-title ()
@@ -713,12 +708,8 @@ This function has been altered to accommodate `exwm-mode'."
     :ensure t
     :defer t
     :init
-    (unless pdumper-dumped
-      (require 'exwm-edit)))
-  (use-package exwm-mff
-    :ensure t
-    :defer t
-    :hook (exwm-init . exwm-mff-mode))
+    (pdumper-require 'exwm-edit)
+    :hook ((exwm-edit-compose . text-mode)))
   (use-package dmenu
     :ensure t
     :defer t
@@ -761,7 +752,8 @@ This function has been altered to accommodate `exwm-mode'."
                                      "games"]
     "The names assigned to workspaces through `exwm-workspace-index-map'.")
   
-  (setq exwm-workspace-index-map (lambda (index) (elt farl-exwm/workspace-names index)))
+  (setq exwm-workspace-index-map (lambda (index)
+                                   (elt farl-exwm/workspace-names index)))
   (defun farl-exwm/list-workspaces ()
     "List EXWM workspaces."
     (exwm-workspace--update-switch-history)
@@ -1113,7 +1105,7 @@ This function has been altered to accommodate `exwm-mode'."
                            (or keyboard-layout-1 keyboard-layout-2)))))
       (if new-layout
           (set-keyboard-layout new-layout)
-        (message "No keyboard layouts selected."))))
+        (message "No keyboard layouts set."))))
   
   (defun cycle-keyboard-layout-reverse ()
     "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3' in reverse."
@@ -1126,7 +1118,7 @@ This function has been altered to accommodate `exwm-mode'."
                            (or keyboard-layout-3 keyboard-layout-2)))))
       (if new-layout
           (set-keyboard-layout new-layout)
-        (message "No keyboard layouts selected."))))
+        (message "No keyboard layouts set."))))
   (defun suspend-computer ()
     (interactive)
     (and (yes-or-no-p "Really suspend? ")
@@ -1324,6 +1316,7 @@ This function has been altered to accommodate `exwm-mode'."
   
                                      ;; Other
                                      ([?\C-d] . [delete])
+                                     ([?\M-d] . [C-delete])
                                      ([?\C-k] . [S-end delete])
                                      ([?\C-g] . [escape])))
   
@@ -1367,15 +1360,16 @@ This function has been altered to accommodate `exwm-mode'."
   (exwm-enable)
   (exwm-config-ido)
   (exwm-randr-enable)
-  (exwm-systemtray-enable))
+  (exwm-systemtray-enable)
+  (add-hook 'kill-emacs-hook (lambda ()
+                               (shell-command "hsetroot -solid '#000000'"))))
 
 (use-package emms
   :if (executable-find "mpd")
   :ensure t
   :defer t
   :init
-  (unless pdumper-dumped
-    (require 'emms-setup))
+  (pdumper-require 'emms-setup)
   (require 'emms-player-mpd)
   (emms-all)
   (setq emms-seek-seconds 5
