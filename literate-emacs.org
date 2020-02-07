@@ -363,7 +363,7 @@ For some reason, the portable dumper has odd behaviors. This block is supposed t
 1. Recover ~load-path~ from the dump image
 2. Restore modes not preserved in the dump image
 3. Fix the scratch buffer
-4. Create a macro to ~require~ a feature only if ~pdumper-dumped~ is nil
+4. Create a function to ~require~ a feature only if ~pdumper-dumped~ is nil
 #+begin_src emacs-lisp
   (defvar pdumper-dumped nil
     "Non-nil if a custom dump image was loaded.")
