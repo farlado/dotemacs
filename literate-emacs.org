@@ -1221,6 +1221,7 @@ Just a useful little tool to check spelling while editing a buffer. Only configu
 
     (add-hook 'flyspell-mode-hook 'flyspell-buffer)
     (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+    (add-hook 'conf-mode-hook 'flyspell-prog-mode)
     (add-hook 'text-mode-hook 'flyspell-mode))
 #+end_src
 
@@ -1498,6 +1499,7 @@ First, we load ~org-tempo~, the extension that allows the old way of doing thing
                                        ("cu"  . "src conf-unix")
                                        ("cs"  . "src conf-space")
                                        ("cx"  . "src conf-xdefaults")
+                                       ("cjp" . "src conf-javaprop")
                                        ("el"  . "src emacs-lisp")
                                        ("py"  . "src python")
                                        ("dot" . "src dot :cmdline -Kdot -Tpng :file")

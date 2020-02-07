@@ -402,6 +402,7 @@ This function has been altered to accommodate `exwm-mode'."
 
   (add-hook 'flyspell-mode-hook 'flyspell-buffer)
   (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+  (add-hook 'conf-mode-hook 'flyspell-prog-mode)
   (add-hook 'text-mode-hook 'flyspell-mode))
 
 (use-package swiper
@@ -571,6 +572,7 @@ This function has been altered to accommodate `exwm-mode'."
                                      ("cu"  . "src conf-unix")
                                      ("cs"  . "src conf-space")
                                      ("cx"  . "src conf-xdefaults")
+                                     ("cjp" . "src conf-javaprop")
                                      ("el"  . "src emacs-lisp")
                                      ("py"  . "src python")
                                      ("dot" . "src dot :cmdline -Kdot -Tpng :file")
