@@ -15,14 +15,6 @@
 (require 'package)
 (package-initialize)
 
-(when (assoc-delete-all "lo" (network-interface-list))
-  (if (package-installed-p 'auto-package-update)
-      (require 'auto-package-update)
-    (progn
-      (package-refresh-contents)
-      (package-install 'auto-package-update)))
-  (auto-package-update-now))
-
 (setq pdumper-load-path load-path
       pdumper-dumped t)
 
@@ -34,10 +26,11 @@
 
                    ;; Looks
                    dashboard
-                   dracula-theme
-                   mood-line
                    rainbow-mode
                    rainbow-delimiters
+                   mini-modeline
+                   diminish
+                   leuven-theme
 
                    ;; Functionality
                    company
@@ -78,7 +71,6 @@
                    exwm-systemtray
                    exwm-edit
                    dmenu
-                   minibuffer-line
                    system-packages
                    desktop-environment
 
@@ -98,7 +90,7 @@
                    2048-game))
     (require package))
 
-(load-theme 'dracula t t)
+(load-theme 'leuven t t)
 
 (dump-emacs-portable (expand-file-name "emacs.pdmp" user-emacs-directory))
 

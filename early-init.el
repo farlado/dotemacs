@@ -16,9 +16,6 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
-(when (getenv "_RUN_EXWM")
-  (set-face-background 'default "#282a36"))
-
 (defvar pdumper-dumped nil
   "Non-nil if a custom dump image was loaded.")
 
@@ -77,10 +74,11 @@ FILENAME and NOERROR are also passed to `require'."
 
                                   ;; Looks
                                   dashboard
-                                  dracula-theme
-                                  mood-line
                                   rainbow-mode
                                   rainbow-delimiters
+                                  mini-modeline
+                                  diminish
+                                  leuven-theme
 
                                   ;; Functionality
                                   company
@@ -115,7 +113,6 @@ FILENAME and NOERROR are also passed to `require'."
                                   exwm
                                   exwm-edit
                                   dmenu
-                                  minibuffer-line
                                   system-packages
                                   desktop-environment
 

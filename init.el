@@ -46,8 +46,6 @@
 
 (add-hook 'after-init-hook 'server-start-if-not-running)
 
-(tooltip-mode -1)
-
 (setq use-dialog-box nil
       use-file-dialog nil)
 
@@ -58,7 +56,7 @@
   (setq dashboard-set-footer nil
         inhibit-startup-screen t
         dashboard-items '((recents . 10))
-        dashboard-startup-banner 'logo
+        dashboard-startup-banner 'official
         initial-buffer-choice (lambda ()
                                 (or (get-buffer "*dashboard*")
                                     (get-buffer "*scratch*")))
@@ -71,70 +69,74 @@
 (when (member "Noto Color Emoji" (font-family-list))
   (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
 
-(use-package dracula-theme
+(use-package mini-modeline
+  :if window-system
   :ensure t
   :defer t
   :init
-  (if pdumper-dumped
-      (enable-theme 'dracula)
-    (load-theme 'dracula t))
-  (set-face-background 'fringe (face-attribute 'default :background))
-  (fringe-mode 10)
-  (setq window-divider-default-right-width 3)
-  (let ((color (face-attribute 'mode-line :background)))
-    (set-face-foreground 'window-divider-first-pixel color)
-    (set-face-foreground 'window-divider-last-pixel color)
-    (set-face-foreground 'window-divider color))
-  (window-divider-mode 1)
-  (set-face-background 'line-number (face-attribute 'default :background))
-  (dolist (frame (frame-list))
-    (set-frame-parameter frame 'alpha 90))
-  (add-to-list 'default-frame-alist '(alpha . 90))
-  ;; Load `org-mode' if it isn't dumped
-  (pdumper-require 'org)
-  ;; Title
-  (set-face-attribute 'org-document-title nil
-                      :weight 'extra-bold :height 1.8)
-  ;; Headers
-  (set-face-attribute 'org-level-1 nil :height 1.3)
-  (set-face-attribute 'org-level-2 nil :height 1.1)
-  (set-face-attribute 'org-level-3 nil :height 1.0))
-
-(use-package mood-line
-  :ensure t
-  :defer t
-  :init
-  (mood-line-mode 1)
-  (set-face-attribute 'mode-line nil :box nil)
-  (set-face-attribute 'mode-line-inactive nil :box nil)
+  (setq mini-modeline-truncate-p nil
+        mini-modeline-r-format '("%e" mode-line-front-space
+                                 mode-line-mule-info
+                                 mode-line-client
+                                 mode-line-modified
+                                 mode-line-remote
+                                 mode-line-frame-identification
+                                 mode-line-buffer-identification
+                                 " " mode-line-position
+                                 (vc-mode vc-mode) " "
+                                 mode-line-modes
+                                 mode-line-misc-info
+                                 mode-line-end-spaces))
+  (when window-system
+    (mini-modeline-mode 1))
+  (use-package diminish
+    :ensure t
+    :defer t
+    :init
+    (defun farl-init/diminish-modes ()
+      "Diminish various minor modes."
+      (dolist (mode '(rainbow-mode
+                      company-mode
+                      subword-mode
+                      flyspell-mode
+                      which-key-mode
+                      visual-line-mode
+                      mini-modeline-mode
+                      hungry-delete-mode
+                      page-break-lines-mode
+                      desktop-environment-mode
+                      highlight-indent-guides-mode))
+        (diminish mode)))
+    (add-hook 'after-init-hook 'farl-init/diminish-modes))
   (setq display-time-24hr-format t)
   (display-time-mode 1)
   (display-battery-mode 1)
   (line-number-mode 1)
   (column-number-mode 1))
 
+(use-package leuven-theme
+  :ensure t
+  :defer t
+  :init
+  (enable-theme 'leuven)
+  (set-face-background 'fringe (face-attribute 'default :background))
+  (fringe-mode 10)
+  (set-face-foreground 'mode-line-buffer-id (face-attribute 'default :foreground))
+  (set-face-background 'line-number (face-attribute 'default :background))
+  (setq window-divider-default-right-width 3
+        window-divider-default-bottom-width 3)
+  (let ((color (face-attribute 'mode-line :background)))
+    (set-face-foreground 'window-divider-first-pixel color)
+    (set-face-foreground 'window-divider-last-pixel color)
+    (set-face-foreground 'window-divider color))
+  (window-divider-mode 1))
+
 (global-page-break-lines-mode 1)
 
-(global-display-line-numbers-mode 1)
+(add-hook 'text-mode-hook 'display-line-numbers-mode)
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+(add-hook 'conf-mode-hook 'display-line-numbers-mode)
 (setq-default indicate-empty-lines t)
-
-(dolist (hook '(Man-mode-hook
-                nov-mode-hook
-                help-mode-hook
-                shell-mode-hook
-                term-mode-hook
-                vterm-mode-hook
-                shell-mode-hook
-                snake-mode-hook
-                tetris-mode-hook
-                sudoku-mode-hook
-                custom-mode-hook
-                ibuffer-mode-hook
-                epresent-mode-hook
-                dashboard-mode-hook
-                package-menu-mode-hook))
-  (add-hook hook (lambda ()
-                   (display-line-numbers-mode -1))))
 
 (show-paren-mode 1)
 (set-face-attribute 'show-paren-match nil
@@ -147,9 +149,7 @@
   :if window-system
   :ensure t
   :defer t
-  :init
-  (define-globalized-minor-mode global-rainbow-mode rainbow-mode rainbow-mode)
-  :hook (after-init . global-rainbow-mode))
+  :hook (prog-mode . rainbow-mode))
 
 (use-package rainbow-delimiters
   :ensure t
@@ -260,7 +260,9 @@ This function has been altered to accommodate `exwm-mode'."
   (interactive)
   (let ((window-to-delete (selected-window))
         (buffer-to-kill (current-buffer))
-        (delete-window-hook (lambda () (ignore-errors (delete-window)))))
+        (delete-window-hook (lambda ()
+                              (ignore-errors
+                                (delete-window)))))
     (unwind-protect
         (progn
           (add-hook 'kill-buffer-hook delete-window-hook t t)
@@ -497,8 +499,7 @@ This function has been altered to accommodate `exwm-mode'."
 (use-package flycheck
   :ensure t
   :defer t
-  :init
-  (global-flycheck-mode 1))
+  :hook (prog-mode . flycheck-mode))
 
 (use-package avy-flycheck
   :ensure t
@@ -637,8 +638,6 @@ This function has been altered to accommodate `exwm-mode'."
 (setq calendar-week-start-day 1)
 (global-set-key (kbd "C-c l") 'calendar)
 
-(global-set-key (kbd "C-c c") 'calc)
-
 (global-set-key (kbd "C-h 4 m") 'man)
 (global-set-key (kbd "C-h 4 w") 'woman)
 
@@ -754,20 +753,15 @@ This function has been altered to accommodate `exwm-mode'."
   
   (setq exwm-workspace-index-map (lambda (index)
                                    (elt farl-exwm/workspace-names index)))
-  (defun farl-exwm/list-workspaces ()
-    "List EXWM workspaces."
+  (defun farl-exwm/echo-area ()
+    "Show `mini-modeline--msg' or EXWM workspaces."
     (exwm-workspace--update-switch-history)
-    (elt exwm-workspace--switch-history
-         (exwm-workspace--position exwm-workspace--current)))
+    (or mini-modeline--msg
+        (elt exwm-workspace--switch-history
+             (exwm-workspace--position
+              exwm-workspace--current))))
   
-  (use-package minibuffer-line
-    :ensure t
-    :defer t
-    :init
-    (minibuffer-line-mode 1)
-    (set-face-attribute 'minibuffer-line nil :inherit 'default)
-    (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
-    (add-hook 'exwm-workspace-switch-hook 'minibuffer-line--update))
+  (setq mini-modeline-l-format '("%e" (:eval (format "%s" (farl-exwm/echo-area)))))
   (defun get-connected-monitors ()
     "Return a list of the currently connected monitors."
     (split-string
@@ -844,11 +838,6 @@ This function has been altered to accommodate `exwm-mode'."
     ;; Keyboard
     (start-process "Keyboard Setup" nil "setxkbmap"
                    "-option" "ctrl:nocaps"))
-  (defun set-wallpaper ()
-    "Set the wallpaper."
-    (start-process "Wallpaper" nil "feh"
-                   "--no-fehbg" "--bg-fill"
-                   (user-config-file ".wallpaper.png")))
   (defun display-and-dock-setup ()
     "Configure displays and dock if applicable."
     (interactive)
@@ -857,8 +846,7 @@ This function has been altered to accommodate `exwm-mode'."
           (display-setup-x230)
         (progn
           (display-setup-w541)
-          (peripheral-setup))))
-      (set-wallpaper))
+          (peripheral-setup)))))
   
   (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
   (defun run-gimp ()
@@ -1143,8 +1131,9 @@ This function has been altered to accommodate `exwm-mode'."
     (let ((confirm confirm-kill-emacs))
       (and
        (or (not (memq t (mapcar (function
-                                 (lambda (buf) (and (buffer-file-name buf)
-                                                    (buffer-modified-p buf))))
+                                 (lambda (buf)
+                                   (and (buffer-file-name buf)
+                                        (buffer-modified-p buf))))
                                 (buffer-list))))
            (progn (setq confirm nil)
                   (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
@@ -1196,8 +1185,9 @@ This function has been altered to accommodate `exwm-mode'."
     (let ((confirm confirm-kill-emacs))
       (and
        (or (not (memq t (mapcar (function
-                                 (lambda (buf) (and (buffer-file-name buf)
-                                                    (buffer-modified-p buf))))
+                                 (lambda (buf)
+                                   (and (buffer-file-name buf)
+                                        (buffer-modified-p buf))))
                                 (buffer-list))))
            (progn (setq confirm nil)
                   (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
