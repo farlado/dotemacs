@@ -2666,8 +2666,11 @@ Some X windows will have weird cursors if this isn't done.
 ** On logout
 When exiting, these are things I want done.
 #+begin_src emacs-lisp :noweb yes :noweb-ref logout
-  (add-hook 'kill-emacs-hook (lambda ()
-                               <<on-logout>>))
+  (defun farl-exwm/on-logout ()
+    "Run this when logging out as part of `kill-emacs-hook'."
+    <<on-logout>>)
+
+  (add-hook 'kill-emacs-hook 'farl-exwm/on-logout)
 #+end_src
 
 *** Black out the root window

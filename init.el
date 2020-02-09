@@ -1359,8 +1359,11 @@ This function has been altered to accommodate `exwm-mode'."
   (exwm-config-ido)
   (exwm-randr-enable)
   (exwm-systemtray-enable)
-  (add-hook 'kill-emacs-hook (lambda ()
-                               (shell-command "hsetroot -solid '#000000'"))))
+  (defun farl-exwm/on-logout ()
+    "Run this when logging out as part of `kill-emacs-hook'."
+    (shell-command "hsetroot -solid '#000000'"))
+  
+  (add-hook 'kill-emacs-hook 'farl-exwm/on-logout))
 
 (use-package emms
   :if (executable-find "mpd")
