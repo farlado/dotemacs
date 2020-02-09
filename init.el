@@ -1291,7 +1291,12 @@ This function has been altered to accommodate `exwm-mode'."
                                  ([XF86AudioPrev] . emms-previous)
                                  ([XF86AudioPlay] . emms-pause)
                                  ([XF86AudioStop] . emms-stop)))
-  (setq exwm-input-simulation-keys '(;; Navigation
+  (setq exwm-input-simulation-keys `(;; Navigation
+                                     ([?\C-a] . [home])
+                                     ([?\C-e] . [end])
+                                     ([?\C-v] . [next])
+                                     ([?\M-v] . [prior])
+  
                                      ([?\C-b] . [left])
                                      ([?\C-f] . [right])
                                      ([?\C-p] . [up])
@@ -1299,13 +1304,14 @@ This function has been altered to accommodate `exwm-mode'."
   
                                      ([?\M-b] . [C-left])
                                      ([?\M-f] . [C-right])
-                                     ([?\M-p] . [C-up])
                                      ([?\M-n] . [C-down])
+                                     ([?\M-p] . [C-up])
   
-                                     ([?\C-a] . [home])
-                                     ([?\C-e] . [end])
-                                     ([?\C-v] . [next])
-                                     ([?\M-v] . [prior])
+                                     ;; Selecting via navigation
+                                     (,(kbd "C-S-b") . [S-left])
+                                     (,(kbd "C-S-f") . [S-right])
+                                     (,(kbd "C-S-n") . [S-down])
+                                     (,(kbd "C-S-p") . [S-up])
   
                                      ;; Copy/Paste
                                      ([?\C-w] . [?\C-x])

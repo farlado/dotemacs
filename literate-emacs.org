@@ -246,6 +246,18 @@ No need to go overboard here, just load package management.
   (package-initialize)
 #+end_src
 
+*** Update packages
+Because every package update means the need for a new dump image, it is paramount we ensure the newest versions are installed. Before we can even do that, we need to ensure the package that allows batch updating is installed. Only do all this if we're connected to the internet.
+#+begin_src emacs-lisp
+  (when (assoc-delete-all "lo" (network-interface-list))
+    (if (package-installed-p 'auto-package-update)
+        (require 'auto-package-update)
+      (progn
+        (package-refresh-contents)
+        (package-install 'auto-package-update)))
+    (auto-package-update-now))
+#+end_src
+
 *** Store ~load-path
 For some reason, the dump image doesn't store ~load-path~, so it needs to be stored here.
 #+begin_src emacs-lisp
@@ -2528,7 +2540,12 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 *** Emacs key bindings in X windows
 This is super nice, because I love these key bindings and they are just intuitive to me, and now they can carry over safely to other programs.
 #+begin_src emacs-lisp
-  (setq exwm-input-simulation-keys '(;; Navigation
+  (setq exwm-input-simulation-keys `(;; Navigation
+                                     ([?\C-a] . [home])
+                                     ([?\C-e] . [end])
+                                     ([?\C-v] . [next])
+                                     ([?\M-v] . [prior])
+
                                      ([?\C-b] . [left])
                                      ([?\C-f] . [right])
                                      ([?\C-p] . [up])
@@ -2536,13 +2553,14 @@ This is super nice, because I love these key bindings and they are just intuitiv
 
                                      ([?\M-b] . [C-left])
                                      ([?\M-f] . [C-right])
-                                     ([?\M-p] . [C-up])
                                      ([?\M-n] . [C-down])
+                                     ([?\M-p] . [C-up])
 
-                                     ([?\C-a] . [home])
-                                     ([?\C-e] . [end])
-                                     ([?\C-v] . [next])
-                                     ([?\M-v] . [prior])
+                                     ;; Selecting via navigation
+                                     (,(kbd "C-S-b") . [S-left])
+                                     (,(kbd "C-S-f") . [S-right])
+                                     (,(kbd "C-S-n") . [S-down])
+                                     (,(kbd "C-S-p") . [S-up])
 
                                      ;; Copy/Paste
                                      ([?\C-w] . [?\C-x])

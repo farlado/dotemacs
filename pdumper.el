@@ -15,6 +15,14 @@
 (require 'package)
 (package-initialize)
 
+(when (assoc-delete-all "lo" (network-interface-list))
+  (if (package-installed-p 'auto-package-update)
+      (require 'auto-package-update)
+    (progn
+      (package-refresh-contents)
+      (package-install 'auto-package-update)))
+  (auto-package-update-now))
+
 (setq pdumper-load-path load-path
       pdumper-dumped t)
 
