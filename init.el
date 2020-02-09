@@ -118,7 +118,9 @@
   :ensure t
   :defer t
   :init
-  (enable-theme 'leuven)
+  (if pdumper-dumped
+      (enable-theme 'leuven)
+    (load-theme 'leuven t))
   (set-face-background 'fringe (face-attribute 'default :background))
   (fringe-mode 10)
   (set-face-foreground 'mode-line-buffer-id (face-attribute 'default :foreground))

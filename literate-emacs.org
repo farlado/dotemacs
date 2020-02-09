@@ -700,7 +700,9 @@ Leuven is absolutely unbeatable. There is very little that I actually have to ch
     :ensure t
     :defer t
     :init
-    (enable-theme 'leuven)
+    (if pdumper-dumped
+        (enable-theme 'leuven)
+      (load-theme 'leuven t))
     <<fringes>>
     <<mode-line>>
     <<line-numbers>>
