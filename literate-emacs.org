@@ -25,10 +25,10 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
   - [[#later-package-management][Later package management]]
   - [[#final-considerations][Final considerations]]
 - [[#making-emacs-much-less-ugly][Making Emacs much less ugly]]
-  - [[#font-style][Font style]]
+  - [[#font][Font]]
+  - [[#theme][Theme]]
   - [[#mode-line][Mode line]]
-  - [[#leuven][Leuven]]
-  - [[#other][Other]]
+  - [[#in-buffers][In buffers]]
 - [[#making-emacs-more-comfortable][Making Emacs more comfortable]]
   - [[#general-functionality][General functionality]]
   - [[#bufferswindows][Buffers/windows]]
@@ -264,11 +264,10 @@ This will save much time later down the line.
 
                      ;; Looks
                      dashboard
+                     dracula-theme
+                     mood-line
                      rainbow-mode
                      rainbow-delimiters
-                     mini-modeline
-                     diminish
-                     leuven-theme
 
                      ;; Functionality
                      company
@@ -309,6 +308,7 @@ This will save much time later down the line.
                      exwm-systemtray
                      exwm-edit
                      dmenu
+                     minibuffer-line
                      system-packages
                      desktop-environment
 
@@ -332,7 +332,7 @@ This will save much time later down the line.
 *** Pre-load the theme
 This saves a lot of time.
 #+begin_src emacs-lisp
-  (load-theme 'leuven t t)
+  (load-theme 'dracula t t)
 #+end_src
 
 *** Write the dump image
@@ -353,6 +353,9 @@ I want to get GUI elements out of my face as soon as I possibly can. They just t
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
+
+  (when (getenv "_RUN_EXWM")
+    (set-face-background 'default "#282a36"))
 #+end_src
 
 *** Handling portable dumping
@@ -449,11 +452,10 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
 
                                     ;; Looks
                                     dashboard
+                                    dracula-theme
+                                    mood-line
                                     rainbow-mode
                                     rainbow-delimiters
-                                    mini-modeline
-                                    diminish
-                                    leuven-theme
 
                                     ;; Functionality
                                     company
@@ -488,6 +490,7 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
                                     exwm
                                     exwm-edit
                                     dmenu
+                                    minibuffer-line
                                     system-packages
                                     desktop-environment
 
@@ -583,6 +586,8 @@ Having the Emacs server running allows for a lot of neat integration with other 
 *** Prepare GUI (Part 2)
 These buggers won't properly set unless it's done after ~early-init.el~, which is a real bummer.
 #+begin_src emacs-lisp
+  (tooltip-mode -1)
+
   (setq use-dialog-box nil
         use-file-dialog nil)
 #+end_src
@@ -597,7 +602,7 @@ I like the default start screen, but it just doesn't cut it for me. I just use t
     (setq dashboard-set-footer nil
           inhibit-startup-screen t
           dashboard-items '((recents . 10))
-          dashboard-startup-banner 'official
+          dashboard-startup-banner 'logo
           initial-buffer-choice (lambda ()
                                   (or (get-buffer "*dashboard*")
                                       (get-buffer "*scratch*")))
@@ -608,12 +613,12 @@ I like the default start screen, but it just doesn't cut it for me. I just use t
 * Making Emacs much less ugly
 Stock Emacs is /ugly/. Just straight up ugly. Suffice to say it leaves much to be desired.
 
-** Font style
+** Font
    :properties:
    :header-args: :tangle (user-emacs-file "init.el")
    :end:
-*** Setting the main font style
-Originally I had this set up through ~customize~, but frankly that is far more difficult to configure than this method. Determine whether my preferred font is present on the system and set it if present. Otherwise, keep whatever default font Emacs chooses. We also set the font size here.
+*** Setting the font style
+Originally I had this set up by means of ~custom-set-faces~, but frankly that is less easily configured than this method. First, we determine whether my preferred font is present on the system and set it if present. Otherwise, keep whatever default font Emacs chooses. We also set the font size here.
 #+begin_src emacs-lisp
   (when (member "Iosevka" (font-family-list))
     (set-face-attribute 'default nil :font "Iosevka" :height 100))
@@ -626,56 +631,87 @@ God does this one feel great to have now that I use an Emacs version that can ha
     (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
 #+end_src
 
-** Mode line
-I've used many different mode lines, but personally I think the best one is not having a mode line to begin with, and instead having information in the echo area. This package does has some.... interesting side effects, but none that are too worrying and only really affect terminals.
+** Theme
+For a long time, I used Leuven for my theme. Nowadays, I don't. It was a brilliant theme, but just didn't work when I needed a new mode line.
 #+begin_src emacs-lisp :noweb yes :tangle (user-emacs-file "init.el")
-  (use-package mini-modeline
-    :if window-system
-    :ensure t
-    :defer t
-    :init
-    (setq mini-modeline-truncate-p nil
-          mini-modeline-r-format '("%e" mode-line-front-space
-                                   mode-line-mule-info
-                                   mode-line-client
-                                   mode-line-modified
-                                   mode-line-remote
-                                   mode-line-frame-identification
-                                   mode-line-buffer-identification
-                                   " " mode-line-position
-                                   (vc-mode vc-mode) " "
-                                   mode-line-modes
-                                   mode-line-misc-info
-                                   mode-line-end-spaces))
-    (when window-system
-      (mini-modeline-mode 1))
-    <<diminish-modes>>
-    <<clock-and-battery>>
-    <<lines-and-columns>>)
+    (use-package dracula-theme
+      :ensure t
+      :defer t
+      :init
+      (if pdumper-dumped
+          (enable-theme 'dracula)
+        (load-theme 'dracula t))
+      <<fringes>>
+      <<line-numbers>>
+      <<window-dividers>>
+      <<transparent-frames>>
+      <<better-org-mode-headers>>)
 #+end_src
 
-*** Hide minor modes I don't care about
-These just take up space and make the status area jitter like crazy. I know what modes I use, so I don't need to CONSTANTLY see them.
-#+begin_src emacs-lisp :noweb-ref diminish-modes
-  (use-package diminish
+*** Fringes
+Having fringes helps keep things looking good and gives the opportunity to have nice indicators on the edges of buffers. I prefer when fringes are the same color as the rest of the window.
+#+begin_src emacs-lisp :noweb-ref fringes
+  (set-face-background 'fringe (face-attribute 'default :background))
+  (fringe-mode 10)
+#+end_src
+
+*** Line numbers
+For some reason, some themes like to give line numbers a different background from the rest of a window. I hate that.
+#+begin_src emacs-lisp :noweb-ref line-numbers
+  (set-face-background 'line-number (face-attribute 'default :background))
+#+end_src
+
+*** Window dividers
+Windows dividers make Emacs look far less sloppy. The color is grabbed from the mode line for consistency.
+#+begin_src emacs-lisp :noweb-ref window-dividers
+  (setq window-divider-default-right-width 3)
+  (let ((color (face-attribute 'mode-line :background)))
+    (set-face-foreground 'window-divider-first-pixel color)
+    (set-face-foreground 'window-divider-last-pixel color)
+    (set-face-foreground 'window-divider color))
+  (window-divider-mode 1)
+#+end_src
+
+*** Transparent frames
+If there's a gimmick I can't get enough of, it's having a transparent frame.
+#+begin_src emacs-lisp :noweb-ref transparent-frames
+  (dolist (frame (frame-list))
+    (set-frame-parameter frame 'alpha 90))
+  (add-to-list 'default-frame-alist '(alpha . 90))
+#+end_src
+
+*** Better ~org-mode~ headers
+For some reason, theme creators don't really think of formatting ~org-mode~ past colors, so I have instead taken matters into my own hands. This way, I can use whatever color scheme I want with some peace of mind that at the least I don't have to look for ~org~-aware themes. +It also means I can override some of the dumber choices of ~org~-aware themes!+
+#+begin_src emacs-lisp :noweb-ref better-org-mode-headers
+  ;; Load `org-mode' if it isn't dumped
+  (pdumper-require 'org)
+  ;; Title
+  (set-face-attribute 'org-document-title nil
+                      :weight 'extra-bold :height 1.8)
+  ;; Headers
+  (set-face-attribute 'org-level-1 nil :height 1.3)
+  (set-face-attribute 'org-level-2 nil :height 1.1)
+  (set-face-attribute 'org-level-3 nil :height 1.0)
+#+end_src
+
+** Mode line
+I hate the default mode line with a burning passion. This mode line, on the other hand, is minimal yet gorgeous. When configured properly, it is hands down the best mode line I have ever used.
+#+begin_src emacs-lisp :noweb yes :tangle (user-emacs-file "init.el")
+  (use-package mood-line
     :ensure t
     :defer t
     :init
-    (defun farl-init/diminish-modes ()
-      "Diminish various minor modes."
-      (dolist (mode '(rainbow-mode
-                      company-mode
-                      subword-mode
-                      flyspell-mode
-                      which-key-mode
-                      visual-line-mode
-                      mini-modeline-mode
-                      hungry-delete-mode
-                      page-break-lines-mode
-                      desktop-environment-mode
-                      highlight-indent-guides-mode))
-        (diminish mode)))
-    (add-hook 'after-init-hook 'farl-init/diminish-modes))
+    (mood-line-mode 1)
+    <<flatten>>
+    <<clock-and-battery>>
+    <<line-and-col-numbers>>)
+#+end_src
+
+*** Make the mode line look flat
+This is just something that bugs me about some themes. I want the mode line to not have that silly box around it.
+#+begin_src emacs-lisp :noweb-ref flatten
+  (set-face-attribute 'mode-line nil :box nil)
+  (set-face-attribute 'mode-line-inactive nil :box nil)
 #+end_src
 
 *** Show clock and battery level on mode line
@@ -688,73 +724,12 @@ I use 24-hour time on all my clocks. I used to use ~fancy-battery~ for battery l
 
 *** Show line and column numbers on the mode line
 Why isn't this enabled by default on a /text editor/?
-#+begin_src emacs-lisp :noweb-ref lines-and-columns
+#+begin_src emacs-lisp :noweb-ref line-and-col-numbers
   (line-number-mode 1)
   (column-number-mode 1)
 #+end_src
 
-** Leuven
-Leuven is absolutely unbeatable. There is very little that I actually have to change about it, and none of them is a fundamental failing of Leuven itself. It's nearly perfection.
-#+begin_src emacs-lisp :noweb yes :tangle (user-emacs-file "init.el")
-  (use-package leuven-theme
-    :ensure t
-    :defer t
-    :init
-    (if pdumper-dumped
-        (enable-theme 'leuven)
-      (load-theme 'leuven t))
-    <<fringes>>
-    <<mode-line>>
-    <<line-numbers>>
-    <<window-dividers>>)
-#+end_src
-
-*** Fringes
-Having fringes helps keep things looking good and gives the opportunity to have nice indicators on the edges of buffers. I prefer when fringes are the same color as the rest of the window.
-#+begin_src emacs-lisp :noweb-ref fringes
-  (set-face-background 'fringe (face-attribute 'default :background))
-  (fringe-mode 10)
-#+end_src
-
-*** Mode line
-For some reason, the mode line uses /white/ for one of its colors. Screw that.
-#+begin_src emacs-lisp :noweb-ref mode-line
-  (set-face-foreground 'mode-line-buffer-id (face-attribute 'default :foreground))
-#+end_src
-
-*** Line numbers
-For some reason, some themes like to give line numbers a different background from the rest of a window. I hate that.
-#+begin_src emacs-lisp :noweb-ref line-numbers
-  (set-face-background 'line-number (face-attribute 'default :background))
-#+end_src
-
-*** Window dividers
-Windows dividers make Emacs look far less sloppy. The color is grabbed from the mode line for consistency.
-#+begin_src emacs-lisp :noweb-ref window-dividers
-  (setq window-divider-default-right-width 3
-        window-divider-default-bottom-width 3)
-  (let ((color (face-attribute 'mode-line :background)))
-    (set-face-foreground 'window-divider-first-pixel color)
-    (set-face-foreground 'window-divider-last-pixel color)
-    (set-face-foreground 'window-divider color))
-  (window-divider-mode 1)
-#+end_src
-
-*** Better ~org-mode~ headers
-For some reason, theme creators don't really think of formatting ~org-mode~ past colors, so I have instead taken matters into my own hands. This way, I can use whatever color scheme I want with some peace of mind that at the least I don't have to look for ~org~-aware themes. +It also means I can override some of the dumber choices of ~org~-aware themes!+
-#+begin_src emacs-lisp :noweb-ref org-headers
-  ;; Load `org-mode' if it isn't dumped
-  (pdumper-require 'org)
-  ;; Title
-  (set-face-attribute 'org-document-title nil
-                      :weight 'extra-bold :height 1.8)
-  ;; Headers
-  (set-face-attribute 'org-level-1 nil :height 1.3)
-  (set-face-attribute 'org-level-2 nil :height 1.1)
-  (set-face-attribute 'org-level-3 nil :height 1.0)
-#+end_src
-
-** Other
+** In buffers
    :properties:
    :header-args: :tangle (user-emacs-file "init.el")
    :end:
@@ -765,7 +740,7 @@ This is used in a number of places in Emacs. Better to have it on all the time t
 #+end_src
 
 *** Line numbers (on most buffers)
-I like having line numbers and indicators for lines past the EOF.
+I like having line numbers and indicators for lines past the EOF. However, I don't like line numbers in modes where it breaks the mode.
 #+begin_src emacs-lisp
   (add-hook 'text-mode-hook 'display-line-numbers-mode)
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
@@ -1811,15 +1786,20 @@ No clue why you have to do so much just to give workspaces names, but at least y
 *** Show a list of workspaces in the echo area
 Because I now use so many workspaces, I need to be able to see what workspace I am currently on. This makes it easier to do that. It's rather buggy at times, but it does what it needs to do.
 #+begin_src emacs-lisp
-  (defun farl-exwm/echo-area ()
-    "Show `mini-modeline--msg' or EXWM workspaces."
+  (defun farl-exwm/list-workspaces ()
+    "List EXWM workspaces."
     (exwm-workspace--update-switch-history)
-    (or mini-modeline--msg
-        (elt exwm-workspace--switch-history
-             (exwm-workspace--position
-              exwm-workspace--current))))
+    (elt exwm-workspace--switch-history
+         (exwm-workspace--position exwm-workspace--current)))
 
-  (setq mini-modeline-l-format '("%e" (:eval (format "%s" (farl-exwm/echo-area)))))
+  (use-package minibuffer-line
+    :ensure t
+    :defer t
+    :init
+    (minibuffer-line-mode 1)
+    (set-face-attribute 'minibuffer-line nil :inherit 'default)
+    (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
+    (add-hook 'exwm-workspace-switch-hook 'minibuffer-line--update))
 #+end_src
 
 ** Multi-head configuration
@@ -1924,6 +1904,16 @@ Because I use a dock on my W541, there are some things I need to do alongside se
                    "-option" "ctrl:nocaps"))
 #+end_src
 
+*** Setting the wallpaper with ~feh~
+This is where it all comes together. In [[https://github.com/farlado/dotfiles][my dotfiles]] I have a wallpaper, which is set by this process.
+#+begin_src emacs-lisp
+  (defun set-wallpaper ()
+    "Set the wallpaper."
+    (start-process "Wallpaper" nil "feh"
+                   "--no-fehbg" "--bg-fill"
+                   (user-config-file ".wallpaper.png")))
+#+end_src
+
 *** Bringing it all together
 Finally, I can make my generic display-and-dock setup function.
 #+begin_src emacs-lisp
@@ -1935,7 +1925,8 @@ Finally, I can make my generic display-and-dock setup function.
           (display-setup-x230)
         (progn
           (display-setup-w541)
-          (peripheral-setup)))))
+          (peripheral-setup))))
+      (set-wallpaper))
 
   (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
 #+end_src
@@ -2597,7 +2588,6 @@ This is for visual consistency. I personally like it this way.
 
 *** XDG compliance and WM settings
 I have to set a few environment variables for the sake of compliance with various XDG specifications, most notably the XDG Base Directory specification. Also in this block I set an environment variable signaling to Java applications that the window manager is not a reparenting window manager.
-#+name: xdg
 #+begin_src emacs-lisp :tangle no
   (setenv "XDG_CURRENT_DESKTOP" "emacs")
   (setenv "GTK2_RC_FILES" (user-config-file "gtk-2.0/gtkrc"))
@@ -2607,14 +2597,12 @@ I have to set a few environment variables for the sake of compliance with variou
 
 *** Hide the cursor when typing
 This is just a point of personal preference. I tried not using it for a while and personally it just felt wrong.
-#+name: xbanish
 #+begin_src emacs-lisp :tangle no
   (start-process "Hide Cursor" nil "xbanish")
 #+end_src
 
 *** Disable screen blanking
 I don't need my laptop's screen shutting off just because I'm sitting and watching a video too long.
-#+name: screen
 #+begin_src emacs-lisp :tangle no
   (start-process "Disable Blanking" nil "xset"
                  "s" "off" "-dpms")
@@ -2622,7 +2610,6 @@ I don't need my laptop's screen shutting off just because I'm sitting and watchi
 
 *** Disable the trackpad
 This thing is disgusting, and I prefer trackpoints way more.
-#+name: trackpad
 #+begin_src emacs-lisp :tangle no
   (start-process "Trackpad Setup" nil "xinput"
                  "disable" (shell-command-to-string
@@ -2633,7 +2620,6 @@ This thing is disgusting, and I prefer trackpoints way more.
 
 *** Keyboard configuration
 This block sets the keyboard layout to US and give Caps Lock the functionality of Control. I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
-#+name: keyboard
 #+begin_src emacs-lisp :tangle no
   (start-process "Keyboard Layout" nil "setxkbmap"
                  "us" "-option" "ctrl:nocaps")
@@ -2641,21 +2627,18 @@ This block sets the keyboard layout to US and give Caps Lock the functionality o
 
 *** Start the compositor
 I don't need it, but having basic compositing is very nice.
-#+name: xcompmgr
 #+begin_src emacs-lisp :tangle no
   (start-process "Compositor" nil "xcompmgr")
 #+end_src
 
 *** Set fallback cursor
 Some X windows will have weird cursors if this isn't done.
-#+name: cursor
 #+begin_src emacs-lisp :tangle no
   (start-process "Fallback Cursor" nil "xsetroot"
                  "-cursor_name" "left_ptr")
 #+end_src
 
 *** Start EXWM
-#+name: exwm
 #+begin_src emacs-lisp :tangle no
   (exwm-enable)
   (exwm-config-ido)

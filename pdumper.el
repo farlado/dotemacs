@@ -26,11 +26,10 @@
 
                    ;; Looks
                    dashboard
+                   dracula-theme
+                   mood-line
                    rainbow-mode
                    rainbow-delimiters
-                   mini-modeline
-                   diminish
-                   leuven-theme
 
                    ;; Functionality
                    company
@@ -71,6 +70,7 @@
                    exwm-systemtray
                    exwm-edit
                    dmenu
+                   minibuffer-line
                    system-packages
                    desktop-environment
 
@@ -90,7 +90,7 @@
                    2048-game))
     (require package))
 
-(load-theme 'leuven t t)
+(load-theme 'dracula t t)
 
 (dump-emacs-portable (expand-file-name "emacs.pdmp" user-emacs-directory))
 
