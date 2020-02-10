@@ -315,19 +315,19 @@ This function has been altered to accommodate `exwm-mode'."
   (interactive)
   (split-window-below)
   (other-window 1)
-  (ibuffer))
+  (buffer-menu))
 
 (defun split-and-follow-horizontal ()
   "Open a new window horizontally."
   (interactive)
   (split-window-right)
   (other-window 1)
-  (ibuffer))
+  (buffer-menu))
 
 (global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
 (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
 
-(global-set-key (kbd "C-x b") 'ibuffer)
+(global-set-key (kbd "C-x b") 'buffer-menu)
 (global-unset-key (kbd "C-x C-b"))
 
 (defun buffer-file-match (string)

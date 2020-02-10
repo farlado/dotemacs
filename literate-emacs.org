@@ -1053,7 +1053,7 @@ Since apparently =C-x C-o= is actually something useful by default, I decided to
     (global-set-key (kbd "C-x o") buffer-move-and-windmove-map))
 #+end_src
 
-*** Move focus and show buffer-menu when explicitly creating new windows
+*** Move focus and show ~buffer-menu~ when explicitly creating new windows
 This to me is preferable to the default behavior.
 #+begin_src emacs-lisp
   (defun split-and-follow-vertical ()
@@ -1061,23 +1061,23 @@ This to me is preferable to the default behavior.
     (interactive)
     (split-window-below)
     (other-window 1)
-    (ibuffer))
+    (buffer-menu))
 
   (defun split-and-follow-horizontal ()
     "Open a new window horizontally."
     (interactive)
     (split-window-right)
     (other-window 1)
-    (ibuffer))
+    (buffer-menu))
 
   (global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
   (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
 #+end_src
 
-*** Use buffer-menu on =C-x b= so the buffer list doesn't open a new window
+*** Use ~buffer-menu~ on =C-x b= so the buffer list doesn't open a new window
 Just another point of personal convenience.
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-x b") 'ibuffer)
+  (global-set-key (kbd "C-x b") 'buffer-menu)
   (global-unset-key (kbd "C-x C-b"))
 #+end_src
 
