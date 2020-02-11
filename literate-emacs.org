@@ -3,6 +3,7 @@
 #+author: Farlado
 #+language: en
 #+options: num:nil toc:2
+#+property: header-args :results none
 
 #+begin_quote
 Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his workshop, I feel a realm of possibility open before me. I feel the comfort of an environment that has evolved over time to fit me perfectly – an assortment of packages and keybindings which help me bring ideas to life day after day.
@@ -31,6 +32,7 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
   - [[#in-buffers][In buffers]]
 - [[#making-emacs-more-comfortable][Making Emacs more comfortable]]
   - [[#general-functionality][General functionality]]
+  - [[#functionsmacros][Functions/macros]]
   - [[#bufferswindows][Buffers/windows]]
   - [[#configuration][Configuration]]
 - [[#making-emacs-a-good-text-editor][Making Emacs a good text editor]]
@@ -920,6 +922,51 @@ I /love/ ~ido-mode~.  Default =M-x= behavior doesn't use ~ido-mode~, so we insta
            ("<menu>" . smex)))
 #+end_src
 
+** Functions/macros
+These are some good-to-have functions and macros.
+
+*** Choose a random item in a list
+This is something that comes in handy a couple times in some of what I do.
+#+begin_src emacs-lisp
+  (defun random-choice (items)
+    "Choose a random item from ITEMS."
+    (let* ((size (length items))
+           (index (random size)))
+      (nth index items)))
+#+end_src
+
+*** Find a string in a buffer's file name
+Since I'm starting to really mess with this, I should probably keep a macro around.
+#+begin_src emacs-lisp
+  (defun buffer-file-match (string)
+    "Find STRING in `buffer-file-name'."
+    (string-match-p string (buffer-file-name)))
+#+end_src
+
+*** Reference a file in ~user-emacs-directory~
+Since I so often will reference files in my ~user-emacs-directory~, I find it worthwhile to create a macro specifically for that.
+#+begin_src emacs-lisp
+  (defmacro user-emacs-file (file)
+    "Find FILE in `user-emacs-directory'."
+    (expand-file-name file user-emacs-directory))
+#+end_src
+
+*** Reference a file in the home directory
+Since I have started to work on a literate dotfiles configuration, it makes sense to use a macro for readability.
+#+begin_src emacs-lisp
+  (defmacro user-home-file (file)
+    "Find FILE in the user's home directory."
+    (expand-file-name file (getenv "HOME")))
+#+end_src
+
+*** Reference a file in =$XDG_CONFIG_HOME=
+This is also crucial for my literate dotfiles, since I am maximizing the compliance of my dotfiles with the XDG Base Directory Specification
+#+begin_src emacs-lisp
+  (defmacro user-config-file (file)
+    "Find a FILE in the user's $XDG_CONFIG_HOME"
+    (expand-file-name file (getenv "XDG_CONFIG_HOME")))
+#+end_src
+
 ** Buffers/windows
 *** Sloppy focus windows
 I hate having to click to focus a different window, so I would rather just have windows sloppily focus.
@@ -988,11 +1035,11 @@ I wanted a way to quickly and gracefully destroy everything that is open at once
   (defun close-buffers-and-windows ()
     "Close every buffer and close all windows, then restart dashboard."
     (interactive)
-    (unless (save-some-buffers)
-      (when (yes-or-no-p "Really kill all buffers? ")
-        (mapc 'kill-buffers (buffer-list))
-        (delete-other-windows)
-        (dashboard-restart))))
+    (when (yes-or-no-p "Really kill all buffers? ")
+      (save-some-buffers)
+      (mapc 'kill-buffer (buffer-list))
+      (delete-other-windows)
+      (dashboard-restart)))
 
   (global-set-key (kbd "C-x C-M-k") 'close-buffers-and-windows)
 #+end_src
@@ -1028,7 +1075,7 @@ Since apparently =C-x C-o= is actually something useful by default, I decided to
     (global-set-key (kbd "C-x o") buffer-move-and-windmove-map))
 #+end_src
 
-*** Move focus and show ~buffer-menu~ when explicitly creating new windows
+*** Move focus and show ~ibuffer~ when explicitly creating new windows
 This to me is preferable to the default behavior.
 #+begin_src emacs-lisp
   (defun split-and-follow-vertical ()
@@ -1036,60 +1083,27 @@ This to me is preferable to the default behavior.
     (interactive)
     (split-window-below)
     (other-window 1)
-    (buffer-menu))
+    (ibuffer))
 
   (defun split-and-follow-horizontal ()
     "Open a new window horizontally."
     (interactive)
     (split-window-right)
     (other-window 1)
-    (buffer-menu))
+    (ibuffer))
 
   (global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
   (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
 #+end_src
 
-*** Use ~buffer-menu~ on =C-x b= so the buffer list doesn't open a new window
+*** Use ~ibuffer~ on =C-x b= so the buffer list doesn't open a new window
 Just another point of personal convenience.
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-x b") 'buffer-menu)
+  (global-set-key (kbd "C-x b") 'ibuffer)
   (global-unset-key (kbd "C-x C-b"))
 #+end_src
 
 ** Configuration
-These are settings specifically pertaining to configuring Emacs or my user environment in general.
-
-*** Easily find a string in a buffer's file name
-Since I'm starting to really mess with this, I should probably keep a macro around.
-#+begin_src emacs-lisp
-  (defun buffer-file-match (string)
-    "Find STRING in `buffer-file-name'."
-    (string-match-p string (buffer-file-name)))
-#+end_src
-
-*** Easily reference a file in ~user-emacs-directory~
-Since I so often will reference files in my ~user-emacs-directory~, I find it worthwhile to create a macro specifically for that.
-#+begin_src emacs-lisp
-  (defmacro user-emacs-file (file)
-    "Find FILE in `user-emacs-directory'."
-    (expand-file-name file user-emacs-directory))
-#+end_src
-
-*** Easily reference a file in the home directory
-Since I have started to work on a literate dotfiles configuration, it makes sense to use a macro for readability.
-#+begin_src emacs-lisp
-  (defmacro user-home-file (file)
-    "Find FILE in the user's home directory."
-    (expand-file-name file (getenv "HOME")))
-#+end_src
-
-*** Easily reference a file in =$XDG_CONFIG_HOME=
-This is also crucial for my literate dotfiles, since I am maximizing the compliance of my dotfiles with the XDG Base Directory Specification
-#+begin_src emacs-lisp
-  (defmacro user-config-file (file)
-    "Find a FILE in the user's $XDG_CONFIG_HOME"
-    (expand-file-name file (getenv "XDG_CONFIG_HOME")))
-#+end_src
 *** Open system configuration with =C-c C-M-e=
 Now that I have a literate(!) system configuration as well, it needs a bind if the file is found.
 #+begin_src emacs-lisp
@@ -1904,14 +1918,22 @@ Because I use a dock on my W541, there are some things I need to do alongside se
                    "-option" "ctrl:nocaps"))
 #+end_src
 
-*** Setting the wallpaper with ~feh~
-This is where it all comes together. In [[https://github.com/farlado/dotfiles][my dotfiles]] I have a wallpaper, which is set by this process.
+*** Setting the wallpaper(s) with ~feh~
+This is where it all comes together. I have a [[https://github.com/farlado/wallpapers][wallpaper repository]] which I keep in =$XDG_CONFIG_HOME/wallpapers= from which random wallpapers are chosen for each monitor.
 #+begin_src emacs-lisp
   (defun set-wallpaper ()
-    "Set the wallpaper."
-    (start-process "Wallpaper" nil "feh"
-                   "--no-fehbg" "--bg-fill"
-                   (user-config-file ".wallpaper.png")))
+    "Set a different wallpaper for each monitor."
+    (ignore-errors
+      (let* ((wallpapers (directory-files-recursively
+                          (user-config-file "wallpapers")
+                          ".png$" nil t t))
+             (command "feh --no-fehbg "))
+        (dolist (monitor (get-connected-monitors))
+          (let ((wallpaper (random-choice wallpapers)))
+            (setq command (concat command "--bg-fill " wallpaper " "))
+            (setq wallpapers (delq wallpaper wallpapers))))
+        (start-process-shell-command
+         "Wallpaper" nil command))))
 #+end_src
 
 *** Bringing it all together
@@ -2580,12 +2602,6 @@ This includes:
    :properties:
    :header-args: :noweb-ref init
    :end:
-*** Make Emacs go fullscreen
-This is for visual consistency. I personally like it this way.
-#+begin_src emacs-lisp
-  (set-frame-parameter nil 'fullscreen 'fullboth)
-#+end_src
-
 *** XDG compliance and WM settings
 I have to set a few environment variables for the sake of compliance with various XDG specifications, most notably the XDG Base Directory specification. Also in this block I set an environment variable signaling to Java applications that the window manager is not a reparenting window manager.
 #+begin_src emacs-lisp :tangle no

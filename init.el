@@ -46,6 +46,8 @@
 
 (add-hook 'after-init-hook 'server-start-if-not-running)
 
+(tooltip-mode -1)
+
 (setq use-dialog-box nil
       use-file-dialog nil)
 
@@ -215,6 +217,28 @@
   :bind (("M-x"    . smex)
          ("<menu>" . smex)))
 
+(defun random-choice (items)
+  "Choose a random item from ITEMS."
+  (let* ((size (length items))
+         (index (random size)))
+    (nth index items)))
+
+(defun buffer-file-match (string)
+  "Find STRING in `buffer-file-name'."
+  (string-match-p string (buffer-file-name)))
+
+(defmacro user-emacs-file (file)
+  "Find FILE in `user-emacs-directory'."
+  (expand-file-name file user-emacs-directory))
+
+(defmacro user-home-file (file)
+  "Find FILE in the user's home directory."
+  (expand-file-name file (getenv "HOME")))
+
+(defmacro user-config-file (file)
+  "Find a FILE in the user's $XDG_CONFIG_HOME"
+  (expand-file-name file (getenv "XDG_CONFIG_HOME")))
+
 (setq focus-follows-mouse t
       mouse-autoselect-window t)
 
@@ -257,11 +281,11 @@ This function has been altered to accommodate `exwm-mode'."
 (defun close-buffers-and-windows ()
   "Close every buffer and close all windows, then restart dashboard."
   (interactive)
-  (unless (save-some-buffers)
-    (when (yes-or-no-p "Really kill all buffers? ")
-      (mapc 'kill-buffers (buffer-list))
-      (delete-other-windows)
-      (dashboard-restart))))
+  (when (yes-or-no-p "Really kill all buffers? ")
+    (save-some-buffers)
+    (mapc 'kill-buffer (buffer-list))
+    (delete-other-windows)
+    (dashboard-restart)))
 
 (global-set-key (kbd "C-x C-M-k") 'close-buffers-and-windows)
 
@@ -293,36 +317,20 @@ This function has been altered to accommodate `exwm-mode'."
   (interactive)
   (split-window-below)
   (other-window 1)
-  (buffer-menu))
+  (ibuffer))
 
 (defun split-and-follow-horizontal ()
   "Open a new window horizontally."
   (interactive)
   (split-window-right)
   (other-window 1)
-  (buffer-menu))
+  (ibuffer))
 
 (global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
 (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
 
-(global-set-key (kbd "C-x b") 'buffer-menu)
+(global-set-key (kbd "C-x b") 'ibuffer)
 (global-unset-key (kbd "C-x C-b"))
-
-(defun buffer-file-match (string)
-  "Find STRING in `buffer-file-name'."
-  (string-match-p string (buffer-file-name)))
-
-(defmacro user-emacs-file (file)
-  "Find FILE in `user-emacs-directory'."
-  (expand-file-name file user-emacs-directory))
-
-(defmacro user-home-file (file)
-  "Find FILE in the user's home directory."
-  (expand-file-name file (getenv "HOME")))
-
-(defmacro user-config-file (file)
-  "Find a FILE in the user's $XDG_CONFIG_HOME"
-  (expand-file-name file (getenv "XDG_CONFIG_HOME")))
 
 (when (file-exists-p (user-config-file "dotfiles/literate-sysconfig.org"))
   (defun sys-config-visit ()
@@ -824,10 +832,18 @@ This function has been altered to accommodate `exwm-mode'."
     (start-process "Keyboard Setup" nil "setxkbmap"
                    "-option" "ctrl:nocaps"))
   (defun set-wallpaper ()
-    "Set the wallpaper."
-    (start-process "Wallpaper" nil "feh"
-                   "--no-fehbg" "--bg-fill"
-                   (user-config-file ".wallpaper.png")))
+    "Set a different wallpaper for each monitor."
+    (ignore-errors
+      (let* ((wallpapers (directory-files-recursively
+                          (user-config-file "wallpapers")
+                          ".png$" nil t t))
+             (command "feh --no-fehbg "))
+        (dolist (monitor (get-connected-monitors))
+          (let ((wallpaper (random-choice wallpapers)))
+            (setq command (concat command "--bg-fill " wallpaper " "))
+            (setq wallpapers (delq wallpaper wallpapers))))
+        (start-process-shell-command
+         "Wallpaper" nil command))))
   (defun display-and-dock-setup ()
     "Configure displays and dock if applicable."
     (interactive)
@@ -1326,7 +1342,6 @@ This function has been altered to accommodate `exwm-mode'."
   (define-key exwm-mode-map (kbd "C-c C-t C-v") nil)
   (define-key exwm-mode-map (kbd "C-c C-t C-m") nil)
   (define-key exwm-mode-map (kbd "C-c C-f") nil)
-  (set-frame-parameter nil 'fullscreen 'fullboth)
   (setenv "XDG_CURRENT_DESKTOP" "emacs")
   (setenv "GTK2_RC_FILES" (user-config-file "gtk-2.0/gtkrc"))
   (setenv "QT_QPA_PLATFORMTHEME" "gtk2")
