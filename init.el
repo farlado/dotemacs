@@ -1008,7 +1008,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   (defvar current-wallpapers nil
     "List of currently active wallpapers.
   
-  This variable is set by `wallpaper-set-wallpaper'. Hand-modifying its
+  This variable is set by `wallpaper-set-wallpaper'.  Hand-modifying its
   value may interfere with `wallpaper-set-wallpaper''s behavior.")
   
   (defun wallpaper-set-wallpaper ()
