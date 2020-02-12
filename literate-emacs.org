@@ -925,6 +925,12 @@ I /love/ ~ido-mode~.  Default =M-x= behavior doesn't use ~ido-mode~, so we insta
 ** Functions/macros
 These are some good-to-have functions and macros.
 
+*** Take off the training wheels
+I'm a big boy now.
+#+begin_src emacs-lisp
+  (setq disabled-command-function nil)
+#+end_src
+
 *** Choose a random item in a list
 This is something that comes in handy a couple times in some of what I do.
 #+begin_src emacs-lisp

@@ -217,6 +217,8 @@
   :bind (("M-x"    . smex)
          ("<menu>" . smex)))
 
+(setq disabled-command-function nil)
+
 (defun random-choice (items)
   "Choose a random item from ITEMS."
   (let* ((size (length items))
