@@ -1398,7 +1398,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   (setenv "GTK2_RC_FILES" (user-config-file "gtk-2.0/gtkrc"))
   (setenv "QT_QPA_PLATFORMTHEME" "gtk2")
   (setenv "_JAVA_AWT_WM_NONREPARENTING" "1")
-  (start-process "Hide Cursor" nil "xbanish")
   (start-process "Disable Blanking" nil "xset"
                  "s" "off" "-dpms")
   (start-process "Trackpad Setup" nil "xinput"

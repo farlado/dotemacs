@@ -88,7 +88,6 @@ Everything has different dependencies so make sure you have what you need. The q
 | ~EXWM~ depends on...   | which is used for...                       |
 |----------------------+--------------------------------------------|
 | ~xorg~                 | obvious reasons                            |
-| ~xbanish~              | hiding the mouse cursor                    |
 | ~xcompmgr~             | compositor                                 |
 | ~arandr~               | monitor configuration                      |
 | ~nm-connection-editor~ | network configuration                      |
@@ -2680,12 +2679,6 @@ I have to set a few environment variables for the sake of compliance with variou
   (setenv "GTK2_RC_FILES" (user-config-file "gtk-2.0/gtkrc"))
   (setenv "QT_QPA_PLATFORMTHEME" "gtk2")
   (setenv "_JAVA_AWT_WM_NONREPARENTING" "1")
-#+end_src
-
-*** Hide the cursor when typing
-This is just a point of personal preference. I tried not using it for a while and personally it just felt wrong.
-#+begin_src emacs-lisp :tangle no
-  (start-process "Hide Cursor" nil "xbanish")
 #+end_src
 
 *** Disable screen blanking
