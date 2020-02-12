@@ -577,7 +577,7 @@ Having the Emacs server running allows for a lot of neat integration with other 
   (pdumper-require 'server)
 
   (defun server-start-if-not-running ()
-    "Call `server-start' if `server-running-p' returns nil."
+    "Call `server-start' if `server-running-p' is nil."
     (interactive)
     (unless (server-running-p)
       (server-start)))
@@ -939,8 +939,8 @@ This is something that comes in handy a couple times in some of what I do.
 Since I'm starting to really mess with this, I should probably keep a macro around.
 #+begin_src emacs-lisp
   (defun buffer-file-match (string)
-    "Find STRING in `buffer-file-name'."
-    (string-match-p string (buffer-file-name)))
+    "Find STRING in variable `buffer-file-name'."
+    (string-match-p string buffer-file-name))
 #+end_src
 
 *** Reference a file in ~user-emacs-directory~
@@ -963,7 +963,7 @@ Since I have started to work on a literate dotfiles configuration, it makes sens
 This is also crucial for my literate dotfiles, since I am maximizing the compliance of my dotfiles with the XDG Base Directory Specification
 #+begin_src emacs-lisp
   (defmacro user-config-file (file)
-    "Find a FILE in the user's $XDG_CONFIG_HOME"
+    "Find a FILE in the user's $XDG_CONFIG_HOME directory."
     (expand-file-name file (getenv "XDG_CONFIG_HOME")))
 #+end_src
 
@@ -1010,7 +1010,7 @@ I had to adjust the function which kills both the current buffer and the current
   (defun kill-this-buffer-and-window ()
     "Kill the current buffer and delete the selected window.
 
-  This function has been altered to accommodate `exwm-mode'."
+  This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     (interactive)
     (let ((window-to-delete (selected-window))
           (buffer-to-kill (current-buffer))
@@ -1781,17 +1781,13 @@ This section is only to ensure the proper workspaces are placed on the right mon
 *** Name workspaces a little more intuitively
 No clue why you have to do so much just to give workspaces names, but at least you can do it.
 #+begin_src emacs-lisp
-  (defvar farl-exwm/workspace-names ["1"
-                                     "2"
-                                     "3"
-                                     "4"
-                                     "5"
-                                     "6"
-                                     "office"
-                                     "discord"
-                                     "telegram"
-                                     "games"]
-    "The names assigned to workspaces through `exwm-workspace-index-map'.")
+  (defcustom farl-exwm/workspace-names '("1" "2" "3" "4" "5" "6"
+                                         "office" "discord"
+                                         "telegram" "games")
+    "The names assigned to workspaces through `exwm-workspace-index-map'."
+    :tag "Workspace names"
+    :group 'exwm
+    :type 'list)
 
   (setq exwm-workspace-index-map (lambda (index)
                                    (elt farl-exwm/workspace-names index)))
@@ -1918,26 +1914,8 @@ Because I use a dock on my W541, there are some things I need to do alongside se
                    "-option" "ctrl:nocaps"))
 #+end_src
 
-*** Setting the wallpaper(s) with ~feh~
-This is where it all comes together. I have a [[https://github.com/farlado/wallpapers][wallpaper repository]] which I keep in =$XDG_CONFIG_HOME/wallpapers= from which random wallpapers are chosen for each monitor.
-#+begin_src emacs-lisp
-  (defun set-wallpaper ()
-    "Set a different wallpaper for each monitor."
-    (ignore-errors
-      (let* ((wallpapers (directory-files-recursively
-                          (user-config-file "wallpapers")
-                          ".png$" nil t t))
-             (command "feh --no-fehbg "))
-        (dolist (monitor (get-connected-monitors))
-          (let ((wallpaper (random-choice wallpapers)))
-            (setq command (concat command "--bg-fill " wallpaper " "))
-            (setq wallpapers (delq wallpaper wallpapers))))
-        (start-process-shell-command
-         "Wallpaper" nil command))))
-#+end_src
-
 *** Bringing it all together
-Finally, I can make my generic display-and-dock setup function.
+Finally, I can make my generic display-and-dock setup function. I also set the wallpaper, but that function is found elsewhere.
 #+begin_src emacs-lisp
   (defun display-and-dock-setup ()
     "Configure displays and dock if applicable."
@@ -1948,7 +1926,7 @@ Finally, I can make my generic display-and-dock setup function.
         (progn
           (display-setup-w541)
           (peripheral-setup))))
-      (set-wallpaper))
+      (wallpaper-set-wallpaper))
 
   (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
 #+end_src
@@ -2081,24 +2059,28 @@ This one is a pleasant surprise to have honestly. Having Emacs handle system pac
 
 *** ~desktop-environment-mode~
 Previously I had to define a lot of functions to do these things, now I just change settings within ~desktop-environment-mode~.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb yes
   (use-package desktop-environment
     :ensure t
     :defer t
     :init
-    (desktop-environment-mode 1))
+    (desktop-environment-mode 1)
+    <<brightness-adjustment>>
+    <<volume-adjustment>>
+    <<lock-screen>>
+    <<screenshots>>)
 #+end_src
 
 **** Brightness adjustment
 This one is the simplest: all I needed to do was change the increment and decrement values.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb-ref volume-adjustment
   (setq desktop-environment-brightness-normal-increment "5%+"
         desktop-environment-brightness-normal-decrement "5%-")
 #+end_src
 
 **** Volume adjustment
 The only things I really don't like about how ~desktop-environment~'s volume controlling is ~desktop-environment-toggle-mute~, which gives way too much output when you mute or unmute the speakers or microphone, so I set up basic scripts to give much more concise output.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb-ref volume-adjustment
   (setq desktop-environment-volume-toggle-command
         (concat "[ \"$(amixer set Master toggle | grep off)\" ] "
                 "&& echo Volume is now muted. | tr '\n' ' ' "
@@ -2111,48 +2093,26 @@ The only things I really don't like about how ~desktop-environment~'s volume con
 
 **** Lock screen
 Haha yes, this is very long and very very stupid.
-#+begin_src emacs-lisp
-  (setq desktop-environment-screenlock-command (concat "i3lock -nmk "
-                                                       "--color=000000 "
-                                                       "--timecolor=ffffffff "
-                                                       "--datecolor=ffffffff "
-                                                       "--wrongcolor=ffffffff "
-                                                       "--ringcolor=00000000 "
-                                                       "--insidecolor=00000000 "
-                                                       "--keyhlcolor=00000000 "
-                                                       "--bshlcolor=00000000 "
-                                                       "--separatorcolor=00000000 "
-                                                       "--ringvercolor=00000000 "
-                                                       "--insidevercolor=00000000 "
-                                                       "--linecolor=00000000 "
-                                                       "--ringwrongcolor=00000000 "
-                                                       "--insidewrongcolor=00000000 "
-                                                       "--timestr=%H:%M "
-                                                       "--datestr='%a %d %b' "
-                                                       "--time-font=Iosevka "
-                                                       "--date-font=Iosevka "
-                                                       "--wrong-font=Iosevka "
-                                                       "--timesize=128 "
-                                                       "--datesize=64 "
-                                                       "--wrongsize=32 "
-                                                       "--time-align 0 "
-                                                       "--date-align 0 "
-                                                       "--wrong-align 0 "
-                                                       "--indpos=-10:-10 "
-                                                       "--timepos=200:125 "
-                                                       "--datepos=200:215 "
-                                                       "--wrongpos=200:155 "
-                                                       "--locktext='' "
-                                                       "--lockfailedtext='' "
-                                                       "--noinputtext='' "
-                                                       " --veriftext='' "
-                                                       "--wrongtext='WRONG' "
-                                                       "--force-clock "
-                                                       "--radius 1 "
-                                                       "--ring-width 1 "))
+#+begin_src emacs-lisp :noweb-ref lock-screen
+  (setq desktop-environment-screenlock-command
+        (concat
+         "i3lock -nmk --color=000000 --timecolor=ffffffff --datecolor=ffffffff "
+         "--wrongcolor=ffffffff --ringcolor=00000000 --insidecolor=00000000 "
+         "--keyhlcolor=00000000 --bshlcolor=00000000 --separatorcolor=00000000 "
+         "--ringvercolor=00000000 --insidevercolor=00000000 --linecolor=00000000 "
+         "--ringwrongcolor=00000000 --insidewrongcolor=00000000 --timestr=%H:%M "
+         "--datestr='%a %d %b' --time-font=Iosevka --date-font=Iosevka "
+         "--wrong-font=Iosevka --timesize=128 --datesize=64 --wrongsize=32 "
+         "--time-align 0 --date-align 0 --wrong-align 0 --indpos=-10:-10 "
+         "--timepos=200:125 --datepos=200:215 --wrongpos=200:155 --locktext='' "
+         "--lockfailedtext='' --noinputtext='' --veriftext='' --wrongtext='WRONG' "
+         "--force-clock --radius 1 --ring-width 1 "))
 #+end_src
 
 **** Screenshots
+     :properties:
+     :header-args: :noweb-ref screenshots
+     :end:
 This one was the least straightforward because the way it's implemented by ~desktop-environment~ is *SUPER* wonky. Here are the binds which will be relevant.
 #+begin_src emacs-lisp
   ;; Storing to clipboard
@@ -2214,6 +2174,90 @@ The functions which ~desktop-environment~ comes with are kinda garbage, so I mad
     (message "Screenshot copied to clipboard."))
 #+end_src
 
+*** Setting the wallpaper
+Any good desktop environment allows you to set a wallpaper. I have a [[https://github.com/farlado/wallpapers][wallpaper repository]] which I keep in =$XDG_CONFIG_HOME/wallpapers= from which random wallpapers are chosen for each monitor.
+#+begin_src emacs-lisp
+  (defgroup wallpaper nil
+    "Settings for wallpapers."
+    :tag "Wallpaper"
+    :group 'exwm
+    :prefix "wallpaper-")
+
+  (defcustom wallpaper-static-wallpapers nil
+    "List of wallpapers to use instead of randomly finding wallpapers.
+
+  Wallpapers must be entered in the list as absolute paths, in the order
+  of your monitors.  This variable should be nil if the variable
+  `wallpaper-cycle-wallpapers' is non-nil."
+    :tag "Static wallpaper(s)"
+    :group 'wallpaper
+    :type 'list)
+
+  (defvar current-wallpapers nil
+    "List of currently active wallpapers.
+
+  This variable is set by `wallpaper-set-wallpaper'. Hand-modifying its
+  value may interfere with `wallpaper-set-wallpaper''s behavior.")
+
+  (defun wallpaper-set-wallpaper ()
+    "Set a different wallpaper for each monitor.
+
+  Wallpapers in $XDG_CONFIG_HOME/wallpapers are chosen at random and do
+  not repeat on each cycle.  The current wallpapers in use can be found
+  in the variable `current-wallpapers'."
+    (interactive)
+    (let ((command "feh --no-fehbg "))
+      (if wallpaper-static-wallpapers
+          (dolist (wallpaper wallpaper-static-wallpapers)
+            (setq command (concat command "--bg-fill " wallpaper " ")))
+        (ignore-errors
+          (let* ((wallpapers (directory-files-recursively
+                              (user-config-file "wallpapers")
+                              ".png$" nil t t)))
+            (dolist (wallpaper current-wallpapers)
+              (setq current-wallpapers (delq wallpaper current-wallpapers)
+                    wallpapers (delq wallpaper wallpapers)))
+            (dolist (monitor (get-connected-monitors))
+              (let ((wallpaper (random-choice wallpapers)))
+                (setq command (concat command "--bg-fill " wallpaper " "))
+                (setq wallpapers (delq wallpaper wallpapers))
+                (add-to-list 'current-wallpapers wallpaper))))))
+      (start-process-shell-command
+       "Wallpaper" nil command)))
+#+end_src
+
+However, I want to go even further: I want to /have my wallpapers as a slideshow/.
+#+begin_src emacs-lisp
+  (defcustom wallpaper-cycle-wallpapers t
+    "If non-nil, cycle through wallpapers at every `wallpaper-update-interval'."
+    :tag "Cycle wallpapers"
+    :group 'wallpaper
+    :type 'boolean)
+
+  (defcustom wallpaper-update-interval 15
+    "Interval in seconds for cycling the wallpaper(s)."
+    :tag "Wallpaper update interval"
+    :group 'wallpaper
+    :type 'integer)
+
+  (defun wallpaper-cycle-wallpaper ()
+    "Cycle through wallpapers if `wallpaper-cycle' is non-nil.
+
+  If `wallpaper-cycle-wallpapers' is nil or `wallpaper-static-wallpapers'
+  is non-nil, kill the timer which called the function in the first place."
+    (if (and wallpaper-cycle-wallpapers
+             (not wallpaper-static-wallpapers))
+        (wallpaper-set-wallpaper)
+      (cancel-function-timers 'wallpaper-set-wallpaper)))
+
+  (defun wallpaper-start-cycle ()
+    "Start the wallpaper cycling timer if `wallpaper-cycle-wallpapers' is non-nil."
+    (when wallpaper-cycle-wallpapers
+      (run-with-timer 0 wallpaper-update-interval 'wallpaper-cycle-wallpaper)))
+
+  (add-hook 'after-init-hook 'wallpaper-start-cycle)
+#+end_src
+
 *** Monitor settings
 Calling ~arandr~ to adjust monitors is useful when I am preparing to present something using my computer or need to adjust how monitors are set up in a unique way that isn't a preset from my dotfiles.
 #+begin_src emacs-lisp
@@ -2271,20 +2315,35 @@ Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucon
 *** Keyboard layout selection
 This will eventually be its own package, but for now, it's just in my config. First, I set up three custom variables:
 #+begin_src emacs-lisp
-  (defvar keyboard-layout-1 "us"
+  (defgroup keyboard-layout nil
+    "Setting the keyboard layout."
+    :tag "Keyboard layout"
+    :group 'keyboard
+    :prefix "keyboard-layout-")
+
+  (defcustom keyboard-layout-1 "us"
     "The first of three keyboard layouts to cycle through.
 
-  Set to nil for one less keyboard layout.")
+  Set to nil for one less keyboard layout."
+    :tag "Layout 1"
+    :group 'keyboard-layout
+    :type 'string)
 
-  (defvar keyboard-layout-2 "epo"
+  (defcustom keyboard-layout-2 "epo"
     "The second of three keyboard layouts to cycle through.
 
-  Set to nil for one less keyboard layout.")
+  Set to nil for one less keyboard layout."
+    :tag "Layout 2"
+    :group 'keyboard-layout
+    :type 'string)
 
-  (defvar keyboard-layout-3 "de"
+  (defcustom keyboard-layout-3 "de"
     "The third of three keyboard layouts to cycle through.
 
-  Set to nil for one less keyboard layout.")
+  Set to nil for one less keyboard layout."
+    :tag "Layout 3"
+    :group 'keyboard-layout
+    :type 'string)
 #+end_src
 
 Then, I use these functions to control setting and cycling the keyboard layout:
@@ -2602,6 +2661,12 @@ This includes:
    :properties:
    :header-args: :noweb-ref init
    :end:
+*** Make Emacs start fullscreen
+This makes setting the wallpaper and everything look a heck of a lot more natural, e.g. Emacs filling the screen looks a heck of a lot less jarring before the wallpaper sets than after.
+#+begin_src emacs-lisp
+  (set-frame-parameter nil 'fullscreen 'fullboth)
+#+end_src
+
 *** XDG compliance and WM settings
 I have to set a few environment variables for the sake of compliance with various XDG specifications, most notably the XDG Base Directory specification. Also in this block I set an environment variable signaling to Java applications that the window manager is not a reparenting window manager.
 #+begin_src emacs-lisp :tangle no
@@ -2635,7 +2700,7 @@ This thing is disgusting, and I prefer trackpoints way more.
 #+end_src
 
 *** Keyboard configuration
-This block sets the keyboard layout to US and give Caps Lock the functionality of Control. I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far.
+This block sets the keyboard layout to US and give Caps Lock the functionality of Control. I was hesitant to do this at first, but it's significantly more comfortable. I almost never used caps lock as it is, given my keyboards have no indicator for it on my laptops, but this gives me a much easier way to do commands without shifting my hand too far. Ideally, however, I configure my keyboards so that this setting is nothing more than an afterthought.
 #+begin_src emacs-lisp :tangle no
   (start-process "Keyboard Layout" nil "setxkbmap"
                  "us" "-option" "ctrl:nocaps")
@@ -2663,6 +2728,9 @@ Some X windows will have weird cursors if this isn't done.
 #+end_src
 
 ** On logout
+   :properties:
+   :header-args: :noweb-ref on-logout
+   :end:
 When exiting, these are things I want done.
 #+begin_src emacs-lisp :noweb yes :noweb-ref logout
   (defun farl-exwm/on-logout ()
@@ -2674,7 +2742,7 @@ When exiting, these are things I want done.
 
 *** Black out the root window
 This way, it looks good when exiting Emacs.
-#+begin_src emacs-lisp :noweb-ref on-logout
+#+begin_src emacs-lisp
   (shell-command "hsetroot -solid '#000000'")
 #+end_src
 

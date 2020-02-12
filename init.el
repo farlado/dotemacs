@@ -39,7 +39,7 @@
 (pdumper-require 'server)
 
 (defun server-start-if-not-running ()
-  "Call `server-start' if `server-running-p' returns nil."
+  "Call `server-start' if `server-running-p' is nil."
   (interactive)
   (unless (server-running-p)
     (server-start)))
@@ -224,8 +224,8 @@
     (nth index items)))
 
 (defun buffer-file-match (string)
-  "Find STRING in `buffer-file-name'."
-  (string-match-p string (buffer-file-name)))
+  "Find STRING in variable `buffer-file-name'."
+  (string-match-p string buffer-file-name))
 
 (defmacro user-emacs-file (file)
   "Find FILE in `user-emacs-directory'."
@@ -236,7 +236,7 @@
   (expand-file-name file (getenv "HOME")))
 
 (defmacro user-config-file (file)
-  "Find a FILE in the user's $XDG_CONFIG_HOME"
+  "Find a FILE in the user's $XDG_CONFIG_HOME directory."
   (expand-file-name file (getenv "XDG_CONFIG_HOME")))
 
 (setq focus-follows-mouse t
@@ -260,7 +260,7 @@
 (defun kill-this-buffer-and-window ()
   "Kill the current buffer and delete the selected window.
 
-This function has been altered to accommodate `exwm-mode'."
+This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   (interactive)
   (let ((window-to-delete (selected-window))
         (buffer-to-kill (current-buffer))
@@ -727,17 +727,13 @@ This function has been altered to accommodate `exwm-mode'."
                                      ((string= exwm-title "Event Tester")
                                       floating-mode-line nil
                                       floating t)))
-  (defvar farl-exwm/workspace-names ["1"
-                                     "2"
-                                     "3"
-                                     "4"
-                                     "5"
-                                     "6"
-                                     "office"
-                                     "discord"
-                                     "telegram"
-                                     "games"]
-    "The names assigned to workspaces through `exwm-workspace-index-map'.")
+  (defcustom farl-exwm/workspace-names '("1" "2" "3" "4" "5" "6"
+                                         "office" "discord"
+                                         "telegram" "games")
+    "The names assigned to workspaces through `exwm-workspace-index-map'."
+    :tag "Workspace names"
+    :group 'exwm
+    :type 'list)
   
   (setq exwm-workspace-index-map (lambda (index)
                                    (elt farl-exwm/workspace-names index)))
@@ -831,19 +827,6 @@ This function has been altered to accommodate `exwm-mode'."
     ;; Keyboard
     (start-process "Keyboard Setup" nil "setxkbmap"
                    "-option" "ctrl:nocaps"))
-  (defun set-wallpaper ()
-    "Set a different wallpaper for each monitor."
-    (ignore-errors
-      (let* ((wallpapers (directory-files-recursively
-                          (user-config-file "wallpapers")
-                          ".png$" nil t t))
-             (command "feh --no-fehbg "))
-        (dolist (monitor (get-connected-monitors))
-          (let ((wallpaper (random-choice wallpapers)))
-            (setq command (concat command "--bg-fill " wallpaper " "))
-            (setq wallpapers (delq wallpaper wallpapers))))
-        (start-process-shell-command
-         "Wallpaper" nil command))))
   (defun display-and-dock-setup ()
     "Configure displays and dock if applicable."
     (interactive)
@@ -853,7 +836,7 @@ This function has been altered to accommodate `exwm-mode'."
         (progn
           (display-setup-w541)
           (peripheral-setup))))
-      (set-wallpaper))
+      (wallpaper-set-wallpaper))
   
   (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
   (defun run-gimp ()
@@ -934,100 +917,151 @@ This function has been altered to accommodate `exwm-mode'."
     :ensure t
     :defer t
     :init
-    (desktop-environment-mode 1))
-  (setq desktop-environment-brightness-normal-increment "5%+"
-        desktop-environment-brightness-normal-decrement "5%-")
-  (setq desktop-environment-volume-toggle-command
-        (concat "[ \"$(amixer set Master toggle | grep off)\" ] "
-                "&& echo Volume is now muted. | tr '\n' ' ' "
-                "|| echo Volume is now unmuted. | tr '\n' ' '")
-        desktop-environment-volume-toggle-microphone-command
-        (concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
-                "&& echo Microphone is now muted. | tr '\n' ' ' "
-                "|| echo Microphone is now unmuted | tr '\n' ' '"))
-  (setq desktop-environment-screenlock-command (concat "i3lock -nmk "
-                                                       "--color=000000 "
-                                                       "--timecolor=ffffffff "
-                                                       "--datecolor=ffffffff "
-                                                       "--wrongcolor=ffffffff "
-                                                       "--ringcolor=00000000 "
-                                                       "--insidecolor=00000000 "
-                                                       "--keyhlcolor=00000000 "
-                                                       "--bshlcolor=00000000 "
-                                                       "--separatorcolor=00000000 "
-                                                       "--ringvercolor=00000000 "
-                                                       "--insidevercolor=00000000 "
-                                                       "--linecolor=00000000 "
-                                                       "--ringwrongcolor=00000000 "
-                                                       "--insidewrongcolor=00000000 "
-                                                       "--timestr=%H:%M "
-                                                       "--datestr='%a %d %b' "
-                                                       "--time-font=Iosevka "
-                                                       "--date-font=Iosevka "
-                                                       "--wrong-font=Iosevka "
-                                                       "--timesize=128 "
-                                                       "--datesize=64 "
-                                                       "--wrongsize=32 "
-                                                       "--time-align 0 "
-                                                       "--date-align 0 "
-                                                       "--wrong-align 0 "
-                                                       "--indpos=-10:-10 "
-                                                       "--timepos=200:125 "
-                                                       "--datepos=200:215 "
-                                                       "--wrongpos=200:155 "
-                                                       "--locktext='' "
-                                                       "--lockfailedtext='' "
-                                                       "--noinputtext='' "
-                                                       " --veriftext='' "
-                                                       "--wrongtext='WRONG' "
-                                                       "--force-clock "
-                                                       "--radius 1 "
-                                                       "--ring-width 1 "))
-  ;; Storing to clipboard
-  (define-key desktop-environment-mode-map (kbd "<print>")
-    'farl-de/desktop-environment-screenshot-part-clip)
-  (define-key desktop-environment-mode-map (kbd "<S-print>")
-    'farl-de/desktop-environment-screenshot-clip)
+    (desktop-environment-mode 1)
+    
+    (setq desktop-environment-brightness-normal-increment "5%+"
+          desktop-environment-brightness-normal-decrement "5%-")
+    (setq desktop-environment-volume-toggle-command
+          (concat "[ \"$(amixer set Master toggle | grep off)\" ] "
+                  "&& echo Volume is now muted. | tr '\n' ' ' "
+                  "|| echo Volume is now unmuted. | tr '\n' ' '")
+          desktop-environment-volume-toggle-microphone-command
+          (concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
+                  "&& echo Microphone is now muted. | tr '\n' ' ' "
+                  "|| echo Microphone is now unmuted | tr '\n' ' '"))
+    (setq desktop-environment-screenlock-command
+          (concat
+           "i3lock -nmk --color=000000 --timecolor=ffffffff --datecolor=ffffffff "
+           "--wrongcolor=ffffffff --ringcolor=00000000 --insidecolor=00000000 "
+           "--keyhlcolor=00000000 --bshlcolor=00000000 --separatorcolor=00000000 "
+           "--ringvercolor=00000000 --insidevercolor=00000000 --linecolor=00000000 "
+           "--ringwrongcolor=00000000 --insidewrongcolor=00000000 --timestr=%H:%M "
+           "--datestr='%a %d %b' --time-font=Iosevka --date-font=Iosevka "
+           "--wrong-font=Iosevka --timesize=128 --datesize=64 --wrongsize=32 "
+           "--time-align 0 --date-align 0 --wrong-align 0 --indpos=-10:-10 "
+           "--timepos=200:125 --datepos=200:215 --wrongpos=200:155 --locktext='' "
+           "--lockfailedtext='' --noinputtext='' --veriftext='' --wrongtext='WRONG' "
+           "--force-clock --radius 1 --ring-width 1 "))
+    ;; Storing to clipboard
+    (define-key desktop-environment-mode-map (kbd "<print>")
+      'farl-de/desktop-environment-screenshot-part-clip)
+    (define-key desktop-environment-mode-map (kbd "<S-print>")
+      'farl-de/desktop-environment-screenshot-clip)
+    
+    ;; Storing to file
+    (define-key desktop-environment-mode-map (kbd "<C-print>")
+      'farl-de/desktop-environment-screenshot-part)
+    (define-key desktop-environment-mode-map (kbd "<C-S-print>")
+      'farl-de/desktop-environment-screenshot)
+    (setq desktop-environment-screenshot-directory "~/screenshots")
+    (setq desktop-environment-screenshot-command
+          "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
+          desktop-environment-screenshot-partial-command
+          "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
+    (defun farl-de/desktop-environment-screenshot ()
+      "Take a screenshot and store it in a file."
+      (interactive)
+      (desktop-environment-screenshot)
+      (message "Screenshot saved in ~/screenshots."))
+    
+    (defun farl-de/desktop-environment-screenshot-part ()
+      "Take a capture of a portion of the screen and store it in a file."
+      (interactive)
+      (desktop-environment-screenshot-part)
+      (message "Screenshot saved in ~/screenshots."))
+    
+    (defun farl-de/desktop-environment-screenshot-clip ()
+      "Take a screenshot and put it in the clipboard."
+      (interactive)
+      (shell-command
+       (concat desktop-environment-screenshot-command
+               " && xclip $FILENAME -selection clipboard "
+               "-t image/png &> /dev/null && rm $FILENAME"))
+      (message "Screenshot copied to clipboard."))
+    
+    (defun farl-de/desktop-environment-screenshot-part-clip ()
+      "Take a shot of a portion of the screen and put it in the clipboard."
+      (interactive)
+      (shell-command
+       (concat desktop-environment-screenshot-partial-command
+               " && xclip $FILENAME -selection clipboard "
+               "-t image/png &> /dev/null && rm $FILENAME"))
+      (message "Screenshot copied to clipboard.")))
+  (defgroup wallpaper nil
+    "Settings for wallpapers."
+    :tag "Wallpaper"
+    :group 'exwm
+    :prefix "wallpaper-")
   
-  ;; Storing to file
-  (define-key desktop-environment-mode-map (kbd "<C-print>")
-    'farl-de/desktop-environment-screenshot-part)
-  (define-key desktop-environment-mode-map (kbd "<C-S-print>")
-    'farl-de/desktop-environment-screenshot)
-  (setq desktop-environment-screenshot-directory "~/screenshots")
-  (setq desktop-environment-screenshot-command
-        "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
-        desktop-environment-screenshot-partial-command
-        "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
-  (defun farl-de/desktop-environment-screenshot ()
-    "Take a screenshot and store it in a file."
-    (interactive)
-    (desktop-environment-screenshot)
-    (message "Screenshot saved in ~/screenshots."))
+  (defcustom wallpaper-static-wallpapers nil
+    "List of wallpapers to use instead of randomly finding wallpapers.
   
-  (defun farl-de/desktop-environment-screenshot-part ()
-    "Take a capture of a portion of the screen and store it in a file."
-    (interactive)
-    (desktop-environment-screenshot-part)
-    (message "Screenshot saved in ~/screenshots."))
+  Wallpapers must be entered in the list as absolute paths, in the order
+  of your monitors.  This variable should be nil if the variable
+  `wallpaper-cycle-wallpapers' is non-nil."
+    :tag "Static wallpaper(s)"
+    :group 'wallpaper
+    :type 'list)
   
-  (defun farl-de/desktop-environment-screenshot-clip ()
-    "Take a screenshot and put it in the clipboard."
-    (interactive)
-    (shell-command
-     (concat desktop-environment-screenshot-command
-             " && xclip $FILENAME -selection clipboard "
-             "-t image/png &> /dev/null && rm $FILENAME"))
-    (message "Screenshot copied to clipboard."))
+  (defvar current-wallpapers nil
+    "List of currently active wallpapers.
   
-  (defun farl-de/desktop-environment-screenshot-part-clip ()
-    "Take a shot of a portion of the screen and put it in the clipboard."
+  This variable is set by `wallpaper-set-wallpaper'. Hand-modifying its
+  value may interfere with `wallpaper-set-wallpaper''s behavior.")
+  
+  (defun wallpaper-set-wallpaper ()
+    "Set a different wallpaper for each monitor.
+  
+  Wallpapers in $XDG_CONFIG_HOME/wallpapers are chosen at random and do
+  not repeat on each cycle.  The current wallpapers in use can be found
+  in the variable `current-wallpapers'."
     (interactive)
-    (shell-command
-     (concat desktop-environment-screenshot-partial-command
-             " && xclip $FILENAME -selection clipboard "
-             "-t image/png &> /dev/null && rm $FILENAME"))
-    (message "Screenshot copied to clipboard."))
+    (let ((command "feh --no-fehbg "))
+      (if wallpaper-static-wallpapers
+          (dolist (wallpaper wallpaper-static-wallpapers)
+            (setq command (concat command "--bg-fill " wallpaper " ")))
+        (ignore-errors
+          (let* ((wallpapers (directory-files-recursively
+                              (user-config-file "wallpapers")
+                              ".png$" nil t t)))
+            (dolist (wallpaper current-wallpapers)
+              (setq current-wallpapers (delq wallpaper current-wallpapers)
+                    wallpapers (delq wallpaper wallpapers)))
+            (dolist (monitor (get-connected-monitors))
+              (let ((wallpaper (random-choice wallpapers)))
+                (setq command (concat command "--bg-fill " wallpaper " "))
+                (setq wallpapers (delq wallpaper wallpapers))
+                (add-to-list 'current-wallpapers wallpaper))))))
+      (start-process-shell-command
+       "Wallpaper" nil command)))
+  (defcustom wallpaper-cycle-wallpapers t
+    "If non-nil, cycle through wallpapers at every `wallpaper-update-interval'."
+    :tag "Cycle wallpapers"
+    :group 'wallpaper
+    :type 'boolean)
+  
+  (defcustom wallpaper-update-interval 15
+    "Interval in seconds for cycling the wallpaper(s)."
+    :tag "Wallpaper update interval"
+    :group 'wallpaper
+    :type 'integer)
+  
+  (defun wallpaper-cycle-wallpaper ()
+    "Cycle through wallpapers if `wallpaper-cycle' is non-nil.
+  
+  If `wallpaper-cycle-wallpapers' is nil or `wallpaper-static-wallpapers'
+  is non-nil, kill the timer which called the function in the first place."
+    (if (and wallpaper-cycle-wallpapers
+             (not wallpaper-static-wallpapers))
+        (wallpaper-set-wallpaper)
+      (cancel-function-timers 'wallpaper-set-wallpaper)))
+  
+  (defun wallpaper-start-cycle ()
+    "Start the wallpaper cycling timer if `wallpaper-cycle-wallpapers' is non-nil."
+    (when wallpaper-cycle-wallpapers
+      (run-with-timer 0 wallpaper-update-interval 'wallpaper-cycle-wallpaper)))
+  
+  (add-hook 'after-init-hook 'wallpaper-start-cycle)
   (defun monitor-settings ()
     "Open arandr to configure monitors."
     (interactive)
@@ -1062,20 +1096,35 @@ This function has been altered to accommodate `exwm-mode'."
      "Audio Loop" nil (concat "pavucontrol;"
                               "pacmd unload-module module-null-sink;"
                               "pacmd unload-module module-loopback")))
-  (defvar keyboard-layout-1 "us"
+  (defgroup keyboard-layout nil
+    "Setting the keyboard layout."
+    :tag "Keyboard layout"
+    :group 'keyboard
+    :prefix "keyboard-layout-")
+  
+  (defcustom keyboard-layout-1 "us"
     "The first of three keyboard layouts to cycle through.
   
-  Set to nil for one less keyboard layout.")
+  Set to nil for one less keyboard layout."
+    :tag "Layout 1"
+    :group 'keyboard-layout
+    :type 'string)
   
-  (defvar keyboard-layout-2 "epo"
+  (defcustom keyboard-layout-2 "epo"
     "The second of three keyboard layouts to cycle through.
   
-  Set to nil for one less keyboard layout.")
+  Set to nil for one less keyboard layout."
+    :tag "Layout 2"
+    :group 'keyboard-layout
+    :type 'string)
   
-  (defvar keyboard-layout-3 "de"
+  (defcustom keyboard-layout-3 "de"
     "The third of three keyboard layouts to cycle through.
   
-  Set to nil for one less keyboard layout.")
+  Set to nil for one less keyboard layout."
+    :tag "Layout 3"
+    :group 'keyboard-layout
+    :type 'string)
   (defun get-keyboard-layout ()
     "Get the current keyboard layout."
     (shell-command-to-string
@@ -1342,6 +1391,7 @@ This function has been altered to accommodate `exwm-mode'."
   (define-key exwm-mode-map (kbd "C-c C-t C-v") nil)
   (define-key exwm-mode-map (kbd "C-c C-t C-m") nil)
   (define-key exwm-mode-map (kbd "C-c C-f") nil)
+  (set-frame-parameter nil 'fullscreen 'fullboth)
   (setenv "XDG_CURRENT_DESKTOP" "emacs")
   (setenv "GTK2_RC_FILES" (user-config-file "gtk-2.0/gtkrc"))
   (setenv "QT_QPA_PLATFORMTHEME" "gtk2")
