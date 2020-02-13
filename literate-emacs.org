@@ -1930,8 +1930,7 @@ Finally, I can make my generic display-and-dock setup function. I also set the w
           (display-setup-x230)
         (progn
           (display-setup-w541)
-          (peripheral-setup))))
-      (wallpaper-set-wallpaper))
+          (peripheral-setup)))))
 
   (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
 #+end_src
@@ -2180,87 +2179,12 @@ The functions which ~desktop-environment~ comes with are kinda garbage, so I mad
 #+end_src
 
 *** Setting the wallpaper
-Any good desktop environment allows you to set a wallpaper. I have a [[https://github.com/farlado/wallpapers][wallpaper repository]] which I keep in =$XDG_CONFIG_HOME/wallpapers= from which random wallpapers are chosen for each monitor.
+I've been working on [[https://github.com/farlado/emacs-wallpaper][an easy way to configure wallpapers]] which makes for way less hassle.
 #+begin_src emacs-lisp
-  (defgroup wallpaper nil
-    "Settings for wallpapers."
-    :tag "Wallpaper"
-    :group 'exwm
-    :prefix "wallpaper-")
-
-  (defcustom wallpaper-static-wallpapers nil
-    "List of wallpapers to use instead of randomly finding wallpapers.
-
-  Wallpapers must be entered in the list as absolute paths, in the order
-  of your monitors.  This variable should be nil if the variable
-  `wallpaper-cycle-wallpapers' is non-nil."
-    :tag "Static wallpaper(s)"
-    :group 'wallpaper
-    :type 'list)
-
-  (defvar current-wallpapers nil
-    "List of currently active wallpapers.
-
-  This variable is set by `wallpaper-set-wallpaper'.  Hand-modifying its
-  value may interfere with `wallpaper-set-wallpaper''s behavior.")
-
-  (defun wallpaper-set-wallpaper ()
-    "Set a different wallpaper for each monitor.
-
-  Wallpapers in $XDG_CONFIG_HOME/wallpapers are chosen at random and do
-  not repeat on each cycle.  The current wallpapers in use can be found
-  in the variable `current-wallpapers'."
-    (interactive)
-    (let ((command "feh --no-fehbg "))
-      (if wallpaper-static-wallpapers
-          (dolist (wallpaper wallpaper-static-wallpapers)
-            (setq command (concat command "--bg-fill " wallpaper " ")))
-        (ignore-errors
-          (let* ((wallpapers (directory-files-recursively
-                              (user-config-file "wallpapers")
-                              ".png$" nil t t)))
-            (dolist (wallpaper current-wallpapers)
-              (setq current-wallpapers (delq wallpaper current-wallpapers)
-                    wallpapers (delq wallpaper wallpapers)))
-            (dolist (monitor (get-connected-monitors))
-              (let ((wallpaper (random-choice wallpapers)))
-                (setq command (concat command "--bg-fill " wallpaper " "))
-                (setq wallpapers (delq wallpaper wallpapers))
-                (add-to-list 'current-wallpapers wallpaper))))))
-      (start-process-shell-command
-       "Wallpaper" nil command)))
-#+end_src
-
-However, I want to go even further: I want to /have my wallpapers as a slideshow/.
-#+begin_src emacs-lisp
-  (defcustom wallpaper-cycle-wallpapers t
-    "If non-nil, cycle through wallpapers at every `wallpaper-update-interval'."
-    :tag "Cycle wallpapers"
-    :group 'wallpaper
-    :type 'boolean)
-
-  (defcustom wallpaper-update-interval 15
-    "Interval in seconds for cycling the wallpaper(s)."
-    :tag "Wallpaper update interval"
-    :group 'wallpaper
-    :type 'integer)
-
-  (defun wallpaper-cycle-wallpaper ()
-    "Cycle through wallpapers if `wallpaper-cycle' is non-nil.
-
-  If `wallpaper-cycle-wallpapers' is nil or `wallpaper-static-wallpapers'
-  is non-nil, kill the timer which called the function in the first place."
-    (if (and wallpaper-cycle-wallpapers
-             (not wallpaper-static-wallpapers))
-        (wallpaper-set-wallpaper)
-      (cancel-function-timers 'wallpaper-set-wallpaper)))
-
-  (defun wallpaper-start-cycle ()
-    "Start the wallpaper cycling timer if `wallpaper-cycle-wallpapers' is non-nil."
-    (when wallpaper-cycle-wallpapers
-      (run-with-timer 0 wallpaper-update-interval 'wallpaper-cycle-wallpaper)))
-
-  (add-hook 'after-init-hook 'wallpaper-start-cycle)
+  (use-package wallpaper
+    :load-path "lisp/wallpaper"
+    :defer t
+    :hook ((exwm-randr-screen-change . set-wallpaper)))
 #+end_src
 
 *** Monitor settings
