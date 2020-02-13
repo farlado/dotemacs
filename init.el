@@ -991,7 +991,8 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   (use-package wallpaper
     :load-path "lisp/wallpaper"
     :defer t
-    :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)))
+    :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
+           (after-init . wallpaper-cycle-mode)))
   (defun monitor-settings ()
     "Open arandr to configure monitors."
     (interactive)

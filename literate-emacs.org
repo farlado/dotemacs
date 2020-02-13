@@ -2184,7 +2184,8 @@ I've been working on [[https://github.com/farlado/emacs-wallpaper][an easy way t
   (use-package wallpaper
     :load-path "lisp/wallpaper"
     :defer t
-    :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)))
+    :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
+           (after-init . wallpaper-cycle-mode)))
 #+end_src
 
 *** Monitor settings
