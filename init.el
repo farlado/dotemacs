@@ -877,7 +877,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     :defer t
     :init
     (when (executable-find "yay")
-      (require 'system-packages)
+      (pdumper-require 'system-packages)
       (add-to-list 'system-packages-supported-package-managers
                    '(yay .
                          ((default-sudo . nil)

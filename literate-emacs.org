@@ -2022,7 +2022,7 @@ This one is a pleasant surprise to have honestly. Having Emacs handle system pac
     :defer t
     :init
     (when (executable-find "yay")
-      (require 'system-packages)
+      (pdumper-require 'system-packages)
       (add-to-list 'system-packages-supported-package-managers
                    '(yay .
                          ((default-sudo . nil)
