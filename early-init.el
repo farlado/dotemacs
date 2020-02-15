@@ -59,15 +59,18 @@ FILENAME and NOERROR are also passed to `require'."
 
 (add-hook 'emacs-startup-hook 'startup/revert-file-name-handler-alist)
 
-(setq gc-cons-threshold 402653184
-      gc-cons-percentage 0.6)
+(defun garbage-collect-defer ()
+  "Defer garbage collection."
+  (setq gc-cons-threshold 402653184
+        gc-cons-percentage 0.6))
 
-(defun startup/reset-gc ()
-  "Return garbage collection to normal parameters after startup."
+(defun garbage-collect-restore ()
+  "Return garbage collection to normal parameters."
   (setq gc-cons-threshold 16777216
         gc-cons-percentage 0.1))
 
-(add-hook 'emacs-startup-hook 'startup/reset-gc)
+(garbage-collect-defer)
+(add-hook 'after-init-hook 'garbage-collect-restore)
 
 (setq custom-file "/dev/null"
       package-selected-packages '(;; Core

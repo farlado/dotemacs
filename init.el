@@ -169,6 +169,9 @@
   :init
   (add-to-list 'company-backends 'company-emoji))
 
+(add-hook 'minibuffer-setup-hook 'garbage-collect-defer)
+(add-hook 'minibuffer-exit-hook 'garbage-collect-restore)
+
 (setq confirm-kill-emacs 'yes-or-no-p)
 
 (setq make-pointer-invisible nil)
@@ -474,6 +477,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
          (haskell-mode . haskell-auto-insert-module-template)))
 
 (use-package highlight-indent-guides
+  :if window-system
   :ensure t
   :defer t
   :init
@@ -612,11 +616,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   :ensure t
   :defer t
   :bind ("C-c t" . vterm))
-
-(use-package nov
-  :ensure t
-  :defer t
-  :mode ("\\.epub\\'" . nov-mode))
 
 (use-package wttrin
   :ensure t
@@ -1233,6 +1232,9 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                                           (interactive)
                                           (exwm-workspace-move-window ,i))))
                                     (number-sequence 0 9))
+  
+                                 ;; Toggle how input is sent to X windows
+                                 ([?\s-q] . exwm-input-toggle-keyboard)
   
                                  ;; Window size adjustment
                                  (,(kbd "C-s-w") . shrink-window)

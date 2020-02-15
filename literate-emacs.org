@@ -318,7 +318,7 @@ This will save much time later down the line.
                      emms-setup
 
                      ;; Other
-                     nov
+                     ;nov
                      wttrin
 
                      ;; games
@@ -425,15 +425,18 @@ For whatever reason, setting ~file-name-handler-alist~ to nil helps Emacs load f
 *** Garbage collection setup
 Garbage collection shouldn't happen during startup, as that will slow Emacs down. Do it later. This is also where more ideal garbage collection settings are chosen.
 #+begin_src emacs-lisp
-  (setq gc-cons-threshold 402653184
-        gc-cons-percentage 0.6)
+  (defun garbage-collect-defer ()
+    "Defer garbage collection."
+    (setq gc-cons-threshold 402653184
+          gc-cons-percentage 0.6))
 
-  (defun startup/reset-gc ()
-    "Return garbage collection to normal parameters after startup."
+  (defun garbage-collect-restore ()
+    "Return garbage collection to normal parameters."
     (setq gc-cons-threshold 16777216
           gc-cons-percentage 0.1))
 
-  (add-hook 'emacs-startup-hook 'startup/reset-gc)
+  (garbage-collect-defer)
+  (add-hook 'after-init-hook 'garbage-collect-restore)
 #+end_src
 
 ** Early package management
@@ -831,6 +834,13 @@ Thanks to ~company~, this is possible now!
     :defer t
     :init
     (add-to-list 'company-backends 'company-emoji))
+#+end_src
+
+*** Don't hang the minibuffer
+When using the minibuffer, never do garbage collection.
+#+begin_src emacs-lisp
+  (add-hook 'minibuffer-setup-hook 'garbage-collect-defer)
+  (add-hook 'minibuffer-exit-hook 'garbage-collect-restore)
 #+end_src
 
 *** Always confirm closing Emacs
@@ -1361,6 +1371,7 @@ I have started to mess around with Haskell, so I needed to grab a mode for that.
 This is really nice to have, because I get indentation screwed up all the time.
 #+begin_src emacs-lisp
   (use-package highlight-indent-guides
+    :if window-system
     :ensure t
     :defer t
     :init
@@ -1571,8 +1582,8 @@ I've been jumping between ~vterm~ and ~ansi-term~. In the end ~vterm~ blows ~ans
 #+end_src
 
 *** Reading ebooks in Emacs
-Not the best way to do epub reading, but at least it's in Emacs.
-#+begin_src emacs-lisp
+Not the best way to do epub reading, but at least it's in Emacs. It is currently disabled because it broke ~org-mode~.
+#+begin_src emacs-lisp :tangle no
   (use-package nov
     :ensure t
     :defer t
@@ -2478,6 +2489,9 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
                                           (interactive)
                                           (exwm-workspace-move-window ,i))))
                                     (number-sequence 0 9))
+
+                                 ;; Toggle how input is sent to X windows
+                                 ([?\s-q] . exwm-input-toggle-keyboard)
 
                                  ;; Window size adjustment
                                  (,(kbd "C-s-w") . shrink-window)
