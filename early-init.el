@@ -70,7 +70,7 @@ FILENAME and NOERROR are also passed to `require'."
         gc-cons-percentage 0.1))
 
 (garbage-collect-defer)
-(add-hook 'after-init-hook 'garbage-collect-restore)
+(add-hook 'emacs-startup-hook 'garbage-collect-restore)
 
 (setq custom-file "/dev/null"
       package-selected-packages '(;; Core

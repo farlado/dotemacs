@@ -436,7 +436,7 @@ Garbage collection shouldn't happen during startup, as that will slow Emacs down
           gc-cons-percentage 0.1))
 
   (garbage-collect-defer)
-  (add-hook 'after-init-hook 'garbage-collect-restore)
+  (add-hook 'emacs-startup-hook 'garbage-collect-restore)
 #+end_src
 
 ** Early package management
