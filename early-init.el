@@ -61,7 +61,7 @@ FILENAME and NOERROR are also passed to `require'."
 
 (defun garbage-collect-defer ()
   "Defer garbage collection."
-  (setq gc-cons-threshold 402653184
+  (setq gc-cons-threshold most-positive-fixnum
         gc-cons-percentage 0.6))
 
 (defun garbage-collect-restore ()
