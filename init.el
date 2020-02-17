@@ -917,6 +917,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     :ensure t
     :defer t
     :init
+    (setq desktop-environment-update-exwm-global-keys :prefix)
     (desktop-environment-mode 1)
     
     (setq desktop-environment-brightness-normal-increment "5%+"
@@ -1026,73 +1027,16 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
      "Audio Loop" nil (concat "pavucontrol;"
                               "pacmd unload-module module-null-sink;"
                               "pacmd unload-module module-loopback")))
-  (defgroup keyboard-layout nil
-    "Setting the keyboard layout."
-    :tag "Keyboard layout"
-    :group 'keyboard
-    :prefix "keyboard-layout-")
-  
-  (defcustom keyboard-layout-1 "us"
-    "The first of three keyboard layouts to cycle through.
-  
-  Set to nil for one less keyboard layout."
-    :tag "Layout 1"
-    :group 'keyboard-layout
-    :type 'string)
-  
-  (defcustom keyboard-layout-2 "epo"
-    "The second of three keyboard layouts to cycle through.
-  
-  Set to nil for one less keyboard layout."
-    :tag "Layout 2"
-    :group 'keyboard-layout
-    :type 'string)
-  
-  (defcustom keyboard-layout-3 "de"
-    "The third of three keyboard layouts to cycle through.
-  
-  Set to nil for one less keyboard layout."
-    :tag "Layout 3"
-    :group 'keyboard-layout
-    :type 'string)
-  (defun get-keyboard-layout ()
-    "Get the current keyboard layout."
-    (shell-command-to-string
-     "setxkbmap -query | grep -oP 'layout:\\s*\\K(\\w+)' | tr '\n' ' ' | sed 's/ //'"))
-  
-  (defun set-keyboard-layout (&optional layout)
-    "Set the keyboard layout to LAYOUT."
-    (interactive)
-    (let ((layout (or layout (read-string "Enter keyboard layout: "))))
-      (start-process "Keyboard layout" nil "setxkbmap"
-                     layout "-option" "ctrl:nocaps")
-      (message "Keyboard layout is now: %s" layout)))
-  
-  (defun cycle-keyboard-layout ()
-    "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3'."
-    (interactive)
-    (let* ((current-layout (get-keyboard-layout))
-           (new-layout (if (string= current-layout keyboard-layout-1)
-                           (or keyboard-layout-2 keyboard-layout-3)
-                         (if (string= current-layout keyboard-layout-2)
-                             (or keyboard-layout-3 keyboard-layout-1)
-                           (or keyboard-layout-1 keyboard-layout-2)))))
-      (if new-layout
-          (set-keyboard-layout new-layout)
-        (message "No keyboard layouts set."))))
-  
-  (defun cycle-keyboard-layout-reverse ()
-    "Cycle between `keyboard-layout-1', `keyboard-layout-2', and `keyboard-layout-3' in reverse."
-    (interactive)
-    (let* ((current-layout (get-keyboard-layout))
-           (new-layout (if (string= current-layout keyboard-layout-3)
-                           (or keyboard-layout-2 keyboard-layout-1)
-                         (if (string= current-layout keyboard-layout-2)
-                             (or keyboard-layout-1 keyboard-layout-3)
-                           (or keyboard-layout-3 keyboard-layout-2)))))
-      (if new-layout
-          (set-keyboard-layout new-layout)
-        (message "No keyboard layouts set."))))
+  (use-package xkb
+    :load-path "lisp/xkb"
+    :defer t
+    :init
+    (setq xkb-cycle-layouts '("us"
+                              "epo"
+                              "de")
+          xkb-options '("ctrl:nocaps")
+          xkb-set-layout-key "s-w")
+    :hook (after-init . xkb-cycle-mode))
   (defun suspend-computer ()
     (interactive)
     (and (yes-or-no-p "Really suspend? ")
@@ -1261,8 +1205,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                                  ([menu]            . smex)
                                  ([?\s-x]           . dmenu)
                                  ([s-tab]           . audio-loopback)
-                                 ([?\s- ]           . cycle-keyboard-layout)
-                                 ([s-backspace]     . cycle-keyboard-layout-reverse)
+                                 ([?\s-w]           . xkb-set-layout)
                                  ([XF86ScreenSaver] . desktop-environment-lock-screen)
   
                                  ;; Controlling EMMS

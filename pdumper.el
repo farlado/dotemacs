@@ -15,6 +15,9 @@
 (require 'package)
 (package-initialize)
 
+(add-to-list 'load-path (expand-file-name "lisp/xkb" user-emacs-directory))
+(add-to-list 'load-path (expand-file-name "lisp/wallpaper" user-emacs-directory))
+
 (setq pdumper-load-path load-path
       pdumper-dumped t)
 
@@ -73,6 +76,8 @@
                    minibuffer-line
                    system-packages
                    desktop-environment
+                   xkb
+                   wallpaper
 
                    ;; Media
                    emms
