@@ -6,7 +6,7 @@
 #+property: header-args :results none
 
 #+begin_quote
-Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his workshop, I feel a realm of possibility open before me. I feel the comfort of an environment that has evolved over time to fit me perfectly – an assortment of packages and keybindings which help me bring ideas to life day after day.
+Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his workshop, I feel a realm of possibility open before me. I feel the comfort of an environment that has evolved over time to fit me perfectly -- an assortment of packages and keybindings which help me bring ideas to life day after day.
 -- [[https://www.braveclojure.com/basic-emacs/][Daniel Higginbotham]]
 #+end_quote
 
@@ -63,10 +63,10 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
 #+END_QUOTE
 
 * About this configuration
-This file is an attempt at a literate GNU Emacs (henceforth "Emacs") configuration. It is /incredibly/ opinionated. Admittedly, much of the "documentation" in here is more commentary I provide about my choices and personal feelings about certain things in Emacs based on my admittedly very limited opinion of the program than honest-to-god documentation of what this file contains. Regardless, the idea is that this file, when tangled, generates everything in my git repository, from ~LICENSE~ to ~.gitignore~. I would /highly/ recommend you *NOT* try to read the ~.el~ files on their own. It's a jungle, especially since all of the commentary regarding the configuration is in this file and this file alone.
+This file is an attempt at a literate GNU Emacs (henceforth "Emacs") configuration. It is /incredibly/ opinionated. Admittedly, much of the "documentation" in here is more commentary I provide about my choices and personal feelings about certain things in Emacs based on my admittedly very limited opinion of the program than honest-to-god documentation of what this file contains. Regardless, the idea is that this file, when tangled, generates everything in my git repository, from =LICENSE= to =.gitignore=. I would /highly/ recommend you *NOT* try to read the =.el= files on their own. It's a jungle, especially since all of the commentary regarding the configuration is in this file and this file alone.
 
 ** Okay, that's pretty neat. Why though?
-The answer is rather simple. Before I used a fully literate file, I had an ~init.el~ which tangled blocks from a ~config.org~ on the fly (read: on startup). It turns out this was abysmally slow, making for a startup time of around 4.5 seconds when loading into my desktop environment. Tangling blocks from a ~literate-emacs.org~ into byte-compiled ~early-init.el~ and ~init.el~ alongside the use of portable dumping (plus multiple other efficiency improvements, of course) cuts this time down to around 1.1 seconds to load into my desktop environment. This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check multiple files when I thought I might have changed something for the worse.
+The answer is rather simple. Before I used a fully literate file, I had an =init.el= which tangled blocks from a =config.org= on the fly (read: on startup). It turns out this was abysmally slow, making for a startup time of around 4.5 seconds when loading into my desktop environment. Tangling blocks from a =literate-emacs.org= into byte-compiled =early-init.el= and =init.el= alongside the use of portable dumping (plus multiple other efficiency improvements, of course) cuts this time down to around 1.1 seconds to load into my desktop environment. This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check multiple files when I thought I might have changed something for the worse.
 
 ** Installation
 1) Clone the repo into where you store your Emacs configuration.
@@ -78,14 +78,11 @@ The answer is rather simple. Before I used a fully literate file, I had an ~init
 *THIS CONFIGURATION IS MEANT FOR EMACS 27 AND 28 AND WILL /NOT/ LOAD PROPERLY ON EMACS 26. THE BRANCH FOR EMACS 26 IS [[https://github.com/farlado/dotemacs/tree/emacs26-end][HERE]].*
 #+end_center
 
-Everything has different dependencies so make sure you have what you need. The quick and dirty route to getting all these dependencies installed and configured is to deploy [[https://github.com/farlado/dotfiles][my dotfiles]]:
-#+begin_src sh :tangle no
-  sh -c "$(curl https://raw.githubusercontent.com/farlado/dotfiles/master/.config/deploy/deploy)"
-#+end_src
+Everything has different dependencies so make sure you have what you need. The quick and dirty route to getting all these dependencies installed and configured is to deploy [[https://github.com/farlado/dotfiles][my dotfiles]].
 
 *** For EXWM
 |----------------------+--------------------------------------------|
-| ~EXWM~ depends on...   | which is used for...                       |
+| EXWM depends on...   | which is used for...                       |
 |----------------------+--------------------------------------------|
 | ~xorg~                 | obvious reasons                            |
 | ~xcompmgr~             | compositor                                 |
@@ -178,7 +175,7 @@ Like mentioned above, this file is supposed to tangle into everything in my git 
 In order to make the files look at least somewhat decent for documentation linters, and to warn those who are unfortunate enough to think they'll just mosey on into one of them if they want to understand the config, we create headers that tells people the reality of the files.
 
 *** =pdumper.el=
-#+begin_src emacs-lisp :tangle (user-emacs-file "pdumper.el")
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/pdumper.el")
   ;;; pdumper.el --- Making a portable dump image
 
   ;; This file is not part of GNU Emacs.
@@ -233,11 +230,11 @@ This is everything related to starting Emacs quickly. First things first is sett
 
 ** Starting Emacs FAST
   :properties:
-  :header-args: :tangle (user-emacs-file "pdumper.el")
+  :header-args: :tangle (user-emacs-file "lisp/pdumper.el")
   :end:
-Even with the "small" amount I ask of Emacs, it's a lot of beef to start up as fast as I demand it start up. The portable dumper is an amazing thing. This is just a minimal setup for utilizing the portable dumper to make Emacs load faster. Every single ~require~ that doesn't create a ~LispObject~ incompatible with the portable dumper can now be skipped while loading. Before I started using the portable dumper, I saw start times of around 2.5 seconds. Now I am down to 1.1 seconds, having cut about half of the start time out. This script must be run while Emacs is *not* open, otherwise it will *crash* Emacs and (if you're using ~vterm~ to run the script) *the dump image will be corrupted*. To run the script, from the shell enter the following, substituting =$USER_EMACS_DIR= for wherever you store your Emacs configuration:
+Even with the "small" amount I ask of Emacs, it's a lot of beef to start up as fast as I demand it start up. The portable dumper is an amazing thing. This is just a minimal setup for utilizing the portable dumper to make Emacs load faster. Every single ~require~ that doesn't create a =LispObject= incompatible with the portable dumper can now be skipped while loading. Before I started using the portable dumper, I saw start times of around 2.5 seconds. Now I am down to 1.1 seconds, having cut about half of the start time out. This script must be run while Emacs is *not* open, otherwise it will *crash* Emacs and (if you're using ~vterm~ to run the script) *the dump image will be corrupted*. To run the script, from the shell enter the following, substituting =$USER_EMACS_DIR= for wherever you store your Emacs configuration:
 #+begin_src sh :tangle no
-  emacs --batch -q -l $USER_EMACS_DIR/pdumper.el
+  emacs --batch -q -l $USER_EMACS_DIR/lisp/pdumper.el
 #+end_src
 
 *** Load packages
@@ -322,7 +319,7 @@ This will save much time later down the line.
                      emms-setup
 
                      ;; Other
-                     ;nov
+                     nov
                      wttrin
 
                      ;; games
@@ -350,7 +347,7 @@ This is where the magic happens.
    :properties:
    :header-args: :tangle (user-emacs-file "early-init.el")
    :end:
-Emacs 27 introduced ~early-init.el~, allowing configuration of multiple items before Emacs has graphically loaded. Either I want these configured as soon as possible, or they are related to Emacs starting up. Which are which is left as an exercise to the reader.
+Emacs 27 introduced =early-init.el=, allowing configuration of multiple items before Emacs has graphically loaded. Either I want these configured as soon as possible, or they are related to Emacs starting up. Which are which is left as an exercise to the reader.
 
 *** Prepare GUI (Part 1)
 I want to get GUI elements out of my face as soon as I possibly can. They just take up space. If I'm running Emacs as my desktop environment (see further below), I want Emacs to immediately take on the background color of the theme I use.
@@ -365,10 +362,10 @@ I want to get GUI elements out of my face as soon as I possibly can. They just t
 
 *** Handling portable dumping
 For some reason, the portable dumper has odd behaviors. This block is supposed to:
-1. Recover ~load-path~ from the dump image
+1. Recover =load-path= from the dump image
 2. Restore modes not preserved in the dump image
 3. Fix the scratch buffer
-4. Create a function to ~require~ a feature only if ~pdumper-dumped~ is nil
+4. Create a function to ~require~ a feature only if =pdumper-dumped= is nil
 #+begin_src emacs-lisp
   (defvar pdumper-dumped nil
     "Non-nil if a custom dump image was loaded.")
@@ -391,7 +388,7 @@ For some reason, the portable dumper has odd behaviors. This block is supposed t
                   (lisp-interaction-mode)))))
 #+end_src
 *** Byte-compile on first run
-It's done after ~after-init-hook~ so that we don't actually do it in the middle of loading files. That would be disastrous.
+It's done after =after-init-hook= so that we don't actually do it in the middle of loading files. That would be disastrous.
 #+begin_src emacs-lisp
   (unless (file-exists-p (expand-file-name "init.elc" user-emacs-directory))
     (add-hook 'after-init-hook
@@ -423,7 +420,7 @@ For whatever reason, setting ~file-name-handler-alist~ to nil helps Emacs load f
 
   (setq file-name-handler-alist nil)
 
-  (add-hook 'emacs-startup-hook 'startup/revert-file-name-handler-alist)
+  (add-hook 'emacs-startup-hook #'startup/revert-file-name-handler-alist)
 #+end_src
 
 *** Garbage collection setup
@@ -440,17 +437,17 @@ Garbage collection shouldn't happen during startup, as that will slow Emacs down
           gc-cons-percentage 0.1))
 
   (garbage-collect-defer)
-  (add-hook 'emacs-startup-hook 'garbage-collect-restore)
+  (add-hook 'emacs-startup-hook #'garbage-collect-restore)
 #+end_src
 
 ** Early package management
    :properties:
    :header-args: :tangle (user-emacs-file "early-init.el")
    :end:
-Because I am writing this configuration to be as portable as possible (e.g. I should be able to dump this onto any machine and run it), I manage all packages through Emacs. All of this is done leading up to the call of ~package-initialize~ between that ~early-init.el~ and ~init.el~, which makes for faster loading.
+Because I am writing this configuration to be as portable as possible (e.g. I should be able to dump this onto any machine and run it), I manage all packages through Emacs. All of this is done leading up to the call of ~package-initialize~ between that =early-init.el= and =init.el=, which makes for faster loading.
 
 *** Disable ~customize~, keep ~package-autoremove~ working
-I /hate/ ~customize~. I configure everything in this file, so I don't need anything messing with my ~init.el~, much less changing settings on me. Even though I do not use ~customize~ but really like protecting packages used in my configuration from ~package-autoremove~, I need to still set ~package-selected-packages~ so that it'll work. Packages are listed in the order in which they are installed.
+I /hate/ ~customize~. I configure everything in this file, so I don't need anything messing with my =init.el=, much less changing settings on me. Even though I do not use ~customize~ but really like protecting packages used in my configuration from ~package-autoremove~, I need to still set =package-selected-packages= so that it'll work. Packages are listed in the order in which they are installed.
 #+begin_src emacs-lisp
   (setq custom-file "/dev/null"
         package-selected-packages '(;; Core
@@ -536,7 +533,7 @@ Next, we have to add our repositories to the list. The GNU and MELPA repositorie
 This part of package management is meant to be done after ~package-initialize~ has been called. At this point, we can leave =early-init.el= and move into =init.el= to continue Emacs startup.
 
 *** Bootstrap ~async~
-This package is super useful for making package installation significantly faster. It also allows for asynchronous ~dired~ and asynchronous byte-compilation.
+This package is super useful for making package installation significantly faster. It also allows for asynchronous ~dired~ and byte-compilation.
 #+begin_src emacs-lisp
   (unless (package-installed-p 'async)
     (package-refresh-contents)
@@ -588,11 +585,11 @@ Having the Emacs server running allows for a lot of neat integration with other 
     (unless (server-running-p)
       (server-start)))
 
-  (add-hook 'after-init-hook 'server-start-if-not-running)
+  (add-hook 'after-init-hook #'server-start-if-not-running)
 #+end_src
 
 *** Prepare GUI (Part 2)
-These buggers won't properly set unless it's done after ~early-init.el~, which is a real bummer.
+These buggers won't properly set unless it's done after =early-init.el=, which is a real bummer.
 #+begin_src emacs-lisp
   (tooltip-mode -1)
 
@@ -626,7 +623,7 @@ Stock Emacs is /ugly/. Just straight up ugly. Suffice to say it leaves much to b
    :header-args: :tangle (user-emacs-file "init.el")
    :end:
 *** Setting the font style
-Originally I had this set up by means of ~custom-set-faces~, but frankly that is less easily configured than this method. First, we determine whether my preferred font is present on the system and set it if present. Otherwise, keep whatever default font Emacs chooses. We also set the font size here.
+Originally I had this set up by means of ~custom-set-faces~, but frankly that is less easily configured than this method.
 #+begin_src emacs-lisp
   (when (member "Iosevka" (font-family-list))
     (set-face-attribute 'default nil :font "Iosevka" :height 100))
@@ -703,7 +700,7 @@ For some reason, theme creators don't really think of formatting ~org-mode~ past
 #+end_src
 
 ** Mode line
-I hate the default mode line with a burning passion. This mode line, on the other hand, is minimal yet gorgeous. When configured properly, it is hands down the best mode line I have ever used.
+I hate the default mode line with a burning passion. This mode line, on the other hand, is minimal and gorgeous. When configured properly, it is hands down the best mode line I have ever used.
 #+begin_src emacs-lisp :noweb yes :tangle (user-emacs-file "init.el")
   (use-package mood-line
     :ensure t
@@ -750,9 +747,9 @@ This is used in a number of places in Emacs. Better to have it on all the time t
 *** Line numbers (on most buffers)
 I like having line numbers and indicators for lines past the EOF. However, I don't like line numbers in modes where it breaks the mode.
 #+begin_src emacs-lisp
-  (add-hook 'text-mode-hook 'display-line-numbers-mode)
-  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
-  (add-hook 'conf-mode-hook 'display-line-numbers-mode)
+  (add-hook 'text-mode-hook #'display-line-numbers-mode)
+  (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+  (add-hook 'conf-mode-hook #'display-line-numbers-mode)
   (setq-default indicate-empty-lines t)
 #+end_src
 
@@ -790,11 +787,11 @@ It's subtle on my theme, but it still helps me keep track of my brackets and par
   :properties:
   :header-args: :tangle (user-emacs-file "init.el")
   :end:
-Anyone who has used Emacs for any period of time can attest to the fact it takes a lot to make Emacs comfortable for one's use. That is not to say that Emacs is /bad/, but it definitely isn't the most usable piece of software out of the box.
+Anyone who has used Emacs for any period of time can attest to the fact it takes a lot to make Emacs comfortable for one's use. That is not to say that Emacs is /bad/, but it definitely isn't the most usable piece of software straight out of the box.
 
 ** General functionality
 *** Use UTF-8 encoding
-This makes for a much easier time editing files and working with text.
+This makes for a much easier time editing files and working with text. Why isn't this the default to begin with?
 #+begin_src emacs-lisp
   (set-language-environment "UTF-8")
   (set-default-coding-systems 'utf-8)
@@ -843,8 +840,8 @@ Thanks to ~company~, this is possible now!
 *** Don't hang the minibuffer
 When using the minibuffer, never do garbage collection.
 #+begin_src emacs-lisp
-  (add-hook 'minibuffer-setup-hook 'garbage-collect-defer)
-  (add-hook 'minibuffer-exit-hook 'garbage-collect-restore)
+  (add-hook 'minibuffer-setup-hook #'garbage-collect-defer)
+  (add-hook 'minibuffer-exit-hook #'garbage-collect-restore)
 #+end_src
 
 *** Always confirm closing Emacs
@@ -854,7 +851,7 @@ I constantly kill Emacs on accident when running it in terminals, so this preven
 #+end_src
 
 *** Don't hide the cursor by default
-This is for when I'm using Emacs outside its role as my desktop environment. I need to know where my cursor is.
+I need to know where my cursor is at all times.
 #+begin_src emacs-lisp
   (setq make-pointer-invisible nil)
 #+end_src
@@ -866,7 +863,7 @@ This solves a number of hanging issues related to a number of different packages
 #+end_src
 
 *** Make scrolling a little less crazy
-Not sure why the mouse wheel get acceleration, but thankfully I don't have to worry about that anymore.
+Not sure why the mouse wheel gets acceleration, but thankfully I don't have to worry about that anymore.
 #+begin_src emacs-lisp
   (setq scroll-margin 0
         auto-window-vscroll nil
@@ -880,7 +877,7 @@ Not sure why the mouse wheel get acceleration, but thankfully I don't have to wo
 *** Change current directory with =C-c d=
 Useful for getting lost in the filesystem!
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-c d") 'cd)
+  (global-set-key (kbd "C-c d") #'cd)
 #+end_src
 
 *** Enable word wrapping for all buffers
@@ -908,7 +905,7 @@ Even as I've gotten used to Emacs key bindings, it is always nice to have this a
 *** Replace "yes or no" prompts with "y or n" prompts
 Beauty in brevity.
 #+begin_src emacs-lisp
-  (defalias 'yes-or-no-p 'y-or-n-p)
+  (defalias 'yes-or-no-p #'y-or-n-p)
 #+end_src
 
 *** Enable ~ido-mode~, install ~smex~
@@ -923,8 +920,8 @@ I /love/ ~ido-mode~.  Default =M-x= behavior doesn't use ~ido-mode~, so we insta
         ido-use-filename-at-point nil
         ido-create-new-buffer 'always)
 
-  (define-key ido-common-completion-map (kbd "C-n") 'ido-next-match)
-  (define-key ido-common-completion-map (kbd "C-p") 'ido-prev-match)
+  (define-key ido-common-completion-map (kbd "C-n") #'ido-next-match)
+  (define-key ido-common-completion-map (kbd "C-p") #'ido-prev-match)
 
   (ido-mode 1)
 
@@ -935,14 +932,14 @@ I /love/ ~ido-mode~.  Default =M-x= behavior doesn't use ~ido-mode~, so we insta
            ("<menu>" . smex)))
 #+end_src
 
-** Functions/macros
-These are some good-to-have functions and macros.
-
 *** Take off the training wheels
 I'm a big boy now.
 #+begin_src emacs-lisp
   (setq disabled-command-function nil)
 #+end_src
+
+** Functions/macros
+These are some good-to-have functions and macros.
 
 *** Choose a random item in a list
 This is something that comes in handy a couple times in some of what I do.
@@ -962,8 +959,8 @@ Since I'm starting to really mess with this, I should probably keep a macro arou
     (string-match-p string buffer-file-name))
 #+end_src
 
-*** Reference a file in ~user-emacs-directory~
-Since I so often will reference files in my ~user-emacs-directory~, I find it worthwhile to create a macro specifically for that.
+*** Reference a file in =user-emacs-directory=
+Since I so often will reference files in my =user-emacs-directory=, I find it worthwhile to create a macro specifically for that.
 #+begin_src emacs-lisp
   (defmacro user-emacs-file (file)
     "Find FILE in `user-emacs-directory'."
@@ -995,13 +992,13 @@ I hate having to click to focus a different window, so I would rather just have 
 #+end_src
 
 *** Making buffer names unique
-This looks a lot fancier than the default behavior.a
+This looks a lot fancier than the default behavior.
 #+begin_src emacs-lisp
   (setq uniquify-buffer-name-style 'forward
         uniquify-after-kill-buffer-p t)
 #+end_src
 
-*** Open dashboard with =C-c M-d=
+*** Restart dashboard with =C-c M-d=
 I constantly accidentally close dashboard, so I made a way to open it again if I accidentally kill it.
 #+begin_src emacs-lisp
   (defun dashboard-restart ()
@@ -1010,21 +1007,21 @@ I constantly accidentally close dashboard, so I made a way to open it again if I
     (dashboard-insert-startupify-lists)
     (switch-to-buffer "*dashboard*"))
 
-  (global-set-key (kbd "C-c M-d") 'dashboard-restart)
+  (global-set-key (kbd "C-c M-d") #'dashboard-restart)
 #+end_src
 
 *** Balance window sizes with =C-c b=
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-c b") 'balance-windows)
+  (global-set-key (kbd "C-c b") #'balance-windows)
 #+end_src
 
 *** Kill the current buffer with =C-x k=
-I had to adjust the function which kills both the current buffer and the current window, because it did not cooperate with EXWM buffers. That's why I have this weird chunk I don't actually have the expertise yet to fully parse.
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-x k") 'kill-this-buffer)
+  (global-set-key (kbd "C-x k") #'kill-this-buffer)
 #+end_src
 
 *** Kill both the buffer and window with =C-x C-k=
+I had to adjust the function which kills both the current buffer and the current window, because it did not cooperate with EXWM buffers.
 #+begin_src emacs-lisp
   (defun kill-this-buffer-and-window ()
     "Kill the current buffer and delete the selected window.
@@ -1045,22 +1042,24 @@ I had to adjust the function which kills both the current buffer and the current
                 (when (eq (selected-window) window-to-delete)
                   (delete-window)))))))
 
-  (global-set-key (kbd "C-x C-k") 'kill-this-buffer-and-window)
+  (global-set-key (kbd "C-x C-k") #'kill-this-buffer-and-window)
 #+end_src
 
 *** Kill all buffers and all windows with =C-x C-M-k=
 I wanted a way to quickly and gracefully destroy everything that is open at once.
 #+begin_src emacs-lisp
   (defun close-buffers-and-windows ()
-    "Close every buffer and close all windows, then restart dashboard."
+    "Close every buffer and close all windows, then restart dashboard if installed."
     (interactive)
     (when (yes-or-no-p "Really kill all buffers? ")
       (save-some-buffers)
       (mapc 'kill-buffer (buffer-list))
       (delete-other-windows)
-      (dashboard-restart)))
+      (when (and (featurep 'dashboard)
+                 (fboundp #'dashboard-restart))
+        (dashboard-restart))))
 
-  (global-set-key (kbd "C-x C-M-k") 'close-buffers-and-windows)
+  (global-set-key (kbd "C-x C-M-k") #'close-buffers-and-windows)
 #+end_src
 
 *** Make the scratch buffer immortal and start blank
@@ -1081,14 +1080,14 @@ Since apparently =C-x C-o= is actually something useful by default, I decided to
     :init
     (defvar buffer-move-and-windmove-map
       (let ((map (make-sparse-keymap)))
-        (define-key map (kbd "w") 'windmove-up)
-        (define-key map (kbd "a") 'windmove-left)
-        (define-key map (kbd "s") 'windmove-down)
-        (define-key map (kbd "d") 'windmove-right)
-        (define-key map (kbd "C-w") 'buf-move-up)
-        (define-key map (kbd "C-a") 'buf-move-left)
-        (define-key map (kbd "C-s") 'buf-move-down)
-        (define-key map (kbd "C-d") 'buf-move-right)
+        (define-key map (kbd "w") #'windmove-up)
+        (define-key map (kbd "a") #'windmove-left)
+        (define-key map (kbd "s") #'windmove-down)
+        (define-key map (kbd "d") #'windmove-right)
+        (define-key map (kbd "C-w") #'buf-move-up)
+        (define-key map (kbd "C-a") #'buf-move-left)
+        (define-key map (kbd "C-s") #'buf-move-down)
+        (define-key map (kbd "C-d") #'buf-move-right)
         map)
       "A keymap for `buffer-move' and `windmove' functions.")
     (global-set-key (kbd "C-x o") buffer-move-and-windmove-map))
@@ -1111,14 +1110,14 @@ This to me is preferable to the default behavior.
     (other-window 1)
     (ibuffer))
 
-  (global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
-  (global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
+  (global-set-key (kbd "C-x 2") #'split-and-follow-vertical)
+  (global-set-key (kbd "C-x 3") #'split-and-follow-horizontal)
 #+end_src
 
 *** Use ~ibuffer~ on =C-x b= so the buffer list doesn't open a new window
 Just another point of personal convenience.
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-x b") 'ibuffer)
+  (global-set-key (kbd "C-x b") #'ibuffer)
   (global-unset-key (kbd "C-x C-b"))
 #+end_src
 
@@ -1132,7 +1131,7 @@ Now that I have a literate(!) system configuration as well, it needs a bind if t
       (interactive)
       (find-file (user-config-file "dotfiles/literate-sysconfig.org")))
 
-    (global-set-key (kbd "C-c C-M-e") 'sys-config-visit))
+    (global-set-key (kbd "C-c C-M-e") #'sys-config-visit))
 #+end_src
 
 *** Open dotfiles configuration with =C-c M-e=
@@ -1144,7 +1143,7 @@ Now that I have a literate(!) system configuration as well, it needs a bind if t
       (interactive)
       (find-file (user-config-file "dotfiles/literate-dotfiles.org")))
 
-    (global-set-key (kbd "C-c M-e") 'literate-dotfiles-visit))
+    (global-set-key (kbd "C-c M-e") #'literate-dotfiles-visit))
 #+end_src
 
 *** Open Emacs configuration with =C-c e=
@@ -1155,7 +1154,7 @@ Since this thing is changing all the time, I really like having it available on 
     (interactive)
     (find-file (user-emacs-file "literate-emacs.org")))
 
-  (global-set-key (kbd "C-c e") 'config-visit)
+  (global-set-key (kbd "C-c e") #'config-visit)
 #+end_src
 
 * Making Emacs a good text editor
@@ -1178,7 +1177,7 @@ A nice way to make diagrams.
 #+end_src
 
 *** ~markdown-mode~ (bootleg org-mode for GitHub)
-I really don't like markdown but I have to use it for school, so...
+I really don't like Markdown but I have to use it, so...
 #+begin_src emacs-lisp
   (use-package markdown-mode
     :ensure t
@@ -1198,7 +1197,7 @@ I've gotten really into literate programming lately, so this makes it much easie
                (buffer-file-match "literate"))
       (org-babel-tangle)))
 
-  (add-hook 'after-save-hook 'tangle-literate-program -100)
+  (add-hook 'after-save-hook #'tangle-literate-program -100)
 #+end_src
 
 *** Automatically byte-compile Emacs files
@@ -1209,7 +1208,7 @@ This is meant to happen when I save my Emacs configuration, so that all bytecode
     (when (string-match-p "literate-emacs.org" (buffer-file-name))
       (byte-recompile-directory user-emacs-directory 0)))
 
-  (add-hook 'after-save-hook 'byte-compile-config-files 100)
+  (add-hook 'after-save-hook #'byte-compile-config-files 100)
 #+end_src
 
 ** General editing
@@ -1224,10 +1223,10 @@ Just a useful little tool to check spelling while editing a buffer. Only configu
     (setq ispell-program-name "aspell"
           ispell-dictionary "american")
 
-    (add-hook 'flyspell-mode-hook 'flyspell-buffer)
-    (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-    (add-hook 'conf-mode-hook 'flyspell-prog-mode)
-    (add-hook 'text-mode-hook 'flyspell-mode))
+    (add-hook 'flyspell-mode-hook #'flyspell-buffer)
+    (add-hook 'prog-mode-hook #'flyspell-prog-mode)
+    (add-hook 'conf-mode-hook #'flyspell-prog-mode)
+    (add-hook 'text-mode-hook #'flyspell-mode))
 #+end_src
 
 *** Better search behavior
@@ -1328,7 +1327,7 @@ I don't need it super often, but it's still nice to have.
     (backward-word)
     (kill-word 1))
 
-  (global-set-key (kbd "C-c DEL") 'whole-kill-word)
+  (global-set-key (kbd "C-c DEL") #'whole-kill-word)
 #+end_src
 
 *** Edit files with superuser privileges using =C-x C-M-f=
@@ -1343,7 +1342,7 @@ This is especially useful when I'm in my own desktop environment and need to edi
 ** Programming
 It's slowly growing, but I still truly do not need all that much when it comes to programming, mostly because I don't actually do all that much programming outside what I do for fun... and editing this file.
 
-*** Use SBCL for inferior LISP mode
+*** Use SBCL for inferior Lisp mode
 #+begin_src emacs-lisp
   (setq inferior-lisp-program "sbcl")
 #+end_src
@@ -1479,7 +1478,7 @@ Since obviously dot snippets are purely harmless +as far as I know+, I just don'
 #+end_src
 
 *** Shortcuts for various snippets
-First, we load ~org-tempo~, the extension that allows the old way of doing things, and add it to ~org-modules~. Then, we add shortcuts for the individual blocks of code. Finally, we can add shortcuts for other items that aren't blocks. I've grown somewhat fond of this way of organizing my shortcuts, because it separates the blocks from the one-liners.
+First, we load ~org-tempo~, the extension that allows the old way of doing things, and add it to =org-modules=. Then, we add shortcuts for the individual blocks of code. Finally, we can add shortcuts for other items that aren't blocks. I've grown somewhat fond of this way of organizing my shortcuts, because it separates the blocks from the one-liners.
 #+begin_src emacs-lisp
   (pdumper-require 'org-tempo)
   (add-to-list 'org-modules 'org-tempo)
@@ -1539,7 +1538,7 @@ For some reason, starting with ~org-mode~ 9.3 or so, all symbols that are bracke
     "Disable the angle bracket syntax added to `org-mode' in versions 9.2 and above."
     (modify-syntax-entry ?< ".")
     (modify-syntax-entry ?> "."))
-  (add-hook 'org-mode-hook 'farl-org/disable-angle-bracket-syntax)
+  (add-hook 'org-mode-hook #'farl-org/disable-angle-bracket-syntax)
 #+end_src
 
 *** Agenda (only enabled if an agenda is found)
@@ -1553,8 +1552,8 @@ I use =C-c M-a= and =C-c s-a= to do things related to my agenda. Only one of my 
       (interactive)
       (find-file "~/agenda.org"))
 
-    (global-set-key (kbd "C-c M-a") 'org-agenda)
-    (global-set-key (kbd "C-c s-a") 'open-agenda))
+    (global-set-key (kbd "C-c M-a") #'org-agenda)
+    (global-set-key (kbd "C-c s-a") #'open-agenda))
 #+end_src
 
 *** Use the current window when editing source blocks
@@ -1566,7 +1565,7 @@ This is just a convenience thing.
 *** Automatically fix inline images generated for diagrams
 This is exactly what I was looking for lmao
 #+begin_src emacs-lisp
-  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+  (add-hook 'org-babel-after-execute-hook #'org-redisplay-inline-images)
 #+end_src
 
 * Making Emacs more than an editor
@@ -1586,8 +1585,8 @@ I've been jumping between ~vterm~ and ~ansi-term~. In the end ~vterm~ blows ~ans
 #+end_src
 
 *** Reading ebooks in Emacs
-Not the best way to do epub reading, but at least it's in Emacs. It is currently disabled because it broke ~org-mode~.
-#+begin_src emacs-lisp :tangle no
+Not the best way to do epub reading, but at least it's in Emacs.
+#+begin_src emacs-lisp
   (use-package nov
     :ensure t
     :defer t
@@ -1610,14 +1609,14 @@ Picking a service to use for this was a pain. I ended up settling for wttrin bec
 Weeks start on Monday.
 #+begin_src emacs-lisp
   (setq calendar-week-start-day 1)
-  (global-set-key (kbd "C-c l") 'calendar)
+  (global-set-key (kbd "C-c l") #'calendar)
 #+end_src
 
 *** Reading the manpages
 Wow, there's actually an Emacs mode for this! I put these into the =C-h= binds, since it is a way of getting help, after all. If for some reason ~man~ is working, ~woman~ can still grab a manpage without calling ~man~.
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-h 4 m") 'man)
-  (global-set-key (kbd "C-h 4 w") 'woman)
+  (global-set-key (kbd "C-h 4 m") #'man)
+  (global-set-key (kbd "C-h 4 w") #'woman)
 #+end_src
 
 ** Games
@@ -1690,7 +1689,7 @@ A simple and fun game. Was a big deal when I was in high school. I still play it
 #+end_src
 
 * Making Emacs a desktop environment
-Yes, Emacs is my *entire desktop environment*. You should probably remove this entire section if you don't plan to use Emacs as your desktop environment, but including it doesn't have any disadvantages either, since it only loads if an environment variable =_RUN_EXWM= exists, which it promptly unsets. Make a note of this when writing your =.xinitrc= or writing a =.desktop= file to load Emacs as your desktop environment.
+Yes, Emacs is my *entire desktop environment*. You should probably remove this section if you don't plan to use Emacs as your desktop environment, but including it doesn't have any disadvantages either, since it only loads if an environment variable =_RUN_EXWM= exists, which it promptly unsets. Make a note of this when writing your =.xinitrc= or writing a =.desktop= file to load Emacs as your desktop environment.
 #+begin_src emacs-lisp :noweb yes :tangle (user-emacs-file "init.el")
   (use-package exwm
     :if (getenv "_RUN_EXWM")
@@ -1730,7 +1729,7 @@ This was annoying when I first installed EXWM. Thankfully this is a very easy fi
     "Rename the current `exwm-mode' buffer after the X window's title."
     (exwm-workspace-rename-buffer exwm-title))
 
-  (add-hook 'exwm-update-title-hook 'farl-exwm/name-buffer-after-window-title)
+  (add-hook 'exwm-update-title-hook #'farl-exwm/name-buffer-after-window-title)
 #+end_src
 
 *** Edit text for an X window in Emacs
@@ -1745,7 +1744,7 @@ At first I questioned why I would do this, but now that I know the advantages of
 #+end_src
 
 *** Getting a ~rofi~ equivalent
-Since I'm using Emacs as a window manager, I need something comparable to ~rofi~ so I can open X windows I haven't bound to keys. It will be bound elsewhere. I really don't want one named after +a project made by Nazis+ a Suckless project, but laziness makes that hard. At some point I will make my own function.
+Since I'm using Emacs as a window manager, I need something comparable to ~rofi~ so I can open X windows I haven't bound to keys. It will be bound elsewhere. I really don't want one named after +a project made by Nazis+ a Suckless project, but laziness makes that hard. At some point I will make my own function, preferably one considerably more minimalist.
 #+begin_src emacs-lisp
   (use-package dmenu
     :ensure t
@@ -1759,7 +1758,7 @@ Since I'm using Emacs as a window manager, I need something comparable to ~rofi~
    :header-args: :noweb-ref workspaces
    :end:
 *** Load all workspaces on startup
-I do not want to have to load all of them on my own...
+I do not want to have to load all of them individually on my own...
 #+begin_src emacs-lisp
   (setq exwm-workspace-number 10)
 #+end_src
@@ -1783,7 +1782,6 @@ This section is only to ensure the proper workspaces are placed on the right mon
 ...and also have some launch floating and/or without a mode line or borders.
 #+begin_src emacs-lisp
   (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
-                                      floating-mode-line nil
                                       workspace 9)
                                      ((string= exwm-class-name "TelegramDesktop")
                                       workspace 8)
@@ -1829,7 +1827,7 @@ Because I now use so many workspaces, I need to be able to see what workspace I 
     (minibuffer-line-mode 1)
     (set-face-attribute 'minibuffer-line nil :inherit 'default)
     (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
-    (add-hook 'exwm-workspace-switch-hook 'minibuffer-line--update))
+    (add-hook 'exwm-workspace-switch-hook #'minibuffer-line--update))
 #+end_src
 
 ** Multi-head configuration
@@ -1947,7 +1945,7 @@ Finally, I can make my generic display-and-dock setup function. I also set the w
           (display-setup-w541)
           (peripheral-setup)))))
 
-  (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
+  (add-hook 'exwm-randr-screen-change-hook #'display-and-dock-setup)
 #+end_src
 
 ** X applications
@@ -2137,15 +2135,15 @@ This one was the least straightforward because the way it's implemented by ~desk
 #+begin_src emacs-lisp
   ;; Storing to clipboard
   (define-key desktop-environment-mode-map (kbd "<print>")
-    'farl-de/desktop-environment-screenshot-part-clip)
+    #'farl-de/desktop-environment-screenshot-part-clip)
   (define-key desktop-environment-mode-map (kbd "<S-print>")
-    'farl-de/desktop-environment-screenshot-clip)
+    #'farl-de/desktop-environment-screenshot-clip)
 
   ;; Storing to file
   (define-key desktop-environment-mode-map (kbd "<C-print>")
-    'farl-de/desktop-environment-screenshot-part)
+    #'farl-de/desktop-environment-screenshot-part)
   (define-key desktop-environment-mode-map (kbd "<C-S-print>")
-    'farl-de/desktop-environment-screenshot)
+    #'farl-de/desktop-environment-screenshot)
 #+end_src
 
 First, I set what directory to store screenshots in.
@@ -2195,7 +2193,7 @@ The functions which ~desktop-environment~ comes with are kinda garbage, so I mad
 #+end_src
 
 *** Setting the wallpaper
-I've been working on [[https://github.com/farlado/emacs-wallpaper][an easy way to configure wallpapers]] which makes for way less hassle.
+I've been working on [[https://github.com/farlado/emacs-wallpaper][an easy way to configure wallpapers]] which makes for way less hassle. It only relies on ~feh~ as a backend for applying wallpapers, so if you use Emacs as a daemon it can manage your wallpapers even if it isn't the window manager.
 #+begin_src emacs-lisp
   (use-package wallpaper
     :load-path "lisp/wallpaper"
@@ -2259,7 +2257,7 @@ Used when I play Jackbox Party Pack with friends. Also set up to launch ~pavucon
 #+end_src
 
 *** Keyboard layout selection
-It's [[https://github.com/farlado/emacs-xkb][its own package]] now.
+It's [[https://github.com/farlado/emacs-xkb][its own package]] now. Check it out, I think it's pretty nice.
 #+begin_src emacs-lisp
   (use-package xkb
     :load-path "lisp/xkb"
@@ -2268,8 +2266,7 @@ It's [[https://github.com/farlado/emacs-xkb][its own package]] now.
     (setq xkb-cycle-layouts '("us"
                               "epo"
                               "de")
-          xkb-options '("ctrl:nocaps")
-          xkb-set-layout-key "s-w")
+          xkb-options '("ctrl:nocaps"))
     :hook (after-init . xkb-cycle-mode))
 #+end_src
 
@@ -2281,7 +2278,7 @@ It's [[https://github.com/farlado/emacs-xkb][its own package]] now.
          (start-process "Suspend" nil "systemctl"
                         "suspend" "-i")))
 
-  (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
+  (global-set-key (kbd "C-x C-M-s") #'suspend-computer)
 #+end_src
 
 *** Rebooting
@@ -2340,7 +2337,7 @@ I copied the function for quitting Emacs to handle reboot too.
        (shell-command "reboot")
        (kill-emacs))))
 
-  (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
+  (global-set-key (kbd "C-x C-M-r") #'save-buffers-reboot)
 #+end_src
 
 *** Shutting down
@@ -2399,7 +2396,7 @@ I copied the function for quitting Emacs to handle shutting down.
        (shell-command "shutdown now")
        (kill-emacs))))
 
-  (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
+  (global-set-key (kbd "C-x C-M-c") #'save-buffers-shut-down)
 #+end_src
 
 ** Keybindings
@@ -2521,14 +2518,14 @@ This is super nice, because I love these key bindings and they are just intuitiv
     (interactive)
     (execute-kbd-macro (kbd "C-q C-k")))
 
-  (define-key exwm-mode-map (kbd "C-x C-s") 'farl-exwm/C-s)
-  (define-key exwm-mode-map (kbd "C-c C-l") 'farl-exwm/C-k)
+  (define-key exwm-mode-map (kbd "C-x C-s") #'farl-exwm/C-s)
+  (define-key exwm-mode-map (kbd "C-c C-l") #'farl-exwm/C-k)
 #+end_src
 
 *** Send a key verbatim more easily
 #+begin_src emacs-lisp
   (define-key exwm-mode-map (kbd "C-c C-q") nil)
-  (define-key exwm-mode-map (kbd "C-q") 'exwm-input-send-next-key)
+  (define-key exwm-mode-map (kbd "C-q") #'exwm-input-send-next-key)
 #+end_src
 
 *** Inhibit keys I don't use
@@ -2618,7 +2615,7 @@ When exiting, these are things I want done.
     "Run this when logging out as part of `kill-emacs-hook'."
     <<on-logout>>)
 
-  (add-hook 'kill-emacs-hook 'farl-exwm/on-logout)
+  (add-hook 'kill-emacs-hook #'farl-exwm/on-logout)
 #+end_src
 
 *** Black out the root window
@@ -2651,7 +2648,7 @@ This loads the necessary files to ensure ~emms~ starts properly.
 
 ** Functions
   :properties:
-  :header-args: :noweb-ref emma-func
+  :header-args: :noweb-ref emms-func
   :end:
 *** Starting the daemon
 #+begin_src emacs-lisp
@@ -2702,24 +2699,24 @@ Now using a keymap in place of that wonky as crap binding system. The new binds 
     (defvar emms-map
       (let ((map (make-sparse-keymap)))
         ;; Opening playlist and music browser
-        (define-key map (kbd "v") 'emms)
-        (define-key map (kbd "b") 'emms-smart-browse)
+        (define-key map (kbd "v") #'emms)
+        (define-key map (kbd "b") #'emms-smart-browse)
         ;; Track navigation
-        (define-key map (kbd "n n") 'emms-next)
-        (define-key map (kbd "n p") 'emms-previous)
-        (define-key map (kbd "p")   'emms-pause)
-        (define-key map (kbd "s")   'emms-stop)
+        (define-key map (kbd "n n") #'emms-next)
+        (define-key map (kbd "n p") #'emms-previous)
+        (define-key map (kbd "p")   #'emms-pause)
+        (define-key map (kbd "s")   #'emms-stop)
         ;; Repeat/shuffle
-        (define-key map (kbd "t C-r") 'emms-toggle-repeat-track)
-        (define-key map (kbd "t r")   'emms-toggle-repeat-playlist)
-        (define-key map (kbd "t s")   'farl-emms/shuffle-with-message)
+        (define-key map (kbd "t C-r") #'emms-toggle-repeat-track)
+        (define-key map (kbd "t r")   #'emms-toggle-repeat-playlist)
+        (define-key map (kbd "t s")   #'farl-emms/shuffle-with-message)
         ;; Refreshing various things
-        (define-key map (kbd "r c") 'emms-player-mpd-update-all-reset-cache)
-        (define-key map (kbd "r d") 'mpd/update-database)
+        (define-key map (kbd "r c") #'emms-player-mpd-update-all-reset-cache)
+        (define-key map (kbd "r d") #'mpd/update-database)
         ;; `mpd'-specific functions
-        (define-key map (kbd "d s") 'mpd/start-music-daemon)
-        (define-key map (kbd "d q") 'mpd/kill-music-daemon)
-        (define-key map (kbd "d u") 'mpd/update-database)
+        (define-key map (kbd "d s") #'mpd/start-music-daemon)
+        (define-key map (kbd "d q") #'mpd/kill-music-daemon)
+        (define-key map (kbd "d u") #'mpd/update-database)
         map)
       "A keymap for controlling `emms'.")
     (global-set-key (kbd "C-c a") emms-map)
@@ -2734,7 +2731,6 @@ This is where ~emms~ is configured to use ~mpd~, and some environment variables 
         emms-player-mpd-server-name "localhost"
         emms-player-mpd-server-port "6601"
         mpc-host "localhost:6601")
-
   (setenv "MPD_HOST" "localhost")
   (setenv "MPD_PORT" "6601")
 #+end_src
@@ -2742,18 +2738,18 @@ This is where ~emms~ is configured to use ~mpd~, and some environment variables 
 * Giving files their footers
 Since we gave files their headers, I see no reason not to give them footers.
 
-*** ~early-init.el~
+*** =early-init.el=
 #+begin_src emacs-lisp :tangle (user-emacs-file "early-init.el")
   ;;; early-init.el ends here
 #+end_src
 
-*** ~init.el~
+*** =init.el=
 #+begin_src emacs-lisp :tangle (user-emacs-file "init.el")
   ;;; init.el ends here
 #+end_src
 
-*** ~pdumper.el~
-#+begin_src emacs-lisp :tangle (user-emacs-file "pdumper.el")
+*** =pdumper.el=
+#+begin_src emacs-lisp :tangle (user-emacs-file "lisp/pdumper.el")
   ;;; pdumper.el ends here
 #+end_src
 

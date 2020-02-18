@@ -57,7 +57,7 @@ FILENAME and NOERROR are also passed to `require'."
 
 (setq file-name-handler-alist nil)
 
-(add-hook 'emacs-startup-hook 'startup/revert-file-name-handler-alist)
+(add-hook 'emacs-startup-hook #'startup/revert-file-name-handler-alist)
 
 (defun garbage-collect-defer ()
   "Defer garbage collection."
@@ -70,7 +70,7 @@ FILENAME and NOERROR are also passed to `require'."
         gc-cons-percentage 0.1))
 
 (garbage-collect-defer)
-(add-hook 'emacs-startup-hook 'garbage-collect-restore)
+(add-hook 'emacs-startup-hook #'garbage-collect-restore)
 
 (setq custom-file "/dev/null"
       package-selected-packages '(;; Core

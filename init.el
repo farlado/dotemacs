@@ -44,7 +44,7 @@
   (unless (server-running-p)
     (server-start)))
 
-(add-hook 'after-init-hook 'server-start-if-not-running)
+(add-hook 'after-init-hook #'server-start-if-not-running)
 
 (tooltip-mode -1)
 
@@ -115,9 +115,9 @@
 
 (global-page-break-lines-mode 1)
 
-(add-hook 'text-mode-hook 'display-line-numbers-mode)
-(add-hook 'prog-mode-hook 'display-line-numbers-mode)
-(add-hook 'conf-mode-hook 'display-line-numbers-mode)
+(add-hook 'text-mode-hook #'display-line-numbers-mode)
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(add-hook 'conf-mode-hook #'display-line-numbers-mode)
 (setq-default indicate-empty-lines t)
 
 (show-paren-mode 1)
@@ -169,8 +169,8 @@
   :init
   (add-to-list 'company-backends 'company-emoji))
 
-(add-hook 'minibuffer-setup-hook 'garbage-collect-defer)
-(add-hook 'minibuffer-exit-hook 'garbage-collect-restore)
+(add-hook 'minibuffer-setup-hook #'garbage-collect-defer)
+(add-hook 'minibuffer-exit-hook #'garbage-collect-restore)
 
 (setq confirm-kill-emacs 'yes-or-no-p)
 
@@ -186,7 +186,7 @@
       mouse-wheel-progressive-speed nil
       mouse-wheel-follow-mouse t)
 
-(global-set-key (kbd "C-c d") 'cd)
+(global-set-key (kbd "C-c d") #'cd)
 
 (global-visual-line-mode 1)
 
@@ -198,7 +198,7 @@
   :init
   (which-key-mode 1))
 
-(defalias 'yes-or-no-p 'y-or-n-p)
+(defalias 'yes-or-no-p #'y-or-n-p)
 
 (pdumper-require 'ido)
 
@@ -209,8 +209,8 @@
       ido-use-filename-at-point nil
       ido-create-new-buffer 'always)
 
-(define-key ido-common-completion-map (kbd "C-n") 'ido-next-match)
-(define-key ido-common-completion-map (kbd "C-p") 'ido-prev-match)
+(define-key ido-common-completion-map (kbd "C-n") #'ido-next-match)
+(define-key ido-common-completion-map (kbd "C-p") #'ido-prev-match)
 
 (ido-mode 1)
 
@@ -256,11 +256,11 @@
   (dashboard-insert-startupify-lists)
   (switch-to-buffer "*dashboard*"))
 
-(global-set-key (kbd "C-c M-d") 'dashboard-restart)
+(global-set-key (kbd "C-c M-d") #'dashboard-restart)
 
-(global-set-key (kbd "C-c b") 'balance-windows)
+(global-set-key (kbd "C-c b") #'balance-windows)
 
-(global-set-key (kbd "C-x k") 'kill-this-buffer)
+(global-set-key (kbd "C-x k") #'kill-this-buffer)
 
 (defun kill-this-buffer-and-window ()
   "Kill the current buffer and delete the selected window.
@@ -281,18 +281,20 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
               (when (eq (selected-window) window-to-delete)
                 (delete-window)))))))
 
-(global-set-key (kbd "C-x C-k") 'kill-this-buffer-and-window)
+(global-set-key (kbd "C-x C-k") #'kill-this-buffer-and-window)
 
 (defun close-buffers-and-windows ()
-  "Close every buffer and close all windows, then restart dashboard."
+  "Close every buffer and close all windows, then restart dashboard if installed."
   (interactive)
   (when (yes-or-no-p "Really kill all buffers? ")
     (save-some-buffers)
     (mapc 'kill-buffer (buffer-list))
     (delete-other-windows)
-    (dashboard-restart)))
+    (when (and (featurep 'dashboard)
+               (fboundp #'dashboard-restart))
+      (dashboard-restart))))
 
-(global-set-key (kbd "C-x C-M-k") 'close-buffers-and-windows)
+(global-set-key (kbd "C-x C-M-k") #'close-buffers-and-windows)
 
 (with-current-buffer "*scratch*"
   (emacs-lock-mode 'kill))
@@ -305,14 +307,14 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   :init
   (defvar buffer-move-and-windmove-map
     (let ((map (make-sparse-keymap)))
-      (define-key map (kbd "w") 'windmove-up)
-      (define-key map (kbd "a") 'windmove-left)
-      (define-key map (kbd "s") 'windmove-down)
-      (define-key map (kbd "d") 'windmove-right)
-      (define-key map (kbd "C-w") 'buf-move-up)
-      (define-key map (kbd "C-a") 'buf-move-left)
-      (define-key map (kbd "C-s") 'buf-move-down)
-      (define-key map (kbd "C-d") 'buf-move-right)
+      (define-key map (kbd "w") #'windmove-up)
+      (define-key map (kbd "a") #'windmove-left)
+      (define-key map (kbd "s") #'windmove-down)
+      (define-key map (kbd "d") #'windmove-right)
+      (define-key map (kbd "C-w") #'buf-move-up)
+      (define-key map (kbd "C-a") #'buf-move-left)
+      (define-key map (kbd "C-s") #'buf-move-down)
+      (define-key map (kbd "C-d") #'buf-move-right)
       map)
     "A keymap for `buffer-move' and `windmove' functions.")
   (global-set-key (kbd "C-x o") buffer-move-and-windmove-map))
@@ -331,10 +333,10 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   (other-window 1)
   (ibuffer))
 
-(global-set-key (kbd "C-x 2") 'split-and-follow-vertical)
-(global-set-key (kbd "C-x 3") 'split-and-follow-horizontal)
+(global-set-key (kbd "C-x 2") #'split-and-follow-vertical)
+(global-set-key (kbd "C-x 3") #'split-and-follow-horizontal)
 
-(global-set-key (kbd "C-x b") 'ibuffer)
+(global-set-key (kbd "C-x b") #'ibuffer)
 (global-unset-key (kbd "C-x C-b"))
 
 (when (file-exists-p (user-config-file "dotfiles/literate-sysconfig.org"))
@@ -343,7 +345,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     (interactive)
     (find-file (user-config-file "dotfiles/literate-sysconfig.org")))
 
-  (global-set-key (kbd "C-c C-M-e") 'sys-config-visit))
+  (global-set-key (kbd "C-c C-M-e") #'sys-config-visit))
 
 (when (file-exists-p (user-config-file "dotfiles/literate-dotfiles.org"))
   (defun literate-dotfiles-visit ()
@@ -351,14 +353,14 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     (interactive)
     (find-file (user-config-file "dotfiles/literate-dotfiles.org")))
 
-  (global-set-key (kbd "C-c M-e") 'literate-dotfiles-visit))
+  (global-set-key (kbd "C-c M-e") #'literate-dotfiles-visit))
 
 (defun config-visit ()
   "Open the configuration file."
   (interactive)
   (find-file (user-emacs-file "literate-emacs.org")))
 
-(global-set-key (kbd "C-c e") 'config-visit)
+(global-set-key (kbd "C-c e") #'config-visit)
 
 (use-package graphviz-dot-mode
   :ensure t
@@ -377,14 +379,14 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
              (buffer-file-match "literate"))
     (org-babel-tangle)))
 
-(add-hook 'after-save-hook 'tangle-literate-program -100)
+(add-hook 'after-save-hook #'tangle-literate-program -100)
 
 (defun byte-compile-config-files ()
   "Byte-compile Emacs configuration files."
   (when (string-match-p "literate-emacs.org" (buffer-file-name))
     (byte-recompile-directory user-emacs-directory 0)))
 
-(add-hook 'after-save-hook 'byte-compile-config-files 100)
+(add-hook 'after-save-hook #'byte-compile-config-files 100)
 
 (when (executable-find "aspell")
   (pdumper-require 'flyspell)
@@ -392,10 +394,10 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   (setq ispell-program-name "aspell"
         ispell-dictionary "american")
 
-  (add-hook 'flyspell-mode-hook 'flyspell-buffer)
-  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-  (add-hook 'conf-mode-hook 'flyspell-prog-mode)
-  (add-hook 'text-mode-hook 'flyspell-mode))
+  (add-hook 'flyspell-mode-hook #'flyspell-buffer)
+  (add-hook 'prog-mode-hook #'flyspell-prog-mode)
+  (add-hook 'conf-mode-hook #'flyspell-prog-mode)
+  (add-hook 'text-mode-hook #'flyspell-mode))
 
 (use-package swiper
   :ensure t
@@ -452,7 +454,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   (backward-word)
   (kill-word 1))
 
-(global-set-key (kbd "C-c DEL") 'whole-kill-word)
+(global-set-key (kbd "C-c DEL") #'whole-kill-word)
 
 (use-package sudo-edit
   :ensure t
@@ -595,7 +597,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   "Disable the angle bracket syntax added to `org-mode' in versions 9.2 and above."
   (modify-syntax-entry ?< ".")
   (modify-syntax-entry ?> "."))
-(add-hook 'org-mode-hook 'farl-org/disable-angle-bracket-syntax)
+(add-hook 'org-mode-hook #'farl-org/disable-angle-bracket-syntax)
 
 (when (file-exists-p "~/agenda.org")
   (setq org-agenda-files '("~/agenda.org"))
@@ -605,17 +607,22 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     (interactive)
     (find-file "~/agenda.org"))
 
-  (global-set-key (kbd "C-c M-a") 'org-agenda)
-  (global-set-key (kbd "C-c s-a") 'open-agenda))
+  (global-set-key (kbd "C-c M-a") #'org-agenda)
+  (global-set-key (kbd "C-c s-a") #'open-agenda))
 
 (setq org-src-window-setup 'current-window)
 
-(add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+(add-hook 'org-babel-after-execute-hook #'org-redisplay-inline-images)
 
 (use-package vterm
   :ensure t
   :defer t
   :bind ("C-c t" . vterm))
+
+(use-package nov
+  :ensure t
+  :defer t
+  :mode ("\\.epub\\'" . nov-mode))
 
 (use-package wttrin
   :ensure t
@@ -625,10 +632,10 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   :bind ("C-c w" . wttrin))
 
 (setq calendar-week-start-day 1)
-(global-set-key (kbd "C-c l") 'calendar)
+(global-set-key (kbd "C-c l") #'calendar)
 
-(global-set-key (kbd "C-h 4 m") 'man)
-(global-set-key (kbd "C-h 4 w") 'woman)
+(global-set-key (kbd "C-h 4 m") #'man)
+(global-set-key (kbd "C-h 4 w") #'woman)
 
 (defvar games-map (make-sparse-keymap)
   "A keymap to which games can be added.")
@@ -691,7 +698,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     "Rename the current `exwm-mode' buffer after the X window's title."
     (exwm-workspace-rename-buffer exwm-title))
   
-  (add-hook 'exwm-update-title-hook 'farl-exwm/name-buffer-after-window-title)
+  (add-hook 'exwm-update-title-hook #'farl-exwm/name-buffer-after-window-title)
   (use-package exwm-edit
     :ensure t
     :defer t
@@ -715,7 +722,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                                              8 "DP2-3"
                                              9 "DP2-2"))
   (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
-                                      floating-mode-line nil
                                       workspace 9)
                                      ((string= exwm-class-name "TelegramDesktop")
                                       workspace 8)
@@ -751,7 +757,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     (minibuffer-line-mode 1)
     (set-face-attribute 'minibuffer-line nil :inherit 'default)
     (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
-    (add-hook 'exwm-workspace-switch-hook 'minibuffer-line--update))
+    (add-hook 'exwm-workspace-switch-hook #'minibuffer-line--update))
   (defun get-connected-monitors ()
     "Return a list of the currently connected monitors."
     (split-string
@@ -838,7 +844,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
           (display-setup-w541)
           (peripheral-setup)))))
   
-  (add-hook 'exwm-randr-screen-change-hook 'display-and-dock-setup)
+  (add-hook 'exwm-randr-screen-change-hook #'display-and-dock-setup)
   (defun run-gimp ()
     "Start GIMP."
     (interactive)
@@ -945,15 +951,15 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
            "--force-clock --radius 1 --ring-width 1 "))
     ;; Storing to clipboard
     (define-key desktop-environment-mode-map (kbd "<print>")
-      'farl-de/desktop-environment-screenshot-part-clip)
+      #'farl-de/desktop-environment-screenshot-part-clip)
     (define-key desktop-environment-mode-map (kbd "<S-print>")
-      'farl-de/desktop-environment-screenshot-clip)
+      #'farl-de/desktop-environment-screenshot-clip)
     
     ;; Storing to file
     (define-key desktop-environment-mode-map (kbd "<C-print>")
-      'farl-de/desktop-environment-screenshot-part)
+      #'farl-de/desktop-environment-screenshot-part)
     (define-key desktop-environment-mode-map (kbd "<C-S-print>")
-      'farl-de/desktop-environment-screenshot)
+      #'farl-de/desktop-environment-screenshot)
     (setq desktop-environment-screenshot-directory "~/screenshots")
     (setq desktop-environment-screenshot-command
           "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
@@ -1034,8 +1040,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     (setq xkb-cycle-layouts '("us"
                               "epo"
                               "de")
-          xkb-options '("ctrl:nocaps")
-          xkb-set-layout-key "s-w")
+          xkb-options '("ctrl:nocaps"))
     :hook (after-init . xkb-cycle-mode))
   (defun suspend-computer ()
     (interactive)
@@ -1043,7 +1048,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
          (start-process "Suspend" nil "systemctl"
                         "suspend" "-i")))
   
-  (global-set-key (kbd "C-x C-M-s") 'suspend-computer)
+  (global-set-key (kbd "C-x C-M-s") #'suspend-computer)
   (defun save-buffers-reboot (&optional arg)
     "Offer to save each buffer, then shut down the computer.
   This function is literally just a copycat of `save-buffers-kill-emacs'.
@@ -1097,7 +1102,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
        (shell-command "reboot")
        (kill-emacs))))
   
-  (global-set-key (kbd "C-x C-M-r") 'save-buffers-reboot)
+  (global-set-key (kbd "C-x C-M-r") #'save-buffers-reboot)
   (defun save-buffers-shut-down (&optional arg)
     "Offer to save each buffer, then shut down the computer.
   This function is literally just a copycat of `save-buffers-kill-emacs'.
@@ -1151,7 +1156,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
        (shell-command "shutdown now")
        (kill-emacs))))
   
-  (global-set-key (kbd "C-x C-M-c") 'save-buffers-shut-down)
+  (global-set-key (kbd "C-x C-M-c") #'save-buffers-shut-down)
   (setq exwm-input-global-keys `(;; Switching workspace focus
                                  ;; s-1 for 1, s-2 for 2, etc...
                                  ,@(mapcar
@@ -1259,10 +1264,10 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     (interactive)
     (execute-kbd-macro (kbd "C-q C-k")))
   
-  (define-key exwm-mode-map (kbd "C-x C-s") 'farl-exwm/C-s)
-  (define-key exwm-mode-map (kbd "C-c C-l") 'farl-exwm/C-k)
+  (define-key exwm-mode-map (kbd "C-x C-s") #'farl-exwm/C-s)
+  (define-key exwm-mode-map (kbd "C-c C-l") #'farl-exwm/C-k)
   (define-key exwm-mode-map (kbd "C-c C-q") nil)
-  (define-key exwm-mode-map (kbd "C-q") 'exwm-input-send-next-key)
+  (define-key exwm-mode-map (kbd "C-q") #'exwm-input-send-next-key)
   (define-key exwm-mode-map (kbd "C-c C-t C-f") nil)
   (define-key exwm-mode-map (kbd "C-c C-t C-v") nil)
   (define-key exwm-mode-map (kbd "C-c C-t C-m") nil)
@@ -1292,7 +1297,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     "Run this when logging out as part of `kill-emacs-hook'."
     (shell-command "hsetroot -solid '#000000'"))
   
-  (add-hook 'kill-emacs-hook 'farl-exwm/on-logout))
+  (add-hook 'kill-emacs-hook #'farl-exwm/on-logout))
 
 (use-package emms
   :if (executable-find "mpd")
@@ -1308,31 +1313,53 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
         emms-player-mpd-server-name "localhost"
         emms-player-mpd-server-port "6601"
         mpc-host "localhost:6601")
-  
   (setenv "MPD_HOST" "localhost")
   (setenv "MPD_PORT" "6601")
-  
+  (defun mpd/start-music-daemon ()
+    "Start MPD, connect to it and sync the metadata cache"
+    (interactive)
+    (shell-command "mpd")
+    (mpd/update-database)
+    (emms-player-mpd-connect)
+    (emms-cache-set-from-mpd-all)
+    (message "MPD started!"))
+  (defun mpd/kill-music-daemon ()
+    "Stop playback and kill the music daemon."
+    (interactive)
+    (emms-stop)
+    (call-process "killall" nil nil nil "mpd")
+    (message "MPD killed!"))
+  (defun mpd/update-database ()
+    "Update the MPD database synchronously."
+    (interactive)
+    (call-process "mpc" nil nil nil "update")
+    (message "MPD database updated!"))
+  (defun farl-emms/shuffle-with-message ()
+    "Shuffle the playlist and say so in the echo area."
+    (interactive)
+    (emms-shuffle)
+    (message "Playlist has been shuffled."))
   (defvar emms-map
     (let ((map (make-sparse-keymap)))
       ;; Opening playlist and music browser
-      (define-key map (kbd "v") 'emms)
-      (define-key map (kbd "b") 'emms-smart-browse)
+      (define-key map (kbd "v") #'emms)
+      (define-key map (kbd "b") #'emms-smart-browse)
       ;; Track navigation
-      (define-key map (kbd "n n") 'emms-next)
-      (define-key map (kbd "n p") 'emms-previous)
-      (define-key map (kbd "p")   'emms-pause)
-      (define-key map (kbd "s")   'emms-stop)
+      (define-key map (kbd "n n") #'emms-next)
+      (define-key map (kbd "n p") #'emms-previous)
+      (define-key map (kbd "p")   #'emms-pause)
+      (define-key map (kbd "s")   #'emms-stop)
       ;; Repeat/shuffle
-      (define-key map (kbd "t C-r") 'emms-toggle-repeat-track)
-      (define-key map (kbd "t r")   'emms-toggle-repeat-playlist)
-      (define-key map (kbd "t s")   'farl-emms/shuffle-with-message)
+      (define-key map (kbd "t C-r") #'emms-toggle-repeat-track)
+      (define-key map (kbd "t r")   #'emms-toggle-repeat-playlist)
+      (define-key map (kbd "t s")   #'farl-emms/shuffle-with-message)
       ;; Refreshing various things
-      (define-key map (kbd "r c") 'emms-player-mpd-update-all-reset-cache)
-      (define-key map (kbd "r d") 'mpd/update-database)
+      (define-key map (kbd "r c") #'emms-player-mpd-update-all-reset-cache)
+      (define-key map (kbd "r d") #'mpd/update-database)
       ;; `mpd'-specific functions
-      (define-key map (kbd "d s") 'mpd/start-music-daemon)
-      (define-key map (kbd "d q") 'mpd/kill-music-daemon)
-      (define-key map (kbd "d u") 'mpd/update-database)
+      (define-key map (kbd "d s") #'mpd/start-music-daemon)
+      (define-key map (kbd "d q") #'mpd/kill-music-daemon)
+      (define-key map (kbd "d u") #'mpd/update-database)
       map)
     "A keymap for controlling `emms'.")
   (global-set-key (kbd "C-c a") emms-map))

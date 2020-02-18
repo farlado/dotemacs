@@ -84,7 +84,7 @@
                    emms-setup
 
                    ;; Other
-                   ;nov
+                   nov
                    wttrin
 
                    ;; games
