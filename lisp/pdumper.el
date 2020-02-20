@@ -39,6 +39,7 @@
                    company-emoji
                    which-key
                    ido
+                   ido-vertical-mode
                    smex
                    buffer-move
 

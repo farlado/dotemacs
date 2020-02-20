@@ -89,6 +89,7 @@ FILENAME and NOERROR are also passed to `require'."
                                   company
                                   company-emoji
                                   which-key
+                                  ido-vertical-mode
                                   smex
                                   buffer-move
 

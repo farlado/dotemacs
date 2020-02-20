@@ -200,25 +200,28 @@
 
 (defalias 'yes-or-no-p #'y-or-n-p)
 
-(pdumper-require 'ido)
-
-(setq ido-everywhere t
-      ido-max-prospects 10
-      ido-enable-prefix nil
-      ido-enable-flex-matching t
-      ido-use-filename-at-point nil
-      ido-create-new-buffer 'always)
-
-(define-key ido-common-completion-map (kbd "C-n") #'ido-next-match)
-(define-key ido-common-completion-map (kbd "C-p") #'ido-prev-match)
-
-(ido-mode 1)
-
-(use-package smex
+(use-package ido-vertical-mode
   :ensure t
   :defer t
-  :bind (("M-x"    . smex)
-         ("<menu>" . smex)))
+  :init
+  (pdumper-require 'ido)
+  (setq ido-everywhere t
+        ido-max-prospects 10
+        ido-enable-prefix nil
+        ido-max-window-height 11
+        ido-enable-flex-matching t
+        ido-use-filename-at-point nil
+        ido-create-new-buffer 'always
+        ido-vertical-define-keys 'C-n-and-C-p-only)
+  (define-key ido-common-completion-map (kbd "C-n") #'ido-next-match)
+  (define-key ido-common-completion-map (kbd "C-p") #'ido-prev-match)
+  (ido-mode 1)
+  (ido-vertical-mode 1)
+  (use-package smex
+    :ensure t
+    :defer t
+    :bind (("M-x"    . smex)
+           ("<menu>" . smex))))
 
 (setq disabled-command-function nil)
 

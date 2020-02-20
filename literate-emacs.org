@@ -274,6 +274,7 @@ This will save much time later down the line.
                      company-emoji
                      which-key
                      ido
+                     ido-vertical-mode
                      smex
                      buffer-move
 
@@ -466,6 +467,7 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
                                     company
                                     company-emoji
                                     which-key
+                                    ido-vertical-mode
                                     smex
                                     buffer-move
 
@@ -908,28 +910,31 @@ Beauty in brevity.
   (defalias 'yes-or-no-p #'y-or-n-p)
 #+end_src
 
-*** Enable ~ido-mode~, install ~smex~
-I /love/ ~ido-mode~.  Default =M-x= behavior doesn't use ~ido-mode~, so we install a package which gives it ~ido-mode~ capabilities. Since Emacs 27 broke the newest version of ~ido-vertical-mode~, I guess I'm SOL. Some other relevant binds are included.
+*** Enable ~ido-mode~, install ~smex~ and ~ido-vertical-mode~
+I /love/ ~ido-mode~.  Default =M-x= behavior doesn't use ~ido-mode~, so we install a package which gives it ~ido-mode~ capabilities. Apparently the fix for the break in ~ido-vertical-mode~ is a single ~setq~ so that's pretty cool, now I have actually good-looking completions again. Some other relevant binds are included.
 #+begin_src emacs-lisp
-  (pdumper-require 'ido)
-
-  (setq ido-everywhere t
-        ido-max-prospects 10
-        ido-enable-prefix nil
-        ido-enable-flex-matching t
-        ido-use-filename-at-point nil
-        ido-create-new-buffer 'always)
-
-  (define-key ido-common-completion-map (kbd "C-n") #'ido-next-match)
-  (define-key ido-common-completion-map (kbd "C-p") #'ido-prev-match)
-
-  (ido-mode 1)
-
-  (use-package smex
+  (use-package ido-vertical-mode
     :ensure t
     :defer t
-    :bind (("M-x"    . smex)
-           ("<menu>" . smex)))
+    :init
+    (pdumper-require 'ido)
+    (setq ido-everywhere t
+          ido-max-prospects 10
+          ido-enable-prefix nil
+          ido-max-window-height 11
+          ido-enable-flex-matching t
+          ido-use-filename-at-point nil
+          ido-create-new-buffer 'always
+          ido-vertical-define-keys 'C-n-and-C-p-only)
+    (define-key ido-common-completion-map (kbd "C-n") #'ido-next-match)
+    (define-key ido-common-completion-map (kbd "C-p") #'ido-prev-match)
+    (ido-mode 1)
+    (ido-vertical-mode 1)
+    (use-package smex
+      :ensure t
+      :defer t
+      :bind (("M-x"    . smex)
+             ("<menu>" . smex))))
 #+end_src
 
 *** Take off the training wheels
