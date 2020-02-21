@@ -707,7 +707,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     :defer t
     :init
     (pdumper-require 'exwm-edit)
-    :hook ((exwm-edit-compose . text-mode)))
+    :hook (exwm-edit-compose . text-mode))
   (use-package dmenu
     :ensure t
     :defer t
@@ -726,6 +726,8 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                                              9 "DP2-2"))
   (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
                                       workspace 9)
+                                     ((string= exwm-class-name "hl2_linux")
+                                      floating-mode-line nil)
                                      ((string= exwm-class-name "TelegramDesktop")
                                       workspace 8)
                                      ((string= exwm-class-name "discord")
@@ -737,9 +739,8 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                                      ((string= exwm-title "Event Tester")
                                       floating-mode-line nil
                                       floating t)))
-  (defcustom farl-exwm/workspace-names '("1" "2" "3" "4" "5" "6"
-                                         "office" "discord"
-                                         "telegram" "games")
+  (defcustom farl-exwm/workspace-names '("" "" "" "" ""
+                                         "" "" "" "" "")
     "The names assigned to workspaces through `exwm-workspace-index-map'."
     :tag "Workspace names"
     :group 'exwm
@@ -1187,6 +1188,9 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   
                                  ;; Toggle how input is sent to X windows
                                  ([?\s-q] . exwm-input-toggle-keyboard)
+  
+                                 ;; Toggle floating
+                                 ([?\s-e] . exwm-floating-toggle-floating)
   
                                  ;; Window size adjustment
                                  (,(kbd "C-s-w") . shrink-window)

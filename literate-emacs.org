@@ -85,6 +85,7 @@ Everything has different dependencies so make sure you have what you need. The q
 | EXWM depends on...   | which is used for...                       |
 |----------------------+--------------------------------------------|
 | ~xorg~                 | obvious reasons                            |
+| ~font-awesome~         | workspace names                            |
 | ~xcompmgr~             | compositor                                 |
 | ~arandr~               | monitor configuration                      |
 | ~nm-connection-editor~ | network configuration                      |
@@ -641,18 +642,18 @@ God does this one feel great to have now that I use an Emacs version that can ha
 ** Theme
 For a long time, I used Leuven for my theme. Nowadays, I don't. It was a brilliant theme, but just didn't work when I needed a new mode line.
 #+begin_src emacs-lisp :noweb yes :tangle (user-emacs-file "init.el")
-    (use-package dracula-theme
-      :ensure t
-      :defer t
-      :init
-      (if pdumper-dumped
-          (enable-theme 'dracula)
-        (load-theme 'dracula t))
-      <<fringes>>
-      <<line-numbers>>
-      <<window-dividers>>
-      <<transparent-frames>>
-      <<better-org-mode-headers>>)
+  (use-package dracula-theme
+    :ensure t
+    :defer t
+    :init
+    (if pdumper-dumped
+        (enable-theme 'dracula)
+      (load-theme 'dracula t))
+    <<fringes>>
+    <<line-numbers>>
+    <<window-dividers>>
+    <<transparent-frames>>
+    <<better-org-mode-headers>>)
 #+end_src
 
 *** Fringes
@@ -1745,7 +1746,7 @@ At first I questioned why I would do this, but now that I know the advantages of
     :defer t
     :init
     (pdumper-require 'exwm-edit)
-    :hook ((exwm-edit-compose . text-mode)))
+    :hook (exwm-edit-compose . text-mode))
 #+end_src
 
 *** Getting a ~rofi~ equivalent
@@ -1788,6 +1789,8 @@ This section is only to ensure the proper workspaces are placed on the right mon
 #+begin_src emacs-lisp
   (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
                                       workspace 9)
+                                     ((string= exwm-class-name "hl2_linux")
+                                      floating-mode-line nil)
                                      ((string= exwm-class-name "TelegramDesktop")
                                       workspace 8)
                                      ((string= exwm-class-name "discord")
@@ -1804,9 +1807,8 @@ This section is only to ensure the proper workspaces are placed on the right mon
 *** Name workspaces a little more intuitively
 No clue why you have to do so much just to give workspaces names, but at least you can do it.
 #+begin_src emacs-lisp
-  (defcustom farl-exwm/workspace-names '("1" "2" "3" "4" "5" "6"
-                                         "office" "discord"
-                                         "telegram" "games")
+  (defcustom farl-exwm/workspace-names '("" "" "" "" ""
+                                         "" "" "" "" "")
     "The names assigned to workspaces through `exwm-workspace-index-map'."
     :tag "Workspace names"
     :group 'exwm
@@ -1985,7 +1987,7 @@ Firefox has some unique abilities when it comes to how to make windows behave wh
 #+end_src
 
 *** Discord
-Yeah, I also use the light theme for Discord. It looks comfy, even if Discord is a garbage application.
+It's kinda trashy but my friends use it.
 #+begin_src emacs-lisp
   (defun run-discord ()
     "Start Discord."
@@ -1994,7 +1996,7 @@ Yeah, I also use the light theme for Discord. It looks comfy, even if Discord is
 #+end_src
 
 *** Telegram
-I have a painfully white theme which fits perfectly with my setup.
+Another trashy messenger my friends use.
 #+begin_src emacs-lisp
   (defun run-telegram ()
     "Start Telegram."
@@ -2438,6 +2440,9 @@ Anything I couldn't cram into ~desktop-environment-mode~ has been slapped into t
 
                                  ;; Toggle how input is sent to X windows
                                  ([?\s-q] . exwm-input-toggle-keyboard)
+
+                                 ;; Toggle floating
+                                 ([?\s-e] . exwm-floating-toggle-floating)
 
                                  ;; Window size adjustment
                                  (,(kbd "C-s-w") . shrink-window)
