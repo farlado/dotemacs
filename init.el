@@ -778,7 +778,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     (minibuffer-line-mode 1)
     (set-face-attribute 'minibuffer-line nil :inherit 'default)
     (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
-    :hook (exwm-workspace-change . minibuffer-line--update))
+    :hook (exwm-workspace-switch . minibuffer-line--update))
   (defun get-connected-monitors ()
     "Return a list of the currently connected monitors."
     (split-string

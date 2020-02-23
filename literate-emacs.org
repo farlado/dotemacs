@@ -373,6 +373,9 @@ For some reason, the portable dumper has odd behaviors. This block is supposed t
   (defvar pdumper-dumped nil
     "Non-nil if a custom dump image was loaded.")
 
+  (defvar pdumper-load-path nil
+    "Contains `load-path' if a custom dump image was loaded.")
+
   (defun pdumper-require (feature &optional filename noerror)
     "Call `require' to load FEATURE if `pdumper-dumped' is nil.
 
@@ -1898,7 +1901,7 @@ Because I now use so many workspaces, I need to be able to see what workspace I 
     (minibuffer-line-mode 1)
     (set-face-attribute 'minibuffer-line nil :inherit 'default)
     (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
-    :hook (exwm-workspace-change . minibuffer-line--update))
+    :hook (exwm-workspace-switch . minibuffer-line--update))
 #+end_src
 
 A function is used to grab the current state of the workspaces.

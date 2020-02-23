@@ -22,6 +22,9 @@
 (defvar pdumper-dumped nil
   "Non-nil if a custom dump image was loaded.")
 
+(defvar pdumper-load-path nil
+  "Contains `load-path' if a custom dump image was loaded.")
+
 (defun pdumper-require (feature &optional filename noerror)
   "Call `require' to load FEATURE if `pdumper-dumped' is nil.
 
