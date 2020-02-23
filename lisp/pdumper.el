@@ -72,6 +72,7 @@
                    exwm-randr
                    exwm-config
                    exwm-systemtray
+                   exwm-mff
                    exwm-edit
                    dmenu
                    minibuffer-line

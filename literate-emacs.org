@@ -308,6 +308,7 @@ This will save much time later down the line.
                      exwm-randr
                      exwm-config
                      exwm-systemtray
+                     exwm-mff
                      exwm-edit
                      dmenu
                      minibuffer-line
@@ -379,23 +380,27 @@ For some reason, the portable dumper has odd behaviors. This block is supposed t
     (unless pdumper-dumped
       (require feature filename noerror)))
 
+  (defun pdumper-fix-scratch-buffer ()
+    "Ensure the scratch buffer is properly loaded."
+    (with-current-buffer "*scratch*"
+      (lisp-interaction-mode)))
+
   (when pdumper-dumped
+    (add-hook 'after-init-hook #'pdumper-fix-scratch-buffer)
     (setq load-path pdumper-load-path)
-    (global-font-lock-mode)
-    (transient-mark-mode)
-    (blink-cursor-mode)
-    (add-hook 'after-init-hook
-              (lambda ()
-                (with-current-buffer "*scratch*"
-                  (lisp-interaction-mode)))))
+    (global-font-lock-mode 1)
+    (transient-mark-mode 1)
+    (blink-cursor-mode 1))
 #+end_src
 *** Byte-compile on first run
 It's done after =after-init-hook= so that we don't actually do it in the middle of loading files. That would be disastrous.
 #+begin_src emacs-lisp
+  (defun farl-init/compile-user-emacs-directory ()
+    "Recompile all files in `user-emacs-directory'."
+    (byte-recompile-directory user-emacs-directory 0))
+
   (unless (file-exists-p (expand-file-name "init.elc" user-emacs-directory))
-    (add-hook 'after-init-hook
-              (lambda ()
-                (byte-recompile-directory user-emacs-directory 0))))
+    (add-hook 'after-init-hook #'farl-init/compile-user-emacs-directory))
 #+end_src
 
 *** Prefer the newest files
@@ -421,7 +426,6 @@ For whatever reason, setting ~file-name-handler-alist~ to nil helps Emacs load f
     (setq file-name-handler-alist startup/file-name-handler-alist))
 
   (setq file-name-handler-alist nil)
-
   (add-hook 'emacs-startup-hook #'startup/revert-file-name-handler-alist)
 #+end_src
 
@@ -496,6 +500,7 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
 
                                     ;; Desktop Environment
                                     exwm
+                                    exwm-mff
                                     exwm-edit
                                     dmenu
                                     minibuffer-line
@@ -580,42 +585,50 @@ These are other startup specific things to be done after package management is f
 *** Start Emacs server
 Having the Emacs server running allows for a lot of neat integration with other parts of my desktop environment. However, I don't want it to start too soon.
 #+begin_src emacs-lisp
-  (pdumper-require 'server)
-
-  (defun server-start-if-not-running ()
-    "Call `server-start' if `server-running-p' is nil."
-    (interactive)
-    (unless (server-running-p)
-      (server-start)))
-
-  (add-hook 'after-init-hook #'server-start-if-not-running)
+  (use-package server
+    :ensure t
+    :defer t
+    :init
+    (pdumper-require 'server)
+    (defun server-start-if-not-running ()
+      "Call `server-start' if `server-running-p' returns nil."
+      (interactive)
+      (unless (server-running-p)
+        (server-start)))
+    :hook (after-init . server-start-if-not-running))
 #+end_src
 
 *** Prepare GUI (Part 2)
 These buggers won't properly set unless it's done after =early-init.el=, which is a real bummer.
 #+begin_src emacs-lisp
   (tooltip-mode -1)
-
   (setq use-dialog-box nil
         use-file-dialog nil)
 #+end_src
 
 *** Alternative start screen
 I like the default start screen, but it just doesn't cut it for me. I just use this to have a nice screen when I start Emacs or close all my buffers.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb yes
   (use-package dashboard
     :ensure t
     :defer t
     :init
+    <<dashboard-or-scratch>>
     (setq dashboard-set-footer nil
           inhibit-startup-screen t
           dashboard-items '((recents . 10))
           dashboard-startup-banner 'logo
-          initial-buffer-choice (lambda ()
-                                  (or (get-buffer "*dashboard*")
-                                      (get-buffer "*scratch*")))
+          initial-buffer-choice #'dashboard-or-scratch
           dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
     (dashboard-setup-startup-hook))
+#+end_src
+
+When Emacs or ~emacsclient~ starts, the first buffer shown should be either dashboard or a scratch buffer.
+#+begin_src emacs-lisp :tangle no :noweb-ref dashboard-or-scratch
+  (defun dashboard-or-scratch ()
+    "Open either dashboard or the scratch buffer."
+    (or (get-buffer "*dashboard*")
+        (get-buffer "*scratch*")))
 #+end_src
 
 * Making Emacs much less ugly
@@ -750,10 +763,14 @@ This is used in a number of places in Emacs. Better to have it on all the time t
 *** Line numbers (on most buffers)
 I like having line numbers and indicators for lines past the EOF. However, I don't like line numbers in modes where it breaks the mode.
 #+begin_src emacs-lisp
-  (add-hook 'text-mode-hook #'display-line-numbers-mode)
-  (add-hook 'prog-mode-hook #'display-line-numbers-mode)
-  (add-hook 'conf-mode-hook #'display-line-numbers-mode)
-  (setq-default indicate-empty-lines t)
+  (use-package display-line-numbers
+    :ensure t
+    :defer t
+    :init
+    (setq-default indicate-empty-lines t)
+    :hook ((text-mode
+            prog-mode
+            conf-mode) . display-line-numbers-mode))
 #+end_src
 
 *** Highlight matching parentheses
@@ -927,15 +944,16 @@ I /love/ ~ido-mode~.  Default =M-x= behavior doesn't use ~ido-mode~, so we insta
           ido-use-filename-at-point nil
           ido-create-new-buffer 'always
           ido-vertical-define-keys 'C-n-and-C-p-only)
-    (define-key ido-common-completion-map (kbd "C-n") #'ido-next-match)
-    (define-key ido-common-completion-map (kbd "C-p") #'ido-prev-match)
     (ido-mode 1)
     (ido-vertical-mode 1)
     (use-package smex
       :ensure t
       :defer t
       :bind (("M-x"    . smex)
-             ("<menu>" . smex))))
+             ("<menu>" . smex)))
+    :bind (:map ido-common-completion-map
+           ("C-n" . ido-next-match)
+           ("C-p" . ido-prev-match)))
 #+end_src
 
 *** Take off the training wheels
@@ -946,16 +964,6 @@ I'm a big boy now.
 
 ** Functions/macros
 These are some good-to-have functions and macros.
-
-*** Choose a random item in a list
-This is something that comes in handy a couple times in some of what I do.
-#+begin_src emacs-lisp
-  (defun random-choice (items)
-    "Choose a random item from ITEMS."
-    (let* ((size (length items))
-           (index (random size)))
-      (nth index items)))
-#+end_src
 
 *** Find a string in a buffer's file name
 Since I'm starting to really mess with this, I should probably keep a macro around.
@@ -1223,16 +1231,18 @@ These settings are specifically about editing text in general and making that ea
 *** Spell-checking
 Just a useful little tool to check spelling while editing a buffer. Only configured if ~aspell~ is installed. It's not super great, but it does the trick well enough for me.
 #+begin_src emacs-lisp
-  (when (executable-find "aspell")
+  (use-package flyspell
+    :if (executable-find "aspell")
+    :ensure t
+    :defer t
+    :init
     (pdumper-require 'flyspell)
-
     (setq ispell-program-name "aspell"
           ispell-dictionary "american")
-
-    (add-hook 'flyspell-mode-hook #'flyspell-buffer)
-    (add-hook 'prog-mode-hook #'flyspell-prog-mode)
-    (add-hook 'conf-mode-hook #'flyspell-prog-mode)
-    (add-hook 'text-mode-hook #'flyspell-mode))
+    :hook ((flyspell-mode . flyspell-buffer)
+           ((prog-mode
+             conf-mode) . flyspell-prog-mode)
+           (text-mode . flyspell-mode)))
 #+end_src
 
 *** Better search behavior
@@ -1417,7 +1427,24 @@ This one is *SUPER COOL*. Being able to jump straight to a problem is really use
 #+end_src
 
 ** Org-mode
+   :properties:
+   :header-args: :tangle no :noweb-ref org-init
+   :end:
 As I spend more time in Org-mode, the more I need from it.
+#+begin_src emacs-lisp :noweb yes :noweb-ref no :tangle (user-emacs-file "init.el")
+  (use-package org
+    :ensure t
+    :defer t
+    :init
+    <<org-init>>
+    :hook (
+           <<org-hooks>>
+           )
+    :bind (
+           <<org-binds>>
+           )
+    )
+#+end_src
 
 *** Table of Contents
 This automates creating the table of contents for an ~org-mode~ document. It also works in ~markdown-mode~ too if I ever have to use Markdown.
@@ -1425,7 +1452,7 @@ This automates creating the table of contents for an ~org-mode~ document. It als
   (use-package toc-org
     :ensure t
     :defer t
-    :hook ((org-mode      . toc-org-mode)
+    :hook ((org-mode . toc-org-mode)
            (markdown-mode . toc-org-mode)))
 #+end_src
 
@@ -1478,9 +1505,12 @@ Since obviously dot snippets are purely harmless +as far as I know+, I just don'
 *** Execute some code without having to confirm
 Since obviously dot snippets are purely harmless +as far as I know+, I just don't bother with having to confirm evaluation every time I try to update a graphic. I also don't need to confirm evaluation of snippets in use in my literate files.
 #+begin_src emacs-lisp
-  (setq org-confirm-babel-evaluate (lambda (lang body)
-                                     (not (or (string= lang "dot")
-                                              (buffer-file-match "literate.*.org$")))))
+  (defun farl-org/confirm-babel-evaluate (lang body)
+    "Don't ask to evaluate graphviz blocks or blocks in a literate programming file."
+    (not (or (string= lang "dot")
+             (buffer-file-match "literate.*.org$"))))
+
+  (setq org-confirm-babel-evaluate #'farl-org/confirm-babel-evaluate)
 #+end_src
 
 *** Shortcuts for various snippets
@@ -1544,22 +1574,37 @@ For some reason, starting with ~org-mode~ 9.3 or so, all symbols that are bracke
     "Disable the angle bracket syntax added to `org-mode' in versions 9.2 and above."
     (modify-syntax-entry ?< ".")
     (modify-syntax-entry ?> "."))
-  (add-hook 'org-mode-hook #'farl-org/disable-angle-bracket-syntax)
+#+end_src
+
+This function is hooked in =org-mode-hook=.
+#+begin_src emacs-lisp :noweb-ref org-hooks
+  (org-mode . farl-org/disable-angle-bracket-syntax)
 #+end_src
 
 *** Agenda (only enabled if an agenda is found)
-I use =C-c M-a= and =C-c s-a= to do things related to my agenda. Only one of my systems actually has my agenda, so this only runs on that machine so I don't try any funny business on other machines.
+I store my agendas in =$HOME/agendas=.
 #+begin_src emacs-lisp
-  (when (file-exists-p "~/agenda.org")
-    (setq org-agenda-files '("~/agenda.org"))
+  (defun open-agenda-file ()
+    "Open the agenda file."
+    (interactive)
+    (find-file (if ido-mode
+                   (ido-completing-read
+                    "Choose an agenda file: "
+                    (all-completions "" org-agenda-files))
+                 (completing-read
+                  "Choose an agenda file: "
+                  (all-completions "" org-agenda-files)))))
 
-    (defun open-agenda ()
-      "Open the agenda file."
-      (interactive)
-      (find-file "~/agenda.org"))
+  (when (file-directory-p "~/agendas")
+    (setq org-agenda-files (directory-files-recursively
+                            (user-home-file "agendas")
+                            ".org$" nil t t)))
+#+end_src
 
-    (global-set-key (kbd "C-c M-a") #'org-agenda)
-    (global-set-key (kbd "C-c s-a") #'open-agenda))
+I open the agenda itself with =C-c M-a= and open a specific agenda file with =C-c s-a=.
+#+begin_src emacs-lisp :noweb-ref org-binds
+  ("C-c s-a" . open-agenda-file)
+  ("C-c M-a" . org-agenda)
 #+end_src
 
 *** Use the current window when editing source blocks
@@ -1570,8 +1615,8 @@ This is just a convenience thing.
 
 *** Automatically fix inline images generated for diagrams
 This is exactly what I was looking for lmao
-#+begin_src emacs-lisp
-  (add-hook 'org-babel-after-execute-hook #'org-redisplay-inline-images)
+#+begin_src emacs-lisp :noweb-ref org-hooks
+  (org-babel-after-execute . org-redisplay-inline-images)
 #+end_src
 
 * Making Emacs more than an editor
@@ -1714,13 +1759,31 @@ Yes, Emacs is my *entire desktop environment*. You should probably remove this s
     <<desktop-environment>>
     <<de-keys>>
     <<init>>
-    <<logout>>)
+    <<logout>>
+    :hook (
+           <<hooks>>
+           )
+    :bind (
+           <<exwm-global-binds>>
+           :map exwm-mode-map
+           <<exwm-mode-binds>>
+           )
+    )
 #+end_src
 
 ** Window management
    :properties:
    :header-args: :noweb-ref window-management
    :end:
+*** The mouse follows focus
+When changing focus, the mouse should follow in case I need it. This is functionality I've used in virtually every window manager.
+#+begin_src emacs-lisp
+  (use-package exwm-mff
+    :ensure t
+    :defer t
+    :hook (exwm-init . exwm-mff-mode))
+#+end_src
+
 *** Configure floating window borders
 Uses the same color as my mode line, uses the same width as window divider width.
 #+begin_src emacs-lisp
@@ -1734,8 +1797,11 @@ This was annoying when I first installed EXWM. Thankfully this is a very easy fi
   (defun farl-exwm/name-buffer-after-window-title ()
     "Rename the current `exwm-mode' buffer after the X window's title."
     (exwm-workspace-rename-buffer exwm-title))
+#+end_src
 
-  (add-hook 'exwm-update-title-hook #'farl-exwm/name-buffer-after-window-title)
+We hook setting the buffer name into when EXWM picks up a change in the window title.
+#+begin_src emacs-lisp :noweb-ref hooks
+  (exwm-update-title . farl-exwm/name-buffer-after-window-title)
 #+end_src
 
 *** Edit text for an X window in Emacs
@@ -1814,27 +1880,34 @@ No clue why you have to do so much just to give workspaces names, but at least y
     :group 'exwm
     :type 'list)
 
-  (setq exwm-workspace-index-map (lambda (index)
-                                   (elt farl-exwm/workspace-names index)))
+  (defun farl-exwm/workspace-index-map (index)
+    "Return either a workspace name for a given INDEX or INDEX itself."
+    (or (elt farl-exwm/workspace-names index) index))
+
+  (setq exwm-workspace-index-map #'farl-exwm/workspace-index-map)
 #+end_src
 
 *** Show a list of workspaces in the echo area
 Because I now use so many workspaces, I need to be able to see what workspace I am currently on. This makes it easier to do that. It's rather buggy at times, but it does what it needs to do.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb yes
+  (use-package minibuffer-line
+    :ensure t
+    :defer t
+    :init
+    <<list-workspaces>>
+    (minibuffer-line-mode 1)
+    (set-face-attribute 'minibuffer-line nil :inherit 'default)
+    (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
+    :hook (exwm-workspace-change . minibuffer-line--update))
+#+end_src
+
+A function is used to grab the current state of the workspaces.
+#+begin_src emacs-lisp :noweb-ref list-workspaces
   (defun farl-exwm/list-workspaces ()
     "List EXWM workspaces."
     (exwm-workspace--update-switch-history)
     (elt exwm-workspace--switch-history
          (exwm-workspace--position exwm-workspace--current)))
-
-  (use-package minibuffer-line
-    :ensure t
-    :defer t
-    :init
-    (minibuffer-line-mode 1)
-    (set-face-attribute 'minibuffer-line nil :inherit 'default)
-    (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
-    (add-hook 'exwm-workspace-switch-hook #'minibuffer-line--update))
 #+end_src
 
 ** Multi-head configuration
@@ -1951,8 +2024,10 @@ Finally, I can make my generic display-and-dock setup function. I also set the w
         (progn
           (display-setup-w541)
           (peripheral-setup)))))
+#+end_src
 
-  (add-hook 'exwm-randr-screen-change-hook #'display-and-dock-setup)
+#+begin_src emacs-lisp :noweb-ref hooks
+  (exwm-randr-screen-change . display-and-dock-setup)
 #+end_src
 
 ** X applications
@@ -2093,7 +2168,11 @@ Previously I had to define a lot of functions to do these things, now I just cha
     <<brightness-adjustment>>
     <<volume-adjustment>>
     <<lock-screen>>
-    <<screenshots>>)
+    <<screenshots>>
+    :bind (:map desktop-environment-mode-map
+           <<de-binds>>
+           )
+    )
 #+end_src
 
 **** Brightness adjustment
@@ -2139,18 +2218,11 @@ Haha yes, this is very long and very very stupid.
      :header-args: :noweb-ref screenshots
      :end:
 This one was the least straightforward because the way it's implemented by ~desktop-environment~ is *SUPER* wonky. Here are the binds which will be relevant.
-#+begin_src emacs-lisp
-  ;; Storing to clipboard
-  (define-key desktop-environment-mode-map (kbd "<print>")
-    #'farl-de/desktop-environment-screenshot-part-clip)
-  (define-key desktop-environment-mode-map (kbd "<S-print>")
-    #'farl-de/desktop-environment-screenshot-clip)
-
-  ;; Storing to file
-  (define-key desktop-environment-mode-map (kbd "<C-print>")
-    #'farl-de/desktop-environment-screenshot-part)
-  (define-key desktop-environment-mode-map (kbd "<C-S-print>")
-    #'farl-de/desktop-environment-screenshot)
+#+begin_src emacs-lisp :noweb-ref de-binds
+  ("<print>" . farl-de/desktop-environment-screenshot-part-clip)
+  ("<S-print>" . farl-de/desktop-environment-screenshot-clip)
+  ("<C-print>" . farl-de/desktop-environment-screenshot-part)
+  ("<C-S-print>" . farl-de/desktop-environment-screenshot)
 #+end_src
 
 First, I set what directory to store screenshots in.
@@ -2206,7 +2278,7 @@ I've been working on [[https://github.com/farlado/emacs-wallpaper][an easy way t
     :load-path "lisp/wallpaper"
     :defer t
     :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
-           (after-init . wallpaper-cycle-mode)))
+           (exwm-init . wallpaper-cycle-mode)))
 #+end_src
 
 *** Monitor settings
@@ -2274,7 +2346,7 @@ It's [[https://github.com/farlado/emacs-xkb][its own package]] now. Check it out
                               "epo"
                               "de")
           xkb-options '("ctrl:nocaps"))
-    :hook (after-init . xkb-cycle-mode))
+    :hook (exwm-init . xkb-cycle-mode))
 #+end_src
 
 *** Suspending
@@ -2284,8 +2356,10 @@ It's [[https://github.com/farlado/emacs-xkb][its own package]] now. Check it out
     (and (yes-or-no-p "Really suspend? ")
          (start-process "Suspend" nil "systemctl"
                         "suspend" "-i")))
+#+end_src
 
-  (global-set-key (kbd "C-x C-M-s") #'suspend-computer)
+#+begin_src emacs-lisp :noweb-ref exwm-global-binds
+  ("C-x C-M-s" . suspend-computer)
 #+end_src
 
 *** Rebooting
@@ -2343,8 +2417,11 @@ I copied the function for quitting Emacs to handle reboot too.
            (funcall confirm "Really reboot? "))
        (shell-command "reboot")
        (kill-emacs))))
+#+end_src
 
-  (global-set-key (kbd "C-x C-M-r") #'save-buffers-reboot)
+This function is globally bound to =C-x C-M-r=.
+#+begin_src emacs-lisp :noweb-ref exwm-global-binds
+  ("C-x C-M-r" . save-buffers-reboot)
 #+end_src
 
 *** Shutting down
@@ -2402,8 +2479,11 @@ I copied the function for quitting Emacs to handle shutting down.
            (funcall confirm "Really shut down? "))
        (shell-command "shutdown now")
        (kill-emacs))))
+#+end_src
 
-  (global-set-key (kbd "C-x C-M-c") #'save-buffers-shut-down)
+This function is globally bound to =C-x C-M-c=.
+#+begin_src emacs-lisp :noweb-ref exwm-global-binds
+  ("C-x C-M-c" . save-buffers-shut-down)
 #+end_src
 
 ** Keybindings
@@ -2516,8 +2596,10 @@ This is super nice, because I love these key bindings and they are just intuitiv
                                      ([?\M-d] . [C-delete])
                                      ([?\C-k] . [S-end delete])
                                      ([?\C-g] . [escape])))
+#+end_src
 
-  ;; I can't do sequences above, so these are separate
+Key sequences cannot be defined in =exwm-input-simulation-keys=, so they are functions which are called.
+#+begin_src emacs-lisp
   (defun farl-exwm/C-s ()
     "Pass C-s to the EXWM window."
     (interactive)
@@ -2527,28 +2609,32 @@ This is super nice, because I love these key bindings and they are just intuitiv
     "Pass C-k to the EXWM window."
     (interactive)
     (execute-kbd-macro (kbd "C-q C-k")))
+#+end_src
 
-  (define-key exwm-mode-map (kbd "C-x C-s") #'farl-exwm/C-s)
-  (define-key exwm-mode-map (kbd "C-c C-l") #'farl-exwm/C-k)
+These functions are bound to keys in =exwm-mode-map=.
+#+begin_src emacs-lisp :noweb-ref exwm-mode-binds
+    ("C-x C-s" . farl-exwm/C-s)
+    ("C-c C-l" . farl-exwm/C-k)
 #+end_src
 
 *** Send a key verbatim more easily
-#+begin_src emacs-lisp
-  (define-key exwm-mode-map (kbd "C-c C-q") nil)
-  (define-key exwm-mode-map (kbd "C-q") #'exwm-input-send-next-key)
+This means there's one less key needed to send a verbatim key to an EXWM buffer. It is obviously bound in =exwm-mode-map=.
+#+begin_src emacs-lisp :noweb-ref exwm-mode-binds
+  ("C-q" . exwm-input-send-next-key)
+  ("C-c C-q" . nil)
 #+end_src
 
 *** Inhibit keys I don't use
-This includes:
+This removes the following from =exwm-mode-map=:
 - Toggling fullscreen
 - Toggling floating
 - Toggling hiding
 - Toggling the mode line
-#+begin_src emacs-lisp
-  (define-key exwm-mode-map (kbd "C-c C-t C-f") nil)
-  (define-key exwm-mode-map (kbd "C-c C-t C-v") nil)
-  (define-key exwm-mode-map (kbd "C-c C-t C-m") nil)
-  (define-key exwm-mode-map (kbd "C-c C-f") nil)
+#+begin_src emacs-lisp :noweb-ref exwm-mode-binds
+  ("C-c C-f" . nil)
+  ("C-c C-t C-f" . nil)
+  ("C-c C-t C-v" . nil)
+  ("C-c C-t C-m" . nil)
 #+end_src
 
 ** On startup
@@ -2624,8 +2710,11 @@ When exiting, these are things I want done.
   (defun farl-exwm/on-logout ()
     "Run this when logging out as part of `kill-emacs-hook'."
     <<on-logout>>)
+#+end_src
 
-  (add-hook 'kill-emacs-hook #'farl-exwm/on-logout)
+This is hooked into when Emacs is killed.
+#+begin_src emacs-lisp :noweb-ref hooks
+  (kill-emacs . farl-exwm/on-logout)
 #+end_src
 
 *** Black out the root window
@@ -2706,30 +2795,30 @@ This loads the necessary files to ensure ~emms~ starts properly.
   :end:
 Now using a keymap in place of that wonky as crap binding system. The new binds let me use ~emms~ in a terminal.
 #+begin_src emacs-lisp
-    (defvar emms-map
-      (let ((map (make-sparse-keymap)))
-        ;; Opening playlist and music browser
-        (define-key map (kbd "v") #'emms)
-        (define-key map (kbd "b") #'emms-smart-browse)
-        ;; Track navigation
-        (define-key map (kbd "n n") #'emms-next)
-        (define-key map (kbd "n p") #'emms-previous)
-        (define-key map (kbd "p")   #'emms-pause)
-        (define-key map (kbd "s")   #'emms-stop)
-        ;; Repeat/shuffle
-        (define-key map (kbd "t C-r") #'emms-toggle-repeat-track)
-        (define-key map (kbd "t r")   #'emms-toggle-repeat-playlist)
-        (define-key map (kbd "t s")   #'farl-emms/shuffle-with-message)
-        ;; Refreshing various things
-        (define-key map (kbd "r c") #'emms-player-mpd-update-all-reset-cache)
-        (define-key map (kbd "r d") #'mpd/update-database)
-        ;; `mpd'-specific functions
-        (define-key map (kbd "d s") #'mpd/start-music-daemon)
-        (define-key map (kbd "d q") #'mpd/kill-music-daemon)
-        (define-key map (kbd "d u") #'mpd/update-database)
-        map)
-      "A keymap for controlling `emms'.")
-    (global-set-key (kbd "C-c a") emms-map)
+  (defvar emms-map
+    (let ((map (make-sparse-keymap)))
+      ;; Opening playlist and music browser
+      (define-key map (kbd "v") #'emms)
+      (define-key map (kbd "b") #'emms-smart-browse)
+      ;; Track navigation
+      (define-key map (kbd "n n") #'emms-next)
+      (define-key map (kbd "n p") #'emms-previous)
+      (define-key map (kbd "p")   #'emms-pause)
+      (define-key map (kbd "s")   #'emms-stop)
+      ;; Repeat/shuffle
+      (define-key map (kbd "t C-r") #'emms-toggle-repeat-track)
+      (define-key map (kbd "t r")   #'emms-toggle-repeat-playlist)
+      (define-key map (kbd "t s")   #'farl-emms/shuffle-with-message)
+      ;; Refreshing various things
+      (define-key map (kbd "r c") #'emms-player-mpd-update-all-reset-cache)
+      (define-key map (kbd "r d") #'mpd/update-database)
+      ;; mpd-specific functions
+      (define-key map (kbd "d s") #'mpd/start-music-daemon)
+      (define-key map (kbd "d q") #'mpd/kill-music-daemon)
+      (define-key map (kbd "d u") #'mpd/update-database)
+      map)
+    "A keymap for controlling `emms'.")
+  (global-set-key (kbd "C-c a") emms-map)
 #+end_src
 
 ** Configuring

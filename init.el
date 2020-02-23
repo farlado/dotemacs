@@ -36,18 +36,19 @@
         auto-package-update-delete-old-versions t)
   (auto-package-update-maybe))
 
-(pdumper-require 'server)
-
-(defun server-start-if-not-running ()
-  "Call `server-start' if `server-running-p' is nil."
-  (interactive)
-  (unless (server-running-p)
-    (server-start)))
-
-(add-hook 'after-init-hook #'server-start-if-not-running)
+(use-package server
+  :ensure t
+  :defer t
+  :init
+  (pdumper-require 'server)
+  (defun server-start-if-not-running ()
+    "Call `server-start' if `server-running-p' returns nil."
+    (interactive)
+    (unless (server-running-p)
+      (server-start)))
+  :hook (after-init . server-start-if-not-running))
 
 (tooltip-mode -1)
-
 (setq use-dialog-box nil
       use-file-dialog nil)
 
@@ -55,13 +56,15 @@
   :ensure t
   :defer t
   :init
+  (defun dashboard-or-scratch ()
+    "Open either dashboard or the scratch buffer."
+    (or (get-buffer "*dashboard*")
+        (get-buffer "*scratch*")))
   (setq dashboard-set-footer nil
         inhibit-startup-screen t
         dashboard-items '((recents . 10))
         dashboard-startup-banner 'logo
-        initial-buffer-choice (lambda ()
-                                (or (get-buffer "*dashboard*")
-                                    (get-buffer "*scratch*")))
+        initial-buffer-choice #'dashboard-or-scratch
         dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
   (dashboard-setup-startup-hook))
 
@@ -115,10 +118,14 @@
 
 (global-page-break-lines-mode 1)
 
-(add-hook 'text-mode-hook #'display-line-numbers-mode)
-(add-hook 'prog-mode-hook #'display-line-numbers-mode)
-(add-hook 'conf-mode-hook #'display-line-numbers-mode)
-(setq-default indicate-empty-lines t)
+(use-package display-line-numbers
+  :ensure t
+  :defer t
+  :init
+  (setq-default indicate-empty-lines t)
+  :hook ((text-mode
+          prog-mode
+          conf-mode) . display-line-numbers-mode))
 
 (show-paren-mode 1)
 (set-face-attribute 'show-paren-match nil
@@ -213,23 +220,18 @@
         ido-use-filename-at-point nil
         ido-create-new-buffer 'always
         ido-vertical-define-keys 'C-n-and-C-p-only)
-  (define-key ido-common-completion-map (kbd "C-n") #'ido-next-match)
-  (define-key ido-common-completion-map (kbd "C-p") #'ido-prev-match)
   (ido-mode 1)
   (ido-vertical-mode 1)
   (use-package smex
     :ensure t
     :defer t
     :bind (("M-x"    . smex)
-           ("<menu>" . smex))))
+           ("<menu>" . smex)))
+  :bind (:map ido-common-completion-map
+         ("C-n" . ido-next-match)
+         ("C-p" . ido-prev-match)))
 
 (setq disabled-command-function nil)
-
-(defun random-choice (items)
-  "Choose a random item from ITEMS."
-  (let* ((size (length items))
-         (index (random size)))
-    (nth index items)))
 
 (defun buffer-file-match (string)
   "Find STRING in variable `buffer-file-name'."
@@ -391,16 +393,18 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
 
 (add-hook 'after-save-hook #'byte-compile-config-files 100)
 
-(when (executable-find "aspell")
+(use-package flyspell
+  :if (executable-find "aspell")
+  :ensure t
+  :defer t
+  :init
   (pdumper-require 'flyspell)
-
   (setq ispell-program-name "aspell"
         ispell-dictionary "american")
-
-  (add-hook 'flyspell-mode-hook #'flyspell-buffer)
-  (add-hook 'prog-mode-hook #'flyspell-prog-mode)
-  (add-hook 'conf-mode-hook #'flyspell-prog-mode)
-  (add-hook 'text-mode-hook #'flyspell-mode))
+  :hook ((flyspell-mode . flyspell-buffer)
+         ((prog-mode
+           conf-mode) . flyspell-prog-mode)
+         (text-mode . flyspell-mode)))
 
 (use-package swiper
   :ensure t
@@ -506,116 +510,125 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   :bind (:map prog-mode-map
          ("C-c C-'" . avy-flycheck-goto-error)))
 
-(use-package toc-org
+(use-package org
   :ensure t
   :defer t
-  :hook ((org-mode      . toc-org-mode)
-         (markdown-mode . toc-org-mode)))
-
-(use-package org-bullets
-  :if window-system
-  :ensure t
-  :defer t
-  :hook (org-mode . org-bullets-mode))
-
-(use-package epresent
-  :if window-system
-  :ensure t
-  :defer t
-  :bind (:map org-mode-map
-         ("C-c r" . epresent-run)))
-
-(setq org-pretty-entities t
-      org-src-fontify-natively t
-      org-agenda-use-time-grid nil
-      org-fontify-done-headline t
-      org-src-tab-acts-natively t
-      org-enforce-todo-dependencies t
-      org-fontify-whole-heading-line t
-      org-agenda-skip-deadline-if-done t
-      org-agenda-skip-scheduled-if-done t
-      org-fontify-quote-and-verse-blocks t
-      org-src-window-setup 'current-window
-      org-highlight-latex-and-related '(latex)
-      org-ellipsis (if window-system "⤵" "...")
-      org-hide-emphasis-markers window-system)
-
-(org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
-
-(setq org-confirm-babel-evaluate (lambda (lang body)
-                                   (not (or (string= lang "dot")
-                                            (buffer-file-match "literate.*.org$")))))
-
-(pdumper-require 'org-tempo)
-(add-to-list 'org-modules 'org-tempo)
-(setq org-structure-template-alist '(;; General blocks
-                                     ("c" . "center")
-                                     ("C" . "comment")
-                                     ("e" . "example")
-                                     ("q" . "quote")
-                                     ("v" . "verse")
-
-                                     ;; Export blocks
-                                     ("a"   . "export ascii")
-                                     ("h"   . "export html")
-                                     ("css" . "export css")
-                                     ("l"   . "export latex")
-
-                                     ;; Code blocks
-                                     ("s"   . "src")
-                                     ("sh"  . "src sh")
-                                     ("cf"  . "src conf")
-                                     ("cu"  . "src conf-unix")
-                                     ("cs"  . "src conf-space")
-                                     ("cx"  . "src conf-xdefaults")
-                                     ("cjp" . "src conf-javaprop")
-                                     ("el"  . "src emacs-lisp")
-                                     ("py"  . "src python")
-                                     ("dot" . "src dot :cmdline -Kdot -Tpng :file")
-                                     ("txt" . "src text :tangle"))
-      org-tempo-keywords-alist '(;; Title/subtitle/author
-                                 ("t"  . "title")
-                                 ("st" . "subtitle")
-                                 ("au" . "author")
-
-                                 ;; Language
-                                 ("la" . "language")
-
-                                 ;; Name/caption
-                                 ("n"  . "name")
-                                 ("ca" . "caption")
-
-                                 ;; Property/options/startup
-                                 ("p"  . "property")
-                                 ("o"  . "options")
-                                 ("su" . "startup")
-
-                                 ;; Other
-                                 ("L" . "latex")
-                                 ("H" . "html")
-                                 ("A" . "ascii")
-                                 ("i" . "index")))
-
-(defun farl-org/disable-angle-bracket-syntax ()
-  "Disable the angle bracket syntax added to `org-mode' in versions 9.2 and above."
-  (modify-syntax-entry ?< ".")
-  (modify-syntax-entry ?> "."))
-(add-hook 'org-mode-hook #'farl-org/disable-angle-bracket-syntax)
-
-(when (file-exists-p "~/agenda.org")
-  (setq org-agenda-files '("~/agenda.org"))
-
-  (defun open-agenda ()
+  :init
+  (use-package toc-org
+    :ensure t
+    :defer t
+    :hook ((org-mode . toc-org-mode)
+           (markdown-mode . toc-org-mode)))
+  (use-package org-bullets
+    :if window-system
+    :ensure t
+    :defer t
+    :hook (org-mode . org-bullets-mode))
+  (use-package epresent
+    :if window-system
+    :ensure t
+    :defer t
+    :bind (:map org-mode-map
+           ("C-c r" . epresent-run)))
+  (setq org-pretty-entities t
+        org-src-fontify-natively t
+        org-agenda-use-time-grid nil
+        org-fontify-done-headline t
+        org-src-tab-acts-natively t
+        org-enforce-todo-dependencies t
+        org-fontify-whole-heading-line t
+        org-agenda-skip-deadline-if-done t
+        org-agenda-skip-scheduled-if-done t
+        org-fontify-quote-and-verse-blocks t
+        org-src-window-setup 'current-window
+        org-highlight-latex-and-related '(latex)
+        org-ellipsis (if window-system "⤵" "...")
+        org-hide-emphasis-markers window-system)
+  (org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
+  (defun farl-org/confirm-babel-evaluate (lang body)
+    "Don't ask to evaluate graphviz blocks or blocks in a literate programming file."
+    (not (or (string= lang "dot")
+             (buffer-file-match "literate.*.org$"))))
+  
+  (setq org-confirm-babel-evaluate #'farl-org/confirm-babel-evaluate)
+  (pdumper-require 'org-tempo)
+  (add-to-list 'org-modules 'org-tempo)
+  (setq org-structure-template-alist '(;; General blocks
+                                       ("c" . "center")
+                                       ("C" . "comment")
+                                       ("e" . "example")
+                                       ("q" . "quote")
+                                       ("v" . "verse")
+  
+                                       ;; Export blocks
+                                       ("a"   . "export ascii")
+                                       ("h"   . "export html")
+                                       ("css" . "export css")
+                                       ("l"   . "export latex")
+  
+                                       ;; Code blocks
+                                       ("s"   . "src")
+                                       ("sh"  . "src sh")
+                                       ("cf"  . "src conf")
+                                       ("cu"  . "src conf-unix")
+                                       ("cs"  . "src conf-space")
+                                       ("cx"  . "src conf-xdefaults")
+                                       ("cjp" . "src conf-javaprop")
+                                       ("el"  . "src emacs-lisp")
+                                       ("py"  . "src python")
+                                       ("dot" . "src dot :cmdline -Kdot -Tpng :file")
+                                       ("txt" . "src text :tangle"))
+        org-tempo-keywords-alist '(;; Title/subtitle/author
+                                   ("t"  . "title")
+                                   ("st" . "subtitle")
+                                   ("au" . "author")
+  
+                                   ;; Language
+                                   ("la" . "language")
+  
+                                   ;; Name/caption
+                                   ("n"  . "name")
+                                   ("ca" . "caption")
+  
+                                   ;; Property/options/startup
+                                   ("p"  . "property")
+                                   ("o"  . "options")
+                                   ("su" . "startup")
+  
+                                   ;; Other
+                                   ("L" . "latex")
+                                   ("H" . "html")
+                                   ("A" . "ascii")
+                                   ("i" . "index")))
+  (defun farl-org/disable-angle-bracket-syntax ()
+    "Disable the angle bracket syntax added to `org-mode' in versions 9.2 and above."
+    (modify-syntax-entry ?< ".")
+    (modify-syntax-entry ?> "."))
+  (defun open-agenda-file ()
     "Open the agenda file."
     (interactive)
-    (find-file "~/agenda.org"))
-
-  (global-set-key (kbd "C-c M-a") #'org-agenda)
-  (global-set-key (kbd "C-c s-a") #'open-agenda))
-
-(setq org-src-window-setup 'current-window)
-
-(add-hook 'org-babel-after-execute-hook #'org-redisplay-inline-images)
+    (find-file (if ido-mode
+                   (ido-completing-read
+                    "Choose an agenda file: "
+                    (all-completions "" org-agenda-files))
+                 (completing-read
+                  "Choose an agenda file: "
+                  (all-completions "" org-agenda-files)))))
+  
+  (when (file-directory-p "~/agendas")
+    (setq org-agenda-files (directory-files-recursively
+                            (user-home-file "agendas")
+                            ".org$" nil t t)))
+  (setq org-src-window-setup 'current-window)
+  :hook (
+         (org-mode . farl-org/disable-angle-bracket-syntax)
+         (org-babel-after-execute . org-redisplay-inline-images)
+         )
+  :bind (
+         ("C-c s-a" . open-agenda-file)
+         ("C-c M-a" . org-agenda)
+         )
+  )
 
 (use-package vterm
   :ensure t
@@ -695,13 +708,15 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   (pdumper-require 'exwm-randr)
   (pdumper-require 'exwm-config)
   (pdumper-require 'exwm-systemtray)
+  (use-package exwm-mff
+    :ensure t
+    :defer t
+    :hook (exwm-init . exwm-mff-mode))
   (setq exwm-floating-border-width window-divider-default-right-width
         exwm-floating-border-color (face-attribute 'mode-line :background))
   (defun farl-exwm/name-buffer-after-window-title ()
     "Rename the current `exwm-mode' buffer after the X window's title."
     (exwm-workspace-rename-buffer exwm-title))
-  
-  (add-hook 'exwm-update-title-hook #'farl-exwm/name-buffer-after-window-title)
   (use-package exwm-edit
     :ensure t
     :defer t
@@ -746,22 +761,24 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     :group 'exwm
     :type 'list)
   
-  (setq exwm-workspace-index-map (lambda (index)
-                                   (elt farl-exwm/workspace-names index)))
-  (defun farl-exwm/list-workspaces ()
-    "List EXWM workspaces."
-    (exwm-workspace--update-switch-history)
-    (elt exwm-workspace--switch-history
-         (exwm-workspace--position exwm-workspace--current)))
+  (defun farl-exwm/workspace-index-map (index)
+    "Return either a workspace name for a given INDEX or INDEX itself."
+    (or (elt farl-exwm/workspace-names index) index))
   
+  (setq exwm-workspace-index-map #'farl-exwm/workspace-index-map)
   (use-package minibuffer-line
     :ensure t
     :defer t
     :init
+    (defun farl-exwm/list-workspaces ()
+      "List EXWM workspaces."
+      (exwm-workspace--update-switch-history)
+      (elt exwm-workspace--switch-history
+           (exwm-workspace--position exwm-workspace--current)))
     (minibuffer-line-mode 1)
     (set-face-attribute 'minibuffer-line nil :inherit 'default)
     (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
-    (add-hook 'exwm-workspace-switch-hook #'minibuffer-line--update))
+    :hook (exwm-workspace-change . minibuffer-line--update))
   (defun get-connected-monitors ()
     "Return a list of the currently connected monitors."
     (split-string
@@ -847,8 +864,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
         (progn
           (display-setup-w541)
           (peripheral-setup)))))
-  
-  (add-hook 'exwm-randr-screen-change-hook #'display-and-dock-setup)
   (defun run-gimp ()
     "Start GIMP."
     (interactive)
@@ -953,17 +968,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
            "--timepos=200:125 --datepos=200:215 --wrongpos=200:155 --locktext='' "
            "--lockfailedtext='' --noinputtext='' --veriftext='' --wrongtext='WRONG' "
            "--force-clock --radius 1 --ring-width 1 "))
-    ;; Storing to clipboard
-    (define-key desktop-environment-mode-map (kbd "<print>")
-      #'farl-de/desktop-environment-screenshot-part-clip)
-    (define-key desktop-environment-mode-map (kbd "<S-print>")
-      #'farl-de/desktop-environment-screenshot-clip)
-    
-    ;; Storing to file
-    (define-key desktop-environment-mode-map (kbd "<C-print>")
-      #'farl-de/desktop-environment-screenshot-part)
-    (define-key desktop-environment-mode-map (kbd "<C-S-print>")
-      #'farl-de/desktop-environment-screenshot)
     (setq desktop-environment-screenshot-directory "~/screenshots")
     (setq desktop-environment-screenshot-command
           "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
@@ -997,12 +1001,19 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
        (concat desktop-environment-screenshot-partial-command
                " && xclip $FILENAME -selection clipboard "
                "-t image/png &> /dev/null && rm $FILENAME"))
-      (message "Screenshot copied to clipboard.")))
+      (message "Screenshot copied to clipboard."))
+    :bind (:map desktop-environment-mode-map
+           ("<print>" . farl-de/desktop-environment-screenshot-part-clip)
+           ("<S-print>" . farl-de/desktop-environment-screenshot-clip)
+           ("<C-print>" . farl-de/desktop-environment-screenshot-part)
+           ("<C-S-print>" . farl-de/desktop-environment-screenshot)
+           )
+    )
   (use-package wallpaper
     :load-path "lisp/wallpaper"
     :defer t
     :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
-           (after-init . wallpaper-cycle-mode)))
+           (exwm-init . wallpaper-cycle-mode)))
   (defun monitor-settings ()
     "Open arandr to configure monitors."
     (interactive)
@@ -1045,14 +1056,12 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                               "epo"
                               "de")
           xkb-options '("ctrl:nocaps"))
-    :hook (after-init . xkb-cycle-mode))
+    :hook (exwm-init . xkb-cycle-mode))
   (defun suspend-computer ()
     (interactive)
     (and (yes-or-no-p "Really suspend? ")
          (start-process "Suspend" nil "systemctl"
                         "suspend" "-i")))
-  
-  (global-set-key (kbd "C-x C-M-s") #'suspend-computer)
   (defun save-buffers-reboot (&optional arg)
     "Offer to save each buffer, then shut down the computer.
   This function is literally just a copycat of `save-buffers-kill-emacs'.
@@ -1105,8 +1114,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
            (funcall confirm "Really reboot? "))
        (shell-command "reboot")
        (kill-emacs))))
-  
-  (global-set-key (kbd "C-x C-M-r") #'save-buffers-reboot)
   (defun save-buffers-shut-down (&optional arg)
     "Offer to save each buffer, then shut down the computer.
   This function is literally just a copycat of `save-buffers-kill-emacs'.
@@ -1159,8 +1166,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
            (funcall confirm "Really shut down? "))
        (shell-command "shutdown now")
        (kill-emacs))))
-  
-  (global-set-key (kbd "C-x C-M-c") #'save-buffers-shut-down)
   (setq exwm-input-global-keys `(;; Switching workspace focus
                                  ;; s-1 for 1, s-2 for 2, etc...
                                  ,@(mapcar
@@ -1259,8 +1264,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                                      ([?\M-d] . [C-delete])
                                      ([?\C-k] . [S-end delete])
                                      ([?\C-g] . [escape])))
-  
-  ;; I can't do sequences above, so these are separate
   (defun farl-exwm/C-s ()
     "Pass C-s to the EXWM window."
     (interactive)
@@ -1270,15 +1273,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     "Pass C-k to the EXWM window."
     (interactive)
     (execute-kbd-macro (kbd "C-q C-k")))
-  
-  (define-key exwm-mode-map (kbd "C-x C-s") #'farl-exwm/C-s)
-  (define-key exwm-mode-map (kbd "C-c C-l") #'farl-exwm/C-k)
-  (define-key exwm-mode-map (kbd "C-c C-q") nil)
-  (define-key exwm-mode-map (kbd "C-q") #'exwm-input-send-next-key)
-  (define-key exwm-mode-map (kbd "C-c C-t C-f") nil)
-  (define-key exwm-mode-map (kbd "C-c C-t C-v") nil)
-  (define-key exwm-mode-map (kbd "C-c C-t C-m") nil)
-  (define-key exwm-mode-map (kbd "C-c C-f") nil)
   (set-frame-parameter nil 'fullscreen 'fullboth)
   (setenv "XDG_CURRENT_DESKTOP" "emacs")
   (setenv "GTK2_RC_FILES" (user-config-file "gtk-2.0/gtkrc"))
@@ -1303,8 +1297,26 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   (defun farl-exwm/on-logout ()
     "Run this when logging out as part of `kill-emacs-hook'."
     (shell-command "hsetroot -solid '#000000'"))
-  
-  (add-hook 'kill-emacs-hook #'farl-exwm/on-logout))
+  :hook (
+         (exwm-update-title . farl-exwm/name-buffer-after-window-title)
+         (exwm-randr-screen-change . display-and-dock-setup)
+         (kill-emacs . farl-exwm/on-logout)
+         )
+  :bind (
+         ("C-x C-M-s" . suspend-computer)
+         ("C-x C-M-r" . save-buffers-reboot)
+         ("C-x C-M-c" . save-buffers-shut-down)
+         :map exwm-mode-map
+         ("C-x C-s" . farl-exwm/C-s)
+         ("C-c C-l" . farl-exwm/C-k)
+         ("C-q" . exwm-input-send-next-key)
+         ("C-c C-q" . nil)
+         ("C-c C-f" . nil)
+         ("C-c C-t C-f" . nil)
+         ("C-c C-t C-v" . nil)
+         ("C-c C-t C-m" . nil)
+         )
+  )
 
 (use-package emms
   :if (executable-find "mpd")
@@ -1363,7 +1375,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
       ;; Refreshing various things
       (define-key map (kbd "r c") #'emms-player-mpd-update-all-reset-cache)
       (define-key map (kbd "r d") #'mpd/update-database)
-      ;; `mpd'-specific functions
+      ;; mpd-specific functions
       (define-key map (kbd "d s") #'mpd/start-music-daemon)
       (define-key map (kbd "d q") #'mpd/kill-music-daemon)
       (define-key map (kbd "d u") #'mpd/update-database)

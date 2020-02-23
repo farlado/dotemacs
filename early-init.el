@@ -29,20 +29,24 @@ FILENAME and NOERROR are also passed to `require'."
   (unless pdumper-dumped
     (require feature filename noerror)))
 
+(defun pdumper-fix-scratch-buffer ()
+  "Ensure the scratch buffer is properly loaded."
+  (with-current-buffer "*scratch*"
+    (lisp-interaction-mode)))
+
 (when pdumper-dumped
+  (add-hook 'after-init-hook #'pdumper-fix-scratch-buffer)
   (setq load-path pdumper-load-path)
-  (global-font-lock-mode)
-  (transient-mark-mode)
-  (blink-cursor-mode)
-  (add-hook 'after-init-hook
-            (lambda ()
-              (with-current-buffer "*scratch*"
-                (lisp-interaction-mode)))))
+  (global-font-lock-mode 1)
+  (transient-mark-mode 1)
+  (blink-cursor-mode 1))
+
+(defun farl-init/compile-user-emacs-directory ()
+  "Recompile all files in `user-emacs-directory'."
+  (byte-recompile-directory user-emacs-directory 0))
 
 (unless (file-exists-p (expand-file-name "init.elc" user-emacs-directory))
-  (add-hook 'after-init-hook
-            (lambda ()
-              (byte-recompile-directory user-emacs-directory 0))))
+  (add-hook 'after-init-hook #'farl-init/compile-user-emacs-directory))
 
 (setq load-prefer-newer t)
 
@@ -56,7 +60,6 @@ FILENAME and NOERROR are also passed to `require'."
   (setq file-name-handler-alist startup/file-name-handler-alist))
 
 (setq file-name-handler-alist nil)
-
 (add-hook 'emacs-startup-hook #'startup/revert-file-name-handler-alist)
 
 (defun garbage-collect-defer ()
@@ -117,6 +120,7 @@ FILENAME and NOERROR are also passed to `require'."
 
                                   ;; Desktop Environment
                                   exwm
+                                  exwm-mff
                                   exwm-edit
                                   dmenu
                                   minibuffer-line
