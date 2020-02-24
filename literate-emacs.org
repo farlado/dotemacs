@@ -6,7 +6,10 @@
 #+property: header-args :results none
 
 #+begin_quote
-Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his workshop, I feel a realm of possibility open before me. I feel the comfort of an environment that has evolved over time to fit me perfectly -- an assortment of packages and keybindings which help me bring ideas to life day after day.
+Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
+workshop, I feel a realm of possibility open before me. I feel the comfort of an
+environment that has evolved over time to fit me perfectly -- an assortment of
+packages and keybindings which help me bring ideas to life day after day.
 -- [[https://www.braveclojure.com/basic-emacs/][Daniel Higginbotham]]
 #+end_quote
 
@@ -63,15 +66,37 @@ Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
 #+END_QUOTE
 
 * About this configuration
-This file is an attempt at a literate GNU Emacs (henceforth "Emacs") configuration. It is /incredibly/ opinionated. Admittedly, much of the "documentation" in here is more commentary I provide about my choices and personal feelings about certain things in Emacs based on my admittedly very limited opinion of the program than honest-to-god documentation of what this file contains. Regardless, the idea is that this file, when tangled, generates everything in my git repository, from =LICENSE= to =.gitignore=. I would /highly/ recommend you *NOT* try to read the =.el= files on their own. It's a jungle, especially since all of the commentary regarding the configuration is in this file and this file alone.
+
+  This file is an attempt at a literate GNU Emacs (henceforth "Emacs")
+  configuration. It is /incredibly/ opinionated. Admittedly, much of the
+  "documentation" in here is more commentary I provide about my choices and
+  personal feelings about certain things in Emacs based on my admittedly very
+  limited opinion of the program than honest-to-god documentation of what this
+  file contains. Regardless, the idea is that this file, when tangled, generates
+  everything in my git repository, from =LICENSE= to =.gitignore=. I would /highly/
+  recommend you *NOT* try to read the =.el= files on their own. It's a jungle,
+  especially since all of the commentary regarding the configuration is in this
+  file and this file alone.
 
 ** Okay, that's pretty neat. Why though?
-The answer is rather simple. Before I used a fully literate file, I had an =init.el= which tangled blocks from a =config.org= on the fly (read: on startup). It turns out this was abysmally slow, making for a startup time of around 4.5 seconds when loading into my desktop environment. Tangling blocks from a =literate-emacs.org= into byte-compiled =early-init.el= and =init.el= alongside the use of portable dumping (plus multiple other efficiency improvements, of course) cuts this time down to around 1.1 seconds to load into my desktop environment. This also comes with the advantage of being a hub for /all/ things related to my Emacs configuration, where previously I had to check multiple files when I thought I might have changed something for the worse.
+
+   The answer is rather simple. Before I used a fully literate file, I had an
+   =init.el= which tangled blocks from a =config.org= on the fly (read: on startup).
+   It turns out this was abysmally slow, making for a startup time of around 4.5
+   seconds when loading into my desktop environment. Tangling blocks from a
+   =literate-emacs.org= into byte-compiled =early-init.el= and =init.el= alongside the
+   use of portable dumping (plus multiple other efficiency improvements, of
+   course) cuts this time down to around 1.1 seconds to load into my desktop
+   environment. This also comes with the advantage of being a hub for /all/ things
+   related to my Emacs configuration, where previously I had to check multiple
+   files when I thought I might have changed something for the worse.
 
 ** Installation
-1) Clone the repo into where you store your Emacs configuration.
-2) Make sure you have all the right dependencies. See below for more details.
-3) If using Emacs as a desktop environment, it may take a couple restarts to work right.
+
+   1) Clone the repo into where you store your Emacs configuration.
+   2) Make sure you have all the right dependencies. See below for more details.
+   3) If using Emacs as a desktop environment, it may take a couple restarts to
+      work right.
 
 ** Dependencies
 #+begin_center
