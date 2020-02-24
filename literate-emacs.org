@@ -308,8 +308,6 @@ This will save much time later down the line.
                      exwm-randr
                      exwm-config
                      exwm-systemtray
-                     exwm-mff
-                     exwm-edit
                      dmenu
                      minibuffer-line
                      system-packages
@@ -503,8 +501,6 @@ I /hate/ ~customize~. I configure everything in this file, so I don't need anyth
 
                                     ;; Desktop Environment
                                     exwm
-                                    exwm-mff
-                                    exwm-edit
                                     dmenu
                                     minibuffer-line
                                     system-packages
@@ -933,7 +929,7 @@ Beauty in brevity.
 
 *** Enable ~ido-mode~, install ~smex~ and ~ido-vertical-mode~
 I /love/ ~ido-mode~.  Default =M-x= behavior doesn't use ~ido-mode~, so we install a package which gives it ~ido-mode~ capabilities. Apparently the fix for the break in ~ido-vertical-mode~ is a single ~setq~ so that's pretty cool, now I have actually good-looking completions again. Some other relevant binds are included.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb yes
   (use-package ido-vertical-mode
     :ensure t
     :defer t
@@ -949,14 +945,19 @@ I /love/ ~ido-mode~.  Default =M-x= behavior doesn't use ~ido-mode~, so we insta
           ido-vertical-define-keys 'C-n-and-C-p-only)
     (ido-mode 1)
     (ido-vertical-mode 1)
-    (use-package smex
-      :ensure t
-      :defer t
-      :bind (("M-x"    . smex)
-             ("<menu>" . smex)))
+    <<smex>>
     :bind (:map ido-common-completion-map
            ("C-n" . ido-next-match)
            ("C-p" . ido-prev-match)))
+#+end_src
+
+For some reason, there's no built-in ~ido~-respecting =M-x= behavior. This package fixes that.
+#+begin_src emacs-lisp :noweb-ref smex :tangle no
+  (use-package smex
+    :ensure t
+    :defer t
+    :bind (("M-x"    . smex)
+           ("<menu>" . smex)))
 #+end_src
 
 *** Take off the training wheels
@@ -1778,22 +1779,6 @@ Yes, Emacs is my *entire desktop environment*. You should probably remove this s
    :properties:
    :header-args: :noweb-ref window-management
    :end:
-*** The mouse follows focus
-When changing focus, the mouse should follow in case I need it. This is functionality I've used in virtually every window manager.
-#+begin_src emacs-lisp
-  (use-package exwm-mff
-    :ensure t
-    :defer t
-    :hook (exwm-init . exwm-mff-mode))
-#+end_src
-
-*** Configure floating window borders
-Uses the same color as my mode line, uses the same width as window divider width.
-#+begin_src emacs-lisp
-  (setq exwm-floating-border-width window-divider-default-right-width
-        exwm-floating-border-color (face-attribute 'mode-line :background))
-#+end_src
-
 *** Name EXWM buffers after the window title
 This was annoying when I first installed EXWM. Thankfully this is a very easy fix.
 #+begin_src emacs-lisp
@@ -1807,15 +1792,11 @@ We hook setting the buffer name into when EXWM picks up a change in the window t
   (exwm-update-title . farl-exwm/name-buffer-after-window-title)
 #+end_src
 
-*** Edit text for an X window in Emacs
-At first I questioned why I would do this, but now that I know the advantages of this, it's too good to pass up. This allows me to edit text from an X window using an Emacs buffer.
+*** Configure floating window borders
+Uses the same color as my mode line, uses the same width as window divider width.
 #+begin_src emacs-lisp
-  (use-package exwm-edit
-    :ensure t
-    :defer t
-    :init
-    (pdumper-require 'exwm-edit)
-    :hook (exwm-edit-compose . text-mode))
+  (setq exwm-floating-border-width window-divider-default-right-width
+        exwm-floating-border-color (face-attribute 'mode-line :background))
 #+end_src
 
 *** Getting a ~rofi~ equivalent

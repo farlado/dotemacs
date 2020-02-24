@@ -123,8 +123,6 @@ FILENAME and NOERROR are also passed to `require'."
 
                                   ;; Desktop Environment
                                   exwm
-                                  exwm-mff
-                                  exwm-edit
                                   dmenu
                                   minibuffer-line
                                   system-packages

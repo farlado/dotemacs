@@ -708,21 +708,11 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   (pdumper-require 'exwm-randr)
   (pdumper-require 'exwm-config)
   (pdumper-require 'exwm-systemtray)
-  (use-package exwm-mff
-    :ensure t
-    :defer t
-    :hook (exwm-init . exwm-mff-mode))
-  (setq exwm-floating-border-width window-divider-default-right-width
-        exwm-floating-border-color (face-attribute 'mode-line :background))
   (defun farl-exwm/name-buffer-after-window-title ()
     "Rename the current `exwm-mode' buffer after the X window's title."
     (exwm-workspace-rename-buffer exwm-title))
-  (use-package exwm-edit
-    :ensure t
-    :defer t
-    :init
-    (pdumper-require 'exwm-edit)
-    :hook (exwm-edit-compose . text-mode))
+  (setq exwm-floating-border-width window-divider-default-right-width
+        exwm-floating-border-color (face-attribute 'mode-line :background))
   (use-package dmenu
     :ensure t
     :defer t
