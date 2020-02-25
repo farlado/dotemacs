@@ -24,22 +24,24 @@
 (dolist (package `(;; Core
                    async
                    use-package
-                   server
                    auto-package-update
+                   server
 
                    ;; Looks
                    dashboard
                    dracula-theme
                    mood-line
+                   display-line-numbers
                    rainbow-mode
                    rainbow-delimiters
 
                    ;; Functionality
+                   which-key
                    company
                    company-emoji
-                   which-key
                    counsel
                    buffer-move
+                   sudo-edit
 
                    ;; Editing
                    graphviz-dot-mode
@@ -49,13 +51,13 @@
                    popup-kill-ring
                    hungry-delete
                    avy
-                   sudo-edit
 
                    ;; Programming
                    haskell-mode
                    highlight-indent-guides
                    company-jedi
                    flycheck
+                   flycheck-posframe
                    avy-flycheck
 
                    ;; `org-mode'
@@ -64,6 +66,17 @@
                    org-bullets
                    epresent
                    org-tempo
+
+                   ;; Other
+                   nov
+                   wttrin
+
+                   ;; games
+                   yahtzee
+                   sudoku
+                   tetris
+                   chess
+                   2048-game
 
                    ;; Desktop Environment
                    exwm
@@ -75,23 +88,12 @@
                    minibuffer-line
                    system-packages
                    desktop-environment
-                   xkb
                    wallpaper
+                   xkb
 
                    ;; Media
                    emms
-                   emms-setup
-
-                   ;; Other
-                   nov
-                   wttrin
-
-                   ;; games
-                   yahtzee
-                   sudoku
-                   tetris
-                   chess
-                   2048-game))
+                   emms-setup))
     (require package))
 
 (load-theme 'dracula t t)

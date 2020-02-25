@@ -92,11 +92,12 @@ FILENAME and NOERROR are also passed to `require'."
                                   rainbow-delimiters
 
                                   ;; Functionality
+                                  which-key
                                   company
                                   company-emoji
-                                  which-key
                                   counsel
                                   buffer-move
+                                  sudo-edit
 
                                   ;; Text Editing
                                   graphviz-dot-mode
@@ -105,7 +106,6 @@ FILENAME and NOERROR are also passed to `require'."
                                   popup-kill-ring
                                   hungry-delete
                                   avy
-                                  sudo-edit
 
                                   ;; Programming
                                   magit
@@ -113,12 +113,24 @@ FILENAME and NOERROR are also passed to `require'."
                                   highlight-indent-guides
                                   company-jedi
                                   flycheck
+                                  flycheck-posframe
                                   avy-flycheck
 
                                   ;; `org-mode'
                                   toc-org
                                   org-bullets
                                   epresent
+
+                                  ;; Extend
+                                  vterm
+                                  nov
+                                  wttrin
+
+                                  ;; Games
+                                  yahtzee
+                                  sudoku
+                                  chess
+                                  2048-game
 
                                   ;; Desktop Environment
                                   exwm
@@ -129,16 +141,7 @@ FILENAME and NOERROR are also passed to `require'."
                                   desktop-environment
 
                                   ;; Other
-                                  emms
-                                  vterm
-                                  nov
-                                  wttrin
-
-                                  ;; Games
-                                  yahtzee
-                                  sudoku
-                                  chess
-                                  2048-game))
+                                  emms))
 
 (require 'package)
 (defun package--save-selected-packages (&rest opt) nil)

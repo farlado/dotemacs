@@ -482,6 +482,16 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   :defer t
   :hook (prog-mode . flycheck-mode))
 
+(use-package flycheck-posframe
+  :if window-system
+  :after flycheck
+  :ensure t
+  :defer t
+  :init
+  (flycheck-posframe-configure-pretty-defaults)
+  (setq flycheck-posframe-position 'window-bottom-left-corner)
+  :hook (flycheck-mode . flycheck-posframe-mode))
+
 (use-package avy-flycheck
   :ensure t
   :defer t

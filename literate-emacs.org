@@ -334,22 +334,24 @@ packages and keybindings which help me bring ideas to life day after day.
       (dolist (package `(;; Core
                          async
                          use-package
-                         server
                          auto-package-update
+                         server
 
                          ;; Looks
                          dashboard
                          dracula-theme
                          mood-line
+                         display-line-numbers
                          rainbow-mode
                          rainbow-delimiters
 
                          ;; Functionality
+                         which-key
                          company
                          company-emoji
-                         which-key
                          counsel
                          buffer-move
+                         sudo-edit
 
                          ;; Editing
                          graphviz-dot-mode
@@ -359,13 +361,13 @@ packages and keybindings which help me bring ideas to life day after day.
                          popup-kill-ring
                          hungry-delete
                          avy
-                         sudo-edit
 
                          ;; Programming
                          haskell-mode
                          highlight-indent-guides
                          company-jedi
                          flycheck
+                         flycheck-posframe
                          avy-flycheck
 
                          ;; `org-mode'
@@ -374,6 +376,17 @@ packages and keybindings which help me bring ideas to life day after day.
                          org-bullets
                          epresent
                          org-tempo
+
+                         ;; Other
+                         nov
+                         wttrin
+
+                         ;; games
+                         yahtzee
+                         sudoku
+                         tetris
+                         chess
+                         2048-game
 
                          ;; Desktop Environment
                          exwm
@@ -385,23 +398,12 @@ packages and keybindings which help me bring ideas to life day after day.
                          minibuffer-line
                          system-packages
                          desktop-environment
-                         xkb
                          wallpaper
+                         xkb
 
                          ;; Media
                          emms
-                         emms-setup
-
-                         ;; Other
-                         nov
-                         wttrin
-
-                         ;; games
-                         yahtzee
-                         sudoku
-                         tetris
-                         chess
-                         2048-game))
+                         emms-setup))
           (require package))
     #+end_src
 
@@ -588,11 +590,12 @@ packages and keybindings which help me bring ideas to life day after day.
                                         rainbow-delimiters
 
                                         ;; Functionality
+                                        which-key
                                         company
                                         company-emoji
-                                        which-key
                                         counsel
                                         buffer-move
+                                        sudo-edit
 
                                         ;; Text Editing
                                         graphviz-dot-mode
@@ -601,7 +604,6 @@ packages and keybindings which help me bring ideas to life day after day.
                                         popup-kill-ring
                                         hungry-delete
                                         avy
-                                        sudo-edit
 
                                         ;; Programming
                                         magit
@@ -609,12 +611,24 @@ packages and keybindings which help me bring ideas to life day after day.
                                         highlight-indent-guides
                                         company-jedi
                                         flycheck
+                                        flycheck-posframe
                                         avy-flycheck
 
                                         ;; `org-mode'
                                         toc-org
                                         org-bullets
                                         epresent
+
+                                        ;; Extend
+                                        vterm
+                                        nov
+                                        wttrin
+
+                                        ;; Games
+                                        yahtzee
+                                        sudoku
+                                        chess
+                                        2048-game
 
                                         ;; Desktop Environment
                                         exwm
@@ -625,16 +639,7 @@ packages and keybindings which help me bring ideas to life day after day.
                                         desktop-environment
 
                                         ;; Other
-                                        emms
-                                        vterm
-                                        nov
-                                        wttrin
-
-                                        ;; Games
-                                        yahtzee
-                                        sudoku
-                                        chess
-                                        2048-game))
+                                        emms))
     #+end_src
 
 *** Disable an annoying ~customize~ function
@@ -1741,6 +1746,22 @@ packages and keybindings which help me bring ideas to life day after day.
         :ensure t
         :defer t
         :hook (prog-mode . flycheck-mode))
+    #+end_src
+
+*** Move ~flycheck~ issues out of the minibuffer
+
+    I want errors to be in their own area, not polluting the minibuffer.
+
+    #+begin_src emacs-lisp
+      (use-package flycheck-posframe
+        :if window-system
+        :after flycheck
+        :ensure t
+        :defer t
+        :init
+        (flycheck-posframe-configure-pretty-defaults)
+        (setq flycheck-posframe-position 'window-bottom-left-corner)
+        :hook (flycheck-mode . flycheck-posframe-mode))
     #+end_src
 
 *** ~avy~-style navigation but between syntax errors
