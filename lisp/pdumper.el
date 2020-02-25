@@ -38,9 +38,7 @@
                    company
                    company-emoji
                    which-key
-                   ido
-                   ido-vertical-mode
-                   smex
+                   counsel
                    buffer-move
 
                    ;; Editing
@@ -72,6 +70,7 @@
                    exwm-randr
                    exwm-config
                    exwm-systemtray
+                   ivy-posframe
                    dmenu
                    minibuffer-line
                    system-packages

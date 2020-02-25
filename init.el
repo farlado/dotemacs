@@ -41,12 +41,8 @@
   :defer t
   :init
   (pdumper-require 'server)
-  (defun server-start-if-not-running ()
-    "Call `server-start' if `server-running-p' returns nil."
-    (interactive)
-    (unless (server-running-p)
-      (server-start)))
-  :hook (after-init . server-start-if-not-running))
+  (unless (server-running-p)
+    (server-start)))
 
 (tooltip-mode -1)
 (setq use-dialog-box nil
@@ -68,11 +64,21 @@
         dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
   (dashboard-setup-startup-hook))
 
+(set-language-environment "UTF-8")
+(set-default-coding-systems 'utf-8)
+(setq locale-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+
 (when (member "Iosevka" (font-family-list))
   (set-face-attribute 'default nil :font "Iosevka" :height 100))
 
 (when (member "Noto Color Emoji" (font-family-list))
   (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
+
+(setq inhibit-compacting-font-caches t)
 
 (use-package dracula-theme
   :ensure t
@@ -96,8 +102,7 @@
   ;; Load `org-mode' if it isn't dumped
   (pdumper-require 'org)
   ;; Title
-  (set-face-attribute 'org-document-title nil
-                      :weight 'extra-bold :height 1.8)
+  (set-face-attribute 'org-document-title nil :weight 'extra-bold :height 1.8)
   ;; Headers
   (set-face-attribute 'org-level-1 nil :height 1.3)
   (set-face-attribute 'org-level-2 nil :height 1.1)
@@ -116,6 +121,8 @@
   (line-number-mode 1)
   (column-number-mode 1))
 
+(global-visual-line-mode 1)
+
 (global-page-break-lines-mode 1)
 
 (use-package display-line-numbers
@@ -128,9 +135,7 @@
           conf-mode) . display-line-numbers-mode))
 
 (show-paren-mode 1)
-(set-face-attribute 'show-paren-match nil
-                    :weight 'extra-bold
-                    :underline t)
+(set-face-attribute 'show-paren-match nil :weight 'extra-bold :underline t)
 (setq show-paren-style 'parentheses
       show-paren-delay 0)
 
@@ -145,36 +150,10 @@
   :defer t
   :hook (prog-mode . rainbow-delimiters-mode))
 
-(set-language-environment "UTF-8")
-(set-default-coding-systems 'utf-8)
-(setq locale-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
-
 (global-unset-key (kbd "C-x C-z"))
 (global-unset-key (kbd "C-z"))
 
-(use-package company
-  :ensure t
-  :defer t
-  :init
-  (setq company-idle-delay 0.75
-        company-minimum-prefix-length 3)
-  (global-company-mode 1)
-  :bind (:map company-active-map
-         ("M-n" . nil)
-         ("M-p" . nil)
-         ("C-n" . company-select-next)
-         ("C-p" . company-select-previous)
-         ("SPC" . company-abort)))
-
-(use-package company-emoji
-  :ensure t
-  :defer t
-  :init
-  (add-to-list 'company-backends 'company-emoji))
+(setq disabled-command-function nil)
 
 (add-hook 'minibuffer-setup-hook #'garbage-collect-defer)
 (add-hook 'minibuffer-exit-hook #'garbage-collect-restore)
@@ -182,8 +161,6 @@
 (setq confirm-kill-emacs 'yes-or-no-p)
 
 (setq make-pointer-invisible nil)
-
-(setq inhibit-compacting-font-caches t)
 
 (setq scroll-margin 0
       auto-window-vscroll nil
@@ -193,45 +170,48 @@
       mouse-wheel-progressive-speed nil
       mouse-wheel-follow-mouse t)
 
-(global-set-key (kbd "C-c d") #'cd)
-
-(global-visual-line-mode 1)
-
 (setq ring-bell-function 'ignore)
+
+(defalias 'yes-or-no-p #'y-or-n-p)
 
 (use-package which-key
   :ensure t
   :defer t
-  :init
-  (which-key-mode 1))
+  :hook (after-init . which-key-mode))
 
-(defalias 'yes-or-no-p #'y-or-n-p)
-
-(use-package ido-vertical-mode
+(use-package company
   :ensure t
   :defer t
   :init
-  (pdumper-require 'ido)
-  (setq ido-everywhere t
-        ido-max-prospects 10
-        ido-enable-prefix nil
-        ido-max-window-height 11
-        ido-enable-flex-matching t
-        ido-use-filename-at-point nil
-        ido-create-new-buffer 'always
-        ido-vertical-define-keys 'C-n-and-C-p-only)
-  (ido-mode 1)
-  (ido-vertical-mode 1)
-  (use-package smex
-    :ensure t
-    :defer t
-    :bind (("M-x"    . smex)
-           ("<menu>" . smex)))
-  :bind (:map ido-common-completion-map
-         ("C-n" . ido-next-match)
-         ("C-p" . ido-prev-match)))
+  (setq company-idle-delay 0.75
+        company-minimum-prefix-length 3)
+  :hook (after-init . global-company-mode)
+  :bind (:map company-active-map
+         ("M-n" . nil)
+         ("M-p" . nil)
+         ("C-n" . company-select-next)
+         ("C-p" . company-select-previous)
+         ("SPC" . company-abort)))
 
-(setq disabled-command-function nil)
+(use-package company-emoji
+  :after company
+  :ensure t
+  :defer t
+  :init
+  (add-to-list 'company-backends 'company-emoji))
+
+(use-package counsel
+  :ensure t
+  :defer t
+  :init
+  (ido-mode -1)
+  (pdumper-require 'counsel)
+  (setq ivy-initial-inputs-alist nil)
+  :hook (after-init . ivy-mode)
+  :bind (("M-x" . counsel-M-x)
+         ("<menu>" . counsel-M-x)
+         ("C-x C-f" . counsel-find-file)
+         ("C-c d" . counsel-cd)))
 
 (defun buffer-file-match (string)
   "Find STRING in variable `buffer-file-name'."
@@ -254,52 +234,6 @@
 
 (setq uniquify-buffer-name-style 'forward
       uniquify-after-kill-buffer-p t)
-
-(defun dashboard-restart ()
-  "Restart the dashboard buffer and switch to it."
-  (interactive)
-  (dashboard-insert-startupify-lists)
-  (switch-to-buffer "*dashboard*"))
-
-(global-set-key (kbd "C-c M-d") #'dashboard-restart)
-
-(global-set-key (kbd "C-c b") #'balance-windows)
-
-(global-set-key (kbd "C-x k") #'kill-this-buffer)
-
-(defun kill-this-buffer-and-window ()
-  "Kill the current buffer and delete the selected window.
-
-This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
-  (interactive)
-  (let ((window-to-delete (selected-window))
-        (buffer-to-kill (current-buffer))
-        (delete-window-hook (lambda ()
-                              (ignore-errors
-                                (delete-window)))))
-    (unwind-protect
-        (progn
-          (add-hook 'kill-buffer-hook delete-window-hook t t)
-          (if (kill-buffer (current-buffer))
-              ;; If `delete-window' failed before, we repeat
-              ;; it to regenerate the error in the echo area.
-              (when (eq (selected-window) window-to-delete)
-                (delete-window)))))))
-
-(global-set-key (kbd "C-x C-k") #'kill-this-buffer-and-window)
-
-(defun close-buffers-and-windows ()
-  "Close every buffer and close all windows, then restart dashboard if installed."
-  (interactive)
-  (when (yes-or-no-p "Really kill all buffers? ")
-    (save-some-buffers)
-    (mapc 'kill-buffer (buffer-list))
-    (delete-other-windows)
-    (when (and (featurep 'dashboard)
-               (fboundp #'dashboard-restart))
-      (dashboard-restart))))
-
-(global-set-key (kbd "C-x C-M-k") #'close-buffers-and-windows)
 
 (with-current-buffer "*scratch*"
   (emacs-lock-mode 'kill))
@@ -344,28 +278,77 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
 (global-set-key (kbd "C-x b") #'ibuffer)
 (global-unset-key (kbd "C-x C-b"))
 
-(when (file-exists-p (user-config-file "dotfiles/literate-sysconfig.org"))
-  (defun sys-config-visit ()
-    "Open the literate system configuration"
-    (interactive)
-    (find-file (user-config-file "dotfiles/literate-sysconfig.org")))
-
-  (global-set-key (kbd "C-c C-M-e") #'sys-config-visit))
-
-(when (file-exists-p (user-config-file "dotfiles/literate-dotfiles.org"))
-  (defun literate-dotfiles-visit ()
-    "Open the literate dotfiles."
-    (interactive)
-    (find-file (user-config-file "dotfiles/literate-dotfiles.org")))
-
-  (global-set-key (kbd "C-c M-e") #'literate-dotfiles-visit))
-
 (defun config-visit ()
   "Open the configuration file."
   (interactive)
   (find-file (user-emacs-file "literate-emacs.org")))
 
 (global-set-key (kbd "C-c e") #'config-visit)
+
+(defun literate-dotfiles-visit ()
+  "Open the literate dotfiles."
+  (interactive)
+  (find-file (user-config-file "dotfiles/literate-dotfiles.org")))
+
+(when (file-exists-p (user-config-file "dotfiles/literate-dotfiles.org"))
+  (global-set-key (kbd "C-c M-e") #'literate-dotfiles-visit))
+
+(defun sys-config-visit ()
+  "Open the literate system configuration"
+  (interactive)
+  (find-file (user-config-file "dotfiles/literate-sysconfig.org")))
+
+(when (file-exists-p (user-config-file "dotfiles/literate-sysconfig.org"))
+  (global-set-key (kbd "C-c C-M-e") #'sys-config-visit))
+
+(defun dashboard-restart ()
+  "Restart the dashboard buffer and switch to it."
+  (interactive)
+  (dashboard-insert-startupify-lists)
+  (switch-to-buffer "*dashboard*"))
+
+(global-set-key (kbd "C-c M-d") #'dashboard-restart)
+
+(global-set-key (kbd "C-c b") #'balance-windows)
+
+(global-set-key (kbd "C-x k") #'kill-this-buffer)
+
+(defun kill-this-buffer-and-window ()
+  "Kill the current buffer and delete the selected window.
+
+This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
+  (interactive)
+  (let ((window-to-delete (selected-window))
+        (buffer-to-kill (current-buffer))
+        (delete-window-hook (lambda ()
+                              (ignore-errors
+                                (delete-window)))))
+    (unwind-protect
+        (progn
+          (add-hook 'kill-buffer-hook delete-window-hook t t)
+          (if (kill-buffer (current-buffer))
+              ;; If `delete-window' failed before, we repeat
+              ;; it to regenerate the error in the echo area.
+              (when (eq (selected-window) window-to-delete)
+                (delete-window)))))))
+
+(global-set-key (kbd "C-x C-k") #'kill-this-buffer-and-window)
+
+(defun close-buffers-and-windows ()
+  "Kill every buffer and close all windows, then restart dashboard."
+  (interactive)
+  (when (yes-or-no-p "Really kill all buffers? ")
+    (save-some-buffers)
+    (mapc 'kill-buffer (buffer-list))
+    (delete-other-windows)
+    (dashboard-restart)))
+
+(global-set-key (kbd "C-x C-M-k") #'close-buffers-and-windows)
+
+(use-package sudo-edit
+  :ensure t
+  :defer t
+  :bind ("C-x C-M-f" . sudo-edit))
 
 (use-package graphviz-dot-mode
   :ensure t
@@ -380,8 +363,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
 (defun tangle-literate-program ()
   "Tangle a file if it's a literate programming file."
   (interactive)
-  (when (and (equal major-mode 'org-mode)
-             (buffer-file-match "literate"))
+  (when (buffer-file-match "literate.*.org$")
     (org-babel-tangle)))
 
 (add-hook 'after-save-hook #'tangle-literate-program -100)
@@ -463,11 +445,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
 
 (global-set-key (kbd "C-c DEL") #'whole-kill-word)
 
-(use-package sudo-edit
-  :ensure t
-  :defer t
-  :bind ("C-x C-M-f" . sudo-edit))
-
 (setq inferior-lisp-program "sbcl")
 
 (use-package magit
@@ -494,6 +471,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   :hook (prog-mode . highlight-indent-guides-mode))
 
 (use-package company-jedi
+  :after company
   :ensure t
   :defer t
   :init
@@ -546,7 +524,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
         org-hide-emphasis-markers window-system)
   (org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
   (defun farl-org/confirm-babel-evaluate (lang body)
-    "Don't ask to evaluate graphviz blocks or blocks in a literate programming file."
+    "Don't ask to evaluate graphviz blocks or literate programming blocks."
     (not (or (string= lang "dot")
              (buffer-file-match "literate.*.org$"))))
   
@@ -576,7 +554,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                                        ("cjp" . "src conf-javaprop")
                                        ("el"  . "src emacs-lisp")
                                        ("py"  . "src python")
-                                       ("dot" . "src dot :cmdline -Kdot -Tpng :file")
+                                       ("dot" . "src dot :file")
                                        ("txt" . "src text :tangle"))
         org-tempo-keywords-alist '(;; Title/subtitle/author
                                    ("t"  . "title")
@@ -601,19 +579,15 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                                    ("A" . "ascii")
                                    ("i" . "index")))
   (defun farl-org/disable-angle-bracket-syntax ()
-    "Disable the angle bracket syntax added to `org-mode' in versions 9.2 and above."
+    "Disable angle bracket syntax."
     (modify-syntax-entry ?< ".")
     (modify-syntax-entry ?> "."))
   (defun open-agenda-file ()
     "Open the agenda file."
     (interactive)
-    (find-file (if ido-mode
-                   (ido-completing-read
-                    "Choose an agenda file: "
-                    (all-completions "" org-agenda-files))
-                 (completing-read
-                  "Choose an agenda file: "
-                  (all-completions "" org-agenda-files)))))
+    (find-file (ivy-read
+                "Open agenda: "
+                (all-completions "" org-agenda-files))))
   
   (when (file-directory-p "~/agendas")
     (setq org-agenda-files (directory-files-recursively
@@ -625,8 +599,8 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
          (org-babel-after-execute . org-redisplay-inline-images)
          )
   :bind (
-         ("C-c s-a" . open-agenda-file)
          ("C-c M-a" . org-agenda)
+         ("C-c s-a" . open-agenda-file)
          )
   )
 
@@ -708,6 +682,23 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   (pdumper-require 'exwm-randr)
   (pdumper-require 'exwm-config)
   (pdumper-require 'exwm-systemtray)
+  (use-package ivy-posframe
+    :ensure t
+    :defer t
+    :init
+    (setq posframe-mouse-banish nil
+          ivy-posframe-min-width 30
+          ivy-posframe-border-width 3
+          ivy-posframe-parameters '((left-fringe . 10)
+                                    (right-fringe . 10)
+                                    (parent-frame . nil))
+          ivy-posframe-height-alist '((swiper . 15)
+                                      (swiper-isearch . 15)
+                                      (t . 11))
+          ivy-posframe-display-functions-alist
+          '((swiper . ivy-posframe-display-at-window-center)
+            (t . ivy-posframe-display-at-frame-center)))
+    :hook (exwm-init . ivy-posframe-mode))
   (defun farl-exwm/name-buffer-after-window-title ()
     "Rename the current `exwm-mode' buffer after the X window's title."
     (exwm-workspace-rename-buffer exwm-title))
@@ -737,7 +728,8 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                                       workspace 8)
                                      ((string= exwm-class-name "discord")
                                       workspace 7)
-                                     ((or (string-match-p "libreoffice" exwm-class-name)
+                                     ((or (string-match-p "libreoffice"
+                                                          exwm-class-name)
                                           (string= exwm-class-name "MuseScore3")
                                           (string= exwm-class-name "Gimp"))
                                       workspace 6)
@@ -760,15 +752,16 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     :ensure t
     :defer t
     :init
+    (pdumper-require 'minibuffer-line)
     (defun farl-exwm/list-workspaces ()
       "List EXWM workspaces."
       (exwm-workspace--update-switch-history)
       (elt exwm-workspace--switch-history
            (exwm-workspace--position exwm-workspace--current)))
-    (minibuffer-line-mode 1)
     (set-face-attribute 'minibuffer-line nil :inherit 'default)
     (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
-    :hook (exwm-workspace-switch . minibuffer-line--update))
+    :hook ((exwm-init . minibuffer-line-mode)
+           (exwm-workspace-switch . minibuffer-line--update)))
   (defun get-connected-monitors ()
     "Return a list of the currently connected monitors."
     (split-string
@@ -932,9 +925,8 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     :ensure t
     :defer t
     :init
+    (pdumper-require 'desktop-environment)
     (setq desktop-environment-update-exwm-global-keys :prefix)
-    (desktop-environment-mode 1)
-    
     (setq desktop-environment-brightness-normal-increment "5%+"
           desktop-environment-brightness-normal-decrement "5%-")
     (setq desktop-environment-volume-toggle-command
@@ -947,17 +939,20 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                   "|| echo Microphone is now unmuted | tr '\n' ' '"))
     (setq desktop-environment-screenlock-command
           (concat
-           "i3lock -nmk --color=000000 --timecolor=ffffffff --datecolor=ffffffff "
-           "--wrongcolor=ffffffff --ringcolor=00000000 --insidecolor=00000000 "
-           "--keyhlcolor=00000000 --bshlcolor=00000000 --separatorcolor=00000000 "
-           "--ringvercolor=00000000 --insidevercolor=00000000 --linecolor=00000000 "
-           "--ringwrongcolor=00000000 --insidewrongcolor=00000000 --timestr=%H:%M "
-           "--datestr='%a %d %b' --time-font=Iosevka --date-font=Iosevka "
-           "--wrong-font=Iosevka --timesize=128 --datesize=64 --wrongsize=32 "
-           "--time-align 0 --date-align 0 --wrong-align 0 --indpos=-10:-10 "
-           "--timepos=200:125 --datepos=200:215 --wrongpos=200:155 --locktext='' "
-           "--lockfailedtext='' --noinputtext='' --veriftext='' --wrongtext='WRONG' "
-           "--force-clock --radius 1 --ring-width 1 "))
+           "i3lock -nmk --color=000000 --timecolor=ffffffff "
+           " --datecolor=ffffffff --wrongcolor=ffffffff "
+           "--ringcolor=00000000 --insidecolor=00000000 "
+           "--keyhlcolor=00000000 --bshlcolor=00000000 "
+           "--separatorcolor=00000000 --ringvercolor=00000000 "
+           "--insidevercolor=00000000 --linecolor=00000000 "
+           "--ringwrongcolor=00000000 --insidewrongcolor=00000000 "
+           "--timestr=%H:%M --datestr='%a %d %b' --time-font=Iosevka "
+           "--date-font=Iosevka --wrong-font=Iosevka --timesize=128 "
+           "--datesize=64 --wrongsize=32 --time-align 0 --date-align 0 "
+           "--wrong-align 0 --indpos=-10:-10 --timepos=200:125 "
+           "--datepos=200:215 --wrongpos=200:155 --locktext='' "
+           "--lockfailedtext='' --noinputtext='' --veriftext='' "
+           "--wrongtext='WRONG' --force-clock --radius 1 --ring-width 1 "))
     (setq desktop-environment-screenshot-directory "~/screenshots")
     (setq desktop-environment-screenshot-command
           "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
@@ -992,7 +987,9 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                " && xclip $FILENAME -selection clipboard "
                "-t image/png &> /dev/null && rm $FILENAME"))
       (message "Screenshot copied to clipboard."))
+    :hook (exwm-init . desktop-environment-mode)
     :bind (:map desktop-environment-mode-map
+           ("<XF86ScreenSaver>" . desktop-environment-lock-screen)
            ("<print>" . farl-de/desktop-environment-screenshot-part-clip)
            ("<S-print>" . farl-de/desktop-environment-screenshot-clip)
            ("<C-print>" . farl-de/desktop-environment-screenshot-part)
@@ -1021,18 +1018,18 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     "Loop desktop audio into a null sink alongside the primary input."
     (interactive)
     (dolist (command '(;; Create null sink `loop'
-                       "pacmd load-module module-null-sink sink_name=loop"
-                       "pacmd update-sink-proplist loop device.description=loop"
+                       "load-module module-null-sink sink_name=loop"
+                       "update-sink-proplist loop device.description=loop"
                        ;; Create null sink `out'
-                       "pacmd load-module module-null-sink sink_name=out"
-                       "pacmd update-sink-proplist out device.description=out"
+                       "load-module module-null-sink sink_name=out"
+                       "update-sink-proplist out device.description=out"
                        ;; Loop `loop' to primary output
-                       "pacmd load-module module-loopback source=loop.monitor"
+                       "load-module module-loopback source=loop.monitor"
                        ;; Pipe it into `out'
-                       "pacmd load-module module-loopback source=loop.monitor sink=out"
+                       "load-module module-loopback source=loop.monitor sink=out"
                        ;; Loop primary input into `out'
-                       "pacmd load-module module-loopback sink=out"))
-      (shell-command command))
+                       "load-module module-loopback sink=out"))
+      (shell-command (concat "pacmd " command)))
     ;; Run `pavucontrol' and then unload the modules after it completes
     (start-process-shell-command
      "Audio Loop" nil (concat "pavucontrol;"
@@ -1047,115 +1044,30 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                               "de")
           xkb-options '("ctrl:nocaps"))
     :hook (exwm-init . xkb-cycle-mode))
+  (defun shut-down--computer ()
+    "Shut down the computer."
+    (shell-command "shutdown now"))
+  
+  (defun shut-down-computer ()
+    "Shut down the computer."
+    (interactive)
+    (add-hook 'kill-emacs-hook #'shut-down--computer)
+    (save-buffers-kill-emacs)
+    (remove-hook 'kill-emacs-hook #'shut-down--computer))
+  (defun reboot--computer ()
+    "Run the reboot command."
+    (shell-command "reboot"))
+  
+  (defun reboot-computer ()
+    "Reboot the computer."
+    (interactive)
+    (add-hook 'kill-emacs-hook #'reboot--computer)
+    (save-buffers-kill-emacs)
+    (remove-hook 'kill-emacs-hook #'reboot--computer))
   (defun suspend-computer ()
     (interactive)
-    (and (yes-or-no-p "Really suspend? ")
-         (start-process "Suspend" nil "systemctl"
-                        "suspend" "-i")))
-  (defun save-buffers-reboot (&optional arg)
-    "Offer to save each buffer, then shut down the computer.
-  This function is literally just a copycat of `save-buffers-kill-emacs'.
-  With prefix ARG, silently save all file-visiting buffers without asking.
-  If there are active processes where `process-query-on-exit-flag'
-  returns non-nil and `confirm-kill-processes' is non-nil,
-  asks whether processes should be killed.
-  Runs the members of `kill-emacs-query-functions' in turn and stops
-  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
-  Instead of just killing Emacs, shuts down the system."
-    (interactive "P")
-    ;; Don't use save-some-buffers-default-predicate, because we want
-    ;; to ask about all the buffers before killing Emacs.
-    (save-some-buffers arg t)
-    (let ((confirm confirm-kill-emacs))
-      (and
-       (or (not (memq t (mapcar (function
-                                 (lambda (buf)
-                                   (and (buffer-file-name buf)
-                                        (buffer-modified-p buf))))
-                                (buffer-list))))
-           (progn (setq confirm nil)
-                  (yes-or-no-p "Modified buffers exist; reboot anyway? ")))
-       (or (not (fboundp 'process-list))
-           ;; process-list is not defined on MSDOS.
-           (not confirm-kill-processes)
-           (let ((processes (process-list))
-                 active)
-             (while processes
-               (and (memq (process-status (car processes)) '(run stop open listen))
-                    (process-query-on-exit-flag (car processes))
-                    (setq active t))
-               (setq processes (cdr processes)))
-             (or (not active)
-                 (with-current-buffer-window
-                  (get-buffer-create "*Process List*") nil
-                  #'(lambda (window _value)
-                      (with-selected-window window
-                        (unwind-protect
-                            (progn
-                              (setq confirm nil)
-                              (yes-or-no-p (concat "Active processes exist; kill "
-                                                   "them and reboot anyway? ")))
-                          (when (window-live-p window)
-                            (quit-restore-window window 'kill)))))
-                  (list-processes t)))))
-       ;; Query the user for other things, perhaps.
-       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
-       (or (null confirm)
-           (funcall confirm "Really reboot? "))
-       (shell-command "reboot")
-       (kill-emacs))))
-  (defun save-buffers-shut-down (&optional arg)
-    "Offer to save each buffer, then shut down the computer.
-  This function is literally just a copycat of `save-buffers-kill-emacs'.
-  With prefix ARG, silently save all file-visiting buffers without asking.
-  If there are active processes where `process-query-on-exit-flag'
-  returns non-nil and `confirm-kill-processes' is non-nil,
-  asks whether processes should be killed.
-  Runs the members of `kill-emacs-query-functions' in turn and stops
-  if any returns nil.  If `confirm-kill-emacs' is non-nil, calls it.
-  Instead of just killing Emacs, shuts down the system."
-    (interactive "P")
-    ;; Don't use save-some-buffers-default-predicate, because we want
-    ;; to ask about all the buffers before killing Emacs.
-    (save-some-buffers arg t)
-    (let ((confirm confirm-kill-emacs))
-      (and
-       (or (not (memq t (mapcar (function
-                                 (lambda (buf)
-                                   (and (buffer-file-name buf)
-                                        (buffer-modified-p buf))))
-                                (buffer-list))))
-           (progn (setq confirm nil)
-                  (yes-or-no-p "Modified buffers exist; shut down anyway? ")))
-       (or (not (fboundp 'process-list))
-           ;; process-list is not defined on MSDOS.
-           (not confirm-kill-processes)
-           (let ((processes (process-list))
-                 active)
-             (while processes
-               (and (memq (process-status (car processes)) '(run stop open listen))
-                    (process-query-on-exit-flag (car processes))
-                    (setq active t))
-               (setq processes (cdr processes)))
-             (or (not active)
-                 (with-current-buffer-window
-                  (get-buffer-create "*Process List*") nil
-                  #'(lambda (window _value)
-                      (with-selected-window window
-                        (unwind-protect
-                            (progn
-                              (setq confirm nil)
-                              (yes-or-no-p (concat "Active processes exist; kill "
-                                                   "them and shut down anyway? ")))
-                          (when (window-live-p window)
-                            (quit-restore-window window 'kill)))))
-                  (list-processes t)))))
-       ;; Query the user for other things, perhaps.
-       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
-       (or (null confirm)
-           (funcall confirm "Really shut down? "))
-       (shell-command "shutdown now")
-       (kill-emacs))))
+    (when (yes-or-no-p "Really suspend? ")
+      (shell-command "systemctl suspend -i")))
   (setq exwm-input-global-keys `(;; Switching workspace focus
                                  ;; s-1 for 1, s-2 for 2, etc...
                                  ,@(mapcar
@@ -1184,9 +1096,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                                  ;; Toggle how input is sent to X windows
                                  ([?\s-q] . exwm-input-toggle-keyboard)
   
-                                 ;; Toggle floating
-                                 ([?\s-e] . exwm-floating-toggle-floating)
-  
                                  ;; Window size adjustment
                                  (,(kbd "C-s-w") . shrink-window)
                                  (,(kbd "C-s-s") . enlarge-window)
@@ -1209,11 +1118,9 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                                  ([?\s-v]          . volume-settings)
   
                                  ;; Other desktop environment things
-                                 ([menu]            . smex)
                                  ([?\s-x]           . dmenu)
                                  ([s-tab]           . audio-loopback)
                                  ([?\s-w]           . xkb-set-layout)
-                                 ([XF86ScreenSaver] . desktop-environment-lock-screen)
   
                                  ;; Controlling EMMS
                                  ([XF86AudioNext] . emms-next)
@@ -1293,9 +1200,9 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
          (kill-emacs . farl-exwm/on-logout)
          )
   :bind (
+         ("C-x C-M-c" . shut-down-computer)
+         ("C-x C-M-r" . reboot-computer)
          ("C-x C-M-s" . suspend-computer)
-         ("C-x C-M-r" . save-buffers-reboot)
-         ("C-x C-M-c" . save-buffers-shut-down)
          :map exwm-mode-map
          ("C-x C-s" . farl-exwm/C-s)
          ("C-c C-l" . farl-exwm/C-k)
