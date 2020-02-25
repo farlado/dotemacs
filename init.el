@@ -207,7 +207,9 @@
   (ido-mode -1)
   (pdumper-require 'counsel)
   (setq ivy-initial-inputs-alist nil)
-  :hook (after-init . ivy-mode)
+  :hook (after-init . (lambda ()
+                        (ivy-mode 1)
+                        (ido-mode -1)))
   :bind (("M-x" . counsel-M-x)
          ("<menu>" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
@@ -488,9 +490,9 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   :ensure t
   :defer t
   :init
-  (flycheck-posframe-configure-pretty-defaults)
   (setq flycheck-posframe-position 'window-bottom-left-corner)
-  :hook (flycheck-mode . flycheck-posframe-mode))
+  :hook ((flycheck-mode . flycheck-posframe-mode)
+         (flycheck-posframe-mode . flycheck-posframe-configure-pretty-defaults)))
 
 (use-package avy-flycheck
   :ensure t
