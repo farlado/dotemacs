@@ -204,14 +204,14 @@
   :ensure t
   :defer t
   :init
-  (ido-mode -1)
+  (defun farl-init/ivy-mode ()
+    "Start `ivy-mode' while disabling `ido-mode'."
+    (ivy-mode 1)
+    (ido-mode -1))
   (pdumper-require 'counsel)
   (setq ivy-initial-inputs-alist nil)
-  :hook (after-init . (lambda ()
-                        (ivy-mode 1)
-                        (ido-mode -1)))
+  :hook (after-init . farl-init/ivy-mode)
   :bind (("M-x" . counsel-M-x)
-         ("<menu>" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
          ("C-c d" . counsel-cd)))
 
