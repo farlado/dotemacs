@@ -1176,6 +1176,8 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                                  ([XF86AudioPlay] . emms-pause)
                                  ([XF86AudioStop] . emms-stop)))
   (setq exwm-input-simulation-keys `(;; Navigation
+                                     ([?\M-<] . [C-home])
+                                     ([?\M->] . [C-end])
                                      ([?\C-a] . [home])
                                      ([?\C-e] . [end])
                                      ([?\C-v] . [next])

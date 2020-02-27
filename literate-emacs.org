@@ -3092,6 +3092,8 @@ packages and keybindings which help me bring ideas to life day after day.
 
     #+begin_src emacs-lisp
       (setq exwm-input-simulation-keys `(;; Navigation
+                                         ([?\M-<] . [C-home])
+                                         ([?\M->] . [C-end])
                                          ([?\C-a] . [home])
                                          ([?\C-e] . [end])
                                          ([?\C-v] . [next])
