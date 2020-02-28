@@ -341,6 +341,7 @@ packages and keybindings which help me bring ideas to life day after day.
                          dashboard
                          dracula-theme
                          mood-line
+                         page-break-lines
                          display-line-numbers
                          rainbow-mode
                          rainbow-delimiters
@@ -586,6 +587,7 @@ packages and keybindings which help me bring ideas to life day after day.
                                         dashboard
                                         dracula-theme
                                         mood-line
+                                        page-break-lines
                                         rainbow-mode
                                         rainbow-delimiters
 
@@ -986,10 +988,13 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Turn ^L into pretty lines
 
     This is used in a number of places in Emacs. Better to have it on all the
-    time than never on.
+    time than never on. I didn't know it was an external package.
 
     #+begin_src emacs-lisp
-      (global-page-break-lines-mode 1)
+      (use-package page-break-lines
+        :ensure t
+        :defer t
+        :hook (after-init . global-page-break-lines-mode))
     #+end_src
 
 *** Line numbers (on most buffers)

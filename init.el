@@ -123,7 +123,10 @@
 
 (global-visual-line-mode 1)
 
-(global-page-break-lines-mode 1)
+(use-package page-break-lines
+  :ensure t
+  :defer t
+  :hook (after-init . global-page-break-lines-mode))
 
 (use-package display-line-numbers
   :ensure t

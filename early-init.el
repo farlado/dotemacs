@@ -88,6 +88,7 @@ FILENAME and NOERROR are also passed to `require'."
                                   dashboard
                                   dracula-theme
                                   mood-line
+                                  page-break-lines
                                   rainbow-mode
                                   rainbow-delimiters
 
