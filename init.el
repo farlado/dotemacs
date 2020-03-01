@@ -87,11 +87,11 @@
   (if pdumper-dumped
       (enable-theme 'dracula)
     (load-theme 'dracula t))
-  (set-face-background 'fringe (face-attribute 'default :background))
+  (set-face-background 'fringe (face-background 'default))
   (fringe-mode 10)
-  (set-face-background 'line-number (face-attribute 'default :background))
+  (set-face-background 'line-number (face-background 'default))
   (setq window-divider-default-right-width 3)
-  (let ((color (face-attribute 'mode-line :background)))
+  (let ((color (face-background 'mode-line)))
     (set-face-foreground 'window-divider-first-pixel color)
     (set-face-foreground 'window-divider-last-pixel color)
     (set-face-foreground 'window-divider color))
@@ -99,14 +99,11 @@
   (dolist (frame (frame-list))
     (set-frame-parameter frame 'alpha 90))
   (add-to-list 'default-frame-alist '(alpha . 90))
-  ;; Load `org-mode' if it isn't dumped
   (pdumper-require 'org)
-  ;; Title
-  (set-face-attribute 'org-document-title nil :weight 'extra-bold :height 1.8)
-  ;; Headers
   (set-face-attribute 'org-level-1 nil :height 1.3)
   (set-face-attribute 'org-level-2 nil :height 1.1)
-  (set-face-attribute 'org-level-3 nil :height 1.0))
+  (set-face-attribute 'org-level-3 nil :height 1.0)
+  (set-face-attribute 'org-document-title nil :weight 'extra-bold :height 1.8))
 
 (use-package mood-line
   :ensure t
@@ -734,6 +731,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     (setq posframe-mouse-banish nil
           ivy-posframe-min-width 30
           ivy-posframe-border-width 3
+          ivy-posframe-hide-minibuffer t
           ivy-posframe-parameters '((left-fringe . 10)
                                     (right-fringe . 10)
                                     (parent-frame . nil))
@@ -754,7 +752,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     "Rename the current `exwm-mode' buffer after the X window's title."
     (exwm-workspace-rename-buffer exwm-title))
   (setq exwm-floating-border-width window-divider-default-right-width
-        exwm-floating-border-color (face-attribute 'mode-line :background))
+        exwm-floating-border-color (face-background 'mode-line))
   (use-package dmenu
     :ensure t
     :defer t
