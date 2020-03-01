@@ -1307,7 +1307,7 @@ packages and keybindings which help me bring ideas to life day after day.
             (define-key map (kbd "C-d") #'buf-move-right)
             map)
           "A keymap for `buffer-move' and `windmove' functions.")
-        (global-set-key (kbd "C-x o") buffer-move-and-windmove-map))
+        :bind-keymap ("C-x o" . buffer-move-and-windmove-map))
     #+end_src
 
 *** Move focus and show ~ibuffer~ when explicitly creating new windows
@@ -3283,7 +3283,8 @@ packages and keybindings which help me bring ideas to life day after day.
       <<emms-load>>
       <<emms-conf>>
       <<emms-func>>
-      <<emms-keys>>)
+      <<emms-keys>>
+      :bind-keymap ("C-c a" . emms-map))
   #+end_src
 
 ** Loading
@@ -3376,7 +3377,6 @@ packages and keybindings which help me bring ideas to life day after day.
          (define-key map (kbd "d u") #'mpd/update-database)
          map)
        "A keymap for controlling `emms'.")
-     (global-set-key (kbd "C-c a") emms-map)
    #+end_src
 
 ** Configuring

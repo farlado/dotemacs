@@ -263,7 +263,7 @@
       (define-key map (kbd "C-d") #'buf-move-right)
       map)
     "A keymap for `buffer-move' and `windmove' functions.")
-  (global-set-key (kbd "C-x o") buffer-move-and-windmove-map))
+  :bind-keymap ("C-x o" . buffer-move-and-windmove-map))
 
 (defun split-and-follow-vertical ()
   "Open a new window vertically."
@@ -1304,6 +1304,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
       (define-key map (kbd "d u") #'mpd/update-database)
       map)
     "A keymap for controlling `emms'.")
-  (global-set-key (kbd "C-c a") emms-map))
+  :bind-keymap ("C-c a" . emms-map))
 
 ;;; init.el ends here
