@@ -771,7 +771,9 @@ packages and keybindings which help me bring ideas to life day after day.
               dashboard-startup-banner 'logo
               initial-buffer-choice #'dashboard-or-scratch
               dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
-        (dashboard-setup-startup-hook))
+        <<dashboard-immortal>>
+        (dashboard-setup-startup-hook)
+        :hook (dashboard-mode . dashboard-immortal))
     #+end_src
 
     When Emacs or ~emacsclient~ starts, the first buffer shown should be either
@@ -782,6 +784,15 @@ packages and keybindings which help me bring ideas to life day after day.
         "Open either dashboard or the scratch buffer."
         (or (get-buffer "*dashboard*")
             (get-buffer "*scratch*")))
+    #+end_src
+
+    I want dashboard to be unkillable.
+
+    #+begin_src emacs-lisp :tangle no :noweb-ref dashboard-immortal
+      (defun dashboard-immortal ()
+	"Make it impossible to kill the dashboard buffer."
+	(with-current-buffer "*dashboard*"
+	  (emacs-lock-mode 'kill)))
     #+end_src
 
 * Making Emacs much less ugly
@@ -1365,18 +1376,6 @@ packages and keybindings which help me bring ideas to life day after day.
         (global-set-key (kbd "C-c C-M-e") #'sys-config-visit))
     #+end_src
 
-*** Restart dashboard with =C-c M-d=
-
-    #+begin_src emacs-lisp
-      (defun dashboard-restart ()
-        "Restart the dashboard buffer and switch to it."
-        (interactive)
-        (dashboard-insert-startupify-lists)
-        (switch-to-buffer "*dashboard*"))
-
-      (global-set-key (kbd "C-c M-d") #'dashboard-restart)
-    #+end_src
-
 *** Balance window sizes with =C-c b=
 
     #+begin_src emacs-lisp
@@ -1426,8 +1425,7 @@ packages and keybindings which help me bring ideas to life day after day.
         (when (yes-or-no-p "Really kill all buffers? ")
           (save-some-buffers)
           (mapc 'kill-buffer (buffer-list))
-          (delete-other-windows)
-          (dashboard-restart)))
+          (delete-other-windows)))
 
       (global-set-key (kbd "C-x C-M-k") #'close-buffers-and-windows)
     #+end_src

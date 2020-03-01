@@ -62,7 +62,12 @@
         dashboard-startup-banner 'logo
         initial-buffer-choice #'dashboard-or-scratch
         dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
-  (dashboard-setup-startup-hook))
+  (defun dashboard-immortal ()
+    "Make it impossible to kill the dashboard buffer."
+    (with-current-buffer "*dashboard*"
+      (emacs-lock-mode 'kill)))
+  (dashboard-setup-startup-hook)
+  :hook (dashboard-mode . dashboard-immortal))
 
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)
@@ -303,14 +308,6 @@
 (when (file-exists-p (user-config-file "dotfiles/literate-sysconfig.org"))
   (global-set-key (kbd "C-c C-M-e") #'sys-config-visit))
 
-(defun dashboard-restart ()
-  "Restart the dashboard buffer and switch to it."
-  (interactive)
-  (dashboard-insert-startupify-lists)
-  (switch-to-buffer "*dashboard*"))
-
-(global-set-key (kbd "C-c M-d") #'dashboard-restart)
-
 (global-set-key (kbd "C-c b") #'balance-windows)
 
 (global-set-key (kbd "C-x k") #'kill-this-buffer)
@@ -342,8 +339,7 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   (when (yes-or-no-p "Really kill all buffers? ")
     (save-some-buffers)
     (mapc 'kill-buffer (buffer-list))
-    (delete-other-windows)
-    (dashboard-restart)))
+    (delete-other-windows)))
 
 (global-set-key (kbd "C-x C-M-k") #'close-buffers-and-windows)
 
