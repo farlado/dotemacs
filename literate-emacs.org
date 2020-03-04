@@ -2225,6 +2225,7 @@ packages and keybindings which help me bring ideas to life day after day.
                                           (t . 11))
               ivy-posframe-display-functions-alist
               '((t . farl-ivy-posframe/exwm-display-window-center)))
+        <<force-position>>
         :hook (exwm-init . ivy-posframe-mode))
     #+end_src
 
@@ -2247,6 +2248,20 @@ packages and keybindings which help me bring ideas to life day after day.
       (defun farl-ivy-posframe/exwm-display-window-center (str)
         "Display a posframe for `ivy-posframe' at point, passing STR."
         (ivy-posframe--display str #'farl-exwm/poshandler-window-center))
+    #+end_src
+
+    Okay, it's important to force position after all. This ensures that every
+    time a posframe is moved, it always moves to the proper place and is the
+    proper size.
+
+    #+begin_src emacs-lisp :noweb-ref force-position
+      (defun farl-posframe/force-set-position (&rest args)
+        "Force the position to be set for a posframe, ignoring ARGS."
+        (setq posframe--last-posframe-pixel-position nil
+              posframe--last-parent-frame-size nil
+              posframe--last-posframe-size nil))
+      (advice-add 'posframe--set-frame-position
+                  :before #'farl-posframe/force-set-position)
     #+end_src
 
 *** Name EXWM buffers after the window title

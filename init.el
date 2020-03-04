@@ -722,6 +722,13 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                                       (t . 11))
           ivy-posframe-display-functions-alist
           '((t . farl-ivy-posframe/exwm-display-window-center)))
+    (defun farl-posframe/force-set-position (&rest args)
+      "Force the position to be set for a posframe, ignoring ARGS."
+      (setq posframe--last-posframe-pixel-position nil
+            posframe--last-parent-frame-size nil
+            posframe--last-posframe-size nil))
+    (advice-add 'posframe--set-frame-position
+                :before #'farl-posframe/force-set-position)
     :hook (exwm-init . ivy-posframe-mode))
   (defun farl-exwm/name-buffer-after-window-title ()
     "Rename the current `exwm-mode' buffer after the X window's title."
