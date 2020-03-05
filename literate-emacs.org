@@ -21,7 +21,6 @@ packages and keybindings which help me bring ideas to life day after day.
   - [[#installation][Installation]]
   - [[#dependencies][Dependencies]]
   - [[#license][License]]
-  - [[#files-to-ignore][Files to ignore]]
 - [[#giving-files-their-headers][Giving files their headers]]
 - [[#making-emacs-start-quickly][Making Emacs start quickly]]
   - [[#starting-emacs-fast][Starting Emacs FAST]]
@@ -51,20 +50,20 @@ packages and keybindings which help me bring ideas to life day after day.
   - [[#not-built-in][Not built-in]]
   - [[#built-in][Built-in]]
   - [[#games][Games]]
+- [[#making-emacs-a-manageplay-music][Making Emacs a manage/play music]]
+  - [[#loading][Loading]]
+  - [[#functions][Functions]]
+  - [[#keybindings][Keybindings]]
+  - [[#configuring][Configuring]]
 - [[#making-emacs-a-desktop-environment][Making Emacs a desktop environment]]
   - [[#window-management][Window management]]
   - [[#workspace-configuration][Workspace configuration]]
   - [[#multi-head-configuration][Multi-head configuration]]
   - [[#x-applications][X applications]]
   - [[#de-components][DE components]]
-  - [[#keybindings][Keybindings]]
+  - [[#keybindings-1][Keybindings]]
   - [[#on-startup][On startup]]
   - [[#on-logout][On logout]]
-- [[#making-emacs-an-mpd-based-music-player][Making Emacs an ~mpd~-based music player]]
-  - [[#loading][Loading]]
-  - [[#functions][Functions]]
-  - [[#keybindings-1][Keybindings]]
-  - [[#configuring][Configuring]]
 - [[#giving-files-their-footers][Giving files their footers]]
 #+END_QUOTE
 
@@ -73,21 +72,21 @@ packages and keybindings which help me bring ideas to life day after day.
   This file is an attempt at a literate GNU Emacs (henceforth "Emacs")
   configuration.
 
-  Literate programming is a method of programming in which programming is worked
-  on in parallel with the development of documentation specifically pertaining
-  to how the program was written, alongside how to use the program at times. The
-  end product is a file that can be /tangled/ into source code and /weaved/ into
+  Literate programming is a method in which programming is worked on in parallel
+  with the development of documentation specifically pertaining to how the
+  program was written, alongside how to use the program at times. The end
+  product is a file that can be /tangled/ into source code and /weaved/ into
   documentation. The benefits of this practice are far easier maintenance of a
   rapidly growing project, and far greater control in the flow of when code is
   introduced in documentation and where it is included in resultant source code.
 
-  This configuration is /incredibly/ opinionated. Hopefully with recent changes
-  this file will contain enough commentary for you to understand everything
-  within it. Regardless, the idea is that this file, when tangled, generates
-  everything in my git repository, from =LICENSE= to =.gitignore=. I would /highly/
-  recommend you *NOT* try to read the =.el= files on their own. It's a jungle,
-  especially since all of the commentary regarding the configuration is in this
-  file and this file alone.
+  This configuration is /incredibly/ opinionated, and it is very likely that most 
+  changes will not be friendly towards the typical Emacs user. Hopefully with
+  recent changes this file will contain enough commentary for you to understand
+  everything within it. Regardless, the idea is that this file, when tangled,
+  generates my entire configuration. I would /highly/ recommend you *NOT* try to
+  read the =.el= files on their own. It's a jungle, especially since all of the
+  commentary regarding the configuration is in this file and this file alone.
 
 ** Okay, that's pretty neat. Why though?
 
@@ -106,24 +105,26 @@ packages and keybindings which help me bring ideas to life day after day.
    where previously I had to check multiple files when I thought I might have
    changed something for the worse.
 
+   There has been some degree more complexity in managing this configuration,
+   since I am having to juggle many more moving parts which may be in different
+   places of the file, but the rewards for this kind of configuration are
+   significantly outweighing the minor inconveniences which come with it.
+
 ** Installation
 
    1) Clone the repo into where you store your Emacs configuration.
    2) Make sure you have all the right dependencies. See below for more details.
-   3) If using Emacs as a desktop environment, it may take a couple restarts to
-      work right.
 
 ** Dependencies
-
-   Everything has different dependencies so make sure you have what you need.
-   The quick and dirty route to getting all these dependencies installed and
-   configured is to deploy [[https://github.com/farlado/dotfiles][my dotfiles]].
 
    #+begin_center
    *THIS CONFIGURATION IS MEANT FOR EMACS 27 AND LATER. IT WILL /NOT/ LOAD
    PROPERLY ON EMACS 26 OR EARLIER. THE BRANCH FOR EMACS 26 OR EARLIER IS [[https://github.com/farlado/dotemacs/tree/emacs26-end][HERE]].*
    #+end_center
 
+   Everything has different dependencies so make sure you have what you need.
+   The quick and dirty route to getting all these dependencies installed and
+   configured is to deploy [[https://github.com/farlado/dotfiles][my dotfiles]].
 
 *** For EXWM
 
@@ -160,46 +161,6 @@ packages and keybindings which help me bring ideas to life day after day.
    Because I +am a lazy piece of shit who doesn't like long licenses+ don't think
    much harm could come from using a pushover license for a configuration, I am
    publishing this literate Emacs configuration under the WTFPL.
-
-   #+begin_src text :tangle (locate-user-emacs-file "LICENSE")
-     DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-     Version 2, December 2004
-
-     Copyright (c) 2019-20 Farlado
-
-     Everyone is permitted to copy and distribute verbatim or modified
-     copies of this license document, and changing it is allowed as long
-     as the name is changed.
-
-                DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-       TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
-
-      0. You just DO WHAT THE FUCK YOU WANT TO.
-   #+end_src
-
-** Files to ignore
-
-   Like mentioned above, this file is supposed to tangle into everything in my
-   git repository. That includes my =.gitignore= as well.
-
-   #+begin_src text :tangle (locate-user-emacs-file ".gitignore")
-     .last-package-update-day
-     .org-id-locations
-     auto-save-list
-     dmenu-items
-     smex-items
-     nov-places
-     emacs.pdmp
-     transient
-     ido.last
-     recentf
-     eshell
-     ,*.elc
-     tramp
-     elpa
-     emms
-     url
-   #+end_src
 
 * Giving files their headers
 
@@ -329,13 +290,13 @@ packages and keybindings which help me bring ideas to life day after day.
                          server
 
                          ;; Looks
-                         dashboard
                          dracula-theme
                          mood-line
                          page-break-lines
                          display-line-numbers
                          rainbow-mode
                          rainbow-delimiters
+                         dashboard
 
                          ;; Functionality
                          which-key
@@ -710,11 +671,10 @@ packages and keybindings which help me bring ideas to life day after day.
       (use-package auto-package-update
         :ensure t
         :defer t
-        :init
-        (setq auto-package-update-interval 2
-              auto-package-update-hide-results t
-              auto-package-update-delete-old-versions t)
-        (auto-package-update-maybe))
+        :custom ((auto-package-update-interval 2)
+                 (auto-package-update-hide-results t)
+                 (auto-package-update-delete-old-versions t))
+        :hook (after-init . auto-package-update-maybe))
     #+end_src
 
 ** Final considerations
@@ -797,7 +757,9 @@ packages and keybindings which help me bring ideas to life day after day.
 
     #+begin_src emacs-lisp
       (when (member "Noto Color Emoji" (font-family-list))
-        (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
+        (set-fontset-font t 'symbol
+                          (font-spec :family "Noto Color Emoji")
+                          nil 'prepend))
     #+end_src
 
 *** Don't unload fonts when not in use
@@ -812,21 +774,20 @@ packages and keybindings which help me bring ideas to life day after day.
 ** Theme
 
    For a long time, I used Leuven for my theme. Nowadays, I don't. It was a
-   brilliant theme, but just didn't work when I needed a new mode line.
+   brilliant theme, but just didn't work when I needed a new mode line. For some
+   reason, the theme doesn't work properly in terminals, so I will have to find
+   a new theme sometime soon.
 
    #+begin_src emacs-lisp :noweb yes :tangle (locate-user-emacs-file "init.el")
      (use-package dracula-theme
+       :if window-system
        :ensure t
        :defer t
        :init
        (if pdumper-dumped
            (enable-theme 'dracula)
          (load-theme 'dracula t))
-       <<fringes>>
-       <<line-numbers>>
-       <<window-dividers>>
-       <<transparent-frames>>
-       <<better-org-mode-headers>>)
+       <<theme-init>>)
    #+end_src
 
 *** Fringes
@@ -835,7 +796,7 @@ packages and keybindings which help me bring ideas to life day after day.
     have nice indicators on the edges of buffers. I prefer when fringes are the
     same color as the rest of the window.
 
-    #+begin_src emacs-lisp :noweb-ref fringes
+    #+begin_src emacs-lisp :noweb-ref theme-init
       (set-face-background 'fringe (face-background 'default))
       (fringe-mode 10)
     #+end_src
@@ -846,16 +807,28 @@ packages and keybindings which help me bring ideas to life day after day.
     background from the rest of a window. I hate that. It distracts me and looks
     extremely tacky quite frankly.
 
-    #+begin_src emacs-lisp :noweb-ref line-numbers
+    #+begin_src emacs-lisp :noweb-ref theme-init
       (set-face-background 'line-number (face-background 'default))
+    #+end_src
+
+*** Flat mode line
+
+    I don't know why, but the mode line just doesn't look as good otherwise.
+
+    #+begin_src emacs-lisp :noweb-ref theme-init
+      (set-face-attribute 'mode-line nil
+                          :box nil)
+      (set-face-attribute 'mode-line-inactive nil
+                          :box nil)
     #+end_src
 
 *** Window dividers
 
     Windows dividers make Emacs look far less sloppy. The color is grabbed from
-    the mode line for consistency.
+    the mode line for consistency. Three pixels seems to be the best looking
+    width for window dividers.
 
-    #+begin_src emacs-lisp :noweb-ref window-dividers
+    #+begin_src emacs-lisp :noweb-ref theme-init
       (setq window-divider-default-right-width 3)
       (let ((color (face-background 'mode-line)))
         (set-face-foreground 'window-divider-first-pixel color)
@@ -867,8 +840,12 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Transparent frames
 
     If there's a gimmick I can't get enough of, it's having a transparent frame.
+    At first, I thought it would look dumb, that it would make things hard to
+    read since Emacs doesn't seem to differentiate between foreground and
+    background when setting alpha values, but now that I have used it for a
+    while, going back to an opaque window seems tacky.
 
-    #+begin_src emacs-lisp :noweb-ref transparent-frames
+    #+begin_src emacs-lisp :noweb-ref theme-init
       (dolist (frame (frame-list))
         (set-frame-parameter frame 'alpha 90))
       (add-to-list 'default-frame-alist '(alpha . 90))
@@ -882,7 +859,7 @@ packages and keybindings which help me bring ideas to life day after day.
     least I don't have to look for ~org~-aware themes. +It also means I can
     override some of the dumber choices of ~org~-aware themes!+
 
-    #+begin_src emacs-lisp :noweb-ref better-org-mode-headers
+    #+begin_src emacs-lisp :noweb-ref theme-init
       (pdumper-require 'org)
       (set-face-attribute 'org-level-1 nil
                           :height 1.3)
@@ -907,44 +884,30 @@ packages and keybindings which help me bring ideas to life day after day.
        :defer t
        :init
        (mood-line-mode 1)
-       <<flatten>>
-       <<clock-and-battery>>
-       <<line-and-col-numbers>>)
+       <<line-and-column-numbers>>
+       <<clock-and-battery>>)
    #+end_src
-
-*** Make the mode line look flat
-
-    This is just something that bugs me about some themes. I want the mode line
-    to not have that silly box around it.
-
-    #+begin_src emacs-lisp :noweb-ref flatten
-      (dolist (face '(mode-line
-                      mode-line-inactive))
-        (set-face-attribute face nil
-                            :box nil))
-    #+end_src
-
-*** Show clock and battery level on mode line
-
-    I used to use ~fancy-battery~ for battery level but it constantly disappeared on my
-    teeny tiny screens so I just decided not to bother with it. Plus it's one less
-    package to configure lol. The clock should be set to 24-hour time.
-
-
-    #+begin_src emacs-lisp :noweb-ref clock-and-battery
-      (setq display-time-24hr-format t)
-      (display-time-mode 1)
-      (display-battery-mode 1)
-    #+end_src
 
 *** Show line and column numbers on the mode line
 
     Why isn't this enabled by default on a /text editor/? What line and column the
     point is on should always be visible on the mode line.
 
-    #+begin_src emacs-lisp :noweb-ref line-and-col-numbers
+    #+begin_src emacs-lisp :noweb-ref line-and-column-numbers
       (line-number-mode 1)
       (column-number-mode 1)
+    #+end_src
+
+*** Show clock and battery level on mode line
+
+    I used to use ~fancy-battery~ for battery level but it constantly disappeared
+    on my teeny tiny screens so I just decided not to bother with it. Plus it's
+    one less package to configure lol. The clock should be set to 24-hour time.
+
+    #+begin_src emacs-lisp :noweb-ref clock-and-battery
+      (display-time-mode 1)
+      (display-battery-mode 1)
+      :custom (display-time-24hr-format t)
     #+end_src
 
 ** In buffers
@@ -983,8 +946,7 @@ packages and keybindings which help me bring ideas to life day after day.
       (use-package display-line-numbers
         :ensure t
         :defer t
-        :init
-        (setq-default indicate-empty-lines t)
+        :custom (indicate-empty-lines t)
         :hook ((text-mode
                 prog-mode
                 conf-mode) . display-line-numbers-mode))
@@ -1039,14 +1001,14 @@ packages and keybindings which help me bring ideas to life day after day.
        :init
        <<dashboard-immortal>>
        <<dashboard-or-scratch>>
-       (setq inhibit-start-screen t
-             dashboard-set-footer nil
-             dashboard-startup-banner 'logo
-             dashboard-items '((recents . 10))
-             initial-buffer-choice #'dashboard-or-scratch
-             dashboard-banner-logo-title
-             "Welcome to Farlado's Illiterate GNU Emacs!")
        (dashboard-setup-startup-hook)
+       :custom ((inhibit-start-screen t)
+                (dashboard-set-footer nil)
+                (dashboard-startup-banner 'logo)
+                (dashboard-items '((recents . 10)))
+                (initial-buffer-choice #'dashboard-or-scratch)
+                (dashboard-banner-logo-title
+                 "Welcome to Farlado's Illiterate GNU Emacs!"))
        :hook (dashboard-mode . dashboard-immortal))
    #+end_src
 
@@ -1188,9 +1150,8 @@ packages and keybindings which help me bring ideas to life day after day.
       (use-package company
         :ensure t
         :defer t
-        :init
-        (setq company-idle-delay 0.75
-              company-minimum-prefix-length 3)
+        :custom ((company-idle-delay 0.75)
+                 (company-minimum-prefix-length 3))
         :hook (after-init . global-company-mode)
         :bind (:map company-active-map
                ("M-n" . nil)
@@ -1552,9 +1513,8 @@ packages and keybindings which help me bring ideas to life day after day.
         :if (executable-find "aspell")
         :ensure t
         :defer t
-        :init
-        (setq ispell-program-name "aspell"
-              ispell-dictionary "american")
+        :custom ((ispell-program-name "aspell")
+                 (ispell-dictionary "american"))
         :hook ((flyspell-mode . flyspell-buffer)
                ((prog-mode
                  conf-mode) . flyspell-prog-mode)
@@ -1615,11 +1575,10 @@ packages and keybindings which help me bring ideas to life day after day.
       (use-package popup-kill-ring
         :ensure t
         :defer t
-        :bind ("M-y" . popup-kill-ring)
-        :init
-        (setq save-interprogram-paste-before-kill t
-              mouse-drag-copy-region t
-              mouse-yank-at-point t))
+        :custom ((save-interprogram-paste-before-kill t)
+                 (mouse-drag-copy-region t)
+                 (mouse-yank-at-point t))
+        :bind ("M-y" . popup-kill-ring))
     #+end_src
 
 *** Delete whatever is selected if typing starts
@@ -1715,8 +1674,7 @@ packages and keybindings which help me bring ideas to life day after day.
       (use-package haskell-mode
         :ensure t
         :defer t
-        :init
-        (setq haskell-stylish-on-save t)
+        :custom (haskell-stylish-on-save t)
         :hook ((haskell-mode . interactive-haskell-mode)
                (haskell-mode . haskell-doc-mode)
                (haskell-mode . haskell-indentation-mode)
@@ -1732,8 +1690,7 @@ packages and keybindings which help me bring ideas to life day after day.
         :if window-system
         :ensure t
         :defer t
-        :init
-        (setq highlight-indent-guides-method 'character)
+        :custom (highlight-indent-guides-method 'character)
         :hook (prog-mode . highlight-indent-guides-mode))
     #+end_src
 
@@ -1769,8 +1726,7 @@ packages and keybindings which help me bring ideas to life day after day.
         :after flycheck
         :ensure t
         :defer t
-        :init
-        (setq flycheck-posframe-position 'window-bottom-left-corner)
+        :custom (flycheck-posframe-position 'window-bottom-left-corner)
         :hook ((flycheck-mode . flycheck-posframe-mode)
                (flycheck-posframe-mode . flycheck-posframe-configure-pretty-defaults)))
     #+end_src
@@ -1800,6 +1756,9 @@ packages and keybindings which help me bring ideas to life day after day.
        :defer t
        :init
        <<org-init>>
+       :custom (
+                <<org-vars>>
+                )
        :hook (
               <<org-hooks>>
               )
@@ -1851,21 +1810,21 @@ packages and keybindings which help me bring ideas to life day after day.
 
     These are just quick things that make ~org-mode~ much easier to use.
 
-    #+begin_src emacs-lisp
-      (setq org-pretty-entities t
-            org-src-fontify-natively t
-            org-agenda-use-time-grid nil
-            org-fontify-done-headline t
-            org-src-tab-acts-natively t
-            org-enforce-todo-dependencies t
-            org-fontify-whole-heading-line t
-            org-agenda-skip-deadline-if-done t
-            org-agenda-skip-scheduled-if-done t
-            org-fontify-quote-and-verse-blocks t
-            org-src-window-setup 'current-window
-            org-highlight-latex-and-related '(latex)
-            org-ellipsis (if window-system "⤵" "...")
-            org-hide-emphasis-markers window-system)
+    #+begin_src emacs-lisp :noweb-ref org-vars
+      (org-pretty-entities t)
+      (org-src-fontify-natively t)
+      (org-agenda-use-time-grid nil)
+      (org-fontify-done-headline t)
+      (org-src-tab-acts-natively t)
+      (org-enforce-todo-dependencies t)
+      (org-fontify-whole-heading-line t)
+      (org-agenda-skip-deadline-if-done t)
+      (org-agenda-skip-scheduled-if-done t)
+      (org-fontify-quote-and-verse-blocks t)
+      (org-src-window-setup 'current-window)
+      (org-highlight-latex-and-related '(latex))
+      (org-ellipsis (if window-system "⤵" "..."))
+      (org-hide-emphasis-markers window-system)
     #+end_src
 
 *** Evaluating Graphviz blocks
@@ -1890,8 +1849,12 @@ packages and keybindings which help me bring ideas to life day after day.
         "Don't ask to evaluate graphviz blocks or literate programming blocks."
         (not (or (string= lang "dot")
                  (buffer-file-match "literate.*.org$"))))
+    #+end_src
 
-      (setq org-confirm-babel-evaluate #'farl-org/confirm-babel-evaluate)
+    The variable for confirming whether to evaluate a block is set later on.
+
+    #+begin_src emacs-lisp :noweb-ref org-vars
+      (org-confirm-babel-evaluate #'farl-org/confirm-babel-evaluate)
     #+end_src
 
 *** Shortcuts for various snippets
@@ -2051,8 +2014,7 @@ packages and keybindings which help me bring ideas to life day after day.
       (use-package wttrin
         :ensure t
         :defer t
-        :init
-        (setq wttrin-default-cities '("Indianapolis"))
+        :custom (wttrin-default-cities '("Indianapolis"))
         :bind ("C-c w" . wttrin))
     #+end_src
 
@@ -2159,7 +2121,139 @@ packages and keybindings which help me bring ideas to life day after day.
                ("2" . 2048-game)))
     #+end_src
 
+* Making Emacs a manage/play music
+
+  I am big on doing as much in Emacs as possible. Having my music player moved
+  to Emacs was a HUGE step. When I first started using it, it was weird, but now
+  I have come to absolutely love it. We only configure EMMS if ~mpd~ is found.
+  Environment variables are set here as well.
+
+  #+begin_src emacs-lisp :noweb yes :tangle (locate-user-emacs-file "init.el")
+    (use-package emms
+      :if (executable-find "mpd")
+      :ensure t
+      :defer t
+      :init
+      <<emms-init>>
+      :custom (
+               <<emms-vars>>
+               )
+      :bind-keymap ("C-c a" . emms-map))
+  #+end_src
+
+** Loading
+
+   This loads the necessary files to ensure ~emms~ starts properly.
+
+   #+begin_src emacs-lisp :noweb-ref emms-init
+     (pdumper-require 'emms-setup)
+     (require 'emms-player-mpd)
+     (emms-all)
+   #+end_src
+
+** Functions
+   :properties:
+   :header-args: :noweb-ref emms-init
+   :end:
+*** Starting the daemon
+
+    #+begin_src emacs-lisp
+      (defun mpd/start-music-daemon ()
+        "Start MPD, connect to it and sync the metadata cache"
+        (interactive)
+        (shell-command "mpd")
+        (mpd/update-database)
+        (emms-player-mpd-connect)
+        (emms-cache-set-from-mpd-all)
+        (message "MPD started!"))
+    #+end_src
+
+*** Stopping the daemon
+
+    #+begin_src emacs-lisp
+      (defun mpd/kill-music-daemon ()
+        "Stop playback and kill the music daemon."
+        (interactive)
+        (emms-stop)
+        (call-process "killall" nil nil nil "mpd")
+        (message "MPD killed!"))
+    #+end_src
+
+*** Updating the database
+
+    #+begin_src emacs-lisp
+      (defun mpd/update-database ()
+        "Update the MPD database synchronously."
+        (interactive)
+        (call-process "mpc" nil nil nil "update")
+        (message "MPD database updated!"))
+    #+end_src
+
+*** Shuffling the playlist
+
+    #+begin_src emacs-lisp
+      (defun farl-emms/shuffle-with-message ()
+        "Shuffle the playlist and say so in the echo area."
+        (interactive)
+        (emms-shuffle)
+        (message "Playlist has been shuffled."))
+    #+end_src
+
+** Keybindings
+  
+   Now using a keymap in place of that wonky as crap binding system. The new
+   binds let me use ~emms~ in a terminal.
+
+   #+begin_src emacs-lisp :noweb-ref emms-init
+     (defvar emms-map
+       (let ((map (make-sparse-keymap)))
+         ;; Opening playlist and music browser
+         (define-key map (kbd "v") #'emms)
+         (define-key map (kbd "b") #'emms-smart-browse)
+         ;; Track navigation
+         (define-key map (kbd "n n") #'emms-next)
+         (define-key map (kbd "n p") #'emms-previous)
+         (define-key map (kbd "p")   #'emms-pause)
+         (define-key map (kbd "s")   #'emms-stop)
+         ;; Repeat/shuffle
+         (define-key map (kbd "t C-r") #'emms-toggle-repeat-track)
+         (define-key map (kbd "t r")   #'emms-toggle-repeat-playlist)
+         (define-key map (kbd "t s")   #'farl-emms/shuffle-with-message)
+         ;; Refreshing various things
+         (define-key map (kbd "r c") #'emms-player-mpd-update-all-reset-cache)
+         (define-key map (kbd "r d") #'mpd/update-database)
+         ;; mpd-specific functions
+         (define-key map (kbd "d s") #'mpd/start-music-daemon)
+         (define-key map (kbd "d q") #'mpd/kill-music-daemon)
+         (define-key map (kbd "d u") #'mpd/update-database)
+         map)
+       "A keymap for controlling `emms'.")
+   #+end_src
+
+** Configuring
+
+   This is where ~emms~ is configured to use ~mpd~.
+
+   #+begin_src emacs-lisp :noweb-ref emms-vars
+     (emms-seek-seconds 5)
+     (emms-player-list '(emms-player-mpd))
+     (emms-info-functions '(emms-info mpd))
+     (emms-player-mpd-server-name "localhost")
+     (emms-player-mpd-server-port "6601")
+     (mpc-host "localhost:6601")
+   #+end_src
+
+   A couple environment variables are also set.
+
+   #+begin_src emacs-lisp :noweb-ref emms-init
+     (setenv "MPD_HOST" "localhost")
+     (setenv "MPD_PORT" "6601")
+   #+end_src
+
 * Making Emacs a desktop environment
+  :properties:
+  :header-args: :noweb yes :noweb-ref exwm-init
+  :end:
 
   Yes, Emacs is my *entire desktop environment*. You should probably remove this
   section if you don't plan to use Emacs as your desktop environment, but
@@ -2168,7 +2262,7 @@ packages and keybindings which help me bring ideas to life day after day.
   of this when writing your =.xinitrc= or writing a =.desktop= file to load Emacs as
   your desktop environment.
 
-  #+begin_src emacs-lisp :noweb yes :tangle (locate-user-emacs-file "init.el")
+  #+begin_src emacs-lisp :noweb-ref no :tangle (locate-user-emacs-file "init.el")
     (use-package exwm
       :if (getenv "_RUN_EXWM")
       :ensure t
@@ -2179,16 +2273,12 @@ packages and keybindings which help me bring ideas to life day after day.
       (pdumper-require 'exwm-randr)
       (pdumper-require 'exwm-config)
       (pdumper-require 'exwm-systemtray)
-      <<window-management>>
-      <<workspaces>>
-      <<multihead>>
-      <<x-applications>>
-      <<desktop-environment>>
-      <<de-keys>>
-      <<init>>
-      <<logout>>
+      <<exwm-init>>
+      :custom (
+               <<exwm-vars>>
+               )
       :hook (
-             <<hooks>>
+             <<exwm-hooks>>
              )
       :bind (
              <<exwm-global-binds>>
@@ -2199,9 +2289,6 @@ packages and keybindings which help me bring ideas to life day after day.
   #+end_src
 
 ** Window management
-   :properties:
-   :header-args: :noweb-ref window-management
-   :end:
 *** Put ~ivy~ menus in special frames
 
     This is meant to reduce how often X windows are resized. All menus are
@@ -2213,20 +2300,20 @@ packages and keybindings which help me bring ideas to life day after day.
         :ensure t
         :defer t
         :init
-        <<posframe-multihead>>
-        (setq posframe-mouse-banish nil
-              ivy-posframe-min-width 30
-              ivy-posframe-border-width 3
-              ivy-posframe-hide-minibuffer nil
-              ivy-posframe-parameters '((left-fringe . 10)
-                                        (right-fringe . 10)
-                                        (parent-frame . nil))
-              ivy-posframe-height-alist '((swiper . 15)
-                                          (swiper-isearch . 15)
-                                          (t . 11))
-              ivy-posframe-display-functions-alist
-              '((t . farl-ivy-posframe/exwm-display-window-center)))
         <<force-position>>
+        <<posframe-multihead>>
+        :custom ((posframe-mouse-banish nil)
+                 (ivy-posframe-min-width 30)
+                 (ivy-posframe-border-width 3)
+                 (ivy-posframe-hide-minibuffer nil)
+                 (ivy-posframe-parameters '((left-fringe . 10)
+                                            (right-fringe . 10)
+                                            (parent-frame . nil)))
+                 (ivy-posframe-height-alist '((swiper . 15)
+                                              (swiper-isearch . 15)
+                                              (t . 11)))
+                 (ivy-posframe-display-functions-alist
+                  '((t . farl-ivy-posframe/exwm-display-window-center))))
         :hook (exwm-init . ivy-posframe-mode))
     #+end_src
 
@@ -2278,15 +2365,16 @@ packages and keybindings which help me bring ideas to life day after day.
     We hook setting the buffer name into when EXWM picks up a change in the
     window title, aptly titled =exwm-update-title-hook=.
 
-    #+begin_src emacs-lisp :noweb-ref hooks
+    #+begin_src emacs-lisp :noweb-ref exwm-hooks
       (exwm-update-title . farl-exwm/name-buffer-after-window-title)
     #+end_src
 
 *** Configure floating window borders
 
-    Uses the same color as my mode line, uses the same width as window dividers.
+    Uses the same color as my mode line, uses the same width as window dividers. For
+    whatever reason, when changed via ~customize-set-variable~ these will break statup.
 
-    #+begin_src emacs-lisp
+    #+begin_src emacs-lisp :noweb-ref exwm-init
       (setq exwm-floating-border-width window-divider-default-right-width
             exwm-floating-border-color (face-background 'mode-line))
     #+end_src
@@ -2303,20 +2391,16 @@ packages and keybindings which help me bring ideas to life day after day.
       (use-package dmenu
         :ensure t
         :defer t
-        :init
-        (setq dmenu-prompt-string "s-x "))
+        :custom (dmenu-prompt-string "s-x "))
     #+end_src
 
 ** Workspace configuration
-   :properties:
-   :header-args: :noweb-ref workspaces
-   :end:
 *** Load all workspaces on startup
 
     I do not want to have to load all of them individually on my own...
 
-    #+begin_src emacs-lisp
-      (setq exwm-workspace-number 10)
+    #+begin_src emacs-lisp :noweb-ref exwm-vars
+      (exwm-workspace-number 10)
     #+end_src
 
 *** Assign workspaces to monitors
@@ -2324,40 +2408,40 @@ packages and keybindings which help me bring ideas to life day after day.
     This section is only to ensure the proper workspaces are placed on the right
     monitors when my W541 is docked.
 
-    #+begin_src emacs-lisp
-      (setq exwm-randr-workspace-monitor-plist '(0 "DP2-2"
-                                                 1 "DP2-1"
-                                                 2 "DP2-3"
-                                                 3 "DP2-2"
-                                                 4 "DP2-1"
-                                                 5 "DP2-3"
-                                                 6 "DP2-2"
-                                                 7 "DP2-1"
-                                                 8 "DP2-3"
-                                                 9 "DP2-2"))
+    #+begin_src emacs-lisp :noweb-ref exwm-vars
+      (exwm-randr-workspace-monitor-plist '(0 "DP2-2"
+                                            1 "DP2-1"
+                                            2 "DP2-3"
+                                            3 "DP2-2"
+                                            4 "DP2-1"
+                                            5 "DP2-3"
+                                            6 "DP2-2"
+                                            7 "DP2-1"
+                                            8 "DP2-3"
+                                            9 "DP2-2"))
     #+end_src
 
 *** Assign programs to workspaces
 
     ...and also have some launch floating and/or without a mode line or borders.
 
-    #+begin_src emacs-lisp
-      (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
-                                          workspace 9)
-                                         ((string= exwm-class-name "hl2_linux")
-                                          floating-mode-line nil)
-                                         ((string= exwm-class-name "TelegramDesktop")
-                                          workspace 8)
-                                         ((string= exwm-class-name "discord")
-                                          workspace 7)
-                                         ((or (string-match-p "libreoffice"
-                                                              exwm-class-name)
-                                              (string= exwm-class-name "MuseScore3")
-                                              (string= exwm-class-name "Gimp"))
-                                          workspace 6)
-                                         ((string= exwm-title "Event Tester")
-                                          floating-mode-line nil
-                                          floating t)))
+    #+begin_src emacs-lisp :noweb-ref exwm-vars
+      (exwm-manage-configurations '(((string= exwm-class-name "Steam")
+                                     workspace 9)
+                                    ((string= exwm-class-name "hl2_linux")
+                                     floating-mode-line nil)
+                                    ((string= exwm-class-name "TelegramDesktop")
+                                     workspace 8)
+                                    ((string= exwm-class-name "discord")
+                                     workspace 7)
+                                    ((or (string-match-p "libreoffice"
+                                                         exwm-class-name)
+                                         (string= exwm-class-name "MuseScore3")
+                                         (string= exwm-class-name "Gimp"))
+                                     workspace 6)
+                                    ((string= exwm-title "Event Tester")
+                                     floating-mode-line nil
+                                     floating t)))
     #+end_src
 
 *** Name workspaces a little more intuitively
@@ -2376,8 +2460,13 @@ packages and keybindings which help me bring ideas to life day after day.
       (defun farl-exwm/workspace-index-map (index)
         "Return either a workspace name for a given INDEX or INDEX itself."
         (or (elt farl-exwm/workspace-names index) index))
+    #+end_src
 
-      (setq exwm-workspace-index-map #'farl-exwm/workspace-index-map)
+    The variable =exwm-workspace-index-map= points to the function used to
+    determine the names of workspaces.
+
+    #+begin_src emacs-lisp :noweb-ref exwm-vars
+      (exwm-workspace-index-map #'farl-exwm/workspace-index-map)
     #+end_src
 
 *** Show a list of workspaces in the echo area
@@ -2386,7 +2475,7 @@ packages and keybindings which help me bring ideas to life day after day.
     workspace I am currently on. This makes it easier to do that. It's rather
     buggy at times, but it does what it needs to do.
 
-    #+begin_src emacs-lisp :noweb yes
+    #+begin_src emacs-lisp
       (use-package minibuffer-line
         :ensure t
         :defer t
@@ -2394,7 +2483,7 @@ packages and keybindings which help me bring ideas to life day after day.
         (pdumper-require 'minibuffer-line)
         <<list-workspaces>>
         (set-face-attribute 'minibuffer-line nil :inherit 'default)
-        (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
+        :custom (minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
         :hook ((exwm-init . minibuffer-line-mode)
                (exwm-workspace-switch . minibuffer-line--update)))
     #+end_src
@@ -2410,9 +2499,6 @@ packages and keybindings which help me bring ideas to life day after day.
     #+end_src
 
 ** Multi-head configuration
-   :properties:
-   :header-args: :noweb-ref multihead
-   :end:
 
    Thankfully, EXWM comes with hooks to handle when monitors are connected and
    disconnected, so I can do monitor configuration entirely in Emacs Lisp. I
@@ -2513,14 +2599,17 @@ packages and keybindings which help me bring ideas to life day after day.
         "Configure peripherals I connect to my dock."
         ;; Trackball
         (let ((trackball-id (shell-command-to-string
-                             (concat "xinput | grep ELECOM | head -n 1 | sed -r "
-                                     "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
+                             (concat "xinput | grep ELECOM | head -n 1 "
+                                     "| sed -r 's/.*id=([0-9]+).*/\\1/' | "
+                                     "tr '\\n' ' '"))))
           (start-process-shell-command
            "Trackball Setup" nil (concat "xinput set-prop " trackball-id
-                                         "'libinput Button Scrolling Button' 10"))
+                                         "'libinput Button Scrolling Button' "
+                                         "10"))
           (start-process-shell-command
            "Trackball Setup" nil (concat "xinput set-prop " trackball-id
-                                         "'libinput Scroll Method Enabled' 0 0 1"))
+                                         "'libinput Scroll Method Enabled' "
+                                         "0 0 1"))
           (start-process-shell-command
            "Trackball Setup" nil (concat "xinput set-button-map " trackball-id
                                          "1 2 3 4 5 6 7 8 9 2 1 2")))
@@ -2548,14 +2637,11 @@ packages and keybindings which help me bring ideas to life day after day.
     Every time EXWM detects a change in the monitors connected or active, this
     function should be called, so it's hooked to =exwm-randr-screen-change-hook=.
 
-    #+begin_src emacs-lisp :noweb-ref hooks
+    #+begin_src emacs-lisp :noweb-ref exwm-hooks
       (exwm-randr-screen-change . display-and-dock-setup)
     #+end_src
 
 ** X applications
-   :properties:
-   :header-args: :noweb-ref x-applications
-   :end:
 *** GIMP
 
     Until GIMP's functionality gets merged into Emacs, guess I'm stuck with it.
@@ -2584,8 +2670,8 @@ packages and keybindings which help me bring ideas to life day after day.
     Firefox has some unique abilities when it comes to how to make windows
     behave which work better for me. I don't use tabs, and I don't want
     anything to do with them, and Firefox lets me hide the tab bar and force all
-    tabs to actually open as new windows. It's like Suckless Surf, but orders of
-    magnitude better.
+    tabs to actually open as new windows. It's like Suckless Surf, but +not made
+    by Nazis+ orders of magnitude faster and more comfortable.
 
     #+begin_src emacs-lisp
       (defun run-firefox ()
@@ -2648,9 +2734,6 @@ packages and keybindings which help me bring ideas to life day after day.
     #+end_src
 
 ** DE components
-   :properties:
-   :header-args: :noweb-ref desktop-environment
-   :end:
 *** System package management
 
     This one is a pleasant surprise to have honestly. Having Emacs handle system
@@ -2685,7 +2768,7 @@ packages and keybindings which help me bring ideas to life day after day.
                               (noconfirm . "--noconfirm"))))
           (setq system-packages-use-sudo nil
                 system-packages-package-manager 'yay))
-        (setq system-packages-noconfirm t)
+        :custom (system-packages-noconfirm t)
         :bind (("C-c p i" . system-packages-install)
                ("C-c p e" . system-packages-ensure)
                ("C-c p u" . system-packages-update)
@@ -2707,17 +2790,15 @@ packages and keybindings which help me bring ideas to life day after day.
     Previously I had to define a lot of functions to do these things, now I just
     change settings within ~desktop-environment-mode~.
 
-    #+begin_src emacs-lisp :noweb yes
+    #+begin_src emacs-lisp
       (use-package desktop-environment
         :ensure t
         :defer t
         :init
-        (pdumper-require 'desktop-environment)
-        (setq desktop-environment-update-exwm-global-keys :prefix)
-        <<brightness-adjustment>>
-        <<volume-adjustment>>
-        <<lock-screen>>
-        <<screenshots>>
+        <<de-init>>
+        :custom (
+                 <<de-vars>>
+                 )
         :hook (exwm-init . desktop-environment-mode)
         :bind (:map desktop-environment-mode-map
                <<de-binds>>
@@ -2725,14 +2806,24 @@ packages and keybindings which help me bring ideas to life day after day.
         )
     #+end_src
 
+    The way ~desktop-environment-mode~ passes its keys through EXWM's mode is one
+    of two options: either the keys are directly bound to ~exwm-mode-map~, or the
+    keys are added to EXWM's prefix key set. I prefer the latter, because it
+    means the keys associated with ~desktop-environment-mode~ will be properly
+    unbound when the mode is toggled off.
+
+    #+begin_src emacs-lisp :noweb-ref de-vars
+      (desktop-environment-update-exwm-global-keys :prefix)
+    #+end_src
+
 **** Brightness adjustment
 
      This one is the simplest: all I needed to do was change the increment and
      decrement values.
 
-     #+begin_src emacs-lisp :noweb-ref brightness-adjustment
-       (setq desktop-environment-brightness-normal-increment "5%+"
-             desktop-environment-brightness-normal-decrement "5%-")
+     #+begin_src emacs-lisp :noweb-ref de-vars
+       (desktop-environment-brightness-normal-increment "5%+")
+       (desktop-environment-brightness-normal-decrement "5%-")
      #+end_src
 
 **** Volume adjustment
@@ -2742,38 +2833,37 @@ packages and keybindings which help me bring ideas to life day after day.
      output when you mute or unmute the speakers or microphone, so I set up
      basic scripts to give much more concise output.
 
-     #+begin_src emacs-lisp :noweb-ref volume-adjustment
-       (setq desktop-environment-volume-toggle-command
-             (concat "[ \"$(amixer set Master toggle | grep off)\" ] "
-                     "&& echo Volume is now muted. | tr '\n' ' ' "
-                     "|| echo Volume is now unmuted. | tr '\n' ' '")
-             desktop-environment-volume-toggle-microphone-command
-             (concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
-                     "&& echo Microphone is now muted. | tr '\n' ' ' "
-                     "|| echo Microphone is now unmuted | tr '\n' ' '"))
+     #+begin_src emacs-lisp :noweb-ref de-vars
+       (desktop-environment-volume-toggle-command
+        (concat "[ \"$(amixer set Master toggle | grep off)\" ] "
+                "&& echo Volume is now muted. | tr '\n' ' ' "
+                "|| echo Volume is now unmuted. | tr '\n' ' '"))
+       (desktop-environment-volume-toggle-microphone-command
+        (concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
+                "&& echo Microphone is now muted. | tr '\n' ' ' "
+                "|| echo Microphone is now unmuted | tr '\n' ' '"))
      #+end_src
 
 **** Lock screen
 
      Haha yes, this is very long and very very stupid.
 
-     #+begin_src emacs-lisp :noweb-ref lock-screen
-       (setq desktop-environment-screenlock-command
-             (concat
-              "i3lock -nmk --color=000000 --timecolor=ffffffff "
-              " --datecolor=ffffffff --wrongcolor=ffffffff "
-              "--ringcolor=00000000 --insidecolor=00000000 "
-              "--keyhlcolor=00000000 --bshlcolor=00000000 "
-              "--separatorcolor=00000000 --ringvercolor=00000000 "
-              "--insidevercolor=00000000 --linecolor=00000000 "
-              "--ringwrongcolor=00000000 --insidewrongcolor=00000000 "
-              "--timestr=%H:%M --datestr='%a %d %b' --time-font=Iosevka "
-              "--date-font=Iosevka --wrong-font=Iosevka --timesize=128 "
-              "--datesize=64 --wrongsize=32 --time-align 0 --date-align 0 "
-              "--wrong-align 0 --indpos=-10:-10 --timepos=200:125 "
-              "--datepos=200:215 --wrongpos=200:155 --locktext='' "
-              "--lockfailedtext='' --noinputtext='' --veriftext='' "
-              "--wrongtext='WRONG' --force-clock --radius 1 --ring-width 1 "))
+     #+begin_src emacs-lisp :noweb-ref de-vars
+       (desktop-environment-screenlock-command
+        (concat "i3lock -nmk --color=000000 --timecolor=ffffffff "
+                " --datecolor=ffffffff --wrongcolor=ffffffff "
+                "--ringcolor=00000000 --insidecolor=00000000 "
+                "--keyhlcolor=00000000 --bshlcolor=00000000 "
+                "--separatorcolor=00000000 --ringvercolor=00000000 "
+                "--insidevercolor=00000000 --linecolor=00000000 "
+                "--ringwrongcolor=00000000 --insidewrongcolor=00000000 "
+                "--timestr=%H:%M --datestr='%a %d %b' --time-font=Iosevka "
+                "--date-font=Iosevka --wrong-font=Iosevka --timesize=128 "
+                "--datesize=64 --wrongsize=32 --time-align 0 --date-align 0 "
+                "--wrong-align 0 --indpos=-10:-10 --timepos=200:125 "
+                "--datepos=200:215 --wrongpos=200:155 --locktext='' "
+                "--lockfailedtext='' --noinputtext='' --veriftext='' "
+                "--wrongtext='WRONG' --force-clock --radius 1 --ring-width 1 "))
      #+end_src
 
      I also have to bind an extra key for this function.
@@ -2783,9 +2873,6 @@ packages and keybindings which help me bring ideas to life day after day.
      #+end_src
 
 **** Screenshots
-     :properties:
-     :header-args: :noweb-ref screenshots
-     :end:
 
      This one was the least straightforward because the way it's implemented by
      ~desktop-environment~ is *SUPER* wonky. Here are the binds:
@@ -2799,24 +2886,24 @@ packages and keybindings which help me bring ideas to life day after day.
 
      First, I set what directory to store screenshots in.
 
-     #+begin_src emacs-lisp
-       (setq desktop-environment-screenshot-directory "~/screenshots")
+     #+begin_src emacs-lisp :noweb-ref de-vars
+       (desktop-environment-screenshot-directory "~/screenshots")
      #+end_src
 
      Then, I can set the commands for taking a full or partial screenshot and
      saving it to a file.
 
-     #+begin_src emacs-lisp
-       (setq desktop-environment-screenshot-command
-             "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
-             desktop-environment-screenshot-partial-command
-             "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
+     #+begin_src emacs-lisp :noweb-ref de-vars
+       (desktop-environment-screenshot-command
+        "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME")
+       (desktop-environment-screenshot-partial-command
+        "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
      #+end_src
 
      The functions which ~desktop-environment~ comes with are kinda garbage, so I
      made my own to replace them.
 
-     #+begin_src emacs-lisp
+     #+begin_src emacs-lisp :noweb-ref de-init
        (defun farl-de/desktop-environment-screenshot ()
          "Take a screenshot and store it in a file."
          (interactive)
@@ -2909,18 +2996,19 @@ packages and keybindings which help me bring ideas to life day after day.
       (defun audio-loopback ()
         "Loop desktop audio into a null sink alongside the primary input."
         (interactive)
-        (dolist (command '(;; Create null sink `loop'
-                           "load-module module-null-sink sink_name=loop"
-                           "update-sink-proplist loop device.description=loop"
-                           ;; Create null sink `out'
-                           "load-module module-null-sink sink_name=out"
-                           "update-sink-proplist out device.description=out"
-                           ;; Loop `loop' to primary output
-                           "load-module module-loopback source=loop.monitor"
-                           ;; Pipe it into `out'
-                           "load-module module-loopback source=loop.monitor sink=out"
-                           ;; Loop primary input into `out'
-                           "load-module module-loopback sink=out"))
+        (dolist (command
+                 '(;; Create null sink `loop'
+                   "load-module module-null-sink sink_name=loop"
+                   "update-sink-proplist loop device.description=loop"
+                   ;; Create null sink `out'
+                   "load-module module-null-sink sink_name=out"
+                   "update-sink-proplist out device.description=out"
+                   ;; Loop `loop' to primary output
+                   "load-module module-loopback source=loop.monitor"
+                   ;; Pipe it into `out'
+                   "load-module module-loopback source=loop.monitor sink=out"
+                   ;; Loop primary input into `out'
+                   "load-module module-loopback sink=out"))
           (shell-command (concat "pacmd " command)))
         ;; Run `pavucontrol' and then unload the modules after it completes
         (start-process-shell-command
@@ -2937,11 +3025,10 @@ packages and keybindings which help me bring ideas to life day after day.
       (use-package xkb
         :load-path "lisp/xkb"
         :defer t
-        :init
-        (setq xkb-cycle-layouts '("us"
-                                  "epo"
-                                  "de")
-              xkb-options '("ctrl:nocaps"))
+        :custom ((xkb-cycle-layouts '("us"
+                                      "epo"
+                                      "de"))
+                 (xkb-options '("ctrl:nocaps")))
         :hook (exwm-init . xkb-cycle-mode))
     #+end_src
 
@@ -3003,75 +3090,79 @@ packages and keybindings which help me bring ideas to life day after day.
     #+end_src
 
 ** Keybindings
-   :properties:
-   :header-args: :noweb-ref de-keys
-   :end:
 *** Global binds to use across everything
 
     Since I'm very lazy and don't feel like writing a whole bunch of lambdas for
     multiple workspaces, presented here are instead some ~mapcar~ calls, like the
     one in [[https://github.com/ch11ng/exwm/wiki/Configuration-Example][this example]].
 
-    #+begin_src emacs-lisp
-      (setq exwm-input-global-keys `(;; Switching workspace focus
-                                     ;; s-1 for 1, s-2 for 2, etc...
-                                     ,@(mapcar
-                                        (lambda (i)
-                                          `(,(kbd (format "s-%d" (% (1+ i) 10))) .
-                                            (lambda ()
-                                              (interactive)
-                                              (exwm-workspace-switch-create ,i))))
-                                        (number-sequence 0 9))
+    #+begin_src emacs-lisp :noweb-ref exwm-vars
+      (exwm-input-global-keys `(;; Switching workspace focus
+                                ;; s-1 for 1, s-2 for 2, etc...
+                                ,@(mapcar
+                                   (lambda (i)
+                                     `(,(kbd (format "s-%d" (% (1+ i) 10)))
+                                       .
+                                       (lambda ()
+                                         (interactive)
+                                         (exwm-workspace-switch-create ,i))))
+                                   (number-sequence 0 9))
 
-                                     ;; Switching window to a workspace
-                                     ;; This was annoying to get working
-                                     ;; s-! for 1, s-@ for 2, etc...
-                                     ,@(mapcar
-                                        (lambda (i)
-                                          `(,(kbd (format "s-%s" (nth i '("!" "@"
-                                                                          "#" "$"
-                                                                          "%" "^"
-                                                                          "&" "*"
-                                                                          "(" ")")))) .
-                                            (lambda ()
-                                              (interactive)
-                                              (exwm-workspace-move-window ,i))))
-                                        (number-sequence 0 9))
+                                ;; Switching window to a workspace
+                                ;; This was annoying to get working
+                                ;; s-! for 1, s-@ for 2, etc...
+                                ,@(mapcar
+                                   (lambda (i)
+                                     `(,(kbd (format "s-%s" (nth i '("!"
+                                                                     "@"
+                                                                     "#"
+                                                                     "$"
+                                                                     "%"
+                                                                     "^"
+                                                                     "&"
+                                                                     "*"
+                                                                     "("
+                                                                     ")"))))
+                                       .
+                                       (lambda ()
+                                         (interactive)
+                                         (exwm-workspace-move-window ,i))))
+                                   (number-sequence 0 9))
 
-                                     ;; Toggle how input is sent to X windows
-                                     ([?\s-q] . exwm-input-toggle-keyboard)
+                                ;; Toggle how input is sent to X windows
+                                ([?\s-q] . exwm-input-toggle-keyboard)
 
-                                     ;; Window size adjustment
-                                     (,(kbd "C-s-w") . shrink-window)
-                                     (,(kbd "C-s-s") . enlarge-window)
-                                     (,(kbd "C-s-a") . shrink-window-horizontally)
-                                     (,(kbd "C-s-d") . enlarge-window-horizontally)
+                                ;; Window size adjustment
+                                (,(kbd "C-s-w") . shrink-window)
+                                (,(kbd "C-s-s") . enlarge-window)
+                                (,(kbd "C-s-a") . shrink-window-horizontally)
+                                (,(kbd "C-s-d") . enlarge-window-horizontally)
 
-                                     ;; Opening programs
-                                     ([XF86Calculator] . calc)
-                                     ([s-return]       . vterm)
-                                     ([?\s-g]          . run-gimp)
-                                     ([?\s-s]          . run-steam)
-                                     ([?\s-f]          . run-firefox)
-                                     ([?\s-d]          . run-discord)
-                                     ([?\s-t]          . run-telegram)
-                                     ([?\s-m]          . run-musescore)
-                                     ([?\s-b]          . run-libreoffice)
-                                     ([?\s-o]          . run-transmission)
-                                     ([?\s-r]          . monitor-settings)
-                                     ([?\s-n]          . network-settings)
-                                     ([?\s-v]          . volume-settings)
+                                ;; Opening programs
+                                ([XF86Calculator] . calc)
+                                ([s-return]       . vterm)
+                                ([?\s-g]          . run-gimp)
+                                ([?\s-s]          . run-steam)
+                                ([?\s-f]          . run-firefox)
+                                ([?\s-d]          . run-discord)
+                                ([?\s-t]          . run-telegram)
+                                ([?\s-m]          . run-musescore)
+                                ([?\s-b]          . run-libreoffice)
+                                ([?\s-o]          . run-transmission)
+                                ([?\s-r]          . monitor-settings)
+                                ([?\s-n]          . network-settings)
+                                ([?\s-v]          . volume-settings)
 
-                                     ;; Other desktop environment things
-                                     ([?\s-x]           . dmenu)
-                                     ([s-tab]           . audio-loopback)
-                                     ([?\s-w]           . xkb-set-layout)
+                                ;; Other desktop environment things
+                                ([?\s-x]           . dmenu)
+                                ([s-tab]           . audio-loopback)
+                                ([?\s-w]           . xkb-set-layout)
 
-                                     ;; Controlling EMMS
-                                     ([XF86AudioNext] . emms-next)
-                                     ([XF86AudioPrev] . emms-previous)
-                                     ([XF86AudioPlay] . emms-pause)
-                                     ([XF86AudioStop] . emms-stop)))
+                                ;; Controlling EMMS
+                                ([XF86AudioNext] . emms-next)
+                                ([XF86AudioPrev] . emms-previous)
+                                ([XF86AudioPlay] . emms-pause)
+                                ([XF86AudioStop] . emms-stop)))
     #+end_src
 
 *** Emacs key bindings in X windows
@@ -3079,43 +3170,43 @@ packages and keybindings which help me bring ideas to life day after day.
     This is super nice, because I love these key bindings and they are just
     intuitive to me, and now they can carry over safely to other programs.
 
-    #+begin_src emacs-lisp
-      (setq exwm-input-simulation-keys `(;; Navigation
-                                         ([?\M-<] . [C-home])
-                                         ([?\M->] . [C-end])
-                                         ([?\C-a] . [home])
-                                         ([?\C-e] . [end])
-                                         ([?\C-v] . [next])
-                                         ([?\M-v] . [prior])
+    #+begin_src emacs-lisp :noweb-ref exwm-vars
+      (exwm-input-simulation-keys `(;; Navigation
+                                    ([?\M-<] . [C-home])
+                                    ([?\M->] . [C-end])
+                                    ([?\C-a] . [home])
+                                    ([?\C-e] . [end])
+                                    ([?\C-v] . [next])
+                                    ([?\M-v] . [prior])
 
-                                         ([?\C-b] . [left])
-                                         ([?\C-f] . [right])
-                                         ([?\C-p] . [up])
-                                         ([?\C-n] . [down])
+                                    ([?\C-b] . [left])
+                                    ([?\C-f] . [right])
+                                    ([?\C-p] . [up])
+                                    ([?\C-n] . [down])
 
-                                         ([?\M-b] . [C-left])
-                                         ([?\M-f] . [C-right])
-                                         ([?\M-n] . [C-down])
-                                         ([?\M-p] . [C-up])
+                                    ([?\M-b] . [C-left])
+                                    ([?\M-f] . [C-right])
+                                    ([?\M-n] . [C-down])
+                                    ([?\M-p] . [C-up])
 
-                                         ;; Selecting via navigation
-                                         (,(kbd "C-S-b") . [S-left])
-                                         (,(kbd "C-S-f") . [S-right])
-                                         (,(kbd "C-S-n") . [S-down])
-                                         (,(kbd "C-S-p") . [S-up])
+                                    ;; Selecting via navigation
+                                    (,(kbd "C-S-b") . [S-left])
+                                    (,(kbd "C-S-f") . [S-right])
+                                    (,(kbd "C-S-n") . [S-down])
+                                    (,(kbd "C-S-p") . [S-up])
 
-                                         ;; Copy/Paste
-                                         ([?\C-w] . [?\C-x])
-                                         ([?\M-w] . [?\C-c])
-                                         ([?\C-y] . [?\C-v])
-                                         ([?\C-s] . [?\C-f])
-                                         ([?\C-\/] . [?\C-z])
+                                    ;; Copy/Paste
+                                    ([?\C-w] . [?\C-x])
+                                    ([?\M-w] . [?\C-c])
+                                    ([?\C-y] . [?\C-v])
+                                    ([?\C-s] . [?\C-f])
+                                    ([?\C-\/] . [?\C-z])
 
-                                         ;; Other
-                                         ([?\C-d] . [delete])
-                                         ([?\M-d] . [C-delete])
-                                         ([?\C-k] . [S-end delete])
-                                         ([?\C-g] . [escape])))
+                                    ;; Other
+                                    ([?\C-d] . [delete])
+                                    ([?\M-d] . [C-delete])
+                                    ([?\C-k] . [S-end delete])
+                                    ([?\C-g] . [escape])))
     #+end_src
 
     Key sequences cannot be defined in =exwm-input-simulation-keys=, so they are
@@ -3166,9 +3257,6 @@ packages and keybindings which help me bring ideas to life day after day.
     #+end_src
 
 ** On startup
-   :properties:
-   :header-args: :noweb-ref init
-   :end:
 *** Make Emacs start fullscreen
 
     This makes setting the wallpaper and everything look a heck of a lot more
@@ -3182,9 +3270,9 @@ packages and keybindings which help me bring ideas to life day after day.
 *** XDG compliance and WM settings
 
     I have to set a few environment variables for the sake of compliance with
-    various XDG specifications, most notably the XDG Base Directory
-    specification. Also in this block I set an environment variable signaling to
-    Java applications that the window manager is not a reparenting window manager.
+    various specifications, most notably the XDG Base Directory Specification.
+    Also in this block I set an environment variable signaling to Java
+    applications that the window manager is not a reparenting window manager.
 
     #+begin_src emacs-lisp :tangle no
       (setenv "XDG_CURRENT_DESKTOP" "emacs")
@@ -3263,7 +3351,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
    When exiting, these are things I want done.
 
-   #+begin_src emacs-lisp :noweb yes :noweb-ref logout
+   #+begin_src emacs-lisp :noweb yes :noweb-ref exwm-init
      (defun farl-exwm/on-logout ()
        "Run this when logging out as part of `kill-emacs-hook'."
        <<on-logout>>)
@@ -3271,7 +3359,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
    This is hooked into when Emacs is killed.
 
-   #+begin_src emacs-lisp :noweb-ref hooks
+   #+begin_src emacs-lisp :noweb-ref exwm-hooks
      (kill-emacs . farl-exwm/on-logout)
    #+end_src
 
@@ -3282,134 +3370,6 @@ packages and keybindings which help me bring ideas to life day after day.
     #+begin_src emacs-lisp
       (shell-command "hsetroot -solid '#000000'")
     #+end_src
-
-* Making Emacs an ~mpd~-based music player
-
-  I am big on doing as much in Emacs as possible. Having my music player moved
-  to Emacs was a HUGE step. When I first started using it, it was weird, but now
-  I have come to absolutely love it. We only configure EMMS if ~mpd~ is found.
-  Environment variables are set here as well.
-
-  #+begin_src emacs-lisp :noweb yes :tangle (locate-user-emacs-file "init.el")
-    (use-package emms
-      :if (executable-find "mpd")
-      :ensure t
-      :defer t
-      :init
-      <<emms-load>>
-      <<emms-conf>>
-      <<emms-func>>
-      <<emms-keys>>
-      :bind-keymap ("C-c a" . emms-map))
-  #+end_src
-
-** Loading
-
-   This loads the necessary files to ensure ~emms~ starts properly.
-
-   #+begin_src emacs-lisp :noweb-ref emms-load
-     (pdumper-require 'emms-setup)
-     (require 'emms-player-mpd)
-     (emms-all)
-   #+end_src
-
-** Functions
-  :properties:
-  :header-args: :noweb-ref emms-func
-  :end:
-*** Starting the daemon
-    
-    #+begin_src emacs-lisp
-      (defun mpd/start-music-daemon ()
-        "Start MPD, connect to it and sync the metadata cache"
-        (interactive)
-        (shell-command "mpd")
-        (mpd/update-database)
-        (emms-player-mpd-connect)
-        (emms-cache-set-from-mpd-all)
-        (message "MPD started!"))
-    #+end_src
-
-*** Stopping the daemon
-
-    #+begin_src emacs-lisp
-      (defun mpd/kill-music-daemon ()
-        "Stop playback and kill the music daemon."
-        (interactive)
-        (emms-stop)
-        (call-process "killall" nil nil nil "mpd")
-        (message "MPD killed!"))
-    #+end_src
-
-*** Updating the database
-
-    #+begin_src emacs-lisp
-      (defun mpd/update-database ()
-        "Update the MPD database synchronously."
-        (interactive)
-        (call-process "mpc" nil nil nil "update")
-        (message "MPD database updated!"))
-    #+end_src
-
-*** Shuffling the playlist
-
-    #+begin_src emacs-lisp
-      (defun farl-emms/shuffle-with-message ()
-        "Shuffle the playlist and say so in the echo area."
-        (interactive)
-        (emms-shuffle)
-        (message "Playlist has been shuffled."))
-    #+end_src
-
-** Keybindings
-   :properties:
-   :header-args: :noweb-ref emms-keys
-   :end:
-  
-   Now using a keymap in place of that wonky as crap binding system. The new
-   binds let me use ~emms~ in a terminal.
-
-   #+begin_src emacs-lisp
-     (defvar emms-map
-       (let ((map (make-sparse-keymap)))
-         ;; Opening playlist and music browser
-         (define-key map (kbd "v") #'emms)
-         (define-key map (kbd "b") #'emms-smart-browse)
-         ;; Track navigation
-         (define-key map (kbd "n n") #'emms-next)
-         (define-key map (kbd "n p") #'emms-previous)
-         (define-key map (kbd "p")   #'emms-pause)
-         (define-key map (kbd "s")   #'emms-stop)
-         ;; Repeat/shuffle
-         (define-key map (kbd "t C-r") #'emms-toggle-repeat-track)
-         (define-key map (kbd "t r")   #'emms-toggle-repeat-playlist)
-         (define-key map (kbd "t s")   #'farl-emms/shuffle-with-message)
-         ;; Refreshing various things
-         (define-key map (kbd "r c") #'emms-player-mpd-update-all-reset-cache)
-         (define-key map (kbd "r d") #'mpd/update-database)
-         ;; mpd-specific functions
-         (define-key map (kbd "d s") #'mpd/start-music-daemon)
-         (define-key map (kbd "d q") #'mpd/kill-music-daemon)
-         (define-key map (kbd "d u") #'mpd/update-database)
-         map)
-       "A keymap for controlling `emms'.")
-   #+end_src
-
-** Configuring
-
-   This is where ~emms~ is configured to use ~mpd~, and some environment variables
-   are set to ensure ~mpd~ is usable.
-
-   #+begin_src emacs-lisp :noweb-ref emms-conf
-     (setq emms-seek-seconds 5
-           emms-player-list '(emms-player-mpd)
-           emms-info-functions '(emms-info mpd)
-           emms-player-mpd-server-name "localhost"
-           emms-player-mpd-server-port "6601"
-           mpc-host "localhost:6601")
-     (setenv "MPD_HOST" "localhost")
-     (setenv "MPD_PORT" "6601")
-   #+end_src
 
 * Giving files their footers
 

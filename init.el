@@ -30,11 +30,10 @@
 (use-package auto-package-update
   :ensure t
   :defer t
-  :init
-  (setq auto-package-update-interval 2
-        auto-package-update-hide-results t
-        auto-package-update-delete-old-versions t)
-  (auto-package-update-maybe))
+  :custom ((auto-package-update-interval 2)
+           (auto-package-update-hide-results t)
+           (auto-package-update-delete-old-versions t))
+  :hook (after-init . auto-package-update-maybe))
 
 (use-package server
   :ensure t
@@ -62,11 +61,14 @@
                       :height 100))
 
 (when (member "Noto Color Emoji" (font-family-list))
-  (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
+  (set-fontset-font t 'symbol
+                    (font-spec :family "Noto Color Emoji")
+                    nil 'prepend))
 
 (setq inhibit-compacting-font-caches t)
 
 (use-package dracula-theme
+  :if window-system
   :ensure t
   :defer t
   :init
@@ -76,6 +78,10 @@
   (set-face-background 'fringe (face-background 'default))
   (fringe-mode 10)
   (set-face-background 'line-number (face-background 'default))
+  (set-face-attribute 'mode-line nil
+                      :box nil)
+  (set-face-attribute 'mode-line-inactive nil
+                      :box nil)
   (setq window-divider-default-right-width 3)
   (let ((color (face-background 'mode-line)))
     (set-face-foreground 'window-divider-first-pixel color)
@@ -101,15 +107,11 @@
   :defer t
   :init
   (mood-line-mode 1)
-  (dolist (face '(mode-line
-                  mode-line-inactive))
-    (set-face-attribute face nil
-                        :box nil))
-  (setq display-time-24hr-format t)
+  (line-number-mode 1)
+  (column-number-mode 1)
   (display-time-mode 1)
   (display-battery-mode 1)
-  (line-number-mode 1)
-  (column-number-mode 1))
+  :custom (display-time-24hr-format t))
 
 (global-visual-line-mode 1)
 
@@ -121,8 +123,7 @@
 (use-package display-line-numbers
   :ensure t
   :defer t
-  :init
-  (setq-default indicate-empty-lines t)
+  :custom (indicate-empty-lines t)
   :hook ((text-mode
           prog-mode
           conf-mode) . display-line-numbers-mode))
@@ -156,14 +157,14 @@
     "Open either dashboard or the scratch buffer."
     (or (get-buffer "*dashboard*")
         (get-buffer "*scratch*")))
-  (setq inhibit-start-screen t
-        dashboard-set-footer nil
-        dashboard-startup-banner 'logo
-        dashboard-items '((recents . 10))
-        initial-buffer-choice #'dashboard-or-scratch
-        dashboard-banner-logo-title
-        "Welcome to Farlado's Illiterate GNU Emacs!")
   (dashboard-setup-startup-hook)
+  :custom ((inhibit-start-screen t)
+           (dashboard-set-footer nil)
+           (dashboard-startup-banner 'logo)
+           (dashboard-items '((recents . 10)))
+           (initial-buffer-choice #'dashboard-or-scratch)
+           (dashboard-banner-logo-title
+            "Welcome to Farlado's Illiterate GNU Emacs!"))
   :hook (dashboard-mode . dashboard-immortal))
 
 (global-unset-key (kbd "C-x C-z"))
@@ -199,9 +200,8 @@
 (use-package company
   :ensure t
   :defer t
-  :init
-  (setq company-idle-delay 0.75
-        company-minimum-prefix-length 3)
+  :custom ((company-idle-delay 0.75)
+           (company-minimum-prefix-length 3))
   :hook (after-init . global-company-mode)
   :bind (:map company-active-map
          ("M-n" . nil)
@@ -385,9 +385,8 @@ This function has been altered to accomodate `exwm-mode'."
   :if (executable-find "aspell")
   :ensure t
   :defer t
-  :init
-  (setq ispell-program-name "aspell"
-        ispell-dictionary "american")
+  :custom ((ispell-program-name "aspell")
+           (ispell-dictionary "american"))
   :hook ((flyspell-mode . flyspell-buffer)
          ((prog-mode
            conf-mode) . flyspell-prog-mode)
@@ -414,11 +413,10 @@ This function has been altered to accomodate `exwm-mode'."
 (use-package popup-kill-ring
   :ensure t
   :defer t
-  :bind ("M-y" . popup-kill-ring)
-  :init
-  (setq save-interprogram-paste-before-kill t
-        mouse-drag-copy-region t
-        mouse-yank-at-point t))
+  :custom ((save-interprogram-paste-before-kill t)
+           (mouse-drag-copy-region t)
+           (mouse-yank-at-point t))
+  :bind ("M-y" . popup-kill-ring))
 
 (delete-selection-mode 1)
 
@@ -452,8 +450,7 @@ This function has been altered to accomodate `exwm-mode'."
 (use-package haskell-mode
   :ensure t
   :defer t
-  :init
-  (setq haskell-stylish-on-save t)
+  :custom (haskell-stylish-on-save t)
   :hook ((haskell-mode . interactive-haskell-mode)
          (haskell-mode . haskell-doc-mode)
          (haskell-mode . haskell-indentation-mode)
@@ -463,8 +460,7 @@ This function has been altered to accomodate `exwm-mode'."
   :if window-system
   :ensure t
   :defer t
-  :init
-  (setq highlight-indent-guides-method 'character)
+  :custom (highlight-indent-guides-method 'character)
   :hook (prog-mode . highlight-indent-guides-mode))
 
 (use-package company-jedi
@@ -484,8 +480,7 @@ This function has been altered to accomodate `exwm-mode'."
   :after flycheck
   :ensure t
   :defer t
-  :init
-  (setq flycheck-posframe-position 'window-bottom-left-corner)
+  :custom (flycheck-posframe-position 'window-bottom-left-corner)
   :hook ((flycheck-mode . flycheck-posframe-mode)
          (flycheck-posframe-mode . flycheck-posframe-configure-pretty-defaults)))
 
@@ -515,27 +510,11 @@ This function has been altered to accomodate `exwm-mode'."
     :defer t
     :bind (:map org-mode-map
            ("C-c r" . epresent-run)))
-  (setq org-pretty-entities t
-        org-src-fontify-natively t
-        org-agenda-use-time-grid nil
-        org-fontify-done-headline t
-        org-src-tab-acts-natively t
-        org-enforce-todo-dependencies t
-        org-fontify-whole-heading-line t
-        org-agenda-skip-deadline-if-done t
-        org-agenda-skip-scheduled-if-done t
-        org-fontify-quote-and-verse-blocks t
-        org-src-window-setup 'current-window
-        org-highlight-latex-and-related '(latex)
-        org-ellipsis (if window-system "⤵" "...")
-        org-hide-emphasis-markers window-system)
   (org-babel-do-load-languages 'org-babel-load-languages '((dot . t)))
   (defun farl-org/confirm-babel-evaluate (lang body)
     "Don't ask to evaluate graphviz blocks or literate programming blocks."
     (not (or (string= lang "dot")
              (buffer-file-match "literate.*.org$"))))
-  
-  (setq org-confirm-babel-evaluate #'farl-org/confirm-babel-evaluate)
   (pdumper-require 'org-tempo)
   (add-to-list 'org-modules 'org-tempo)
   (setq org-structure-template-alist '(;; General blocks
@@ -600,6 +579,23 @@ This function has been altered to accomodate `exwm-mode'."
     (setq org-agenda-files (directory-files-recursively
                             (user-home-file "agendas")
                             ".org$" nil t t)))
+  :custom (
+           (org-pretty-entities t)
+           (org-src-fontify-natively t)
+           (org-agenda-use-time-grid nil)
+           (org-fontify-done-headline t)
+           (org-src-tab-acts-natively t)
+           (org-enforce-todo-dependencies t)
+           (org-fontify-whole-heading-line t)
+           (org-agenda-skip-deadline-if-done t)
+           (org-agenda-skip-scheduled-if-done t)
+           (org-fontify-quote-and-verse-blocks t)
+           (org-src-window-setup 'current-window)
+           (org-highlight-latex-and-related '(latex))
+           (org-ellipsis (if window-system "⤵" "..."))
+           (org-hide-emphasis-markers window-system)
+           (org-confirm-babel-evaluate #'farl-org/confirm-babel-evaluate)
+           )
   :hook (
          (org-mode . farl-org/disable-angle-bracket-syntax)
          (org-babel-after-execute . org-redisplay-inline-images)
@@ -623,8 +619,7 @@ This function has been altered to accomodate `exwm-mode'."
 (use-package wttrin
   :ensure t
   :defer t
-  :init
-  (setq wttrin-default-cities '("Indianapolis"))
+  :custom (wttrin-default-cities '("Indianapolis"))
   :bind ("C-c w" . wttrin))
 
 (setq calendar-week-start-day 1)
@@ -678,6 +673,73 @@ This function has been altered to accomodate `exwm-mode'."
   :bind (:map games-map
          ("2" . 2048-game)))
 
+(use-package emms
+  :if (executable-find "mpd")
+  :ensure t
+  :defer t
+  :init
+  (pdumper-require 'emms-setup)
+  (require 'emms-player-mpd)
+  (emms-all)
+  (defun mpd/start-music-daemon ()
+    "Start MPD, connect to it and sync the metadata cache"
+    (interactive)
+    (shell-command "mpd")
+    (mpd/update-database)
+    (emms-player-mpd-connect)
+    (emms-cache-set-from-mpd-all)
+    (message "MPD started!"))
+  (defun mpd/kill-music-daemon ()
+    "Stop playback and kill the music daemon."
+    (interactive)
+    (emms-stop)
+    (call-process "killall" nil nil nil "mpd")
+    (message "MPD killed!"))
+  (defun mpd/update-database ()
+    "Update the MPD database synchronously."
+    (interactive)
+    (call-process "mpc" nil nil nil "update")
+    (message "MPD database updated!"))
+  (defun farl-emms/shuffle-with-message ()
+    "Shuffle the playlist and say so in the echo area."
+    (interactive)
+    (emms-shuffle)
+    (message "Playlist has been shuffled."))
+  (defvar emms-map
+    (let ((map (make-sparse-keymap)))
+      ;; Opening playlist and music browser
+      (define-key map (kbd "v") #'emms)
+      (define-key map (kbd "b") #'emms-smart-browse)
+      ;; Track navigation
+      (define-key map (kbd "n n") #'emms-next)
+      (define-key map (kbd "n p") #'emms-previous)
+      (define-key map (kbd "p")   #'emms-pause)
+      (define-key map (kbd "s")   #'emms-stop)
+      ;; Repeat/shuffle
+      (define-key map (kbd "t C-r") #'emms-toggle-repeat-track)
+      (define-key map (kbd "t r")   #'emms-toggle-repeat-playlist)
+      (define-key map (kbd "t s")   #'farl-emms/shuffle-with-message)
+      ;; Refreshing various things
+      (define-key map (kbd "r c") #'emms-player-mpd-update-all-reset-cache)
+      (define-key map (kbd "r d") #'mpd/update-database)
+      ;; mpd-specific functions
+      (define-key map (kbd "d s") #'mpd/start-music-daemon)
+      (define-key map (kbd "d q") #'mpd/kill-music-daemon)
+      (define-key map (kbd "d u") #'mpd/update-database)
+      map)
+    "A keymap for controlling `emms'.")
+  (setenv "MPD_HOST" "localhost")
+  (setenv "MPD_PORT" "6601")
+  :custom (
+           (emms-seek-seconds 5)
+           (emms-player-list '(emms-player-mpd))
+           (emms-info-functions '(emms-info mpd))
+           (emms-player-mpd-server-name "localhost")
+           (emms-player-mpd-server-port "6601")
+           (mpc-host "localhost:6601")
+           )
+  :bind-keymap ("C-c a" . emms-map))
+
 (use-package exwm
   :if (getenv "_RUN_EXWM")
   :ensure t
@@ -692,6 +754,13 @@ This function has been altered to accomodate `exwm-mode'."
     :ensure t
     :defer t
     :init
+    (defun farl-posframe/force-set-position (&rest args)
+      "Force the position to be set for a posframe, ignoring ARGS."
+      (setq posframe--last-posframe-pixel-position nil
+            posframe--last-parent-frame-size nil
+            posframe--last-posframe-size nil))
+    (advice-add 'posframe--set-frame-position
+                :before #'farl-posframe/force-set-position)
     (defun farl-exwm/poshandler-window-center (info)
       "Display a posframe at window center, accounting for EXWM."
       (let* ((window-info (posframe-poshandler-window-center info))
@@ -708,25 +777,18 @@ This function has been altered to accomodate `exwm-mode'."
     (defun farl-ivy-posframe/exwm-display-window-center (str)
       "Display a posframe for `ivy-posframe' at point, passing STR."
       (ivy-posframe--display str #'farl-exwm/poshandler-window-center))
-    (setq posframe-mouse-banish nil
-          ivy-posframe-min-width 30
-          ivy-posframe-border-width 3
-          ivy-posframe-hide-minibuffer nil
-          ivy-posframe-parameters '((left-fringe . 10)
-                                    (right-fringe . 10)
-                                    (parent-frame . nil))
-          ivy-posframe-height-alist '((swiper . 15)
-                                      (swiper-isearch . 15)
-                                      (t . 11))
-          ivy-posframe-display-functions-alist
-          '((t . farl-ivy-posframe/exwm-display-window-center)))
-    (defun farl-posframe/force-set-position (&rest args)
-      "Force the position to be set for a posframe, ignoring ARGS."
-      (setq posframe--last-posframe-pixel-position nil
-            posframe--last-parent-frame-size nil
-            posframe--last-posframe-size nil))
-    (advice-add 'posframe--set-frame-position
-                :before #'farl-posframe/force-set-position)
+    :custom ((posframe-mouse-banish nil)
+             (ivy-posframe-min-width 30)
+             (ivy-posframe-border-width 3)
+             (ivy-posframe-hide-minibuffer nil)
+             (ivy-posframe-parameters '((left-fringe . 10)
+                                        (right-fringe . 10)
+                                        (parent-frame . nil)))
+             (ivy-posframe-height-alist '((swiper . 15)
+                                          (swiper-isearch . 15)
+                                          (t . 11)))
+             (ivy-posframe-display-functions-alist
+              '((t . farl-ivy-posframe/exwm-display-window-center))))
     :hook (exwm-init . ivy-posframe-mode))
   (defun farl-exwm/name-buffer-after-window-title ()
     "Rename the current `exwm-mode' buffer after the X window's title."
@@ -736,35 +798,7 @@ This function has been altered to accomodate `exwm-mode'."
   (use-package dmenu
     :ensure t
     :defer t
-    :init
-    (setq dmenu-prompt-string "s-x "))
-  (setq exwm-workspace-number 10)
-  (setq exwm-randr-workspace-monitor-plist '(0 "DP2-2"
-                                             1 "DP2-1"
-                                             2 "DP2-3"
-                                             3 "DP2-2"
-                                             4 "DP2-1"
-                                             5 "DP2-3"
-                                             6 "DP2-2"
-                                             7 "DP2-1"
-                                             8 "DP2-3"
-                                             9 "DP2-2"))
-  (setq exwm-manage-configurations '(((string= exwm-class-name "Steam")
-                                      workspace 9)
-                                     ((string= exwm-class-name "hl2_linux")
-                                      floating-mode-line nil)
-                                     ((string= exwm-class-name "TelegramDesktop")
-                                      workspace 8)
-                                     ((string= exwm-class-name "discord")
-                                      workspace 7)
-                                     ((or (string-match-p "libreoffice"
-                                                          exwm-class-name)
-                                          (string= exwm-class-name "MuseScore3")
-                                          (string= exwm-class-name "Gimp"))
-                                      workspace 6)
-                                     ((string= exwm-title "Event Tester")
-                                      floating-mode-line nil
-                                      floating t)))
+    :custom (dmenu-prompt-string "s-x "))
   (defcustom farl-exwm/workspace-names '("" "" "" "" ""
                                          "" "" "" "" "")
     "The names assigned to workspaces through `exwm-workspace-index-map'."
@@ -775,8 +809,6 @@ This function has been altered to accomodate `exwm-mode'."
   (defun farl-exwm/workspace-index-map (index)
     "Return either a workspace name for a given INDEX or INDEX itself."
     (or (elt farl-exwm/workspace-names index) index))
-  
-  (setq exwm-workspace-index-map #'farl-exwm/workspace-index-map)
   (use-package minibuffer-line
     :ensure t
     :defer t
@@ -788,7 +820,7 @@ This function has been altered to accomodate `exwm-mode'."
       (elt exwm-workspace--switch-history
            (exwm-workspace--position exwm-workspace--current)))
     (set-face-attribute 'minibuffer-line nil :inherit 'default)
-    (setq minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
+    :custom (minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
     :hook ((exwm-init . minibuffer-line-mode)
            (exwm-workspace-switch . minibuffer-line--update)))
   (defun get-connected-monitors ()
@@ -853,14 +885,17 @@ This function has been altered to accomodate `exwm-mode'."
     "Configure peripherals I connect to my dock."
     ;; Trackball
     (let ((trackball-id (shell-command-to-string
-                         (concat "xinput | grep ELECOM | head -n 1 | sed -r "
-                                 "'s/.*id=([0-9]+).*/\\1/' | tr '\\n' ' '"))))
+                         (concat "xinput | grep ELECOM | head -n 1 "
+                                 "| sed -r 's/.*id=([0-9]+).*/\\1/' | "
+                                 "tr '\\n' ' '"))))
       (start-process-shell-command
        "Trackball Setup" nil (concat "xinput set-prop " trackball-id
-                                     "'libinput Button Scrolling Button' 10"))
+                                     "'libinput Button Scrolling Button' "
+                                     "10"))
       (start-process-shell-command
        "Trackball Setup" nil (concat "xinput set-prop " trackball-id
-                                     "'libinput Scroll Method Enabled' 0 0 1"))
+                                     "'libinput Scroll Method Enabled' "
+                                     "0 0 1"))
       (start-process-shell-command
        "Trackball Setup" nil (concat "xinput set-button-map " trackball-id
                                      "1 2 3 4 5 6 7 8 9 2 1 2")))
@@ -935,7 +970,7 @@ This function has been altered to accomodate `exwm-mode'."
                           (noconfirm . "--noconfirm"))))
       (setq system-packages-use-sudo nil
             system-packages-package-manager 'yay))
-    (setq system-packages-noconfirm t)
+    :custom (system-packages-noconfirm t)
     :bind (("C-c p i" . system-packages-install)
            ("C-c p e" . system-packages-ensure)
            ("C-c p u" . system-packages-update)
@@ -954,39 +989,6 @@ This function has been altered to accomodate `exwm-mode'."
     :ensure t
     :defer t
     :init
-    (pdumper-require 'desktop-environment)
-    (setq desktop-environment-update-exwm-global-keys :prefix)
-    (setq desktop-environment-brightness-normal-increment "5%+"
-          desktop-environment-brightness-normal-decrement "5%-")
-    (setq desktop-environment-volume-toggle-command
-          (concat "[ \"$(amixer set Master toggle | grep off)\" ] "
-                  "&& echo Volume is now muted. | tr '\n' ' ' "
-                  "|| echo Volume is now unmuted. | tr '\n' ' '")
-          desktop-environment-volume-toggle-microphone-command
-          (concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
-                  "&& echo Microphone is now muted. | tr '\n' ' ' "
-                  "|| echo Microphone is now unmuted | tr '\n' ' '"))
-    (setq desktop-environment-screenlock-command
-          (concat
-           "i3lock -nmk --color=000000 --timecolor=ffffffff "
-           " --datecolor=ffffffff --wrongcolor=ffffffff "
-           "--ringcolor=00000000 --insidecolor=00000000 "
-           "--keyhlcolor=00000000 --bshlcolor=00000000 "
-           "--separatorcolor=00000000 --ringvercolor=00000000 "
-           "--insidevercolor=00000000 --linecolor=00000000 "
-           "--ringwrongcolor=00000000 --insidewrongcolor=00000000 "
-           "--timestr=%H:%M --datestr='%a %d %b' --time-font=Iosevka "
-           "--date-font=Iosevka --wrong-font=Iosevka --timesize=128 "
-           "--datesize=64 --wrongsize=32 --time-align 0 --date-align 0 "
-           "--wrong-align 0 --indpos=-10:-10 --timepos=200:125 "
-           "--datepos=200:215 --wrongpos=200:155 --locktext='' "
-           "--lockfailedtext='' --noinputtext='' --veriftext='' "
-           "--wrongtext='WRONG' --force-clock --radius 1 --ring-width 1 "))
-    (setq desktop-environment-screenshot-directory "~/screenshots")
-    (setq desktop-environment-screenshot-command
-          "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME"
-          desktop-environment-screenshot-partial-command
-          "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
     (defun farl-de/desktop-environment-screenshot ()
       "Take a screenshot and store it in a file."
       (interactive)
@@ -1016,6 +1018,39 @@ This function has been altered to accomodate `exwm-mode'."
                " && xclip $FILENAME -selection clipboard "
                "-t image/png &> /dev/null && rm $FILENAME"))
       (message "Screenshot copied to clipboard."))
+    :custom (
+             (desktop-environment-update-exwm-global-keys :prefix)
+             (desktop-environment-brightness-normal-increment "5%+")
+             (desktop-environment-brightness-normal-decrement "5%-")
+             (desktop-environment-volume-toggle-command
+              (concat "[ \"$(amixer set Master toggle | grep off)\" ] "
+                      "&& echo Volume is now muted. | tr '\n' ' ' "
+                      "|| echo Volume is now unmuted. | tr '\n' ' '"))
+             (desktop-environment-volume-toggle-microphone-command
+              (concat "[ \"$(amixer set Capture toggle | grep off)\" ] "
+                      "&& echo Microphone is now muted. | tr '\n' ' ' "
+                      "|| echo Microphone is now unmuted | tr '\n' ' '"))
+             (desktop-environment-screenlock-command
+              (concat "i3lock -nmk --color=000000 --timecolor=ffffffff "
+                      " --datecolor=ffffffff --wrongcolor=ffffffff "
+                      "--ringcolor=00000000 --insidecolor=00000000 "
+                      "--keyhlcolor=00000000 --bshlcolor=00000000 "
+                      "--separatorcolor=00000000 --ringvercolor=00000000 "
+                      "--insidevercolor=00000000 --linecolor=00000000 "
+                      "--ringwrongcolor=00000000 --insidewrongcolor=00000000 "
+                      "--timestr=%H:%M --datestr='%a %d %b' --time-font=Iosevka "
+                      "--date-font=Iosevka --wrong-font=Iosevka --timesize=128 "
+                      "--datesize=64 --wrongsize=32 --time-align 0 --date-align 0 "
+                      "--wrong-align 0 --indpos=-10:-10 --timepos=200:125 "
+                      "--datepos=200:215 --wrongpos=200:155 --locktext='' "
+                      "--lockfailedtext='' --noinputtext='' --veriftext='' "
+                      "--wrongtext='WRONG' --force-clock --radius 1 --ring-width 1 "))
+             (desktop-environment-screenshot-directory "~/screenshots")
+             (desktop-environment-screenshot-command
+              "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME")
+             (desktop-environment-screenshot-partial-command
+              "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
+             )
     :hook (exwm-init . desktop-environment-mode)
     :bind (:map desktop-environment-mode-map
            ("<XF86ScreenSaver>" . desktop-environment-lock-screen)
@@ -1046,18 +1081,19 @@ This function has been altered to accomodate `exwm-mode'."
   (defun audio-loopback ()
     "Loop desktop audio into a null sink alongside the primary input."
     (interactive)
-    (dolist (command '(;; Create null sink `loop'
-                       "load-module module-null-sink sink_name=loop"
-                       "update-sink-proplist loop device.description=loop"
-                       ;; Create null sink `out'
-                       "load-module module-null-sink sink_name=out"
-                       "update-sink-proplist out device.description=out"
-                       ;; Loop `loop' to primary output
-                       "load-module module-loopback source=loop.monitor"
-                       ;; Pipe it into `out'
-                       "load-module module-loopback source=loop.monitor sink=out"
-                       ;; Loop primary input into `out'
-                       "load-module module-loopback sink=out"))
+    (dolist (command
+             '(;; Create null sink `loop'
+               "load-module module-null-sink sink_name=loop"
+               "update-sink-proplist loop device.description=loop"
+               ;; Create null sink `out'
+               "load-module module-null-sink sink_name=out"
+               "update-sink-proplist out device.description=out"
+               ;; Loop `loop' to primary output
+               "load-module module-loopback source=loop.monitor"
+               ;; Pipe it into `out'
+               "load-module module-loopback source=loop.monitor sink=out"
+               ;; Loop primary input into `out'
+               "load-module module-loopback sink=out"))
       (shell-command (concat "pacmd " command)))
     ;; Run `pavucontrol' and then unload the modules after it completes
     (start-process-shell-command
@@ -1067,11 +1103,10 @@ This function has been altered to accomodate `exwm-mode'."
   (use-package xkb
     :load-path "lisp/xkb"
     :defer t
-    :init
-    (setq xkb-cycle-layouts '("us"
-                              "epo"
-                              "de")
-          xkb-options '("ctrl:nocaps"))
+    :custom ((xkb-cycle-layouts '("us"
+                                  "epo"
+                                  "de"))
+             (xkb-options '("ctrl:nocaps")))
     :hook (exwm-init . xkb-cycle-mode))
   (defun shut-down--computer ()
     "Shut down the computer."
@@ -1097,101 +1132,6 @@ This function has been altered to accomodate `exwm-mode'."
     (interactive)
     (when (yes-or-no-p "Really suspend? ")
       (shell-command "systemctl suspend -i")))
-  (setq exwm-input-global-keys `(;; Switching workspace focus
-                                 ;; s-1 for 1, s-2 for 2, etc...
-                                 ,@(mapcar
-                                    (lambda (i)
-                                      `(,(kbd (format "s-%d" (% (1+ i) 10))) .
-                                        (lambda ()
-                                          (interactive)
-                                          (exwm-workspace-switch-create ,i))))
-                                    (number-sequence 0 9))
-  
-                                 ;; Switching window to a workspace
-                                 ;; This was annoying to get working
-                                 ;; s-! for 1, s-@ for 2, etc...
-                                 ,@(mapcar
-                                    (lambda (i)
-                                      `(,(kbd (format "s-%s" (nth i '("!" "@"
-                                                                      "#" "$"
-                                                                      "%" "^"
-                                                                      "&" "*"
-                                                                      "(" ")")))) .
-                                        (lambda ()
-                                          (interactive)
-                                          (exwm-workspace-move-window ,i))))
-                                    (number-sequence 0 9))
-  
-                                 ;; Toggle how input is sent to X windows
-                                 ([?\s-q] . exwm-input-toggle-keyboard)
-  
-                                 ;; Window size adjustment
-                                 (,(kbd "C-s-w") . shrink-window)
-                                 (,(kbd "C-s-s") . enlarge-window)
-                                 (,(kbd "C-s-a") . shrink-window-horizontally)
-                                 (,(kbd "C-s-d") . enlarge-window-horizontally)
-  
-                                 ;; Opening programs
-                                 ([XF86Calculator] . calc)
-                                 ([s-return]       . vterm)
-                                 ([?\s-g]          . run-gimp)
-                                 ([?\s-s]          . run-steam)
-                                 ([?\s-f]          . run-firefox)
-                                 ([?\s-d]          . run-discord)
-                                 ([?\s-t]          . run-telegram)
-                                 ([?\s-m]          . run-musescore)
-                                 ([?\s-b]          . run-libreoffice)
-                                 ([?\s-o]          . run-transmission)
-                                 ([?\s-r]          . monitor-settings)
-                                 ([?\s-n]          . network-settings)
-                                 ([?\s-v]          . volume-settings)
-  
-                                 ;; Other desktop environment things
-                                 ([?\s-x]           . dmenu)
-                                 ([s-tab]           . audio-loopback)
-                                 ([?\s-w]           . xkb-set-layout)
-  
-                                 ;; Controlling EMMS
-                                 ([XF86AudioNext] . emms-next)
-                                 ([XF86AudioPrev] . emms-previous)
-                                 ([XF86AudioPlay] . emms-pause)
-                                 ([XF86AudioStop] . emms-stop)))
-  (setq exwm-input-simulation-keys `(;; Navigation
-                                     ([?\M-<] . [C-home])
-                                     ([?\M->] . [C-end])
-                                     ([?\C-a] . [home])
-                                     ([?\C-e] . [end])
-                                     ([?\C-v] . [next])
-                                     ([?\M-v] . [prior])
-  
-                                     ([?\C-b] . [left])
-                                     ([?\C-f] . [right])
-                                     ([?\C-p] . [up])
-                                     ([?\C-n] . [down])
-  
-                                     ([?\M-b] . [C-left])
-                                     ([?\M-f] . [C-right])
-                                     ([?\M-n] . [C-down])
-                                     ([?\M-p] . [C-up])
-  
-                                     ;; Selecting via navigation
-                                     (,(kbd "C-S-b") . [S-left])
-                                     (,(kbd "C-S-f") . [S-right])
-                                     (,(kbd "C-S-n") . [S-down])
-                                     (,(kbd "C-S-p") . [S-up])
-  
-                                     ;; Copy/Paste
-                                     ([?\C-w] . [?\C-x])
-                                     ([?\M-w] . [?\C-c])
-                                     ([?\C-y] . [?\C-v])
-                                     ([?\C-s] . [?\C-f])
-                                     ([?\C-\/] . [?\C-z])
-  
-                                     ;; Other
-                                     ([?\C-d] . [delete])
-                                     ([?\M-d] . [C-delete])
-                                     ([?\C-k] . [S-end delete])
-                                     ([?\C-g] . [escape])))
   (defun farl-exwm/C-s ()
     "Pass C-s to the EXWM window."
     (interactive)
@@ -1225,6 +1165,138 @@ This function has been altered to accomodate `exwm-mode'."
   (defun farl-exwm/on-logout ()
     "Run this when logging out as part of `kill-emacs-hook'."
     (shell-command "hsetroot -solid '#000000'"))
+  :custom (
+           (exwm-workspace-number 10)
+           (exwm-randr-workspace-monitor-plist '(0 "DP2-2"
+                                                 1 "DP2-1"
+                                                 2 "DP2-3"
+                                                 3 "DP2-2"
+                                                 4 "DP2-1"
+                                                 5 "DP2-3"
+                                                 6 "DP2-2"
+                                                 7 "DP2-1"
+                                                 8 "DP2-3"
+                                                 9 "DP2-2"))
+           (exwm-manage-configurations '(((string= exwm-class-name "Steam")
+                                          workspace 9)
+                                         ((string= exwm-class-name "hl2_linux")
+                                          floating-mode-line nil)
+                                         ((string= exwm-class-name "TelegramDesktop")
+                                          workspace 8)
+                                         ((string= exwm-class-name "discord")
+                                          workspace 7)
+                                         ((or (string-match-p "libreoffice"
+                                                              exwm-class-name)
+                                              (string= exwm-class-name "MuseScore3")
+                                              (string= exwm-class-name "Gimp"))
+                                          workspace 6)
+                                         ((string= exwm-title "Event Tester")
+                                          floating-mode-line nil
+                                          floating t)))
+           (exwm-workspace-index-map #'farl-exwm/workspace-index-map)
+           (exwm-input-global-keys `(;; Switching workspace focus
+                                     ;; s-1 for 1, s-2 for 2, etc...
+                                     ,@(mapcar
+                                        (lambda (i)
+                                          `(,(kbd (format "s-%d" (% (1+ i) 10)))
+                                            .
+                                            (lambda ()
+                                              (interactive)
+                                              (exwm-workspace-switch-create ,i))))
+                                        (number-sequence 0 9))
+           
+                                     ;; Switching window to a workspace
+                                     ;; This was annoying to get working
+                                     ;; s-! for 1, s-@ for 2, etc...
+                                     ,@(mapcar
+                                        (lambda (i)
+                                          `(,(kbd (format "s-%s" (nth i '("!"
+                                                                          "@"
+                                                                          "#"
+                                                                          "$"
+                                                                          "%"
+                                                                          "^"
+                                                                          "&"
+                                                                          "*"
+                                                                          "("
+                                                                          ")"))))
+                                            .
+                                            (lambda ()
+                                              (interactive)
+                                              (exwm-workspace-move-window ,i))))
+                                        (number-sequence 0 9))
+           
+                                     ;; Toggle how input is sent to X windows
+                                     ([?\s-q] . exwm-input-toggle-keyboard)
+           
+                                     ;; Window size adjustment
+                                     (,(kbd "C-s-w") . shrink-window)
+                                     (,(kbd "C-s-s") . enlarge-window)
+                                     (,(kbd "C-s-a") . shrink-window-horizontally)
+                                     (,(kbd "C-s-d") . enlarge-window-horizontally)
+           
+                                     ;; Opening programs
+                                     ([XF86Calculator] . calc)
+                                     ([s-return]       . vterm)
+                                     ([?\s-g]          . run-gimp)
+                                     ([?\s-s]          . run-steam)
+                                     ([?\s-f]          . run-firefox)
+                                     ([?\s-d]          . run-discord)
+                                     ([?\s-t]          . run-telegram)
+                                     ([?\s-m]          . run-musescore)
+                                     ([?\s-b]          . run-libreoffice)
+                                     ([?\s-o]          . run-transmission)
+                                     ([?\s-r]          . monitor-settings)
+                                     ([?\s-n]          . network-settings)
+                                     ([?\s-v]          . volume-settings)
+           
+                                     ;; Other desktop environment things
+                                     ([?\s-x]           . dmenu)
+                                     ([s-tab]           . audio-loopback)
+                                     ([?\s-w]           . xkb-set-layout)
+           
+                                     ;; Controlling EMMS
+                                     ([XF86AudioNext] . emms-next)
+                                     ([XF86AudioPrev] . emms-previous)
+                                     ([XF86AudioPlay] . emms-pause)
+                                     ([XF86AudioStop] . emms-stop)))
+           (exwm-input-simulation-keys `(;; Navigation
+                                         ([?\M-<] . [C-home])
+                                         ([?\M->] . [C-end])
+                                         ([?\C-a] . [home])
+                                         ([?\C-e] . [end])
+                                         ([?\C-v] . [next])
+                                         ([?\M-v] . [prior])
+           
+                                         ([?\C-b] . [left])
+                                         ([?\C-f] . [right])
+                                         ([?\C-p] . [up])
+                                         ([?\C-n] . [down])
+           
+                                         ([?\M-b] . [C-left])
+                                         ([?\M-f] . [C-right])
+                                         ([?\M-n] . [C-down])
+                                         ([?\M-p] . [C-up])
+           
+                                         ;; Selecting via navigation
+                                         (,(kbd "C-S-b") . [S-left])
+                                         (,(kbd "C-S-f") . [S-right])
+                                         (,(kbd "C-S-n") . [S-down])
+                                         (,(kbd "C-S-p") . [S-up])
+           
+                                         ;; Copy/Paste
+                                         ([?\C-w] . [?\C-x])
+                                         ([?\M-w] . [?\C-c])
+                                         ([?\C-y] . [?\C-v])
+                                         ([?\C-s] . [?\C-f])
+                                         ([?\C-\/] . [?\C-z])
+           
+                                         ;; Other
+                                         ([?\C-d] . [delete])
+                                         ([?\M-d] . [C-delete])
+                                         ([?\C-k] . [S-end delete])
+                                         ([?\C-g] . [escape])))
+           )
   :hook (
          (exwm-update-title . farl-exwm/name-buffer-after-window-title)
          (exwm-randr-screen-change . display-and-dock-setup)
@@ -1245,70 +1317,5 @@ This function has been altered to accomodate `exwm-mode'."
          ("C-c C-t C-m" . nil)
          )
   )
-
-(use-package emms
-  :if (executable-find "mpd")
-  :ensure t
-  :defer t
-  :init
-  (pdumper-require 'emms-setup)
-  (require 'emms-player-mpd)
-  (emms-all)
-  (setq emms-seek-seconds 5
-        emms-player-list '(emms-player-mpd)
-        emms-info-functions '(emms-info mpd)
-        emms-player-mpd-server-name "localhost"
-        emms-player-mpd-server-port "6601"
-        mpc-host "localhost:6601")
-  (setenv "MPD_HOST" "localhost")
-  (setenv "MPD_PORT" "6601")
-  (defun mpd/start-music-daemon ()
-    "Start MPD, connect to it and sync the metadata cache"
-    (interactive)
-    (shell-command "mpd")
-    (mpd/update-database)
-    (emms-player-mpd-connect)
-    (emms-cache-set-from-mpd-all)
-    (message "MPD started!"))
-  (defun mpd/kill-music-daemon ()
-    "Stop playback and kill the music daemon."
-    (interactive)
-    (emms-stop)
-    (call-process "killall" nil nil nil "mpd")
-    (message "MPD killed!"))
-  (defun mpd/update-database ()
-    "Update the MPD database synchronously."
-    (interactive)
-    (call-process "mpc" nil nil nil "update")
-    (message "MPD database updated!"))
-  (defun farl-emms/shuffle-with-message ()
-    "Shuffle the playlist and say so in the echo area."
-    (interactive)
-    (emms-shuffle)
-    (message "Playlist has been shuffled."))
-  (defvar emms-map
-    (let ((map (make-sparse-keymap)))
-      ;; Opening playlist and music browser
-      (define-key map (kbd "v") #'emms)
-      (define-key map (kbd "b") #'emms-smart-browse)
-      ;; Track navigation
-      (define-key map (kbd "n n") #'emms-next)
-      (define-key map (kbd "n p") #'emms-previous)
-      (define-key map (kbd "p")   #'emms-pause)
-      (define-key map (kbd "s")   #'emms-stop)
-      ;; Repeat/shuffle
-      (define-key map (kbd "t C-r") #'emms-toggle-repeat-track)
-      (define-key map (kbd "t r")   #'emms-toggle-repeat-playlist)
-      (define-key map (kbd "t s")   #'farl-emms/shuffle-with-message)
-      ;; Refreshing various things
-      (define-key map (kbd "r c") #'emms-player-mpd-update-all-reset-cache)
-      (define-key map (kbd "r d") #'mpd/update-database)
-      ;; mpd-specific functions
-      (define-key map (kbd "d s") #'mpd/start-music-daemon)
-      (define-key map (kbd "d q") #'mpd/kill-music-daemon)
-      (define-key map (kbd "d u") #'mpd/update-database)
-      map)
-    "A keymap for controlling `emms'.")
-  :bind-keymap ("C-c a" . emms-map))
 
 ;;; init.el ends here

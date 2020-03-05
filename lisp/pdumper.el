@@ -28,13 +28,13 @@
                    server
 
                    ;; Looks
-                   dashboard
                    dracula-theme
                    mood-line
                    page-break-lines
                    display-line-numbers
                    rainbow-mode
                    rainbow-delimiters
+                   dashboard
 
                    ;; Functionality
                    which-key
