@@ -48,7 +48,7 @@ FILENAME and NOERROR are also passed to `require'."
   "Recompile all files in `user-emacs-directory'."
   (byte-recompile-directory user-emacs-directory 0))
 
-(unless (file-exists-p (expand-file-name "init.elc" user-emacs-directory))
+(unless (file-exists-p (locate-user-emacs-file "init.elc"))
   (add-hook 'after-init-hook #'farl-init/compile-user-emacs-directory))
 
 (setq load-prefer-newer t)

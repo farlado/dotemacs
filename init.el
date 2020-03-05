@@ -48,27 +48,6 @@
 (setq use-dialog-box nil
       use-file-dialog nil)
 
-(use-package dashboard
-  :ensure t
-  :defer t
-  :init
-  (defun dashboard-or-scratch ()
-    "Open either dashboard or the scratch buffer."
-    (or (get-buffer "*dashboard*")
-        (get-buffer "*scratch*")))
-  (setq dashboard-set-footer nil
-        inhibit-startup-screen t
-        dashboard-items '((recents . 10))
-        dashboard-startup-banner 'logo
-        initial-buffer-choice #'dashboard-or-scratch
-        dashboard-banner-logo-title "Welcome to Farlado's Illiterate GNU Emacs!")
-  (defun dashboard-immortal ()
-    "Make it impossible to kill the dashboard buffer."
-    (with-current-buffer "*dashboard*"
-      (emacs-lock-mode 'kill)))
-  (dashboard-setup-startup-hook)
-  :hook (dashboard-mode . dashboard-immortal))
-
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)
 (setq locale-coding-system 'utf-8)
@@ -78,7 +57,9 @@
 (prefer-coding-system 'utf-8)
 
 (when (member "Iosevka" (font-family-list))
-  (set-face-attribute 'default nil :font "Iosevka" :height 100))
+  (set-face-attribute 'default nil
+                      :font "Iosevka"
+                      :height 100))
 
 (when (member "Noto Color Emoji" (font-family-list))
   (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
@@ -105,18 +86,25 @@
     (set-frame-parameter frame 'alpha 90))
   (add-to-list 'default-frame-alist '(alpha . 90))
   (pdumper-require 'org)
-  (set-face-attribute 'org-level-1 nil :height 1.3)
-  (set-face-attribute 'org-level-2 nil :height 1.1)
-  (set-face-attribute 'org-level-3 nil :height 1.0)
-  (set-face-attribute 'org-document-title nil :weight 'extra-bold :height 1.8))
+  (set-face-attribute 'org-level-1 nil
+                      :height 1.3)
+  (set-face-attribute 'org-level-2 nil
+                      :height 1.1)
+  (set-face-attribute 'org-level-3 nil
+                      :height 1.0)
+  (set-face-attribute 'org-document-title nil
+                      :weight 'extra-bold
+                      :height 1.8))
 
 (use-package mood-line
   :ensure t
   :defer t
   :init
   (mood-line-mode 1)
-  (set-face-attribute 'mode-line nil :box nil)
-  (set-face-attribute 'mode-line-inactive nil :box nil)
+  (dolist (face '(mode-line
+                  mode-line-inactive))
+    (set-face-attribute face nil
+                        :box nil))
   (setq display-time-24hr-format t)
   (display-time-mode 1)
   (display-battery-mode 1)
@@ -140,7 +128,9 @@
           conf-mode) . display-line-numbers-mode))
 
 (show-paren-mode 1)
-(set-face-attribute 'show-paren-match nil :weight 'extra-bold :underline t)
+(set-face-attribute 'show-paren-match nil
+                    :weight 'extra-bold
+                    :underline t)
 (setq show-paren-style 'parentheses
       show-paren-delay 0)
 
@@ -155,6 +145,27 @@
   :defer t
   :hook (prog-mode . rainbow-delimiters-mode))
 
+(use-package dashboard
+  :ensure t
+  :defer t
+  :init
+  (defun dashboard-immortal ()
+    "Make the dashboard buffer immortal."
+    (emacs-lock-mode 'kill))
+  (defun dashboard-or-scratch ()
+    "Open either dashboard or the scratch buffer."
+    (or (get-buffer "*dashboard*")
+        (get-buffer "*scratch*")))
+  (setq inhibit-start-screen t
+        dashboard-set-footer nil
+        dashboard-startup-banner 'logo
+        dashboard-items '((recents . 10))
+        initial-buffer-choice #'dashboard-or-scratch
+        dashboard-banner-logo-title
+        "Welcome to Farlado's Illiterate GNU Emacs!")
+  (dashboard-setup-startup-hook)
+  :hook (dashboard-mode . dashboard-immortal))
+
 (global-unset-key (kbd "C-x C-z"))
 (global-unset-key (kbd "C-z"))
 
@@ -163,7 +174,7 @@
 (add-hook 'minibuffer-setup-hook #'garbage-collect-defer)
 (add-hook 'minibuffer-exit-hook #'garbage-collect-restore)
 
-(setq confirm-kill-emacs 'yes-or-no-p)
+(setq confirm-kill-emacs #'yes-or-no-p)
 
 (setq make-pointer-invisible nil)
 
@@ -177,7 +188,8 @@
 
 (setq ring-bell-function 'ignore)
 
-(defalias 'yes-or-no-p #'y-or-n-p)
+(defalias 'yes-or-no-p #'y-or-n-p
+  "Use `y-or-n-p' instead of a yes/no prompt.")
 
 (use-package which-key
   :ensure t
@@ -203,7 +215,7 @@
   :ensure t
   :defer t
   :init
-  (add-to-list 'company-backends 'company-emoji))
+  (add-to-list 'company-backends #'company-emoji))
 
 (use-package counsel
   :ensure t
@@ -212,9 +224,9 @@
   (defun farl-init/ivy-mode ()
     "Start `ivy-mode' while disabling `ido-mode'."
     (ivy-mode 1)
-    (ido-mode -1))
-  (pdumper-require 'counsel)
-  (setq ivy-initial-inputs-alist nil)
+    (ido-mode -1)
+    (counsel-mode 1)
+    (setq ivy-initial-inputs-alist nil))
   :hook (after-init . farl-init/ivy-mode)
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
@@ -223,10 +235,6 @@
 (defun buffer-file-match (string)
   "Find STRING in variable `buffer-file-name'."
   (string-match-p string buffer-file-name))
-
-(defmacro user-emacs-file (file)
-  "Find FILE in `user-emacs-directory'."
-  (expand-file-name file user-emacs-directory))
 
 (defmacro user-home-file (file)
   "Find FILE in the user's home directory."
@@ -288,7 +296,7 @@
 (defun config-visit ()
   "Open the configuration file."
   (interactive)
-  (find-file (user-emacs-file "literate-emacs.org")))
+  (find-file (locate-user-emacs-file "literate-emacs.org")))
 
 (global-set-key (kbd "C-c e") #'config-visit)
 
@@ -315,7 +323,7 @@
 (defun kill-this-buffer-and-window ()
   "Kill the current buffer and delete the selected window.
 
-This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
+This function has been altered to accomodate `exwm-mode'."
   (interactive)
   (let ((window-to-delete (selected-window))
         (buffer-to-kill (current-buffer))
@@ -351,12 +359,12 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
 (use-package graphviz-dot-mode
   :ensure t
   :defer t
-  :init
-  (pdumper-require 'graphviz-dot-mode))
+  :mode ("\\.dot\\'" . graphviz-dot-mode))
 
 (use-package markdown-mode
   :ensure t
-  :defer t)
+  :defer t
+  :mode ("\\.md\\'" . markdown-mode))
 
 (defun tangle-literate-program ()
   "Tangle a file if it's a literate programming file."
@@ -378,7 +386,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
   :ensure t
   :defer t
   :init
-  (pdumper-require 'flyspell)
   (setq ispell-program-name "aspell"
         ispell-dictionary "american")
   :hook ((flyspell-mode . flyspell-buffer)
@@ -434,14 +441,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
                             (?\" . ?\")))
 (electric-pair-mode 1)
 (minibuffer-electric-default-mode 1)
-
-(defun whole-kill-word ()
-  "Delete an entire word."
-  (interactive)
-  (backward-word)
-  (kill-word 1))
-
-(global-set-key (kbd "C-c DEL") #'whole-kill-word)
 
 (setq inferior-lisp-program "sbcl")
 
@@ -601,7 +600,6 @@ This function has been altered from `kill-buffer-and-window' for `exwm-mode'."
     (setq org-agenda-files (directory-files-recursively
                             (user-home-file "agendas")
                             ".org$" nil t t)))
-  (setq org-src-window-setup 'current-window)
   :hook (
          (org-mode . farl-org/disable-angle-bracket-syntax)
          (org-babel-after-execute . org-redisplay-inline-images)

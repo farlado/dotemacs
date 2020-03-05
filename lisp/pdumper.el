@@ -15,8 +15,8 @@
 (require 'package)
 (package-initialize)
 
-(add-to-list 'load-path (expand-file-name "lisp/xkb" user-emacs-directory))
-(add-to-list 'load-path (expand-file-name "lisp/wallpaper" user-emacs-directory))
+(add-to-list 'load-path (locate-user-emacs-file "lisp/xkb"))
+(add-to-list 'load-path (locate-user-emacs-file "lisp/wallpaper"))
 
 (setq pdumper-load-path load-path
       pdumper-dumped t)
@@ -99,6 +99,6 @@
 
 (load-theme 'dracula t t)
 
-(dump-emacs-portable (expand-file-name "emacs.pdmp" user-emacs-directory))
+(dump-emacs-portable (locate-user-emacs-file "emacs.pdmp"))
 
 ;;; pdumper.el ends here
