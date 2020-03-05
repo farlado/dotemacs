@@ -750,46 +750,6 @@ This function has been altered to accomodate `exwm-mode'."
   (pdumper-require 'exwm-randr)
   (pdumper-require 'exwm-config)
   (pdumper-require 'exwm-systemtray)
-  (use-package ivy-posframe
-    :ensure t
-    :defer t
-    :init
-    (defun farl-posframe/force-set-position (&rest args)
-      "Force the position to be set for a posframe, ignoring ARGS."
-      (setq posframe--last-posframe-pixel-position nil
-            posframe--last-parent-frame-size nil
-            posframe--last-posframe-size nil))
-    (advice-add 'posframe--set-frame-position
-                :before #'farl-posframe/force-set-position)
-    (defun farl-exwm/poshandler-window-center (info)
-      "Display a posframe at window center, accounting for EXWM."
-      (let* ((window-info (posframe-poshandler-window-center info))
-             (window-x (car window-info))
-             (window-y (cdr window-info))
-             (monitor-info (elt exwm-workspace--workareas
-                                exwm-workspace-current-index))
-             (monitor-x (aref monitor-info 0))
-             (monitor-y (aref monitor-info 1))
-             (posframe-x (+ window-x monitor-x))
-             (posframe-y (+ window-y monitor-y)))
-        (cons posframe-x posframe-y)))
-    
-    (defun farl-ivy-posframe/exwm-display-window-center (str)
-      "Display a posframe for `ivy-posframe' at point, passing STR."
-      (ivy-posframe--display str #'farl-exwm/poshandler-window-center))
-    :custom ((posframe-mouse-banish nil)
-             (ivy-posframe-min-width 30)
-             (ivy-posframe-border-width 3)
-             (ivy-posframe-hide-minibuffer nil)
-             (ivy-posframe-parameters '((left-fringe . 10)
-                                        (right-fringe . 10)
-                                        (parent-frame . nil)))
-             (ivy-posframe-height-alist '((swiper . 15)
-                                          (swiper-isearch . 15)
-                                          (t . 11)))
-             (ivy-posframe-display-functions-alist
-              '((t . farl-ivy-posframe/exwm-display-window-center))))
-    :hook (exwm-init . ivy-posframe-mode))
   (defun farl-exwm/name-buffer-after-window-title ()
     "Rename the current `exwm-mode' buffer after the X window's title."
     (exwm-workspace-rename-buffer exwm-title))

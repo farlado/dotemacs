@@ -84,7 +84,6 @@
                    exwm-randr
                    exwm-config
                    exwm-systemtray
-                   ivy-posframe
                    dmenu
                    minibuffer-line
                    system-packages

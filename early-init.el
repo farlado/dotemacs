@@ -135,7 +135,6 @@ FILENAME and NOERROR are also passed to `require'."
 
                                   ;; Desktop Environment
                                   exwm
-                                  ivy-posframe
                                   dmenu
                                   minibuffer-line
                                   system-packages
