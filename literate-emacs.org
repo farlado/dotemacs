@@ -320,6 +320,7 @@ packages and keybindings which help me bring ideas to life day after day.
                          highlight-indent-guides
                          company-jedi
                          flycheck
+                         flycheck-package
                          flycheck-posframe
                          avy-flycheck
 
@@ -569,6 +570,7 @@ packages and keybindings which help me bring ideas to life day after day.
                                         highlight-indent-guides
                                         company-jedi
                                         flycheck
+                                        flycheck-package
                                         flycheck-posframe
                                         avy-flycheck
 
@@ -1592,9 +1594,9 @@ packages and keybindings which help me bring ideas to life day after day.
     This saves me tons of time when it comes to managing whitespace. Instead of
     having to repeatedly press delete or backspace, a single keystroke decimates
     all the whitespace between the point and whatever is in the direction the
-    deletion happens.
+    deletion happens. Currently broken.
 
-    #+begin_src emacs-lisp
+    #+begin_src emacs-lisp :tangle no
       (use-package hungry-delete
         :ensure t
         :defer t
@@ -1712,6 +1714,21 @@ packages and keybindings which help me bring ideas to life day after day.
         :ensure t
         :defer t
         :hook (prog-mode . flycheck-mode))
+    #+end_src
+
+*** On-the-fly package linting
+
+    Now that I'm dabbling in writing Emacs packages, I need to be able to lint
+    packages more thoroughly. Adding a linter specifically for packages is very
+    comfy and cool and good.
+
+    #+begin_src emacs-lisp
+      (use-package flycheck-package
+        :after flycheck
+        :ensure t
+        :defer t
+        :init
+        (flycheck-package-setup))
     #+end_src
 
 *** Move ~flycheck~ issues out of the minibuffer

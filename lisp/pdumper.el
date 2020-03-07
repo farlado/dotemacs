@@ -58,6 +58,7 @@
                    highlight-indent-guides
                    company-jedi
                    flycheck
+                   flycheck-package
                    flycheck-posframe
                    avy-flycheck
 

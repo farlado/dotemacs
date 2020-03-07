@@ -420,12 +420,6 @@ This function has been altered to accomodate `exwm-mode'."
 
 (delete-selection-mode 1)
 
-(use-package hungry-delete
-  :ensure t
-  :defer t
-  :init
-  (global-hungry-delete-mode 1))
-
 (use-package avy
   :ensure t
   :defer t
@@ -474,6 +468,13 @@ This function has been altered to accomodate `exwm-mode'."
   :ensure t
   :defer t
   :hook (prog-mode . flycheck-mode))
+
+(use-package flycheck-package
+  :after flycheck
+  :ensure t
+  :defer t
+  :init
+  (flycheck-package-setup))
 
 (use-package flycheck-posframe
   :if window-system

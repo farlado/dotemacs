@@ -114,6 +114,7 @@ FILENAME and NOERROR are also passed to `require'."
                                   highlight-indent-guides
                                   company-jedi
                                   flycheck
+                                  flycheck-package
                                   flycheck-posframe
                                   avy-flycheck
 
