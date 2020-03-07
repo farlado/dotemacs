@@ -1761,7 +1761,6 @@ packages and keybindings which help me bring ideas to life day after day.
 
    #+begin_src emacs-lisp :noweb-ref no :tangle (locate-user-emacs-file "init.el")
      (use-package org
-       :ensure t
        :defer t
        :init
        <<org-init>>

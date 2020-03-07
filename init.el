@@ -486,7 +486,6 @@ This function has been altered to accomodate `exwm-mode'."
          ("C-c C-'" . avy-flycheck-goto-error)))
 
 (use-package org
-  :ensure t
   :defer t
   :init
   (use-package toc-org
