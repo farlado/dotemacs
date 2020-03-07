@@ -35,13 +35,9 @@
            (auto-package-update-delete-old-versions t))
   :hook (after-init . auto-package-update-maybe))
 
-(use-package server
-  :ensure t
-  :defer t
-  :init
-  (pdumper-require 'server)
-  (unless (server-running-p)
-    (server-start)))
+(pdumper-require 'server)
+(unless (server-running-p)
+  (server-start))
 
 (tooltip-mode -1)
 (setq use-dialog-box nil
@@ -121,7 +117,6 @@
   :hook (after-init . global-page-break-lines-mode))
 
 (use-package display-line-numbers
-  :ensure t
   :defer t
   :custom (indicate-empty-lines t)
   :hook ((text-mode
@@ -383,7 +378,6 @@ This function has been altered to accomodate `exwm-mode'."
 
 (use-package flyspell
   :if (executable-find "aspell")
-  :ensure t
   :defer t
   :custom ((ispell-program-name "aspell")
            (ispell-dictionary "american"))
@@ -647,7 +641,6 @@ This function has been altered to accomodate `exwm-mode'."
          ("s" . sudoku)))
 
 (use-package tetris
-  :ensure t
   :defer t
   :bind (:map games-map
          ("t" . 'tetris)

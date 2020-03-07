@@ -692,13 +692,9 @@ packages and keybindings which help me bring ideas to life day after day.
     other parts of my desktop environment.
 
     #+begin_src emacs-lisp
-      (use-package server
-        :ensure t
-        :defer t
-        :init
-        (pdumper-require 'server)
-        (unless (server-running-p)
-          (server-start)))
+      (pdumper-require 'server)
+      (unless (server-running-p)
+        (server-start))
     #+end_src
 
 *** Prepare GUI (Part 2)
@@ -944,7 +940,6 @@ packages and keybindings which help me bring ideas to life day after day.
 
     #+begin_src emacs-lisp
       (use-package display-line-numbers
-        :ensure t
         :defer t
         :custom (indicate-empty-lines t)
         :hook ((text-mode
@@ -1511,7 +1506,6 @@ packages and keybindings which help me bring ideas to life day after day.
     #+begin_src emacs-lisp
       (use-package flyspell
         :if (executable-find "aspell")
-        :ensure t
         :defer t
         :custom ((ispell-program-name "aspell")
                  (ispell-dictionary "american"))
@@ -2095,7 +2089,6 @@ packages and keybindings which help me bring ideas to life day after day.
 
     #+begin_src emacs-lisp
       (use-package tetris
-        :ensure t
         :defer t
         :bind (:map games-map
                ("t" . 'tetris)
