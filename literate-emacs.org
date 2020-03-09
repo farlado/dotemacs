@@ -50,7 +50,7 @@ packages and keybindings which help me bring ideas to life day after day.
   - [[#not-built-in][Not built-in]]
   - [[#built-in][Built-in]]
   - [[#games][Games]]
-- [[#making-emacs-a-manageplay-music][Making Emacs a manage/play music]]
+- [[#making-emacs-manageplay-my-music][Making Emacs manage/play my music]]
   - [[#loading][Loading]]
   - [[#functions][Functions]]
   - [[#keybindings][Keybindings]]
@@ -2128,7 +2128,7 @@ packages and keybindings which help me bring ideas to life day after day.
                ("2" . 2048-game)))
     #+end_src
 
-* Making Emacs a manage/play music
+* Making Emacs manage/play my music
 
   I am big on doing as much in Emacs as possible. Having my music player moved
   to Emacs was a HUGE step. When I first started using it, it was weird, but now
@@ -2142,9 +2142,8 @@ packages and keybindings which help me bring ideas to life day after day.
       :defer t
       :init
       <<emms-init>>
-      :custom (
-               <<emms-vars>>
-               )
+      :custom ((emms-completing-read #'ivy-completing-read)
+               <<emms-vars>>)
       :bind-keymap ("C-c a" . emms-map))
   #+end_src
 
@@ -2267,7 +2266,7 @@ packages and keybindings which help me bring ideas to life day after day.
   including it doesn't have any disadvantages either, since it only loads if an
   environment variable =_RUN_EXWM= exists, which it promptly unsets. Make a note
   of this when writing your =.xinitrc= or writing a =.desktop= file to load Emacs as
-  your desktop environment.
+  your desktop environment. EXWM should replace the current window manager.
 
   #+begin_src emacs-lisp :noweb-ref no :tangle (locate-user-emacs-file "init.el")
     (use-package exwm
@@ -2281,18 +2280,14 @@ packages and keybindings which help me bring ideas to life day after day.
       (pdumper-require 'exwm-config)
       (pdumper-require 'exwm-systemtray)
       <<exwm-init>>
-      :custom (
-               <<exwm-vars>>
-               )
+      :custom ((exwm-replace t)
+               <<exwm-vars>>)
       :hook (
-             <<exwm-hooks>>
-             )
+             <<exwm-hooks>>)
       :bind (
              <<exwm-global-binds>>
              :map exwm-mode-map
-             <<exwm-mode-binds>>
-             )
-      )
+             <<exwm-mode-binds>>))
   #+end_src
 
 ** Window management
@@ -2424,9 +2419,8 @@ packages and keybindings which help me bring ideas to life day after day.
         :ensure t
         :defer t
         :init
-        (pdumper-require 'minibuffer-line)
         <<list-workspaces>>
-        (set-face-attribute 'minibuffer-line nil :inherit 'default)
+        :custom-face (minibuffer-line ((t (:inherit default))))
         :custom (minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
         :hook ((exwm-init . minibuffer-line-mode)
                (exwm-workspace-switch . minibuffer-line--update)))
@@ -2734,30 +2728,23 @@ packages and keybindings which help me bring ideas to life day after day.
     Previously I had to define a lot of functions to do these things, now I just
     change settings within ~desktop-environment-mode~.
 
+    The way ~desktop-environment-mode~ passes its keys through EXWM's mode is one
+    of two options: either the keys are directly bound to =exwm-mode-map=, or the
+    keys are added to EXWM's prefix key set. I prefer the latter, because it
+    means the keys associated with ~desktop-environment-mode~ will be properly
+    unbound when the mode is toggled off.
+
     #+begin_src emacs-lisp
       (use-package desktop-environment
         :ensure t
         :defer t
         :init
         <<de-init>>
-        :custom (
-                 <<de-vars>>
-                 )
+        :custom ((desktop-environment-update-exwm-global-keys :prefix)
+                 <<de-vars>>)
         :hook (exwm-init . desktop-environment-mode)
         :bind (:map desktop-environment-mode-map
-               <<de-binds>>
-               )
-        )
-    #+end_src
-
-    The way ~desktop-environment-mode~ passes its keys through EXWM's mode is one
-    of two options: either the keys are directly bound to ~exwm-mode-map~, or the
-    keys are added to EXWM's prefix key set. I prefer the latter, because it
-    means the keys associated with ~desktop-environment-mode~ will be properly
-    unbound when the mode is toggled off.
-
-    #+begin_src emacs-lisp :noweb-ref de-vars
-      (desktop-environment-update-exwm-global-keys :prefix)
+               <<de-binds>>))
     #+end_src
 
 **** Brightness adjustment

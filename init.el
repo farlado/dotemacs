@@ -729,14 +729,13 @@ This function has been altered to accomodate `exwm-mode'."
     "A keymap for controlling `emms'.")
   (setenv "MPD_HOST" "localhost")
   (setenv "MPD_PORT" "6601")
-  :custom (
+  :custom ((emms-completing-read #'ivy-completing-read)
            (emms-seek-seconds 5)
            (emms-player-list '(emms-player-mpd))
            (emms-info-functions '(emms-info mpd))
            (emms-player-mpd-server-name "localhost")
            (emms-player-mpd-server-port "6601")
-           (mpc-host "localhost:6601")
-           )
+           (mpc-host "localhost:6601"))
   :bind-keymap ("C-c a" . emms-map))
 
 (use-package exwm
@@ -772,13 +771,12 @@ This function has been altered to accomodate `exwm-mode'."
     :ensure t
     :defer t
     :init
-    (pdumper-require 'minibuffer-line)
     (defun farl-exwm/list-workspaces ()
       "List EXWM workspaces."
       (exwm-workspace--update-switch-history)
       (elt exwm-workspace--switch-history
            (exwm-workspace--position exwm-workspace--current)))
-    (set-face-attribute 'minibuffer-line nil :inherit 'default)
+    :custom-face (minibuffer-line ((t (:inherit default))))
     :custom (minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
     :hook ((exwm-init . minibuffer-line-mode)
            (exwm-workspace-switch . minibuffer-line--update)))
@@ -977,8 +975,7 @@ This function has been altered to accomodate `exwm-mode'."
                " && xclip $FILENAME -selection clipboard "
                "-t image/png &> /dev/null && rm $FILENAME"))
       (message "Screenshot copied to clipboard."))
-    :custom (
-             (desktop-environment-update-exwm-global-keys :prefix)
+    :custom ((desktop-environment-update-exwm-global-keys :prefix)
              (desktop-environment-brightness-normal-increment "5%+")
              (desktop-environment-brightness-normal-decrement "5%-")
              (desktop-environment-volume-toggle-command
@@ -1008,17 +1005,14 @@ This function has been altered to accomodate `exwm-mode'."
              (desktop-environment-screenshot-command
               "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME")
              (desktop-environment-screenshot-partial-command
-              "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME")
-             )
+              "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim -s $FILENAME"))
     :hook (exwm-init . desktop-environment-mode)
     :bind (:map desktop-environment-mode-map
            ("<XF86ScreenSaver>" . desktop-environment-lock-screen)
            ("<print>" . farl-de/desktop-environment-screenshot-part-clip)
            ("<S-print>" . farl-de/desktop-environment-screenshot-clip)
            ("<C-print>" . farl-de/desktop-environment-screenshot-part)
-           ("<C-S-print>" . farl-de/desktop-environment-screenshot)
-           )
-    )
+           ("<C-S-print>" . farl-de/desktop-environment-screenshot)))
   (use-package wallpaper
     :load-path "lisp/wallpaper"
     :defer t
@@ -1124,7 +1118,7 @@ This function has been altered to accomodate `exwm-mode'."
   (defun farl-exwm/on-logout ()
     "Run this when logging out as part of `kill-emacs-hook'."
     (shell-command "hsetroot -solid '#000000'"))
-  :custom (
+  :custom ((exwm-replace t)
            (exwm-workspace-number 10)
            (exwm-randr-workspace-monitor-plist '(0 "DP2-2"
                                                  1 "DP2-1"
@@ -1254,13 +1248,11 @@ This function has been altered to accomodate `exwm-mode'."
                                          ([?\C-d] . [delete])
                                          ([?\M-d] . [C-delete])
                                          ([?\C-k] . [S-end delete])
-                                         ([?\C-g] . [escape])))
-           )
+                                         ([?\C-g] . [escape]))))
   :hook (
          (exwm-update-title . farl-exwm/name-buffer-after-window-title)
          (exwm-randr-screen-change . display-and-dock-setup)
-         (kill-emacs . farl-exwm/on-logout)
-         )
+         (kill-emacs . farl-exwm/on-logout))
   :bind (
          ("C-x C-M-c" . shut-down-computer)
          ("C-x C-M-r" . reboot-computer)
@@ -1273,8 +1265,6 @@ This function has been altered to accomodate `exwm-mode'."
          ("C-c C-f" . nil)
          ("C-c C-t C-f" . nil)
          ("C-c C-t C-v" . nil)
-         ("C-c C-t C-m" . nil)
-         )
-  )
+         ("C-c C-t C-m" . nil)))
 
 ;;; init.el ends here
