@@ -1275,20 +1275,15 @@ packages and keybindings which help me bring ideas to life day after day.
       (use-package buffer-move
         :ensure t
         :defer t
-        :init
-        (defvar buffer-move-and-windmove-map
-          (let ((map (make-sparse-keymap)))
-            (define-key map (kbd "w") #'windmove-up)
-            (define-key map (kbd "a") #'windmove-left)
-            (define-key map (kbd "s") #'windmove-down)
-            (define-key map (kbd "d") #'windmove-right)
-            (define-key map (kbd "C-w") #'buf-move-up)
-            (define-key map (kbd "C-a") #'buf-move-left)
-            (define-key map (kbd "C-s") #'buf-move-down)
-            (define-key map (kbd "C-d") #'buf-move-right)
-            map)
-          "A keymap for `buffer-move' and `windmove' functions.")
-        :bind-keymap ("C-x o" . buffer-move-and-windmove-map))
+        :bind (("C-x o" . nil)
+               ("C-x o w" . windmove-up)
+               ("C-x o a" . windmove-left)
+               ("C-x o s" . windmove-down)
+               ("C-x o d" . windmove-right)
+               ("C-x o C-w" . buf-move-up)
+               ("C-x o C-a" . buf-move-left)
+               ("C-x o C-s" . buf-move-down)
+               ("C-x o C-d" . buf-move-right)))
     #+end_src
 
 *** Move focus and show ~ibuffer~ when explicitly creating new windows
@@ -2133,7 +2128,6 @@ packages and keybindings which help me bring ideas to life day after day.
   I am big on doing as much in Emacs as possible. Having my music player moved
   to Emacs was a HUGE step. When I first started using it, it was weird, but now
   I have come to absolutely love it. We only configure EMMS if ~mpd~ is found.
-  Environment variables are set here as well.
 
   #+begin_src emacs-lisp :noweb yes :tangle (locate-user-emacs-file "init.el")
     (use-package emms
@@ -2142,9 +2136,8 @@ packages and keybindings which help me bring ideas to life day after day.
       :defer t
       :init
       <<emms-init>>
-      :custom ((emms-completing-read #'ivy-completing-read)
-               <<emms-vars>>)
-      :bind-keymap ("C-c a" . emms-map))
+      <<emms-vars>>
+      <<emms-keys>>)
   #+end_src
 
 ** Loading
@@ -2207,33 +2200,32 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Keybindings
   
-   Now using a keymap in place of that wonky as crap binding system. The new
-   binds let me use ~emms~ in a terminal.
+   Making a keymap was a mistake. This is so much comfier and looks a lot nicer
+   when using ~which-key~, and does not require the creation of an entire keymap.
 
-   #+begin_src emacs-lisp :noweb-ref emms-init
-     (defvar emms-map
-       (let ((map (make-sparse-keymap)))
-         ;; Opening playlist and music browser
-         (define-key map (kbd "v") #'emms)
-         (define-key map (kbd "b") #'emms-smart-browse)
-         ;; Track navigation
-         (define-key map (kbd "n n") #'emms-next)
-         (define-key map (kbd "n p") #'emms-previous)
-         (define-key map (kbd "p")   #'emms-pause)
-         (define-key map (kbd "s")   #'emms-stop)
-         ;; Repeat/shuffle
-         (define-key map (kbd "t C-r") #'emms-toggle-repeat-track)
-         (define-key map (kbd "t r")   #'emms-toggle-repeat-playlist)
-         (define-key map (kbd "t s")   #'farl-emms/shuffle-with-message)
-         ;; Refreshing various things
-         (define-key map (kbd "r c") #'emms-player-mpd-update-all-reset-cache)
-         (define-key map (kbd "r d") #'mpd/update-database)
-         ;; mpd-specific functions
-         (define-key map (kbd "d s") #'mpd/start-music-daemon)
-         (define-key map (kbd "d q") #'mpd/kill-music-daemon)
-         (define-key map (kbd "d u") #'mpd/update-database)
-         map)
-       "A keymap for controlling `emms'.")
+   #+begin_src emacs-lisp :noweb-ref emms-keys
+     :bind (;; Opening playlist and music browser
+            ("C-c a v" . emms)
+            ("C-c a b" . emms-smart-browse)
+
+            ;; Track navigation
+            ("C-c a n n" . emms-next)
+            ("C-c a n p" . emms-previous)
+            ("C-c a p" . emms-pause)
+            ("C-c a s" . emms-stop)
+
+            ;; Repeat/shuffle
+            ("C-c a t C-r" . emms-toggle-repeat-track)
+            ("C-c a t r" . emms-toggle-repeat-playlist)
+            ("C-c a t s" . farl-emms/shuffle-with-message)
+
+            ;; Refreshing the emms cache
+            ("C-c a c" . emms-player-mpd-update-all-reset-cache)
+
+            ;; mpd related functions
+            ("C-c a d s" . mpd/start-music-daemon)
+            ("C-c a d q" . mpd/kill-music-daemon)
+            ("C-c a d u" . mpd/update-database))
    #+end_src
 
 ** Configuring
@@ -2241,12 +2233,12 @@ packages and keybindings which help me bring ideas to life day after day.
    This is where ~emms~ is configured to use ~mpd~.
 
    #+begin_src emacs-lisp :noweb-ref emms-vars
-     (emms-seek-seconds 5)
-     (emms-player-list '(emms-player-mpd))
-     (emms-info-functions '(emms-info mpd))
-     (emms-player-mpd-server-name "localhost")
-     (emms-player-mpd-server-port "6601")
-     (mpc-host "localhost:6601")
+     :custom ((emms-seek-seconds 5)
+              (emms-player-list '(emms-player-mpd))
+              (emms-info-functions '(emms-info mpd))
+              (emms-completing-read #'ivy-completing-read)
+              (emms-player-mpd-server-name "localhost")
+              (emms-player-mpd-server-port "6601"))
    #+end_src
 
    A couple environment variables are also set.
