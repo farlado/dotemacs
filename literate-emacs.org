@@ -1590,7 +1590,7 @@ packages and keybindings which help me bring ideas to life day after day.
     all the whitespace between the point and whatever is in the direction the
     deletion happens. Currently broken.
 
-    #+begin_src emacs-lisp :tangle no
+    #+begin_src emacs-lisp
       (use-package hungry-delete
         :ensure t
         :defer t

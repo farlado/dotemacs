@@ -414,6 +414,12 @@ This function has been altered to accomodate `exwm-mode'."
 
 (delete-selection-mode 1)
 
+(use-package hungry-delete
+  :ensure t
+  :defer t
+  :init
+  (global-hungry-delete-mode 1))
+
 (use-package avy
   :ensure t
   :defer t
