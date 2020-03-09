@@ -510,55 +510,57 @@ This function has been altered to accomodate `exwm-mode'."
     "Don't ask to evaluate graphviz blocks or literate programming blocks."
     (not (or (string= lang "dot")
              (buffer-file-match "literate.*.org$"))))
-  (pdumper-require 'org-tempo)
-  (add-to-list 'org-modules 'org-tempo)
-  (setq org-structure-template-alist '(;; General blocks
-                                       ("c" . "center")
-                                       ("C" . "comment")
-                                       ("e" . "example")
-                                       ("q" . "quote")
-                                       ("v" . "verse")
+  (use-package org-tempo
+    :defer t
+    :init
+    (add-to-list 'org-modules 'org-tempo)
+    :custom ((org-structure-template-alist '(;; General blocks
+                                             ("c" . "center")
+                                             ("C" . "comment")
+                                             ("e" . "example")
+                                             ("q" . "quote")
+                                             ("v" . "verse")
   
-                                       ;; Export blocks
-                                       ("a"   . "export ascii")
-                                       ("h"   . "export html")
-                                       ("css" . "export css")
-                                       ("l"   . "export latex")
+                                             ;; Export blocks
+                                             ("a"   . "export ascii")
+                                             ("h"   . "export html")
+                                             ("css" . "export css")
+                                             ("l"   . "export latex")
   
-                                       ;; Code blocks
-                                       ("s"   . "src")
-                                       ("sh"  . "src sh")
-                                       ("cf"  . "src conf")
-                                       ("cu"  . "src conf-unix")
-                                       ("cs"  . "src conf-space")
-                                       ("cx"  . "src conf-xdefaults")
-                                       ("cjp" . "src conf-javaprop")
-                                       ("el"  . "src emacs-lisp")
-                                       ("py"  . "src python")
-                                       ("dot" . "src dot :file")
-                                       ("txt" . "src text :tangle"))
-        org-tempo-keywords-alist '(;; Title/subtitle/author
-                                   ("t"  . "title")
-                                   ("st" . "subtitle")
-                                   ("au" . "author")
+                                             ;; Code blocks
+                                             ("s"   . "src")
+                                             ("sh"  . "src sh")
+                                             ("cf"  . "src conf")
+                                             ("cu"  . "src conf-unix")
+                                             ("cs"  . "src conf-space")
+                                             ("cx"  . "src conf-xdefaults")
+                                             ("cjp" . "src conf-javaprop")
+                                             ("el"  . "src emacs-lisp")
+                                             ("py"  . "src python")
+                                             ("dot" . "src dot :file")
+                                             ("txt" . "src text :tangle")))
+             (org-tempo-keywords-alist '(;; Title/subtitle/author
+                                         ("t"  . "title")
+                                         ("st" . "subtitle")
+                                         ("au" . "author")
   
-                                   ;; Language
-                                   ("la" . "language")
+                                         ;; Language
+                                         ("la" . "language")
   
-                                   ;; Name/caption
-                                   ("n"  . "name")
-                                   ("ca" . "caption")
+                                         ;; Name/caption
+                                         ("n"  . "name")
+                                         ("ca" . "caption")
   
-                                   ;; Property/options/startup
-                                   ("p"  . "property")
-                                   ("o"  . "options")
-                                   ("su" . "startup")
+                                         ;; Property/options/startup
+                                         ("p"  . "property")
+                                         ("o"  . "options")
+                                         ("su" . "startup")
   
-                                   ;; Other
-                                   ("L" . "latex")
-                                   ("H" . "html")
-                                   ("A" . "ascii")
-                                   ("i" . "index")))
+                                         ;; Other
+                                         ("L" . "latex")
+                                         ("H" . "html")
+                                         ("A" . "ascii")
+                                         ("i" . "index")))))
   (defun farl-org/disable-angle-bracket-syntax ()
     "Disable angle bracket syntax."
     (modify-syntax-entry ?< ".")
@@ -589,17 +591,13 @@ This function has been altered to accomodate `exwm-mode'."
            (org-highlight-latex-and-related '(latex))
            (org-ellipsis (if window-system "⤵" "..."))
            (org-hide-emphasis-markers window-system)
-           (org-confirm-babel-evaluate #'farl-org/confirm-babel-evaluate)
-           )
+           (org-confirm-babel-evaluate #'farl-org/confirm-babel-evaluate))
   :hook (
          (org-mode . farl-org/disable-angle-bracket-syntax)
-         (org-babel-after-execute . org-redisplay-inline-images)
-         )
+         (org-babel-after-execute . org-redisplay-inline-images))
   :bind (
          ("C-c M-a" . org-agenda)
-         ("C-c s-a" . open-agenda-file)
-         )
-  )
+         ("C-c s-a" . open-agenda-file)))
 
 (use-package vterm
   :ensure t
@@ -712,23 +710,23 @@ This function has been altered to accomodate `exwm-mode'."
          ("C-c a b" . emms-smart-browse)
   
          ;; Track navigation
-         ("C-c a n n" . emms-next)
-         ("C-c a n p" . emms-previous)
+         ("C-c a C-n" . emms-next)
+         ("C-c a C-p" . emms-previous)
          ("C-c a p" . emms-pause)
-         ("C-c a s" . emms-stop)
+         ("C-c a C-s" . emms-stop)
   
          ;; Repeat/shuffle
-         ("C-c a t C-r" . emms-toggle-repeat-track)
-         ("C-c a t r" . emms-toggle-repeat-playlist)
-         ("C-c a t s" . farl-emms/shuffle-with-message)
+         ("C-c a C-r" . emms-toggle-repeat-track)
+         ("C-c a r" . emms-toggle-repeat-playlist)
+         ("C-c a s" . farl-emms/shuffle-with-message)
   
          ;; Refreshing the emms cache
          ("C-c a c" . emms-player-mpd-update-all-reset-cache)
   
          ;; mpd related functions
-         ("C-c a d s" . mpd/start-music-daemon)
-         ("C-c a d q" . mpd/kill-music-daemon)
-         ("C-c a d u" . mpd/update-database)))
+         ("C-c a d" . mpd/start-music-daemon)
+         ("C-c a q" . mpd/kill-music-daemon)
+         ("C-c a u" . mpd/update-database)))
 
 (use-package exwm
   :if (getenv "_RUN_EXWM")

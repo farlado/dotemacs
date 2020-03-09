@@ -1760,15 +1760,11 @@ packages and keybindings which help me bring ideas to life day after day.
        :init
        <<org-init>>
        :custom (
-                <<org-vars>>
-                )
+                <<org-vars>>)
        :hook (
-              <<org-hooks>>
-              )
+              <<org-hooks>>)
        :bind (
-              <<org-binds>>
-              )
-       )
+              <<org-binds>>))
    #+end_src
 
 *** Table of Contents
@@ -1869,55 +1865,57 @@ packages and keybindings which help me bring ideas to life day after day.
     because it separates the blocks from the one-liners.
 
     #+begin_src emacs-lisp
-      (pdumper-require 'org-tempo)
-      (add-to-list 'org-modules 'org-tempo)
-      (setq org-structure-template-alist '(;; General blocks
-                                           ("c" . "center")
-                                           ("C" . "comment")
-                                           ("e" . "example")
-                                           ("q" . "quote")
-                                           ("v" . "verse")
+      (use-package org-tempo
+        :defer t
+        :init
+        (add-to-list 'org-modules 'org-tempo)
+        :custom ((org-structure-template-alist '(;; General blocks
+                                                 ("c" . "center")
+                                                 ("C" . "comment")
+                                                 ("e" . "example")
+                                                 ("q" . "quote")
+                                                 ("v" . "verse")
 
-                                           ;; Export blocks
-                                           ("a"   . "export ascii")
-                                           ("h"   . "export html")
-                                           ("css" . "export css")
-                                           ("l"   . "export latex")
+                                                 ;; Export blocks
+                                                 ("a"   . "export ascii")
+                                                 ("h"   . "export html")
+                                                 ("css" . "export css")
+                                                 ("l"   . "export latex")
 
-                                           ;; Code blocks
-                                           ("s"   . "src")
-                                           ("sh"  . "src sh")
-                                           ("cf"  . "src conf")
-                                           ("cu"  . "src conf-unix")
-                                           ("cs"  . "src conf-space")
-                                           ("cx"  . "src conf-xdefaults")
-                                           ("cjp" . "src conf-javaprop")
-                                           ("el"  . "src emacs-lisp")
-                                           ("py"  . "src python")
-                                           ("dot" . "src dot :file")
-                                           ("txt" . "src text :tangle"))
-            org-tempo-keywords-alist '(;; Title/subtitle/author
-                                       ("t"  . "title")
-                                       ("st" . "subtitle")
-                                       ("au" . "author")
+                                                 ;; Code blocks
+                                                 ("s"   . "src")
+                                                 ("sh"  . "src sh")
+                                                 ("cf"  . "src conf")
+                                                 ("cu"  . "src conf-unix")
+                                                 ("cs"  . "src conf-space")
+                                                 ("cx"  . "src conf-xdefaults")
+                                                 ("cjp" . "src conf-javaprop")
+                                                 ("el"  . "src emacs-lisp")
+                                                 ("py"  . "src python")
+                                                 ("dot" . "src dot :file")
+                                                 ("txt" . "src text :tangle")))
+                 (org-tempo-keywords-alist '(;; Title/subtitle/author
+                                             ("t"  . "title")
+                                             ("st" . "subtitle")
+                                             ("au" . "author")
 
-                                       ;; Language
-                                       ("la" . "language")
+                                             ;; Language
+                                             ("la" . "language")
 
-                                       ;; Name/caption
-                                       ("n"  . "name")
-                                       ("ca" . "caption")
+                                             ;; Name/caption
+                                             ("n"  . "name")
+                                             ("ca" . "caption")
 
-                                       ;; Property/options/startup
-                                       ("p"  . "property")
-                                       ("o"  . "options")
-                                       ("su" . "startup")
+                                             ;; Property/options/startup
+                                             ("p"  . "property")
+                                             ("o"  . "options")
+                                             ("su" . "startup")
 
-                                       ;; Other
-                                       ("L" . "latex")
-                                       ("H" . "html")
-                                       ("A" . "ascii")
-                                       ("i" . "index")))
+                                             ;; Other
+                                             ("L" . "latex")
+                                             ("H" . "html")
+                                             ("A" . "ascii")
+                                             ("i" . "index")))))
     #+end_src
 
 *** Don't give angle brackets syntax
@@ -2209,23 +2207,23 @@ packages and keybindings which help me bring ideas to life day after day.
             ("C-c a b" . emms-smart-browse)
 
             ;; Track navigation
-            ("C-c a n n" . emms-next)
-            ("C-c a n p" . emms-previous)
+            ("C-c a C-n" . emms-next)
+            ("C-c a C-p" . emms-previous)
             ("C-c a p" . emms-pause)
-            ("C-c a s" . emms-stop)
+            ("C-c a C-s" . emms-stop)
 
             ;; Repeat/shuffle
-            ("C-c a t C-r" . emms-toggle-repeat-track)
-            ("C-c a t r" . emms-toggle-repeat-playlist)
-            ("C-c a t s" . farl-emms/shuffle-with-message)
+            ("C-c a C-r" . emms-toggle-repeat-track)
+            ("C-c a r" . emms-toggle-repeat-playlist)
+            ("C-c a s" . farl-emms/shuffle-with-message)
 
             ;; Refreshing the emms cache
             ("C-c a c" . emms-player-mpd-update-all-reset-cache)
 
             ;; mpd related functions
-            ("C-c a d s" . mpd/start-music-daemon)
-            ("C-c a d q" . mpd/kill-music-daemon)
-            ("C-c a d u" . mpd/update-database))
+            ("C-c a d" . mpd/start-music-daemon)
+            ("C-c a q" . mpd/kill-music-daemon)
+            ("C-c a u" . mpd/update-database))
    #+end_src
 
 ** Configuring
