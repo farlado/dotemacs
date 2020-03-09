@@ -1,21 +1,3 @@
-;;; init.el --- Initializing Farlado's Illiterate GNU Emacs
-
-;; This file is not part of GNU Emacs.
-
-
-
-;;; Commentary:
-
-;; This file has been automatically generated from `literate-emacs.org'.
-;; If you don't have a copy of that file, it is best not to use this file!
-;; All relevant commentary is in `literate-emacs.org', not here.
-;; There may not be any comments past this point.
-;; Abandon all hope, ye who enter here.
-
-
-
-;;; Code:
-
 (unless (package-installed-p 'async)
   (package-refresh-contents)
   (package-install 'async))
@@ -1260,5 +1242,3 @@ This function has been altered to accomodate `exwm-mode'."
          ("C-c C-t C-f" . nil)
          ("C-c C-t C-v" . nil)
          ("C-c C-t C-m" . nil)))
-
-;;; init.el ends here

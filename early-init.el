@@ -1,21 +1,3 @@
-;;; early-init.el --- Early Initialization of Farlado's Illiterate GNU Emacs
-
-;; This file is not part of GNU Emacs.
-
-
-
-;;; Commentary:
-
-;; This file has been automatically generated from `literate-emacs.org'.
-;; If you don't have a copy of that file, it is best not to use this file!
-;; All relevant commentary is in `literate-emacs.org', not here.
-;; There may not be any comments past this point.
-;; Abandon all hope, ye who enter here.
-
-
-
-;;; Code:
-
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
@@ -153,5 +135,3 @@ FILENAME and NOERROR are also passed to `require'."
 
 (setq package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
-
-;;; early-init.el ends here

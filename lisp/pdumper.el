@@ -1,21 +1,3 @@
-;;; pdumper.el --- Making a portable dump image
-
-;; This file is not part of GNU Emacs.
-
-
-
-;;; Commentary:
-
-;; This file has been automatically generated from `literate-emacs.org'.
-;; If you don't have a copy of that file, it is best not to use this file!
-;; All relevant commentary is in `literate-emacs.org', not here.
-;; There may not be any comments past this point.
-;; Abandon all hope, ye who enter here.
-
-
-
-;;; Code:
-
 (require 'package)
 (package-initialize)
 
@@ -104,5 +86,3 @@
 (load-theme 'dracula t t)
 
 (dump-emacs-portable (locate-user-emacs-file "emacs.pdmp"))
-
-;;; pdumper.el ends here

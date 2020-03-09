@@ -21,7 +21,6 @@ packages and keybindings which help me bring ideas to life day after day.
   - [[#installation][Installation]]
   - [[#dependencies][Dependencies]]
   - [[#license][License]]
-- [[#giving-files-their-headers][Giving files their headers]]
 - [[#making-emacs-start-quickly][Making Emacs start quickly]]
   - [[#starting-emacs-fast][Starting Emacs FAST]]
   - [[#do-these-things-asap][Do these things ASAP]]
@@ -64,7 +63,6 @@ packages and keybindings which help me bring ideas to life day after day.
   - [[#keybindings-1][Keybindings]]
   - [[#on-startup][On startup]]
   - [[#on-logout][On logout]]
-- [[#giving-files-their-footers][Giving files their footers]]
 #+END_QUOTE
 
 * About this configuration
@@ -161,79 +159,6 @@ packages and keybindings which help me bring ideas to life day after day.
    Because I +am a lazy piece of shit who doesn't like long licenses+ don't think
    much harm could come from using a pushover license for a configuration, I am
    publishing this literate Emacs configuration under the WTFPL.
-
-* Giving files their headers
-
-  In order to make the files look at least somewhat decent for documentation
-  linters, and to warn those who are unfortunate enough to think they'll just
-  mosey on into one of them if they want to understand the config, we create
-  headers that tell people the reality of the files.
-
-*** =pdumper.el=
-
-    #+begin_src emacs-lisp :tangle (locate-user-emacs-file "lisp/pdumper.el")
-      ;;; pdumper.el --- Making a portable dump image
-
-      ;; This file is not part of GNU Emacs.
-
-      
-
-      ;;; Commentary:
-
-      ;; This file has been automatically generated from `literate-emacs.org'.
-      ;; If you don't have a copy of that file, it is best not to use this file!
-      ;; All relevant commentary is in `literate-emacs.org', not here.
-      ;; There may not be any comments past this point.
-      ;; Abandon all hope, ye who enter here.
-
-      
-
-      ;;; Code:
-    #+end_src
-
-*** =early-init.el=
-
-    #+begin_src emacs-lisp :tangle (locate-user-emacs-file "early-init.el")
-      ;;; early-init.el --- Early Initialization of Farlado's Illiterate GNU Emacs
-
-      ;; This file is not part of GNU Emacs.
-
-      
-
-      ;;; Commentary:
-
-      ;; This file has been automatically generated from `literate-emacs.org'.
-      ;; If you don't have a copy of that file, it is best not to use this file!
-      ;; All relevant commentary is in `literate-emacs.org', not here.
-      ;; There may not be any comments past this point.
-      ;; Abandon all hope, ye who enter here.
-
-      
-
-      ;;; Code:
-    #+end_src
-
-*** =init.el=
-
-    #+begin_src emacs-lisp :tangle (locate-user-emacs-file "init.el")
-      ;;; init.el --- Initializing Farlado's Illiterate GNU Emacs
-
-      ;; This file is not part of GNU Emacs.
-
-      
-
-      ;;; Commentary:
-
-      ;; This file has been automatically generated from `literate-emacs.org'.
-      ;; If you don't have a copy of that file, it is best not to use this file!
-      ;; All relevant commentary is in `literate-emacs.org', not here.
-      ;; There may not be any comments past this point.
-      ;; Abandon all hope, ye who enter here.
-
-      
-
-      ;;; Code:
-    #+end_src
 
 * Making Emacs start quickly
 
@@ -3302,27 +3227,5 @@ packages and keybindings which help me bring ideas to life day after day.
 
     #+begin_src emacs-lisp
       (shell-command "hsetroot -solid '#000000'")
-    #+end_src
-
-* Giving files their footers
-
-  Since we gave files their headers, I see no reason not to give them footers.
-
-*** =early-init.el=
-
-    #+begin_src emacs-lisp :tangle (locate-user-emacs-file "early-init.el")
-      ;;; early-init.el ends here
-    #+end_src
-
-*** =init.el=
-
-    #+begin_src emacs-lisp :tangle (locate-user-emacs-file "init.el")
-      ;;; init.el ends here
-    #+end_src
-
-*** =pdumper.el=
-
-    #+begin_src emacs-lisp :tangle (locate-user-emacs-file "lisp/pdumper.el")
-      ;;; pdumper.el ends here
     #+end_src
 
