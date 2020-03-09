@@ -1,7 +1,9 @@
 ;;; init.el --- Initializing Farlado's Illiterate GNU Emacs
 
 ;; This file is not part of GNU Emacs.
+
 
+
 ;;; Commentary:
 
 ;; This file has been automatically generated from `literate-emacs.org'.
@@ -9,7 +11,9 @@
 ;; All relevant commentary is in `literate-emacs.org', not here.
 ;; There may not be any comments past this point.
 ;; Abandon all hope, ye who enter here.
+
 
+
 ;;; Code:
 
 (unless (package-installed-p 'async)
@@ -43,13 +47,13 @@
 (setq use-dialog-box nil
       use-file-dialog nil)
 
+(prefer-coding-system 'utf-8)
+(setq locale-coding-system 'utf-8)
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)
-(setq locale-coding-system 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (set-selection-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
 
 (when (member "Iosevka" (font-family-list))
   (set-face-attribute 'default nil
