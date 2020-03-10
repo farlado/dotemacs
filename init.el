@@ -728,7 +728,6 @@ This function has been altered to accomodate `exwm-mode'."
   (defun farl-exwm/name-buffer-after-window-title ()
     "Rename the current `exwm-mode' buffer after the X window's title."
     (exwm-workspace-rename-buffer exwm-title))
-  (add-to-list 'ibuffer-filter-groups '("EXWM" (mode . exwm-mode)))
   (setq exwm-floating-border-width window-divider-default-right-width
         exwm-floating-border-color (face-background 'mode-line))
   (use-package dmenu

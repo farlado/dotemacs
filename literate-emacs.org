@@ -2236,14 +2236,6 @@ packages and keybindings which help me bring ideas to life day after day.
       (exwm-update-title . farl-exwm/name-buffer-after-window-title)
     #+end_src
 
-*** Sort EXWM buffers in their own group
-
-    This is just something I was wanting to try doing for a while.
-
-    #+begin_src emacs-lisp
-      (add-to-list 'ibuffer-filter-groups '("EXWM" (mode . exwm-mode)))
-    #+end_src
-
 *** Configure floating window borders
 
     Uses the same color as my mode line, uses the same width as window dividers. For
