@@ -764,9 +764,10 @@ packages and keybindings which help me bring ideas to life day after day.
     #+begin_src emacs-lisp :noweb-ref theme-init
       (setq window-divider-default-right-width 3)
       (let ((color (face-background 'mode-line)))
-        (set-face-foreground 'window-divider-first-pixel color)
-        (set-face-foreground 'window-divider-last-pixel color)
-        (set-face-foreground 'window-divider color))
+        (dolist (face '(window-divider-first-pixel
+                        window-divider-last-pixel
+                        window-divider))
+          (set-face-foreground face color)))
       (window-divider-mode 1)
     #+end_src
 
@@ -2233,6 +2234,14 @@ packages and keybindings which help me bring ideas to life day after day.
 
     #+begin_src emacs-lisp :noweb-ref exwm-hooks
       (exwm-update-title . farl-exwm/name-buffer-after-window-title)
+    #+end_src
+
+*** Sort EXWM buffers in their own group
+
+    This is just something I was wanting to try doing for a while.
+
+    #+begin_src emacs-lisp
+      (add-to-list 'ibuffer-filter-groups '("EXWM" (mode . exwm-mode)))
     #+end_src
 
 *** Configure floating window borders

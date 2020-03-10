@@ -66,9 +66,10 @@
                       :box nil)
   (setq window-divider-default-right-width 3)
   (let ((color (face-background 'mode-line)))
-    (set-face-foreground 'window-divider-first-pixel color)
-    (set-face-foreground 'window-divider-last-pixel color)
-    (set-face-foreground 'window-divider color))
+    (dolist (face '(window-divider-first-pixel
+                    window-divider-last-pixel
+                    window-divider))
+      (set-face-foreground face color)))
   (window-divider-mode 1)
   (dolist (frame (frame-list))
     (set-frame-parameter frame 'alpha 90))
@@ -727,6 +728,7 @@ This function has been altered to accomodate `exwm-mode'."
   (defun farl-exwm/name-buffer-after-window-title ()
     "Rename the current `exwm-mode' buffer after the X window's title."
     (exwm-workspace-rename-buffer exwm-title))
+  (add-to-list 'ibuffer-filter-groups '("EXWM" (mode . exwm-mode)))
   (setq exwm-floating-border-width window-divider-default-right-width
         exwm-floating-border-color (face-background 'mode-line))
   (use-package dmenu
