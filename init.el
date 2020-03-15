@@ -87,28 +87,34 @@
   (display-time-mode 1)
   (display-battery-mode 1)
   (use-package diminish
-    :after (subword
-            desktop-environment)
     :ensure t
-    :diminish (ivy-mode
-               eldoc-mode
-               subword-mode
-               company-mode
-               rainbow-mode
-               counsel-mode
-               flycheck-mode
-               flyspell-mode
-               which-key-mode
-               auto-revert-mode
-               visual-line-mode
-               haskell-doc-mode
-               flyspell-prog-mode
-               hungry-delete-mode
-               page-break-lines-mode
-               desktop-environment-mode
-               haskell-indentation-mode
-               interactive-haskell-mode
-               compilation-shell-minor-mode))
+    :defer t
+    :init
+    (defun farl-init/diminish ()
+      "Call `diminish' for various modes."
+      (dolist (mode '(ivy-mode
+                      eldoc-mode
+                      subword-mode
+                      company-mode
+                      rainbow-mode
+                      counsel-mode
+                      flycheck-mode
+                      flyspell-mode
+                      which-key-mode
+                      auto-revert-mode
+                      visual-line-mode
+                      haskell-doc-mode
+                      flyspell-prog-mode
+                      hungry-delete-mode
+                      page-break-lines-mode
+                      desktop-environment-mode
+                      haskell-indentation-mode
+                      interactive-haskell-mode
+                      compilation-shell-minor-mode
+                      highlight-indent-guides-mode))
+        (diminish mode)))
+    :hook ((after-init . farl-init/diminish)
+           (exwm-init . farl-init/diminish)))
   :custom ((powerline-default-separator 'wave)
            (spaceline-line-column-p t)
            (spaceline-buffer-size-p nil)

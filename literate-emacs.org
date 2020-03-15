@@ -5,6 +5,7 @@
 #+startup: hideblocks
 #+options: num:nil toc:2
 #+property: header-args :results none
+#+export_exclude_tags: noexport
 
 #+begin_quote
 Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
@@ -849,28 +850,34 @@ packages and keybindings which help me bring ideas to life day after day.
 
     #+begin_src emacs-lisp :noweb-ref mode-line-init
       (use-package diminish
-        :after (subword
-                desktop-environment)
         :ensure t
-        :diminish (ivy-mode
-                   eldoc-mode
-                   subword-mode
-                   company-mode
-                   rainbow-mode
-                   counsel-mode
-                   flycheck-mode
-                   flyspell-mode
-                   which-key-mode
-                   auto-revert-mode
-                   visual-line-mode
-                   haskell-doc-mode
-                   flyspell-prog-mode
-                   hungry-delete-mode
-                   page-break-lines-mode
-                   desktop-environment-mode
-                   haskell-indentation-mode
-                   interactive-haskell-mode
-                   compilation-shell-minor-mode))
+        :defer t
+        :init
+        (defun farl-init/diminish ()
+          "Call `diminish' for various modes."
+          (dolist (mode '(ivy-mode
+                          eldoc-mode
+                          subword-mode
+                          company-mode
+                          rainbow-mode
+                          counsel-mode
+                          flycheck-mode
+                          flyspell-mode
+                          which-key-mode
+                          auto-revert-mode
+                          visual-line-mode
+                          haskell-doc-mode
+                          flyspell-prog-mode
+                          hungry-delete-mode
+                          page-break-lines-mode
+                          desktop-environment-mode
+                          haskell-indentation-mode
+                          interactive-haskell-mode
+                          compilation-shell-minor-mode
+                          highlight-indent-guides-mode))
+            (diminish mode)))
+        :hook ((after-init . farl-init/diminish)
+               (exwm-init . farl-init/diminish)))
     #+end_src
 
 ** In buffers
