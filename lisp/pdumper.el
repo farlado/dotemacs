@@ -67,6 +67,10 @@
                    chess
                    2048-game
 
+                   ;; Media
+                   emms
+                   emms-setup
+
                    ;; Desktop Environment
                    exwm
                    exwm-randr
@@ -76,11 +80,7 @@
                    minibuffer-line
                    system-packages
                    desktop-environment
-                   xkb
-
-                   ;; Media
-                   emms
-                   emms-setup))
+                   xkb))
     (require package))
 
 (load-theme 'leuven t t)

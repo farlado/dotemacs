@@ -87,7 +87,8 @@
   (display-time-mode 1)
   (display-battery-mode 1)
   (use-package diminish
-    :after subword
+    :after (subword
+            desktop-environment)
     :ensure t
     :diminish (ivy-mode
                eldoc-mode
@@ -111,6 +112,7 @@
   :custom ((powerline-default-separator 'wave)
            (spaceline-line-column-p t)
            (spaceline-buffer-size-p nil)
+           (spaceline-minor-modes-separator " ")
            (spaceline-buffer-encoding-abbrev-p nil)
            (display-time-24hr-format t)))
 

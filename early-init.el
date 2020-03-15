@@ -118,15 +118,15 @@ FILENAME and NOERROR are also passed to `require'."
                                   chess
                                   2048-game
 
+                                  ;; Other
+                                  emms
+
                                   ;; Desktop Environment
                                   exwm
                                   dmenu
                                   minibuffer-line
                                   system-packages
-                                  desktop-environment
-
-                                  ;; Other
-                                  emms))
+                                  desktop-environment))
 
 (pdumper-require 'package)
 (defun package--save-selected-packages (&rest opt)

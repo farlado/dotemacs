@@ -97,7 +97,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
    Tangling blocks from a =literate-emacs.org= into byte-compiled =early-init.el=
    and =init.el= alongside the use of portable dumping (plus multiple other
-   efficiency improvements, of course) cuts this time down to around 1.5
+   efficiency improvements, of course) cuts this time down to around 1.5 to 1.7
    seconds to load into my desktop environment. This also comes with the
    advantage of being a hub for /all/ things related to my Emacs configuration,
    where previously I had to check multiple files when I thought I might have
@@ -177,8 +177,8 @@ packages and keybindings which help me bring ideas to life day after day.
    Emacs 27 to make Emacs load faster. Every single ~require~ that doesn't create
    a =LispObject= incompatible with the portable dumper can now be skipped while
    loading. Before I started using the portable dumper, I saw start times of
-   around 2.5 seconds. Now I am down to 1.5 seconds, having cut about half of
-   the start time out.
+   around 2.5 seconds. Now I am down to between 1.5 and 1.7 seconds, having cut
+   about half of the start time out.
 
    This script must be run while Emacs is *not* open, otherwise it will *crash*
    Emacs and (if you're using ~vterm~ or another virtual terminal inside of Emacs
@@ -280,6 +280,10 @@ packages and keybindings which help me bring ideas to life day after day.
                          chess
                          2048-game
 
+                         ;; Media
+                         emms
+                         emms-setup
+
                          ;; Desktop Environment
                          exwm
                          exwm-randr
@@ -289,11 +293,7 @@ packages and keybindings which help me bring ideas to life day after day.
                          minibuffer-line
                          system-packages
                          desktop-environment
-                         xkb
-
-                         ;; Media
-                         emms
-                         emms-setup))
+                         xkb))
           (require package))
     #+end_src
 
@@ -525,15 +525,15 @@ packages and keybindings which help me bring ideas to life day after day.
                                         chess
                                         2048-game
 
+                                        ;; Other
+                                        emms
+
                                         ;; Desktop Environment
                                         exwm
                                         dmenu
                                         minibuffer-line
                                         system-packages
-                                        desktop-environment
-
-                                        ;; Other
-                                        emms))
+                                        desktop-environment))
     #+end_src
 
 *** Disable an annoying ~customize~ function
@@ -808,6 +808,7 @@ packages and keybindings which help me bring ideas to life day after day.
        :custom ((powerline-default-separator 'wave)
                 (spaceline-line-column-p t)
                 (spaceline-buffer-size-p nil)
+                (spaceline-minor-modes-separator " ")
                 (spaceline-buffer-encoding-abbrev-p nil)
                 <<mode-line-vars>>))
    #+end_src
@@ -848,7 +849,8 @@ packages and keybindings which help me bring ideas to life day after day.
 
     #+begin_src emacs-lisp :noweb-ref mode-line-init
       (use-package diminish
-        :after subword
+        :after (subword
+                desktop-environment)
         :ensure t
         :diminish (ivy-mode
                    eldoc-mode
