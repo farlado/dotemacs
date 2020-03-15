@@ -2,9 +2,6 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
-(when (getenv "_RUN_EXWM")
-  (set-face-background 'default "#282a36"))
-
 (defvar pdumper-dumped nil
   "Non-nil if a custom dump image was loaded.")
 
@@ -64,7 +61,7 @@ FILENAME and NOERROR are also passed to `require'."
 (garbage-collect-defer)
 (add-hook 'emacs-startup-hook #'garbage-collect-restore)
 
-(setq custom-file "/dev/null"
+(setq custom-file "/tmp/custom.el"
       package-selected-packages '(;; Core
                                   async
                                   use-package
@@ -72,8 +69,9 @@ FILENAME and NOERROR are also passed to `require'."
 
                                   ;; Looks
                                   dashboard
-                                  dracula-theme
-                                  mood-line
+                                  leuven-theme
+                                  spaceline
+                                  diminish
                                   page-break-lines
                                   rainbow-mode
                                   rainbow-delimiters
@@ -130,8 +128,12 @@ FILENAME and NOERROR are also passed to `require'."
                                   ;; Other
                                   emms))
 
-(require 'package)
-(defun package--save-selected-packages (&rest opt) nil)
+(pdumper-require 'package)
+(defun package--save-selected-packages (&rest opt)
+  "Return nil.
+
+This function was altered to inhibit a specific undesired behavior."
+  nil)
 
 (setq package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))

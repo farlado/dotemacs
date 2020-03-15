@@ -29,41 +29,33 @@
 (setq use-dialog-box nil
       use-file-dialog nil)
 
-(prefer-coding-system 'utf-8)
-(setq locale-coding-system 'utf-8)
-(set-language-environment "UTF-8")
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
-
-(when (member "Iosevka" (font-family-list))
-  (set-face-attribute 'default nil
-                      :font "Iosevka"
-                      :height 100))
-
-(when (member "Noto Color Emoji" (font-family-list))
-  (set-fontset-font t 'symbol
-                    (font-spec :family "Noto Color Emoji")
-                    nil 'prepend))
-
-(setq inhibit-compacting-font-caches t)
-
-(use-package dracula-theme
+(use-package leuven-theme
   :if window-system
   :ensure t
   :defer t
   :init
   (if pdumper-dumped
-      (enable-theme 'dracula)
-    (load-theme 'dracula t))
+      (enable-theme 'leuven)
+    (load-theme 'leuven t))
+  (prefer-coding-system 'utf-8)
+  (setq locale-coding-system 'utf-8)
+  (set-language-environment "UTF-8")
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (when (member "Iosevka" (font-family-list))
+    (set-face-attribute 'default nil
+                        :font "Iosevka"
+                        :height 100))
+  (when (member "Noto Color Emoji" (font-family-list))
+    (set-fontset-font t 'symbol
+                      (font-spec :family "Noto Color Emoji")
+                      nil 'prepend))
+  (setq inhibit-compacting-font-caches t)
   (set-face-background 'fringe (face-background 'default))
   (fringe-mode 10)
   (set-face-background 'line-number (face-background 'default))
-  (set-face-attribute 'mode-line nil
-                      :box nil)
-  (set-face-attribute 'mode-line-inactive nil
-                      :box nil)
   (setq window-divider-default-right-width 3)
   (let ((color (face-background 'mode-line)))
     (dolist (face '(window-divider-first-pixel
@@ -71,9 +63,6 @@
                     window-divider))
       (set-face-foreground face color)))
   (window-divider-mode 1)
-  (dolist (frame (frame-list))
-    (set-frame-parameter frame 'alpha 90))
-  (add-to-list 'default-frame-alist '(alpha . 90))
   (pdumper-require 'org)
   (set-face-attribute 'org-level-1 nil
                       :height 1.3)
@@ -85,16 +74,45 @@
                       :weight 'extra-bold
                       :height 1.8))
 
-(use-package mood-line
+(use-package spaceline
   :ensure t
   :defer t
   :init
-  (mood-line-mode 1)
+  (pdumper-require 'spaceline-config)
+  (if window-system
+      (spaceline-emacs-theme)
+    (spaceline-spacemacs-theme))
   (line-number-mode 1)
   (column-number-mode 1)
   (display-time-mode 1)
   (display-battery-mode 1)
-  :custom (display-time-24hr-format t))
+  (use-package diminish
+    :after subword
+    :ensure t
+    :diminish (ivy-mode
+               eldoc-mode
+               subword-mode
+               company-mode
+               rainbow-mode
+               counsel-mode
+               flycheck-mode
+               flyspell-mode
+               which-key-mode
+               auto-revert-mode
+               visual-line-mode
+               haskell-doc-mode
+               flyspell-prog-mode
+               hungry-delete-mode
+               page-break-lines-mode
+               desktop-environment-mode
+               haskell-indentation-mode
+               interactive-haskell-mode
+               compilation-shell-minor-mode))
+  :custom ((powerline-default-separator 'wave)
+           (spaceline-line-column-p t)
+           (spaceline-buffer-size-p nil)
+           (spaceline-buffer-encoding-abbrev-p nil)
+           (display-time-24hr-format t)))
 
 (global-visual-line-mode 1)
 
@@ -142,7 +160,7 @@
   (dashboard-setup-startup-hook)
   :custom ((inhibit-start-screen t)
            (dashboard-set-footer nil)
-           (dashboard-startup-banner 'logo)
+           (dashboard-startup-banner 'official)
            (dashboard-items '((recents . 10)))
            (initial-buffer-choice #'dashboard-or-scratch)
            (dashboard-banner-logo-title
@@ -734,8 +752,16 @@ This function has been altered to accomodate `exwm-mode'."
     :ensure t
     :defer t
     :custom (dmenu-prompt-string "s-x "))
-  (defcustom farl-exwm/workspace-names '("" "" "" "" ""
-                                         "" "" "" "" "")
+  (defcustom farl-exwm/workspace-names '("1"
+                                         "2"
+                                         "3"
+                                         "4"
+                                         "5"
+                                         "6"
+                                         "office"
+                                         "discord"
+                                         "telegram"
+                                         "games")
     "The names assigned to workspaces through `exwm-workspace-index-map'."
     :tag "Workspace names"
     :group 'exwm
@@ -990,11 +1016,6 @@ This function has been altered to accomodate `exwm-mode'."
            ("<S-print>" . farl-de/desktop-environment-screenshot-clip)
            ("<C-print>" . farl-de/desktop-environment-screenshot-part)
            ("<C-S-print>" . farl-de/desktop-environment-screenshot)))
-  (use-package wallpaper
-    :load-path "lisp/wallpaper"
-    :defer t
-    :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
-           (exwm-init . wallpaper-cycle-mode)))
   (defun monitor-settings ()
     "Open arandr to configure monitors."
     (interactive)

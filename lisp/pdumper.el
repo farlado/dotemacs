@@ -2,7 +2,6 @@
 (package-initialize)
 
 (add-to-list 'load-path (locate-user-emacs-file "lisp/xkb"))
-(add-to-list 'load-path (locate-user-emacs-file "lisp/wallpaper"))
 
 (setq pdumper-load-path load-path
       pdumper-dumped t)
@@ -14,8 +13,10 @@
                    server
 
                    ;; Looks
-                   dracula-theme
-                   mood-line
+                   leuven-theme
+                   spaceline
+                   spaceline-config
+                   diminish
                    page-break-lines
                    display-line-numbers
                    rainbow-mode
@@ -75,7 +76,6 @@
                    minibuffer-line
                    system-packages
                    desktop-environment
-                   wallpaper
                    xkb
 
                    ;; Media
@@ -83,6 +83,6 @@
                    emms-setup))
     (require package))
 
-(load-theme 'dracula t t)
+(load-theme 'leuven t t)
 
 (dump-emacs-portable (locate-user-emacs-file "emacs.pdmp"))

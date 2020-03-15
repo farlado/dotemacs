@@ -71,20 +71,20 @@ packages and keybindings which help me bring ideas to life day after day.
   configuration.
 
   Literate programming is a method in which programming is worked on in parallel
-  with the development of documentation specifically pertaining to how the
-  program was written, alongside how to use the program at times. The end
-  product is a file that can be /tangled/ into source code and /weaved/ into
-  documentation. The benefits of this practice are far easier maintenance of a
-  rapidly growing project, and far greater control in the flow of when code is
-  introduced in documentation and where it is included in resultant source code.
+  with the development of documentation specifically pertaining to how said
+  program was written, alongside how to use the program at times. The end result
+  is a file that can be /tangled/ into source code and /weaved/ into documentation.
+  The benefits of this practice are far easier maintenance of a rapidly growing
+  project, and far greater control in the flow of when code is introduced in
+  documentation and where it is included in resultant source code.
 
   This configuration is /incredibly/ opinionated, and it is very likely that most 
-  changes will not be friendly towards the typical Emacs user. Hopefully with
-  recent changes this file will contain enough commentary for you to understand
-  everything within it. Regardless, the idea is that this file, when tangled,
-  generates my entire configuration. I would /highly/ recommend you *NOT* try to
-  read the =.el= files on their own. It's a jungle, especially since all of the
-  commentary regarding the configuration is in this file and this file alone.
+  changes will not be friendly towards the typical Emacs user. Hopefully this
+  file will contain enough commentary for you to understand everything within
+  it. Regardless, the idea is that this file, when tangled, generates my entire
+  configuration. I would /highly/ recommend you *NOT* try to read the =.el= files on
+  their own. It's a jungle, especially since all of the commentary regarding the
+  configuration is in this file and this file alone.
 
 ** Okay, that's pretty neat. Why though?
 
@@ -97,7 +97,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
    Tangling blocks from a =literate-emacs.org= into byte-compiled =early-init.el=
    and =init.el= alongside the use of portable dumping (plus multiple other
-   efficiency improvements, of course) cuts this time down to around 1.1
+   efficiency improvements, of course) cuts this time down to around 1.5
    seconds to load into my desktop environment. This also comes with the
    advantage of being a hub for /all/ things related to my Emacs configuration,
    where previously I had to check multiple files when I thought I might have
@@ -116,7 +116,7 @@ packages and keybindings which help me bring ideas to life day after day.
 ** Dependencies
 
    #+begin_center
-   *THIS CONFIGURATION IS MEANT FOR EMACS 27 AND LATER. IT WILL /NOT/ LOAD
+   *THIS CONFIGURATION IS MEANT FOR EMACS 27 AND LATER. IT WILL LIKELY /NOT/ LOAD
    PROPERLY ON EMACS 26 OR EARLIER. THE BRANCH FOR EMACS 26 OR EARLIER IS [[https://github.com/farlado/dotemacs/tree/emacs26-end][HERE]].*
    #+end_center
 
@@ -177,7 +177,7 @@ packages and keybindings which help me bring ideas to life day after day.
    Emacs 27 to make Emacs load faster. Every single ~require~ that doesn't create
    a =LispObject= incompatible with the portable dumper can now be skipped while
    loading. Before I started using the portable dumper, I saw start times of
-   around 2.5 seconds. Now I am down to 1.1 seconds, having cut about half of
+   around 2.5 seconds. Now I am down to 1.5 seconds, having cut about half of
    the start time out.
 
    This script must be run while Emacs is *not* open, otherwise it will *crash*
@@ -199,14 +199,13 @@ packages and keybindings which help me bring ideas to life day after day.
       (package-initialize)
 
       (add-to-list 'load-path (locate-user-emacs-file "lisp/xkb"))
-      (add-to-list 'load-path (locate-user-emacs-file "lisp/wallpaper"))
     #+end_src
 
 *** Store =load-path=
 
     For some reason, the dump image doesn't store =load-path=, so it needs to be
     stored here, to be restored when =early-init.el= is loaded. A boolean is also
-    set to =t= to indicate a portable dump image was used when Emacs is loaded.
+    set to indicate a portable dump image was used when Emacs is loaded.
 
     #+begin_src emacs-lisp
       (setq pdumper-load-path load-path
@@ -227,8 +226,10 @@ packages and keybindings which help me bring ideas to life day after day.
                          server
 
                          ;; Looks
-                         dracula-theme
-                         mood-line
+                         leuven-theme
+                         spaceline
+                         spaceline-config
+                         diminish
                          page-break-lines
                          display-line-numbers
                          rainbow-mode
@@ -288,7 +289,6 @@ packages and keybindings which help me bring ideas to life day after day.
                          minibuffer-line
                          system-packages
                          desktop-environment
-                         wallpaper
                          xkb
 
                          ;; Media
@@ -304,7 +304,7 @@ packages and keybindings which help me bring ideas to life day after day.
     portable dump image.
 
     #+begin_src emacs-lisp
-      (load-theme 'dracula t t)
+      (load-theme 'leuven t t)
     #+end_src
 
 *** Write the dump image
@@ -330,15 +330,12 @@ packages and keybindings which help me bring ideas to life day after day.
     I want to get GUI elements out of my face as soon as I possibly can. They
     just take up space. If I'm running Emacs as my desktop environment (see
     further below), I want Emacs to immediately take on the background color of
-    the theme I use.
+    the theme I use to make startup marginally more aesthetically pleasing.
 
     #+begin_src emacs-lisp
       (menu-bar-mode -1)
       (tool-bar-mode -1)
       (scroll-bar-mode -1)
-
-      (when (getenv "_RUN_EXWM")
-        (set-face-background 'default "#282a36"))
     #+end_src
 
 *** Handling portable dumping
@@ -455,10 +452,10 @@ packages and keybindings which help me bring ideas to life day after day.
    :header-args: :tangle (locate-user-emacs-file "early-init.el")
    :end:
 
-   Because I am writing this configuration to be as portable as possible (e.g. I
-   should be able to dump this onto any machine and run it), I manage all
-   packages through Emacs. All of this is done leading up to the call of
-   ~package-initialize~ between that =early-init.el= and =init.el=, which makes for
+   Because I am writing this configuration to be as independent/portable as
+   possible (e.g. I should be able to dump this onto any machine and run it), I
+   manage all packages through Emacs. All of this is done leading up to the call
+   of ~package-initialize~ between that =early-init.el= and =init.el=, which makes for
    faster loading.
 
 *** Disable ~customize~, keep ~package-autoremove~ working
@@ -471,7 +468,7 @@ packages and keybindings which help me bring ideas to life day after day.
     order in which they are mentioned in this configuration.
 
     #+begin_src emacs-lisp
-      (setq custom-file "/dev/null"
+      (setq custom-file "/tmp/custom.el"
             package-selected-packages '(;; Core
                                         async
                                         use-package
@@ -479,8 +476,9 @@ packages and keybindings which help me bring ideas to life day after day.
 
                                         ;; Looks
                                         dashboard
-                                        dracula-theme
-                                        mood-line
+                                        leuven-theme
+                                        spaceline
+                                        diminish
                                         page-break-lines
                                         rainbow-mode
                                         rainbow-delimiters
@@ -545,8 +543,12 @@ packages and keybindings which help me bring ideas to life day after day.
     everything related to package management.
 
     #+begin_src emacs-lisp
-      (require 'package)
-      (defun package--save-selected-packages (&rest opt) nil)
+      (pdumper-require 'package)
+      (defun package--save-selected-packages (&rest opt)
+        "Return nil.
+
+      This function was altered to inhibit a specific undesired behavior."
+        nil)
     #+end_src
 
 *** Configure package repositories
@@ -626,7 +628,8 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Start Emacs server
 
     Having the Emacs server running allows for a lot of neat integration with
-    other parts of my desktop environment.
+    other parts of my desktop environment. I don't want to try to start a server
+    if one is already running, though.
 
     #+begin_src emacs-lisp
       (pdumper-require 'server)
@@ -653,7 +656,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Font
    :properties:
-   :header-args: :tangle (locate-user-emacs-file "init.el")
+   :header-args: :noweb-ref theme-init
    :end:
 
 *** Use UTF-8 encoding
@@ -674,7 +677,9 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Setting the font style
 
     Originally I had this set up by means of ~custom-set-faces~, but frankly that
-    is less easily configured than this method.
+    is less easily configured than this method. Every part of ~customize~ simply
+    isn't all that useful when trying to make things easier to edit directly
+    from the configuration files.
 
     #+begin_src emacs-lisp
       (when (member "Iosevka" (font-family-list))
@@ -706,20 +711,20 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Theme
 
-   For a long time, I used Leuven for my theme. Nowadays, I don't. It was a
-   brilliant theme, but just didn't work when I needed a new mode line. For some
-   reason, the theme doesn't work properly in terminals, so I will have to find
-   a new theme sometime soon.
+   Leuven is my theme of choice. Leuven is king. Long live Leuven. This theme is
+   /brilliant/. It took months to find a theme that could hold a candle to Leuven,
+   and even then it failed to stick with me as well as Leuven has. Once you can
+   appreciate a light theme, it becomes increasingly more difficult to drop it.
 
    #+begin_src emacs-lisp :noweb yes :tangle (locate-user-emacs-file "init.el")
-     (use-package dracula-theme
+     (use-package leuven-theme
        :if window-system
        :ensure t
        :defer t
        :init
        (if pdumper-dumped
-           (enable-theme 'dracula)
-         (load-theme 'dracula t))
+           (enable-theme 'leuven)
+         (load-theme 'leuven t))
        <<theme-init>>)
    #+end_src
 
@@ -727,7 +732,8 @@ packages and keybindings which help me bring ideas to life day after day.
 
     Having fringes helps keep things looking good and gives the opportunity to
     have nice indicators on the edges of buffers. I prefer when fringes are the
-    same color as the rest of the window.
+    same color as the rest of the window, a choice which many themes seem not to
+    agree with unfortunately.
 
     #+begin_src emacs-lisp :noweb-ref theme-init
       (set-face-background 'fringe (face-background 'default))
@@ -738,21 +744,12 @@ packages and keybindings which help me bring ideas to life day after day.
 
     For some reason, some themes like to give line numbers a different color
     background from the rest of a window. I hate that. It distracts me and looks
-    extremely tacky quite frankly.
+    extremely tacky. Keeping the line numbers' background color the same color
+    as the background of the rest of the window leaves little in the way of
+    distractions.
 
     #+begin_src emacs-lisp :noweb-ref theme-init
       (set-face-background 'line-number (face-background 'default))
-    #+end_src
-
-*** Flat mode line
-
-    I don't know why, but the mode line just doesn't look as good otherwise.
-
-    #+begin_src emacs-lisp :noweb-ref theme-init
-      (set-face-attribute 'mode-line nil
-                          :box nil)
-      (set-face-attribute 'mode-line-inactive nil
-                          :box nil)
     #+end_src
 
 *** Window dividers
@@ -769,20 +766,6 @@ packages and keybindings which help me bring ideas to life day after day.
                         window-divider))
           (set-face-foreground face color)))
       (window-divider-mode 1)
-    #+end_src
-
-*** Transparent frames
-
-    If there's a gimmick I can't get enough of, it's having a transparent frame.
-    At first, I thought it would look dumb, that it would make things hard to
-    read since Emacs doesn't seem to differentiate between foreground and
-    background when setting alpha values, but now that I have used it for a
-    while, going back to an opaque window seems tacky.
-
-    #+begin_src emacs-lisp :noweb-ref theme-init
-      (dolist (frame (frame-list))
-        (set-frame-parameter frame 'alpha 90))
-      (add-to-list 'default-frame-alist '(alpha . 90))
     #+end_src
 
 *** Better ~org-mode~ headers
@@ -808,18 +791,25 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Mode line
 
-   I hate the default mode line with a burning passion. This mode line, on the
-   other hand, is minimal and gorgeous. When configured properly, it is hands
-   down the best mode line I have ever used.
+   I hate the default mode line with a burning passion. Costing me an additional
+   four tenths of a second at startup, the mode line from Spacemacs is much more
+   comfortable and clean.
 
    #+begin_src emacs-lisp :noweb yes :tangle (locate-user-emacs-file "init.el")
-     (use-package mood-line
+     (use-package spaceline
        :ensure t
        :defer t
        :init
-       (mood-line-mode 1)
-       <<line-and-column-numbers>>
-       <<clock-and-battery>>)
+       (pdumper-require 'spaceline-config)
+       (if window-system
+           (spaceline-emacs-theme)
+         (spaceline-spacemacs-theme))
+       <<mode-line-init>>
+       :custom ((powerline-default-separator 'wave)
+                (spaceline-line-column-p t)
+                (spaceline-buffer-size-p nil)
+                (spaceline-buffer-encoding-abbrev-p nil)
+                <<mode-line-vars>>))
    #+end_src
 
 *** Show line and column numbers on the mode line
@@ -827,7 +817,7 @@ packages and keybindings which help me bring ideas to life day after day.
     Why isn't this enabled by default on a /text editor/? What line and column the
     point is on should always be visible on the mode line.
 
-    #+begin_src emacs-lisp :noweb-ref line-and-column-numbers
+    #+begin_src emacs-lisp :noweb-ref mode-line-init
       (line-number-mode 1)
       (column-number-mode 1)
     #+end_src
@@ -836,12 +826,49 @@ packages and keybindings which help me bring ideas to life day after day.
 
     I used to use ~fancy-battery~ for battery level but it constantly disappeared
     on my teeny tiny screens so I just decided not to bother with it. Plus it's
-    one less package to configure lol. The clock should be set to 24-hour time.
+    one less package to configure lol.
 
-    #+begin_src emacs-lisp :noweb-ref clock-and-battery
+    #+begin_src emacs-lisp :noweb-ref mode-line-init
       (display-time-mode 1)
       (display-battery-mode 1)
-      :custom (display-time-24hr-format t)
+    #+end_src
+
+    The clock should be set to 24-hour time.
+
+    #+begin_src emacs-lisp :noweb-ref mode-line-vars
+      (display-time-24hr-format t)
+    #+end_src
+
+*** Hide minor modes from the mode line
+
+    The modeline is quite crowded when there's so many minor modes present. This
+    package makes it a lot cozier by removing those minor modes. However, it
+    seems as though it doesn't really work unless it's loaded after every other
+    package to ensure all the modes to diminish are loaded.
+
+    #+begin_src emacs-lisp :noweb-ref mode-line-init
+      (use-package diminish
+        :after subword
+        :ensure t
+        :diminish (ivy-mode
+                   eldoc-mode
+                   subword-mode
+                   company-mode
+                   rainbow-mode
+                   counsel-mode
+                   flycheck-mode
+                   flyspell-mode
+                   which-key-mode
+                   auto-revert-mode
+                   visual-line-mode
+                   haskell-doc-mode
+                   flyspell-prog-mode
+                   hungry-delete-mode
+                   page-break-lines-mode
+                   desktop-environment-mode
+                   haskell-indentation-mode
+                   interactive-haskell-mode
+                   compilation-shell-minor-mode))
     #+end_src
 
 ** In buffers
@@ -937,7 +964,7 @@ packages and keybindings which help me bring ideas to life day after day.
        (dashboard-setup-startup-hook)
        :custom ((inhibit-start-screen t)
                 (dashboard-set-footer nil)
-                (dashboard-startup-banner 'logo)
+                (dashboard-startup-banner 'official)
                 (dashboard-items '((recents . 10)))
                 (initial-buffer-choice #'dashboard-or-scratch)
                 (dashboard-banner-logo-title
@@ -2317,8 +2344,16 @@ packages and keybindings which help me bring ideas to life day after day.
     least you can do it.
 
     #+begin_src emacs-lisp
-      (defcustom farl-exwm/workspace-names '("" "" "" "" ""
-                                             "" "" "" "" "")
+      (defcustom farl-exwm/workspace-names '("1"
+                                             "2"
+                                             "3"
+                                             "4"
+                                             "5"
+                                             "6"
+                                             "office"
+                                             "discord"
+                                             "telegram"
+                                             "games")
         "The names assigned to workspaces through `exwm-workspace-index-map'."
         :tag "Workspace names"
         :group 'exwm
@@ -2794,21 +2829,6 @@ packages and keybindings which help me bring ideas to life day after day.
          (message "Screenshot copied to clipboard."))
      #+end_src
 
-*** Setting the wallpaper
-
-    I've been working on [[https://github.com/farlado/emacs-wallpaper][an easy way to configure wallpapers]] which makes for way
-    less hassle. It only relies on ~feh~ as a backend for applying wallpapers, so
-    if you use Emacs as a daemon it can manage your wallpapers even if it isn't
-    the window manager.
-
-    #+begin_src emacs-lisp
-      (use-package wallpaper
-        :load-path "lisp/wallpaper"
-        :defer t
-        :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
-               (exwm-init . wallpaper-cycle-mode)))
-    #+end_src
-
 *** Monitor settings
 
     Calling ~arandr~ to adjust monitors is useful when I am preparing to present
@@ -3118,9 +3138,7 @@ packages and keybindings which help me bring ideas to life day after day.
 ** On startup
 *** Make Emacs start fullscreen
 
-    This makes setting the wallpaper and everything look a heck of a lot more
-    natural, e.g. Emacs filling the screen looks a heck of a lot less jarring
-    before the wallpaper sets than after.
+    This makes Emacs startup look a lot more natural.
 
     #+begin_src emacs-lisp
       (set-frame-parameter nil 'fullscreen 'fullboth)
