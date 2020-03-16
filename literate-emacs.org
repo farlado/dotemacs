@@ -5,7 +5,6 @@
 #+startup: hideblocks
 #+options: num:nil toc:2
 #+property: header-args :results none
-#+export_exclude_tags: noexport
 
 #+begin_quote
 Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
