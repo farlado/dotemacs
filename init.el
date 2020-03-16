@@ -74,53 +74,22 @@
                       :weight 'extra-bold
                       :height 1.8))
 
-(use-package spaceline
+(use-package mood-line
   :ensure t
   :defer t
   :init
-  (pdumper-require 'spaceline-config)
-  (if window-system
-      (spaceline-emacs-theme)
-    (spaceline-spacemacs-theme))
+  (mood-line-mode 1)
+  (defun mood-line-segment-major-mode ()
+    "Displays the curent major mode in the mode-line."
+    (propertize "%m " 'face 'mode-line-buffer-id))
   (line-number-mode 1)
   (column-number-mode 1)
   (display-time-mode 1)
   (display-battery-mode 1)
-  (use-package diminish
-    :ensure t
-    :defer t
-    :init
-    (defun farl-init/diminish ()
-      "Call `diminish' for various modes."
-      (dolist (mode '(ivy-mode
-                      eldoc-mode
-                      subword-mode
-                      company-mode
-                      rainbow-mode
-                      counsel-mode
-                      flycheck-mode
-                      flyspell-mode
-                      which-key-mode
-                      auto-revert-mode
-                      visual-line-mode
-                      haskell-doc-mode
-                      flyspell-prog-mode
-                      hungry-delete-mode
-                      page-break-lines-mode
-                      desktop-environment-mode
-                      haskell-indentation-mode
-                      interactive-haskell-mode
-                      compilation-shell-minor-mode
-                      highlight-indent-guides-mode))
-        (diminish mode)))
-    :hook ((after-init . farl-init/diminish)
-           (exwm-init . farl-init/diminish)))
-  :custom ((powerline-default-separator 'wave)
-           (spaceline-line-column-p t)
-           (spaceline-buffer-size-p nil)
-           (spaceline-minor-modes-separator " ")
-           (spaceline-buffer-encoding-abbrev-p nil)
-           (display-time-24hr-format t)))
+  :custom-face (mood-line-status-info ((t (:inherit mode-line) (:background nil))))
+  :custom-face (mood-line-unimportant ((t (:inherit mode-line) (:background nil))))
+  :custom-face (mood-line-status-neutral ((t (:inherit mode-line) (:background nil))))
+  :custom (display-time-24hr-format t))
 
 (global-visual-line-mode 1)
 

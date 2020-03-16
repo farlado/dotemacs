@@ -14,9 +14,7 @@
 
                    ;; Looks
                    leuven-theme
-                   spaceline
-                   spaceline-config
-                   diminish
+                   mood-line
                    page-break-lines
                    display-line-numbers
                    rainbow-mode

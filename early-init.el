@@ -70,8 +70,7 @@ FILENAME and NOERROR are also passed to `require'."
                                   ;; Looks
                                   dashboard
                                   leuven-theme
-                                  spaceline
-                                  diminish
+                                  mood-line
                                   page-break-lines
                                   rainbow-mode
                                   rainbow-delimiters
