@@ -6,8 +6,7 @@
 #+options: num:nil toc:2
 #+property: header-args :results none
 
-#+attr_html: :style margin-left: auto; margin-right: auto;
-[[file:logo.png]]
+#+html: <p align="center"><img src="logo.png" /></p>
 
 #+begin_quote
 Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
@@ -118,10 +117,16 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Dependencies
 
-   #+begin_center
-   *THIS CONFIGURATION IS MEANT FOR EMACS 27 AND LATER. IT WILL LIKELY /NOT/ LOAD
-   PROPERLY ON EMACS 26 OR EARLIER. THE BRANCH FOR EMACS 26 OR EARLIER IS [[https://github.com/farlado/dotemacs/tree/emacs26-end][HERE]].*
-   #+end_center
+   #+begin_export html
+   <p align="center">
+     <b>
+       THIS CONFIGURATION IS MEANT FOR EMACS 27 AND LATER. IT WILL MOST LIKELY
+       <i>NOT</i> LOAD PROPERLY ON EMACS 26 OR EARLIER. THE BRANCH FOR EMACS 26
+       AND EARLIER CAN BE FOUND
+       <a href="https://github.com/farlado/dotemacs/tree/emacs26-end">HERE</a>.
+     </b>
+   </p>
+   #+end_export
 
    Everything has different dependencies so make sure you have what you need.
    The quick and dirty route to getting all these dependencies installed and
