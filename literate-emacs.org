@@ -6,6 +6,9 @@
 #+options: num:nil toc:2
 #+property: header-args :results none
 
+#+attr_html: :style margin-left: auto; margin-right: auto;
+[[file:logo.png]]
+
 #+begin_quote
 Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
 workshop, I feel a realm of possibility open before me. I feel the comfort of an
@@ -945,7 +948,7 @@ packages and keybindings which help me bring ideas to life day after day.
        (dashboard-setup-startup-hook)
        :custom ((inhibit-start-screen t)
                 (dashboard-set-footer nil)
-                (dashboard-startup-banner 'official)
+                (dashboard-startup-banner (locate-user-emacs-file "logo.png"))
                 (dashboard-items '((recents . 10)))
                 (initial-buffer-choice #'dashboard-or-scratch)
                 (dashboard-banner-logo-title
@@ -955,7 +958,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
    When Emacs or ~emacsclient~ starts, the first buffer shown should be either
    dashboard or a scratch buffer. To prevent use of a lambda (something I
-   have come to try to avoid where I can for a number of good reasions).
+   have come to try to avoid where I can for a number of good reasons).
 
    #+begin_src emacs-lisp :noweb-ref dashboard-or-scratch
      (defun dashboard-or-scratch ()

@@ -139,7 +139,7 @@
   (dashboard-setup-startup-hook)
   :custom ((inhibit-start-screen t)
            (dashboard-set-footer nil)
-           (dashboard-startup-banner 'official)
+           (dashboard-startup-banner (locate-user-emacs-file "logo.png"))
            (dashboard-items '((recents . 10)))
            (initial-buffer-choice #'dashboard-or-scratch)
            (dashboard-banner-logo-title
