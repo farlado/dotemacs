@@ -89,7 +89,9 @@
   :custom-face (mood-line-status-info ((t (:inherit mode-line) (:background nil))))
   :custom-face (mood-line-unimportant ((t (:inherit mode-line) (:background nil))))
   :custom-face (mood-line-status-neutral ((t (:inherit mode-line) (:background nil))))
-  :custom (display-time-24hr-format t))
+  :custom ((display-time-24hr-format t)
+           (display-time-day-and-date t)
+           (display-time-format "%a %m/%d %H:%M")))
 
 (global-visual-line-mode 1)
 

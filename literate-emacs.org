@@ -844,10 +844,12 @@ packages and keybindings which help me bring ideas to life day after day.
       (display-battery-mode 1)
     #+end_src
 
-    The clock should be set to 24-hour time.
+    The clock should be in 24-hour time, and the date should also be shown.
 
     #+begin_src emacs-lisp :noweb-ref mode-line-vars
-      :custom (display-time-24hr-format t)
+      :custom ((display-time-24hr-format t)
+               (display-time-day-and-date t)
+               (display-time-format "%a %m/%d %H:%M"))
     #+end_src
 
 ** In buffers
