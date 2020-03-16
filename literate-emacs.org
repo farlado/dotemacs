@@ -117,12 +117,10 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Dependencies
 
-   #+html: <p align="center">
    #+begin_center
    *THIS CONFIGURATION IS MEANT FOR EMACS 27 AND LATER. IT WILL LIKELY /NOT/ LOAD
    PROPERLY ON EMACS 26 OR EARLIER. THE BRANCH FOR EMACS 26 OR EARLIER IS [[https://github.com/farlado/dotemacs/tree/emacs26-end][HERE]].*
    #+end_center
-   #+html: </p>
 
    Everything has different dependencies so make sure you have what you need.
    The quick and dirty route to getting all these dependencies installed and
