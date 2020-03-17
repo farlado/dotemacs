@@ -129,7 +129,7 @@ FILENAME and NOERROR are also passed to `require'."
 
 (pdumper-require 'package)
 (defun package--save-selected-packages (&rest opt)
-  "Return nil.
+  "Return nil, ignoring OPT.
 
 This function was altered to inhibit a specific undesired behavior."
   nil)
