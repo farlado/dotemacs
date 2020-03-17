@@ -223,20 +223,56 @@
   "Find a FILE in the user's $XDG_CONFIG_HOME directory."
   (expand-file-name file (getenv "XDG_CONFIG_HOME")))
 
-(setq focus-follows-mouse t
-      mouse-autoselect-window t)
-
-(setq uniquify-buffer-name-style 'forward
-      uniquify-after-kill-buffer-p t)
-
-(with-current-buffer "*scratch*"
-  (emacs-lock-mode 'kill))
-
-(setq initial-scratch-message "")
+(use-package ibuffer
+  :defer t
+  :init
+  (defun farl-ibuffer/use-default-filter-group ()
+    "Switch to the intended filter group."
+    (ibuffer-switch-to-saved-filter-groups "default"))
+  :custom ((ibuffer-saved-filter-groups
+            (quote (("default"
+                     ("firefox" (name . "Firefox$"))
+                     ("exwm" (or (mode . exwm-mode)
+                                 (name . "^\\*XELB-DEBUG\\*$")))
+                     ("emms" (or (mode . emms-mode)
+                                 (mode . emms-browser-mode)
+                                 (mode . emms-playlist-mode)))
+                     ("vterm" (mode . vterm-mode))
+                     ("magit" (name . "^magit.*:"))
+                     ("dired" (mode . dired-mode))
+                     ("elisp" (mode . emacs-lisp-mode))
+                     ("emacs" (or (name . "^\\*dashboard\\*$")
+                                  (name . "^\\*scratch\\*$")
+                                  (name . "^\\*Messages\\*$")
+                                  (name . "^\\*Backtrace\\*$")
+                                  (name . "^\\*Compile-Log\\*$")
+                                  (name . "^\\*Shell.*Output\\*$")))))))
+           (uniquify-buffer-name-style 'forward)
+           (uniquify-after-kill-buffer-p t))
+  :hook (ibuffer-mode . farl-ibuffer/use-default-filter-group)
+  :bind (("C-x b" . ibuffer)
+         ("C-x C-b" . nil)))
 
 (use-package buffer-move
   :ensure t
   :defer t
+  :init
+  (defun split-and-follow-vertical ()
+    "Open a new window vertically."
+    (interactive)
+    (split-window-below)
+    (other-window 1)
+    (ibuffer))
+  (defun split-and-follow-horizontal ()
+    "Open a new window horizontally."
+    (interactive)
+    (split-window-right)
+    (other-window 1)
+    (ibuffer))
+  :bind (("C-x 2" . split-and-follow-vertical)
+         ("C-x 3" . split-and-follow-horizontal))
+  :custom ((focus-follows-mouse t)
+           (mouse-autoselect-window t))
   :bind (("C-x o" . nil)
          ("C-x o w" . windmove-up)
          ("C-x o a" . windmove-left)
@@ -247,25 +283,10 @@
          ("C-x o C-s" . buf-move-down)
          ("C-x o C-d" . buf-move-right)))
 
-(defun split-and-follow-vertical ()
-  "Open a new window vertically."
-  (interactive)
-  (split-window-below)
-  (other-window 1)
-  (ibuffer))
+(with-current-buffer "*scratch*"
+  (emacs-lock-mode 'kill))
 
-(defun split-and-follow-horizontal ()
-  "Open a new window horizontally."
-  (interactive)
-  (split-window-right)
-  (other-window 1)
-  (ibuffer))
-
-(global-set-key (kbd "C-x 2") #'split-and-follow-vertical)
-(global-set-key (kbd "C-x 3") #'split-and-follow-horizontal)
-
-(global-set-key (kbd "C-x b") #'ibuffer)
-(global-unset-key (kbd "C-x C-b"))
+(setq initial-scratch-message "")
 
 (defun config-visit ()
   "Open the configuration file."

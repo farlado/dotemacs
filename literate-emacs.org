@@ -1180,25 +1180,104 @@ packages and keybindings which help me bring ideas to life day after day.
     #+end_src
 
 ** Buffers/windows
-*** Sloppy focus windows
+*** Buffer management
 
-    I hate having to click to focus a different window, so I would rather just
-    have windows sloppily focus. This has some flaws when using Emacs as a
-    desktop environment, but it's still cozier than the alternative.
+    Buffer management is done using ~ibuffer~, which is orders of magnitude more
+    comfortable than other ways I've seen of managing buffers. Packages like
+    ~helm~ can probably do good, but I personally like using what's already
+    available to me. Buffer names should also be made unique. This looks a lot
+    fancier than the default behavior, and makes buffer names far easier to read
+    at a glance.
 
     #+begin_src emacs-lisp
-      (setq focus-follows-mouse t
-            mouse-autoselect-window t)
+      (use-package ibuffer
+        :defer t
+        :init
+        (defun farl-ibuffer/use-default-filter-group ()
+          "Switch to the intended filter group."
+          (ibuffer-switch-to-saved-filter-groups "default"))
+        :custom ((ibuffer-saved-filter-groups
+                  (quote (("default"
+                           ("firefox" (name . "Firefox$"))
+                           ("exwm" (or (mode . exwm-mode)
+                                       (name . "^\\*XELB-DEBUG\\*$")))
+                           ("emms" (or (mode . emms-mode)
+                                       (mode . emms-browser-mode)
+                                       (mode . emms-playlist-mode)))
+                           ("vterm" (mode . vterm-mode))
+                           ("magit" (name . "^magit.*:"))
+                           ("dired" (mode . dired-mode))
+                           ("elisp" (mode . emacs-lisp-mode))
+                           ("emacs" (or (name . "^\\*dashboard\\*$")
+                                        (name . "^\\*scratch\\*$")
+                                        (name . "^\\*Messages\\*$")
+                                        (name . "^\\*Backtrace\\*$")
+                                        (name . "^\\*Compile-Log\\*$")
+                                        (name . "^\\*Shell.*Output\\*$")))))))
+                 (uniquify-buffer-name-style 'forward)
+                 (uniquify-after-kill-buffer-p t))
+        :hook (ibuffer-mode . farl-ibuffer/use-default-filter-group)
+        :bind (("C-x b" . ibuffer)
+               ("C-x C-b" . nil)))
     #+end_src
 
-*** Making buffer names unique
+*** Follow when making new windows
 
-    This looks a lot fancier than the default behavior, and makes buffer names
-    far easier to read at a glance.
+      When forming a new window, it should be followed and ~ibuffer~ should be
+      opened. This replaces the other not particularly friendly behavior.
 
-    #+begin_src emacs-lisp
-      (setq uniquify-buffer-name-style 'forward
-            uniquify-after-kill-buffer-p t)
+      #+begin_src emacs-lisp :noweb-ref window-management :tangle no
+        :init
+        (defun split-and-follow-vertical ()
+          "Open a new window vertically."
+          (interactive)
+          (split-window-below)
+          (other-window 1)
+          (ibuffer))
+        (defun split-and-follow-horizontal ()
+          "Open a new window horizontally."
+          (interactive)
+          (split-window-right)
+          (other-window 1)
+          (ibuffer))
+        :bind (("C-x 2" . split-and-follow-vertical)
+               ("C-x 3" . split-and-follow-horizontal))
+    #+end_src
+
+*** Changing focus and moving windows
+
+    There are built-in functions for changing focus between windows, but there
+    are not good built-in functions for swapping two windows and moving buffers
+    between windows. Since ~other-window~ is hot garbage, I instead use =C-x o= as a
+    prefix for the commands related to moving focus or moving windows.
+
+    #+begin_src emacs-lisp :noweb yes
+      (use-package buffer-move
+        :ensure t
+        :defer t
+        <<window-management>>
+        :bind (("C-x o" . nil)
+               ("C-x o w" . windmove-up)
+               ("C-x o a" . windmove-left)
+               ("C-x o s" . windmove-down)
+               ("C-x o d" . windmove-right)
+               ("C-x o C-w" . buf-move-up)
+               ("C-x o C-a" . buf-move-left)
+               ("C-x o C-s" . buf-move-down)
+               ("C-x o C-d" . buf-move-right)))
+    #+end_src
+
+*** Sloppy focus (focus by mouse hover)
+
+    Changing focus can also be done through sloppy focus, e.g. moving the cursor
+    between windows. I hate having to click to focus a different window, so I
+    would rather just have windows sloppily focus. This has some flaws when
+    using Emacs as a desktop environment, but it's still cozier than the
+    alternative behavior.
+
+    #+begin_src emacs-lisp :noweb-ref window-management :tangle no
+        :custom ((focus-follows-mouse t)
+                 (mouse-autoselect-window t))
     #+end_src
 
 *** Make the scratch buffer immortal and start blank
@@ -1213,57 +1292,7 @@ packages and keybindings which help me bring ideas to life day after day.
       (setq initial-scratch-message "")
     #+end_src
 
-*** ~buffer-move~ (moving windows) and ~windmove~ (changing focus)
-
-    Since apparently =C-x C-o= is actually something useful by default, I decided
-    to squash ~windmove~ and ~buffer-move~ into a single keymap.
-
-    #+begin_src emacs-lisp
-      (use-package buffer-move
-        :ensure t
-        :defer t
-        :bind (("C-x o" . nil)
-               ("C-x o w" . windmove-up)
-               ("C-x o a" . windmove-left)
-               ("C-x o s" . windmove-down)
-               ("C-x o d" . windmove-right)
-               ("C-x o C-w" . buf-move-up)
-               ("C-x o C-a" . buf-move-left)
-               ("C-x o C-s" . buf-move-down)
-               ("C-x o C-d" . buf-move-right)))
-    #+end_src
-
-*** Move focus and show ~ibuffer~ when explicitly creating new windows
-
-    This to me is preferable to the default behavior.
-
-    #+begin_src emacs-lisp
-      (defun split-and-follow-vertical ()
-        "Open a new window vertically."
-        (interactive)
-        (split-window-below)
-        (other-window 1)
-        (ibuffer))
-
-      (defun split-and-follow-horizontal ()
-        "Open a new window horizontally."
-        (interactive)
-        (split-window-right)
-        (other-window 1)
-        (ibuffer))
-
-      (global-set-key (kbd "C-x 2") #'split-and-follow-vertical)
-      (global-set-key (kbd "C-x 3") #'split-and-follow-horizontal)
-    #+end_src
-
 ** Key binds
-*** Use ~ibuffer~ on =C-x b=
-
-    #+begin_src emacs-lisp
-      (global-set-key (kbd "C-x b") #'ibuffer)
-      (global-unset-key (kbd "C-x C-b"))
-    #+end_src
-
 *** Open Emacs configuration with =C-c e=
 
     #+begin_src emacs-lisp
