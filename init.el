@@ -560,8 +560,7 @@ This function has been altered to accomodate `exwm-mode'."
     (setq org-agenda-files (directory-files-recursively
                             (user-home-file "agendas")
                             ".org$" nil t t)))
-  :custom (
-           (org-pretty-entities t)
+  :custom ((org-pretty-entities t)
            (org-src-fontify-natively t)
            (org-agenda-use-time-grid nil)
            (org-fontify-done-headline t)
@@ -576,12 +575,10 @@ This function has been altered to accomodate `exwm-mode'."
            (org-ellipsis (if window-system "⤵" "..."))
            (org-hide-emphasis-markers window-system)
            (org-confirm-babel-evaluate #'farl-org/confirm-babel-evaluate))
-  :hook (
-         (org-mode . farl-org/disable-angle-bracket-syntax)
+  :hook ((org-mode . farl-org/disable-angle-bracket-syntax)
          (org-babel-after-execute . org-redisplay-inline-images))
-  :bind (
-         ("C-c M-a" . org-agenda)
-         ("C-c s-a" . open-agenda-file)))
+  :bind (("C-c s-a" . open-agenda-file)
+         ("C-c M-a" . org-agenda)))
 
 (use-package vterm
   :ensure t
@@ -1226,12 +1223,10 @@ This function has been altered to accomodate `exwm-mode'."
                                          ([?\M-d] . [C-delete])
                                          ([?\C-k] . [S-end delete])
                                          ([?\C-g] . [escape]))))
-  :hook (
-         (exwm-update-title . farl-exwm/name-buffer-after-window-title)
+  :hook ((exwm-update-title . farl-exwm/name-buffer-after-window-title)
          (exwm-randr-screen-change . display-and-dock-setup)
          (kill-emacs . farl-exwm/on-logout))
-  :bind (
-         ("C-x C-M-c" . shut-down-computer)
+  :bind (("C-x C-M-c" . shut-down-computer)
          ("C-x C-M-r" . reboot-computer)
          ("C-x C-M-s" . suspend-computer)
          :map exwm-mode-map

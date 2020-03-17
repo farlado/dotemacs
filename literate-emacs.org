@@ -5,7 +5,6 @@
 #+startup: hideblocks
 #+options: num:nil toc:2
 #+property: header-args :results none
-
 #+html: <p align="center"><img src="logo.png" /></p>
 
 #+begin_quote
@@ -1707,12 +1706,9 @@ packages and keybindings which help me bring ideas to life day after day.
        :defer t
        :init
        <<org-init>>
-       :custom (
-                <<org-vars>>)
-       :hook (
-              <<org-hooks>>)
-       :bind (
-              <<org-binds>>))
+       <<org-custom>>
+       <<org-hook>>
+       <<org-binds>>)
    #+end_src
 
 *** Table of Contents
@@ -1755,23 +1751,25 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Quality-of-life settings
 
-    These are just quick things that make ~org-mode~ much easier to use.
+    These are just quick things that make ~org-mode~ much easier to use. Other
+    settings are pulled into here for a cleaner tangle.
 
-    #+begin_src emacs-lisp :noweb-ref org-vars
-      (org-pretty-entities t)
-      (org-src-fontify-natively t)
-      (org-agenda-use-time-grid nil)
-      (org-fontify-done-headline t)
-      (org-src-tab-acts-natively t)
-      (org-enforce-todo-dependencies t)
-      (org-fontify-whole-heading-line t)
-      (org-agenda-skip-deadline-if-done t)
-      (org-agenda-skip-scheduled-if-done t)
-      (org-fontify-quote-and-verse-blocks t)
-      (org-src-window-setup 'current-window)
-      (org-highlight-latex-and-related '(latex))
-      (org-ellipsis (if window-system "⤵" "..."))
-      (org-hide-emphasis-markers window-system)
+    #+begin_src emacs-lisp :noweb yes :noweb-ref org-custom
+      :custom ((org-pretty-entities t)
+               (org-src-fontify-natively t)
+               (org-agenda-use-time-grid nil)
+               (org-fontify-done-headline t)
+               (org-src-tab-acts-natively t)
+               (org-enforce-todo-dependencies t)
+               (org-fontify-whole-heading-line t)
+               (org-agenda-skip-deadline-if-done t)
+               (org-agenda-skip-scheduled-if-done t)
+               (org-fontify-quote-and-verse-blocks t)
+               (org-src-window-setup 'current-window)
+               (org-highlight-latex-and-related '(latex))
+               (org-ellipsis (if window-system "⤵" "..."))
+               (org-hide-emphasis-markers window-system)
+               <<org-vars>>)
     #+end_src
 
 *** Evaluating Graphviz blocks
@@ -1882,10 +1880,12 @@ packages and keybindings which help me bring ideas to life day after day.
         (modify-syntax-entry ?> "."))
     #+end_src
 
-    This function is hooked in =org-mode-hook=.
+    This function is hooked in =org-mode-hook=. Other hooks are pulled into here
+    for a significantly cleaner tangle.
 
-    #+begin_src emacs-lisp :noweb-ref org-hooks
-      (org-mode . farl-org/disable-angle-bracket-syntax)
+    #+begin_src emacs-lisp :noweb-ref org-hook
+      :hook ((org-mode . farl-org/disable-angle-bracket-syntax)
+             <<org-hooks>>)
     #+end_src
 
 *** Agenda (only enabled if an agenda is found)
@@ -1907,10 +1907,11 @@ packages and keybindings which help me bring ideas to life day after day.
     #+end_src
 
     I open the agenda with =C-c M-a= and open a specific agenda file with =C-c s-a=.
+    These are the only binds done in this entire section.
 
     #+begin_src emacs-lisp :noweb-ref org-binds
-      ("C-c M-a" . org-agenda)
-      ("C-c s-a" . open-agenda-file)
+      :bind (("C-c s-a" . open-agenda-file)
+             ("C-c M-a" . org-agenda))
     #+end_src
 
 *** Automatically fix inline images generated for diagrams
@@ -2213,22 +2214,22 @@ packages and keybindings which help me bring ideas to life day after day.
       :defer t
       :init
       (setenv "_RUN_EXWM")
-      (pdumper-require 'exwm)
-      (pdumper-require 'exwm-randr)
-      (pdumper-require 'exwm-config)
-      (pdumper-require 'exwm-systemtray)
       <<exwm-init>>
       :custom ((exwm-replace t)
                <<exwm-vars>>)
-      :hook (
-             <<exwm-hooks>>)
-      :bind (
-             <<exwm-global-binds>>
-             :map exwm-mode-map
-             <<exwm-mode-binds>>))
+      <<exwm-hook>>
+      <<exwm-binds>>)
   #+end_src
 
 ** Window management
+
+   #+begin_src emacs-lisp
+     (pdumper-require 'exwm)
+     (pdumper-require 'exwm-randr)
+     (pdumper-require 'exwm-config)
+     (pdumper-require 'exwm-systemtray)
+   #+end_src
+
 *** Name EXWM buffers after the window title
 
     This was annoying when I first installed EXWM. Thankfully it's easy to fix.
@@ -2240,10 +2241,12 @@ packages and keybindings which help me bring ideas to life day after day.
     #+end_src
 
     We hook setting the buffer name into when EXWM picks up a change in the
-    window title, aptly titled =exwm-update-title-hook=.
+    window title, aptly titled =exwm-update-title-hook=. Other hooks are pulled
+    into this block for a cleaner tangle.
 
-    #+begin_src emacs-lisp :noweb-ref exwm-hooks
-      (exwm-update-title . farl-exwm/name-buffer-after-window-title)
+    #+begin_src emacs-lisp :noweb-ref exwm-hook
+      :hook ((exwm-update-title . farl-exwm/name-buffer-after-window-title)
+             <<exwm-hooks>>)
     #+end_src
 
 *** Configure floating window borders
@@ -2909,10 +2912,14 @@ packages and keybindings which help me bring ideas to life day after day.
         (remove-hook 'kill-emacs-hook #'shut-down--computer))
     #+end_src
 
-    This function is globally bound to =C-x C-M-c=.
+    This function is globally bound to =C-x C-M-c=. Other binds are pulled into
+    here for a cleaner end result upon tangling.
 
-    #+begin_src emacs-lisp :noweb-ref exwm-global-binds
-      ("C-x C-M-c" . shut-down-computer)
+    #+begin_src emacs-lisp :noweb-ref exwm-binds
+      :bind (("C-x C-M-c" . shut-down-computer)
+             <<exwm-global-binds>>
+             :map exwm-mode-map
+             <<exwm-mode-binds>>)
     #+end_src
 
 *** Rebooting
