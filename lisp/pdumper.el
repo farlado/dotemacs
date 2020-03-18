@@ -26,6 +26,7 @@
                    company
                    company-emoji
                    counsel
+                   ibuffer
                    buffer-move
                    sudo-edit
 
@@ -74,6 +75,7 @@
                    exwm-randr
                    exwm-config
                    exwm-systemtray
+                   exwm-mff
                    dmenu
                    minibuffer-line
                    system-packages

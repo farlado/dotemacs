@@ -156,8 +156,6 @@
 
 (setq confirm-kill-emacs #'yes-or-no-p)
 
-(setq make-pointer-invisible nil)
-
 (setq scroll-margin 0
       auto-window-vscroll nil
       scroll-conservatively 100000
@@ -749,6 +747,10 @@ This function has been altered to accomodate `exwm-mode'."
     :ensure t
     :defer t
     :custom (dmenu-prompt-string "s-x "))
+  (use-package exwm-mff
+    :ensure t
+    :defer t
+    :hook (exwm-init . exwm-mff-mode))
   (defcustom farl-exwm/workspace-names '("1"
                                          "2"
                                          "3"
@@ -1096,16 +1098,17 @@ This function has been altered to accomodate `exwm-mode'."
   (setenv "_JAVA_AWT_WM_NONREPARENTING" "1")
   (start-process "Disable Blanking" nil "xset"
                  "s" "off" "-dpms")
+  (start-process "Keyboard Layout" nil "setxkbmap"
+                 "us" "-option" "ctrl:nocaps")
   (start-process "Trackpad Setup" nil "xinput"
                  "disable" (shell-command-to-string
                             (concat "xinput | grep Synap | head -n 1 | "
                                     "sed -r 's/.*id=([0-9]+).*/\\1/' | "
                                     "tr '\n' ' ' | sed 's/ //'")))
-  (start-process "Keyboard Layout" nil "setxkbmap"
-                 "us" "-option" "ctrl:nocaps")
   (start-process "Compositor" nil "xcompmgr")
   (start-process "Fallback Cursor" nil "xsetroot"
                  "-cursor_name" "left_ptr")
+  (start-process "Mouse banisher" nil "xbanish")
   (exwm-enable)
   (exwm-config-ido)
   (exwm-randr-enable)

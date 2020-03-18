@@ -240,6 +240,7 @@ packages and keybindings which help me bring ideas to life day after day.
                          company
                          company-emoji
                          counsel
+                         ibuffer
                          buffer-move
                          sudo-edit
 
@@ -288,6 +289,7 @@ packages and keybindings which help me bring ideas to life day after day.
                          exwm-randr
                          exwm-config
                          exwm-systemtray
+                         exwm-mff
                          dmenu
                          minibuffer-line
                          system-packages
@@ -529,6 +531,7 @@ packages and keybindings which help me bring ideas to life day after day.
                                         ;; Desktop Environment
                                         exwm
                                         dmenu
+                                        exwm-mff
                                         minibuffer-line
                                         system-packages
                                         desktop-environment))
@@ -1022,15 +1025,6 @@ packages and keybindings which help me bring ideas to life day after day.
 
     #+begin_src emacs-lisp
       (setq confirm-kill-emacs #'yes-or-no-p)
-    #+end_src
-
-*** Don't hide the cursor by default
-
-    I need to know where my cursor is at all times. I don't like the cursor
-    hiding every time I type, leaving me unsure where it even is.
-
-    #+begin_src emacs-lisp
-      (setq make-pointer-invisible nil)
     #+end_src
 
 *** Make scrolling a little less crazy
@@ -2303,6 +2297,19 @@ packages and keybindings which help me bring ideas to life day after day.
         :custom (dmenu-prompt-string "s-x "))
     #+end_src
 
+*** Mouse follows focus
+
+    This is something I keep adding and removing repeatedly, into perpetuity. I
+    really like this behavior, even in spite of the troubled history I have with
+    this specific implementation.
+
+    #+begin_src emacs-lisp
+      (use-package exwm-mff
+        :ensure t
+        :defer t
+        :hook (exwm-init . exwm-mff-mode))
+    #+end_src
+
 ** Workspace configuration
 *** Load all workspaces on startup
 
@@ -3187,18 +3194,6 @@ packages and keybindings which help me bring ideas to life day after day.
                      "s" "off" "-dpms")
     #+end_src
 
-*** Disable the trackpad
-
-    This thing is disgusting, and I prefer trackpoints way more.
-
-    #+begin_src emacs-lisp :tangle no
-      (start-process "Trackpad Setup" nil "xinput"
-                     "disable" (shell-command-to-string
-                                (concat "xinput | grep Synap | head -n 1 | "
-                                        "sed -r 's/.*id=([0-9]+).*/\\1/' | "
-                                        "tr '\n' ' ' | sed 's/ //'")))
-    #+end_src
-
 *** Keyboard configuration
 
     This block sets the keyboard layout to US and give Caps Lock the
@@ -3212,6 +3207,18 @@ packages and keybindings which help me bring ideas to life day after day.
     #+begin_src emacs-lisp :tangle no
       (start-process "Keyboard Layout" nil "setxkbmap"
                      "us" "-option" "ctrl:nocaps")
+    #+end_src
+
+*** Disable the trackpad
+
+    This thing is disgusting, and I prefer trackpoints way more.
+
+    #+begin_src emacs-lisp :tangle no
+      (start-process "Trackpad Setup" nil "xinput"
+                     "disable" (shell-command-to-string
+                                (concat "xinput | grep Synap | head -n 1 | "
+                                        "sed -r 's/.*id=([0-9]+).*/\\1/' | "
+                                        "tr '\n' ' ' | sed 's/ //'")))
     #+end_src
 
 *** Start the compositor
@@ -3229,6 +3236,14 @@ packages and keybindings which help me bring ideas to life day after day.
     #+begin_src emacs-lisp :tangle no
       (start-process "Fallback Cursor" nil "xsetroot"
                      "-cursor_name" "left_ptr")
+    #+end_src
+
+*** Banish the mouse
+
+    I've always been mixed on this behavior but it seems like a good idea.
+
+    #+begin_src emacs-lisp
+      (start-process "Mouse banisher" nil "xbanish")
     #+end_src
 
 *** Start EXWM
