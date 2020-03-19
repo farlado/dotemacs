@@ -339,6 +339,9 @@ packages and keybindings which help me bring ideas to life day after day.
       (menu-bar-mode -1)
       (tool-bar-mode -1)
       (scroll-bar-mode -1)
+
+      (when (getenv "_RUN_EMACS")
+        (set-face-background 'default "#282a36"))
     #+end_src
 
 *** Handling portable dumping
