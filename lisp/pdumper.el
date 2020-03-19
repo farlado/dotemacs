@@ -1,7 +1,9 @@
 (require 'package)
 (package-initialize)
 
-(add-to-list 'load-path (locate-user-emacs-file "lisp/xkb"))
+(setq load-path `(,@load-path
+                  (locate-user-emacs-file "lisp/xkb")
+                  (locate-user-emacs-file "lisp/wallpaper")))
 
 (setq pdumper-load-path load-path
       pdumper-dumped t)
