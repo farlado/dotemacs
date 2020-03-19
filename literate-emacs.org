@@ -199,9 +199,8 @@ packages and keybindings which help me bring ideas to life day after day.
       (require 'package)
       (package-initialize)
 
-      (setq load-path `(,@load-path
-                        (locate-user-emacs-file "lisp/xkb")
-                        (locate-user-emacs-file "lisp/wallpaper")))
+      (add-to-list 'load-path (locate-user-emacs-file "lisp/xkb"))
+      (add-to-list 'load-path (locate-user-emacs-file "lisp/wallpaper"))
     #+end_src
 
 *** Store =load-path=
