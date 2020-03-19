@@ -29,14 +29,14 @@
 (setq use-dialog-box nil
       use-file-dialog nil)
 
-(use-package leuven-theme
+(use-package dracula-theme
   :if window-system
   :ensure t
   :defer t
   :init
   (if pdumper-dumped
-      (enable-theme 'leuven)
-    (load-theme 'leuven t))
+      (enable-theme 'dracula)
+    (load-theme 'dracula t))
   (prefer-coding-system 'utf-8)
   (setq locale-coding-system 'utf-8)
   (set-language-environment "UTF-8")
@@ -63,6 +63,9 @@
                     window-divider))
       (set-face-foreground face color)))
   (window-divider-mode 1)
+  (dolist (frame (frame-list))
+    (set-frame-parameter frame 'alpha 90))
+  (add-to-list 'default-frame-alist '(alpha . 90))
   (pdumper-require 'org)
   (set-face-attribute 'org-level-1 nil
                       :height 1.3)
@@ -79,16 +82,10 @@
   :defer t
   :init
   (mood-line-mode 1)
-  (defun mood-line-segment-major-mode ()
-    "Displays the curent major mode in the mode-line."
-    (propertize "%m " 'face 'mode-line-buffer-id))
   (line-number-mode 1)
   (column-number-mode 1)
   (display-time-mode 1)
   (display-battery-mode 1)
-  :custom-face (mood-line-status-info ((t (:inherit mode-line) (:background nil))))
-  :custom-face (mood-line-unimportant ((t (:inherit mode-line) (:background nil))))
-  :custom-face (mood-line-status-neutral ((t (:inherit mode-line) (:background nil))))
   :custom ((display-time-24hr-format t)
            (display-time-day-and-date t)
            (display-time-format "%a %m/%d %H:%M")))
@@ -479,7 +476,8 @@ This function has been altered to accomodate `exwm-mode'."
   :after flycheck
   :ensure t
   :defer t
-  :custom (flycheck-posframe-position 'window-bottom-left-corner)
+  :custom ((posframe-mouse-banish nil)
+           (flycheck-posframe-position 'window-bottom-left-corner))
   :hook ((flycheck-mode . flycheck-posframe-mode)
          (flycheck-posframe-mode . flycheck-posframe-configure-pretty-defaults)))
 
@@ -751,16 +749,8 @@ This function has been altered to accomodate `exwm-mode'."
     :ensure t
     :defer t
     :hook (exwm-init . exwm-mff-mode))
-  (defcustom farl-exwm/workspace-names '("1"
-                                         "2"
-                                         "3"
-                                         "4"
-                                         "5"
-                                         "6"
-                                         "office"
-                                         "discord"
-                                         "telegram"
-                                         "games")
+  (defcustom farl-exwm/workspace-names '("" "" "" "" ""
+                                         "" "" "" "" "")
     "The names assigned to workspaces through `exwm-workspace-index-map'."
     :tag "Workspace names"
     :group 'exwm
@@ -1015,6 +1005,11 @@ This function has been altered to accomodate `exwm-mode'."
            ("<S-print>" . farl-de/desktop-environment-screenshot-clip)
            ("<C-print>" . farl-de/desktop-environment-screenshot-part)
            ("<C-S-print>" . farl-de/desktop-environment-screenshot)))
+  (use-package wallpaper
+    :load-path "lisp/wallpaper"
+    :defer t
+    :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
+           (exwm-init . wallpaper-cycle-mode)))
   (defun monitor-settings ()
     "Open arandr to configure monitors."
     (interactive)

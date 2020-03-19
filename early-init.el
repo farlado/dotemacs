@@ -69,7 +69,7 @@ FILENAME and NOERROR are also passed to `require'."
 
                                   ;; Looks
                                   dashboard
-                                  leuven-theme
+                                  dracula-theme
                                   mood-line
                                   page-break-lines
                                   rainbow-mode

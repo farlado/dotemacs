@@ -13,7 +13,7 @@
                    server
 
                    ;; Looks
-                   leuven-theme
+                   dracula-theme
                    mood-line
                    page-break-lines
                    display-line-numbers
@@ -80,9 +80,10 @@
                    minibuffer-line
                    system-packages
                    desktop-environment
+                   wallpaper
                    xkb))
     (require package))
 
-(load-theme 'leuven t t)
+(load-theme 'dracula t t)
 
 (dump-emacs-portable (locate-user-emacs-file "emacs.pdmp"))

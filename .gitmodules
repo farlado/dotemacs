@@ -1,3 +1,6 @@
 [submodule "lisp/xkb"]
 	path = lisp/xkb
 	url = https://github.com/farlado/emacs-xkb
+[submodule "lisp/wallpaper"]
+	path = lisp/wallpaper
+	url = https://github.com/farlado/emacs-wallpaper

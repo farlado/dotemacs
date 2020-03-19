@@ -227,7 +227,7 @@ packages and keybindings which help me bring ideas to life day after day.
                          server
 
                          ;; Looks
-                         leuven-theme
+                         dracula-theme
                          mood-line
                          page-break-lines
                          display-line-numbers
@@ -294,6 +294,7 @@ packages and keybindings which help me bring ideas to life day after day.
                          minibuffer-line
                          system-packages
                          desktop-environment
+                         wallpaper
                          xkb))
           (require package))
     #+end_src
@@ -305,7 +306,7 @@ packages and keybindings which help me bring ideas to life day after day.
     portable dump image.
 
     #+begin_src emacs-lisp
-      (load-theme 'leuven t t)
+      (load-theme 'dracula t t)
     #+end_src
 
 *** Write the dump image
@@ -477,7 +478,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
                                         ;; Looks
                                         dashboard
-                                        leuven-theme
+                                        dracula-theme
                                         mood-line
                                         page-break-lines
                                         rainbow-mode
@@ -712,20 +713,22 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Theme
 
-   Leuven is my theme of choice. Leuven is king. Long live Leuven. This theme is
-   /brilliant/. It took months to find a theme that could hold a candle to Leuven,
-   and even then it failed to stick with me as well as Leuven has. Once you can
-   appreciate a light theme, it becomes increasingly more difficult to drop it.
+   For the longest time I thought Leuven was seriously my best choice. As time
+   has gone by, I've gotten less and less fond of Leuven. It served me well at
+   the beginning of my exploration, but after so long using dark themes and
+   having wallpapers behind my Emacs, Leuven stopped cutting it. Currently the
+   theme I've stuck with is Dracula. It is the most comfortable and there are
+   GTK themes that match it very well.
 
    #+begin_src emacs-lisp :noweb yes :tangle (locate-user-emacs-file "init.el")
-     (use-package leuven-theme
+     (use-package dracula-theme
        :if window-system
        :ensure t
        :defer t
        :init
        (if pdumper-dumped
-           (enable-theme 'leuven)
-         (load-theme 'leuven t))
+           (enable-theme 'dracula)
+         (load-theme 'dracula t))
        <<theme-init>>)
    #+end_src
 
@@ -769,6 +772,20 @@ packages and keybindings which help me bring ideas to life day after day.
       (window-divider-mode 1)
     #+end_src
 
+*** Transparent frames
+
+    If there's a gimmick I can't get enough of, it's having a transparent frame.
+    At first, I thought it would look dumb, but it would make things hard to
+    read since Emacs doesn't seem to differentiate between foreground and
+    background when setting alpha values, but now that I have used it for a
+    while, going back to an opaque frame seems tacky.
+
+    #+begin_src emacs-lisp :noweb-ref theme-init
+      (dolist (frame (frame-list))
+        (set-frame-parameter frame 'alpha 90))
+      (add-to-list 'default-frame-alist '(alpha . 90))
+    #+end_src
+
 *** Better ~org-mode~ headers
 
     For some reason, theme creators don't really think of formatting ~org-mode~
@@ -801,33 +818,10 @@ packages and keybindings which help me bring ideas to life day after day.
        :defer t
        :init
        (mood-line-mode 1)
-       <<mode-line-init>>
-       :custom-face <<mode-line-faces>>
-       <<mode-line-vars>>)
+       <<mode-line-init>>)
    #+end_src
 
-*** Change a hard-coded face by force
-
-    This frustrates me a lot, but at least there's a way to fix it.
-
-    #+begin_src emacs-lisp :noweb-ref mode-line-init
-      (defun mood-line-segment-major-mode ()
-        "Displays the curent major mode in the mode-line."
-        (propertize "%m " 'face 'mode-line-buffer-id))
-    #+end_src
-
-*** Use some less ridiculous colors for the mode line
-
-    As much as I love Leuven, it definitely isn't the most friendly towards this
-    mode line. In order to fix this, we set a few faces accordingly.
-
-    #+begin_src emacs-lisp :noweb-ref mode-line-faces
-      (mood-line-status-info ((t (:inherit mode-line) (:background nil))))
-      (mood-line-unimportant ((t (:inherit mode-line) (:background nil))))
-      (mood-line-status-neutral ((t (:inherit mode-line) (:background nil))))
-    #+end_src
-
-*** Show line and column numbers on the mode line
+*** Show line/column numbers on the mode line
 
     Why isn't this enabled by default on a /text editor/? What line and column the
     point is on should always be visible on the mode line.
@@ -841,16 +835,12 @@ packages and keybindings which help me bring ideas to life day after day.
 
     I used to use ~fancy-battery~ for battery level but it constantly disappeared
     on my teeny tiny screens so I just decided not to bother with it. Plus it's
-    one less package to configure lol.
+    one less package to configure lol. The clock should be in 24-hour time, and
+    the date should also be shown.
 
     #+begin_src emacs-lisp :noweb-ref mode-line-init
       (display-time-mode 1)
       (display-battery-mode 1)
-    #+end_src
-
-    The clock should be in 24-hour time, and the date should also be shown.
-
-    #+begin_src emacs-lisp :noweb-ref mode-line-vars
       :custom ((display-time-24hr-format t)
                (display-time-day-and-date t)
                (display-time-format "%a %m/%d %H:%M"))
@@ -1700,7 +1690,8 @@ packages and keybindings which help me bring ideas to life day after day.
         :after flycheck
         :ensure t
         :defer t
-        :custom (flycheck-posframe-position 'window-bottom-left-corner)
+        :custom ((posframe-mouse-banish nil)
+                 (flycheck-posframe-position 'window-bottom-left-corner))
         :hook ((flycheck-mode . flycheck-posframe-mode)
                (flycheck-posframe-mode . flycheck-posframe-configure-pretty-defaults)))
     #+end_src
@@ -2366,16 +2357,8 @@ packages and keybindings which help me bring ideas to life day after day.
     least you can do it.
 
     #+begin_src emacs-lisp
-      (defcustom farl-exwm/workspace-names '("1"
-                                             "2"
-                                             "3"
-                                             "4"
-                                             "5"
-                                             "6"
-                                             "office"
-                                             "discord"
-                                             "telegram"
-                                             "games")
+      (defcustom farl-exwm/workspace-names '("" "" "" "" ""
+                                             "" "" "" "" "")
         "The names assigned to workspaces through `exwm-workspace-index-map'."
         :tag "Workspace names"
         :group 'exwm
@@ -2850,6 +2833,21 @@ packages and keybindings which help me bring ideas to life day after day.
                   "-t image/png &> /dev/null && rm $FILENAME"))
          (message "Screenshot copied to clipboard."))
      #+end_src
+
+*** Setting the wallpaper
+
+    I've been working on [[https://github.com/farlado/emacs-wallpaper][an easy way to configure wallpapers]] which makes for way
+    less hassle. It only relies on ~feh~ as a backend for applying wallpapers, so
+    if you use Emacs as a daemon it can manage your wallpapers even if it isn't
+    the window manager.
+
+    #+begin_src emacs-lisp
+      (use-package wallpaper
+        :load-path "lisp/wallpaper"
+        :defer t
+        :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
+               (exwm-init . wallpaper-cycle-mode)))
+    #+end_src
 
 *** Monitor settings
 
