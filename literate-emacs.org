@@ -200,7 +200,6 @@ packages and keybindings which help me bring ideas to life day after day.
       (package-initialize)
 
       (add-to-list 'load-path (locate-user-emacs-file "lisp/xkb"))
-      (add-to-list 'load-path (locate-user-emacs-file "lisp/wallpaper"))
     #+end_src
 
 *** Store =load-path=
