@@ -2,7 +2,7 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
-(when (getenv "_RUN_EMACS")
+(when (getenv "_RUN_EXWM")
   (set-face-background 'default "#282a36"))
 
 (defvar pdumper-dumped nil
