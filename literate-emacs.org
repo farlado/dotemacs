@@ -539,7 +539,8 @@ packages and keybindings which help me bring ideas to life day after day.
                                         exwm-mff
                                         minibuffer-line
                                         system-packages
-                                        desktop-environment))
+                                        desktop-environment
+                                        wallpaper))
     #+end_src
 
 *** Disable an annoying ~customize~ function
@@ -2843,11 +2844,11 @@ packages and keybindings which help me bring ideas to life day after day.
     I've been working on [[https://github.com/farlado/emacs-wallpaper][an easy way to configure wallpapers]] which makes for way
     less hassle. It only relies on ~feh~ as a backend for applying wallpapers, so
     if you use Emacs as a daemon it can manage your wallpapers even if it isn't
-    the window manager.
+    the window manager. It's on MELPA now!
 
     #+begin_src emacs-lisp
       (use-package wallpaper
-        :load-path "lisp/wallpaper"
+        :ensure t
         :defer t
         :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
                (exwm-init . wallpaper-cycle-mode)))

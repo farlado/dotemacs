@@ -1006,7 +1006,7 @@ This function has been altered to accomodate `exwm-mode'."
            ("<C-print>" . farl-de/desktop-environment-screenshot-part)
            ("<C-S-print>" . farl-de/desktop-environment-screenshot)))
   (use-package wallpaper
-    :load-path "lisp/wallpaper"
+    :ensure t
     :defer t
     :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
            (exwm-init . wallpaper-cycle-mode)))

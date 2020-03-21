@@ -129,7 +129,8 @@ FILENAME and NOERROR are also passed to `require'."
                                   exwm-mff
                                   minibuffer-line
                                   system-packages
-                                  desktop-environment))
+                                  desktop-environment
+                                  wallpaper))
 
 (pdumper-require 'package)
 (defun package--save-selected-packages (&rest opt)
