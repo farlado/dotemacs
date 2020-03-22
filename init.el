@@ -1198,9 +1198,9 @@ This function has been altered to accomodate `exwm-mode'."
                                      ([?\s-v]          . volume-settings)
            
                                      ;; Other desktop environment things
-                                     ([?\s-x]           . dmenu)
-                                     ([s-tab]           . audio-loopback)
-                                     ([?\s-w]           . xkb-set-layout)
+                                     ([?\s-x] . dmenu)
+                                     ([s-tab] . audio-loopback)
+                                     ([?\s-w] . xkb-set-layout)
            
                                      ;; Controlling EMMS
                                      ([XF86AudioNext] . emms-next)

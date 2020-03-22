@@ -2384,28 +2384,23 @@ packages and keybindings which help me bring ideas to life day after day.
 
     Because I now use so many workspaces, I need to be able to see what
     workspace I am currently on. This makes it easier to do that. It's rather
-    buggy at times, but it does what it needs to do.
+    buggy at times, but it does what it needs to do. A function is used to grab
+    the current state of the workspaces.
 
     #+begin_src emacs-lisp
       (use-package minibuffer-line
         :ensure t
         :defer t
         :init
-        <<list-workspaces>>
+        (defun farl-exwm/list-workspaces ()
+          "List EXWM workspaces."
+          (exwm-workspace--update-switch-history)
+          (elt exwm-workspace--switch-history
+               (exwm-workspace--position exwm-workspace--current)))
         :custom-face (minibuffer-line ((t (:inherit default))))
         :custom (minibuffer-line-format '((:eval (farl-exwm/list-workspaces))))
         :hook ((exwm-init . minibuffer-line-mode)
                (exwm-workspace-switch . minibuffer-line--update)))
-    #+end_src
-
-    A function is used to grab the current state of the workspaces.
-
-    #+begin_src emacs-lisp :noweb-ref list-workspaces
-      (defun farl-exwm/list-workspaces ()
-        "List EXWM workspaces."
-        (exwm-workspace--update-switch-history)
-        (elt exwm-workspace--switch-history
-             (exwm-workspace--position exwm-workspace--current)))
     #+end_src
 
 ** Multi-head configuration
@@ -3062,9 +3057,9 @@ packages and keybindings which help me bring ideas to life day after day.
                                 ([?\s-v]          . volume-settings)
 
                                 ;; Other desktop environment things
-                                ([?\s-x]           . dmenu)
-                                ([s-tab]           . audio-loopback)
-                                ([?\s-w]           . xkb-set-layout)
+                                ([?\s-x] . dmenu)
+                                ([s-tab] . audio-loopback)
+                                ([?\s-w] . xkb-set-layout)
 
                                 ;; Controlling EMMS
                                 ([XF86AudioNext] . emms-next)
