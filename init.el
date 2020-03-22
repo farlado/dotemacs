@@ -979,7 +979,7 @@ This function has been altered to accomodate `exwm-mode'."
                       "&& echo Microphone is now muted. | tr '\n' ' ' "
                       "|| echo Microphone is now unmuted | tr '\n' ' '"))
              (desktop-environment-screenlock-command
-              (concat "i3lock -nmk --color=000000 --timecolor=ffffffff "
+              (concat "i3lock -nk --color=000000 --timecolor=ffffffff "
                       " --datecolor=ffffffff --wrongcolor=ffffffff "
                       "--ringcolor=00000000 --insidecolor=00000000 "
                       "--keyhlcolor=00000000 --bshlcolor=00000000 "
@@ -992,7 +992,8 @@ This function has been altered to accomodate `exwm-mode'."
                       "--wrong-align 0 --indpos=-10:-10 --timepos=200:125 "
                       "--datepos=200:215 --wrongpos=200:155 --locktext='' "
                       "--lockfailedtext='' --noinputtext='' --veriftext='' "
-                      "--wrongtext='WRONG' --force-clock --radius 1 --ring-width 1 "))
+                      "--wrongtext='WRONG' --force-clock --radius 1 --ring-width 1 "
+                      "--pass-media-keys --pass-screen-keys --pass-power-keys "))
              (desktop-environment-screenshot-directory "~/screenshots")
              (desktop-environment-screenshot-command
               "FILENAME=$(date +'%Y-%m-%d-%H:%M:%S').png && maim $FILENAME")

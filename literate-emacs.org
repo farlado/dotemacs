@@ -2753,7 +2753,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
      #+begin_src emacs-lisp :noweb-ref de-vars
        (desktop-environment-screenlock-command
-        (concat "i3lock -nmk --color=000000 --timecolor=ffffffff "
+        (concat "i3lock -nk --color=000000 --timecolor=ffffffff "
                 " --datecolor=ffffffff --wrongcolor=ffffffff "
                 "--ringcolor=00000000 --insidecolor=00000000 "
                 "--keyhlcolor=00000000 --bshlcolor=00000000 "
@@ -2766,7 +2766,8 @@ packages and keybindings which help me bring ideas to life day after day.
                 "--wrong-align 0 --indpos=-10:-10 --timepos=200:125 "
                 "--datepos=200:215 --wrongpos=200:155 --locktext='' "
                 "--lockfailedtext='' --noinputtext='' --veriftext='' "
-                "--wrongtext='WRONG' --force-clock --radius 1 --ring-width 1 "))
+                "--wrongtext='WRONG' --force-clock --radius 1 --ring-width 1 "
+                "--pass-media-keys --pass-screen-keys --pass-power-keys "))
      #+end_src
 
      I also have to bind an extra key for this function.
