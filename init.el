@@ -938,19 +938,19 @@ This function has been altered to accomodate `exwm-mode'."
     :ensure t
     :defer t
     :init
-    (defun farl-de/desktop-environment-screenshot ()
+    (defun farl-de/screenshot ()
       "Take a screenshot and store it in a file."
       (interactive)
       (desktop-environment-screenshot)
       (message "Screenshot saved in ~/screenshots."))
     
-    (defun farl-de/desktop-environment-screenshot-part ()
+    (defun farl-de/screenshot-part ()
       "Take a capture of a portion of the screen and store it in a file."
       (interactive)
       (desktop-environment-screenshot-part)
       (message "Screenshot saved in ~/screenshots."))
     
-    (defun farl-de/desktop-environment-screenshot-clip ()
+    (defun farl-de/screenshot-clip ()
       "Take a screenshot and put it in the clipboard."
       (interactive)
       (shell-command
@@ -959,7 +959,7 @@ This function has been altered to accomodate `exwm-mode'."
                "-t image/png &> /dev/null && rm $FILENAME"))
       (message "Screenshot copied to clipboard."))
     
-    (defun farl-de/desktop-environment-screenshot-part-clip ()
+    (defun farl-de/screenshot-part-clip ()
       "Take a shot of a portion of the screen and put it in the clipboard."
       (interactive)
       (shell-command
@@ -1002,10 +1002,10 @@ This function has been altered to accomodate `exwm-mode'."
     :hook (exwm-init . desktop-environment-mode)
     :bind (:map desktop-environment-mode-map
            ("<XF86ScreenSaver>" . desktop-environment-lock-screen)
-           ("<print>" . farl-de/desktop-environment-screenshot-part-clip)
-           ("<S-print>" . farl-de/desktop-environment-screenshot-clip)
-           ("<C-print>" . farl-de/desktop-environment-screenshot-part)
-           ("<C-S-print>" . farl-de/desktop-environment-screenshot)))
+           ("<print>" . farl-de/screenshot-part-clip)
+           ("<S-print>" . farl-de/screenshot-clip)
+           ("<C-print>" . farl-de/screenshot-part)
+           ("<C-S-print>" . farl-de/screenshot)))
   (use-package wallpaper
     :ensure t
     :defer t
