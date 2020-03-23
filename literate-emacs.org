@@ -1381,7 +1381,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
     #+begin_src emacs-lisp
       (defun close-buffers-and-windows ()
-        "Kill every buffer and close all windows, then restart dashboard."
+        "Kill every buffer and close all windows."
         (interactive)
         (when (yes-or-no-p "Really kill all buffers? ")
           (save-some-buffers)

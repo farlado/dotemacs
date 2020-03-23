@@ -340,7 +340,7 @@ This function has been altered to accomodate `exwm-mode'."
 (global-set-key (kbd "C-x C-k") #'kill-this-buffer-and-window)
 
 (defun close-buffers-and-windows ()
-  "Kill every buffer and close all windows, then restart dashboard."
+  "Kill every buffer and close all windows."
   (interactive)
   (when (yes-or-no-p "Really kill all buffers? ")
     (save-some-buffers)
