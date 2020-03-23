@@ -128,13 +128,13 @@
   :ensure t
   :defer t
   :init
-  (defun dashboard-immortal ()
-    "Make the dashboard buffer immortal."
-    (emacs-lock-mode 'kill))
   (defun dashboard-or-scratch ()
     "Open either dashboard or the scratch buffer."
     (or (get-buffer "*dashboard*")
         (get-buffer "*scratch*")))
+  (defun dashboard-immortal ()
+    "Make the dashboard buffer immortal."
+    (emacs-lock-mode 'kill))
   (dashboard-setup-startup-hook)
   :custom ((inhibit-start-screen t)
            (dashboard-set-footer nil)
@@ -272,8 +272,6 @@
     (split-window-right)
     (other-window 1)
     (ibuffer))
-  :bind (("C-x 2" . split-and-follow-vertical)
-         ("C-x 3" . split-and-follow-horizontal))
   :custom ((focus-follows-mouse t)
            (mouse-autoselect-window t))
   :bind (("C-x o" . nil)
@@ -284,7 +282,9 @@
          ("C-x o C-w" . buf-move-up)
          ("C-x o C-a" . buf-move-left)
          ("C-x o C-s" . buf-move-down)
-         ("C-x o C-d" . buf-move-right)))
+         ("C-x o C-d" . buf-move-right)
+         ("C-x 2" . split-and-follow-vertical)
+         ("C-x 3" . split-and-follow-horizontal)))
 
 (with-current-buffer "*scratch*"
   (emacs-lock-mode 'kill))

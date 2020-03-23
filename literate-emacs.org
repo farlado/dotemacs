@@ -962,7 +962,7 @@ packages and keybindings which help me bring ideas to life day after day.
    dashboard or a scratch buffer. To prevent use of a lambda (something I
    have come to try to avoid where I can for a number of good reasons).
 
-   #+begin_src emacs-lisp :noweb-ref dashboard-or-scratch
+   #+begin_src emacs-lisp :noweb-ref dashboard-init
      (defun dashboard-or-scratch ()
        "Open either dashboard or the scratch buffer."
        (or (get-buffer "*dashboard*")
@@ -973,7 +973,7 @@ packages and keybindings which help me bring ideas to life day after day.
    time, and this is meant to prevent that by hooking ~emacs-lock-mode~ into
    =dashboard-mode-hook= to lock the buffer from being killed.
 
-   #+begin_src emacs-lisp :noweb-ref dashboard-immortal
+   #+begin_src emacs-lisp :noweb-ref dashboard-init
      (defun dashboard-immortal ()
        "Make the dashboard buffer immortal."
        (emacs-lock-mode 'kill))
@@ -1122,7 +1122,7 @@ packages and keybindings which help me bring ideas to life day after day.
         :ensure t
         :defer t
         :init
-        <<fix-ido>>
+        <<counsel-init>>
         :hook (after-init . farl-init/ivy-mode)
         :bind (("M-x" . counsel-M-x)
                ("C-x C-f" . counsel-find-file)
@@ -1133,7 +1133,7 @@ packages and keybindings which help me bring ideas to life day after day.
     packages I use break. I don't want that to happen, so I hook a function
     into =after-init-hook= to prevent that clash.
 
-    #+begin_src emacs-lisp :tangle no :noweb-ref fix-ido
+    #+begin_src emacs-lisp :tangle no :noweb-ref counsel-init
       (defun farl-init/ivy-mode ()
         "Start `ivy-mode' while disabling `ido-mode'."
         (ivy-mode 1)
@@ -1175,6 +1175,19 @@ packages and keybindings which help me bring ideas to life day after day.
     #+end_src
 
 ** Buffers/windows
+*** Sloppy focus
+
+    Changing focus can also be done through sloppy focus, e.g. moving the cursor
+    between windows. I hate having to click to focus a different window, so I
+    would rather just have windows sloppily focus. This has some flaws when
+    using Emacs as a desktop environment, but it's still cozier than the
+    alternative behavior. It's tangled into the window management form.
+
+    #+begin_src emacs-lisp :noweb-ref window-management-vars :tangle no
+      :custom ((focus-follows-mouse t)
+               (mouse-autoselect-window t))
+    #+end_src
+
 *** Buffer management
 
     Buffer management is done using ~ibuffer~, which is orders of magnitude more
@@ -1222,13 +1235,39 @@ packages and keybindings which help me bring ideas to life day after day.
                ("C-x C-b" . nil)))
     #+end_src
 
-*** Follow when making new windows
+*** Window management
+
+    There are built-in functions for changing focus between windows, but there
+    are not good built-in functions for swapping two windows and moving buffers
+    between windows. Since ~other-window~ is hot garbage, I instead use =C-x o= as a
+    prefix for the commands related to moving focus or moving windows.
+
+    #+begin_src emacs-lisp :noweb yes
+      (use-package buffer-move
+        :ensure t
+        :defer t
+        :init
+        <<window-management-init>>
+        <<window-management-vars>>
+        :bind (("C-x o" . nil)
+               ("C-x o w" . windmove-up)
+               ("C-x o a" . windmove-left)
+               ("C-x o s" . windmove-down)
+               ("C-x o d" . windmove-right)
+               ("C-x o C-w" . buf-move-up)
+               ("C-x o C-a" . buf-move-left)
+               ("C-x o C-s" . buf-move-down)
+               ("C-x o C-d" . buf-move-right)
+               <<window-management-binds>>))
+    #+end_src
+
+*** Follow to new windows
 
       When forming a new window, it should be followed and ~ibuffer~ should be
-      opened. This replaces the other not particularly friendly behavior.
+      opened. This replaces the other not particularly friendly behavior, and is
+      tangled into the window management form.
 
-      #+begin_src emacs-lisp :noweb-ref window-management :tangle no
-        :init
+      #+begin_src emacs-lisp :noweb-ref window-management-init :tangle no
         (defun split-and-follow-vertical ()
           "Open a new window vertically."
           (interactive)
@@ -1241,47 +1280,16 @@ packages and keybindings which help me bring ideas to life day after day.
           (split-window-right)
           (other-window 1)
           (ibuffer))
-        :bind (("C-x 2" . split-and-follow-vertical)
-               ("C-x 3" . split-and-follow-horizontal))
     #+end_src
 
-*** Changing focus and moving windows
+    The new functions are bound to the "default" keys for splitting the window.
 
-    There are built-in functions for changing focus between windows, but there
-    are not good built-in functions for swapping two windows and moving buffers
-    between windows. Since ~other-window~ is hot garbage, I instead use =C-x o= as a
-    prefix for the commands related to moving focus or moving windows.
-
-    #+begin_src emacs-lisp :noweb yes
-      (use-package buffer-move
-        :ensure t
-        :defer t
-        <<window-management>>
-        :bind (("C-x o" . nil)
-               ("C-x o w" . windmove-up)
-               ("C-x o a" . windmove-left)
-               ("C-x o s" . windmove-down)
-               ("C-x o d" . windmove-right)
-               ("C-x o C-w" . buf-move-up)
-               ("C-x o C-a" . buf-move-left)
-               ("C-x o C-s" . buf-move-down)
-               ("C-x o C-d" . buf-move-right)))
+    #+begin_src emacs-lisp :noweb-ref window-management-binds :tangle no
+      ("C-x 2" . split-and-follow-vertical)
+      ("C-x 3" . split-and-follow-horizontal)
     #+end_src
 
-*** Sloppy focus (focus by mouse hover)
-
-    Changing focus can also be done through sloppy focus, e.g. moving the cursor
-    between windows. I hate having to click to focus a different window, so I
-    would rather just have windows sloppily focus. This has some flaws when
-    using Emacs as a desktop environment, but it's still cozier than the
-    alternative behavior.
-
-    #+begin_src emacs-lisp :noweb-ref window-management :tangle no
-        :custom ((focus-follows-mouse t)
-                 (mouse-autoselect-window t))
-    #+end_src
-
-*** Make the scratch buffer immortal and start blank
+*** Immortal blank scratch buffer
 
     I kill the scratch buffer way too often if I don't do this. While I'm here,
     I might as well also make the scratch buffer blank.
@@ -2249,7 +2257,7 @@ packages and keybindings which help me bring ideas to life day after day.
       :custom ((exwm-replace t)
                <<exwm-vars>>)
       <<exwm-hook>>
-      <<exwm-binds>>)
+      <<exwm-bind>>)
   #+end_src
 
 ** Window management
@@ -2962,9 +2970,9 @@ packages and keybindings which help me bring ideas to life day after day.
     This function is globally bound to =C-x C-M-c=. Other binds are pulled into
     here for a cleaner end result upon tangling.
 
-    #+begin_src emacs-lisp :noweb-ref exwm-binds
+    #+begin_src emacs-lisp :noweb-ref exwm-bind
       :bind (("C-x C-M-c" . shut-down-computer)
-             <<exwm-global-binds>>
+             <<exwm-binds>>
              :map exwm-mode-map
              <<exwm-mode-binds>>)
     #+end_src
@@ -2986,7 +2994,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
     This function is globally bound to =C-x C-M-r=.
 
-    #+begin_src emacs-lisp :noweb-ref exwm-global-binds
+    #+begin_src emacs-lisp :noweb-ref exwm-binds
       ("C-x C-M-r" . reboot-computer)
     #+end_src
 
@@ -3001,7 +3009,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
     This function is globally bound to =C-x C-M-s=.
 
-    #+begin_src emacs-lisp :noweb-ref exwm-global-binds
+    #+begin_src emacs-lisp :noweb-ref exwm-binds
       ("C-x C-M-s" . suspend-computer)
     #+end_src
 
