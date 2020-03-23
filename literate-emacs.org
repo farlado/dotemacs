@@ -169,7 +169,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Starting Emacs FAST
    :properties:
-   :header-args: :tangle (locate-user-emacs-file "lisp/pdumper.el")
+   :header-args: :tangle "lisp/pdumper.el"
    :end:
 
    Even with the "small" amount I ask of Emacs, it's a lot of beef to start up
@@ -569,7 +569,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Later package management
    :properties:
-   :header-args: :tangle (locate-user-emacs-file "init.el")
+   :header-args: :tangle "init.el"
    :end:
 
    This part of package management is meant to be done after ~package-initialize~
@@ -624,7 +624,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Final considerations
    :properties:
-   :header-args: :tangle (locate-user-emacs-file "init.el")
+   :header-args: :tangle "init.el"
    :end:
 
    These are other startup-specific things to be done after package management
@@ -724,7 +724,7 @@ packages and keybindings which help me bring ideas to life day after day.
    theme I've stuck with is Dracula. It is the most comfortable and there are
    GTK themes that match it very well.
 
-   #+begin_src emacs-lisp :noweb yes :tangle (locate-user-emacs-file "init.el")
+   #+begin_src emacs-lisp :noweb yes :tangle "init.el"
      (use-package dracula-theme
        :if window-system
        :ensure t
@@ -816,7 +816,7 @@ packages and keybindings which help me bring ideas to life day after day.
    I hate the default mode line with a burning passion. This mode line is sleek
    and minimalist for a quick startup and a compact look and saved frustration.
 
-   #+begin_src emacs-lisp :noweb yes :tangle (locate-user-emacs-file "init.el")
+   #+begin_src emacs-lisp :noweb yes :tangle "init.el"
      (use-package mood-line
        :ensure t
        :defer t
@@ -852,7 +852,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** In buffers
    :properties:
-   :header-args: :tangle (locate-user-emacs-file "init.el")
+   :header-args: :tangle "init.el"
    :end:
 
 *** Word wrapping
@@ -941,13 +941,12 @@ packages and keybindings which help me bring ideas to life day after day.
    I like the default start screen, but it just doesn't cut it for me. I just
    use this to have a nice screen when I start Emacs or close all my buffers.
 
-   #+begin_src emacs-lisp :noweb yes :tangle (locate-user-emacs-file "init.el")
+   #+begin_src emacs-lisp :noweb yes :tangle "init.el"
      (use-package dashboard
        :ensure t
        :defer t
        :init
-       <<dashboard-immortal>>
-       <<dashboard-or-scratch>>
+       <<dashboard-init>>
        (dashboard-setup-startup-hook)
        :custom ((inhibit-start-screen t)
                 (dashboard-set-footer nil)
@@ -982,7 +981,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 * Making Emacs more comfortable
   :properties:
-  :header-args: :tangle (locate-user-emacs-file "init.el")
+  :header-args: :tangle "init.el"
   :end:
 
   Anyone who has used Emacs for any period of time can attest to the fact that
@@ -1397,7 +1396,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 * Making Emacs a good text editor
   :properties:
-  :header-args: :tangle (locate-user-emacs-file "init.el")
+  :header-args: :tangle "init.el"
   :end:
 
   Emacs /is/ a text editor... right? This used to be a +somewhat bigger+ mess of
@@ -1733,7 +1732,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
    As I spend more time in Org-mode, the more I need from it.
 
-   #+begin_src emacs-lisp :noweb-ref no :tangle (locate-user-emacs-file "init.el")
+   #+begin_src emacs-lisp :noweb-ref no :tangle "init.el"
      (use-package org
        :defer t
        :init
@@ -1956,7 +1955,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 * Making Emacs more than an editor
   :properties:
-  :header-args: :tangle (locate-user-emacs-file "init.el")
+  :header-args: :tangle "init.el"
   :end:
 
   Emacs is also more than just an editor, right? If it isn't about editing text
@@ -2108,7 +2107,7 @@ packages and keybindings which help me bring ideas to life day after day.
   to Emacs was a HUGE step. When I first started using it, it was weird, but now
   I have come to absolutely love it. We only configure EMMS if ~mpd~ is found.
 
-  #+begin_src emacs-lisp :noweb yes :tangle (locate-user-emacs-file "init.el")
+  #+begin_src emacs-lisp :noweb yes :tangle "init.el"
     (use-package emms
       :if (executable-find "mpd")
       :ensure t
@@ -2239,7 +2238,7 @@ packages and keybindings which help me bring ideas to life day after day.
   of this when writing your =.xinitrc= or writing a =.desktop= file to load Emacs as
   your desktop environment. EXWM should replace the current window manager.
 
-  #+begin_src emacs-lisp :noweb-ref no :tangle (locate-user-emacs-file "init.el")
+  #+begin_src emacs-lisp :noweb-ref no :tangle "init.el"
     (use-package exwm
       :if (getenv "_RUN_EXWM")
       :ensure t
