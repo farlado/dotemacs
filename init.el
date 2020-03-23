@@ -92,6 +92,8 @@
 
 (global-visual-line-mode 1)
 
+(setq-default cursor-type 'bar)
+
 (use-package page-break-lines
   :ensure t
   :defer t
@@ -240,14 +242,14 @@
                      ("haskell" (mode . haskell-mode))
                      ("python" (mode . python-mode))
                      ("org"   (mode . org-mode))
-                     ("emacs" (or (mode . help-mode)
-                                  (mode . info-mode)
-                                  (name . "^\\*dashboard\\*$")
-                                  (name . "^\\*scratch\\*$")
-                                  (name . "^\\*Messages\\*$")
-                                  (name . "^\\*Backtrace\\*$")
+                     ("emacs" (or (name . "^\\*Shell.*Output\\*$")
                                   (name . "^\\*Compile-Log\\*$")
-                                  (name . "^\\*Shell.*Output\\*$")))))))
+                                  (name . "^\\*Backtrace\\*$")
+                                  (name . "^\\*dashboard\\*$")
+                                  (name . "^\\*Messages\\*$")
+                                  (name . "^\\*scratch\\*$")
+                                  (name . "^\\*info\\*$")
+                                  (name . "^\\*Help\\*$")))))))
            (uniquify-buffer-name-style 'forward)
            (uniquify-after-kill-buffer-p t))
   :hook (ibuffer-mode . farl-ibuffer/use-default-filter-group)
