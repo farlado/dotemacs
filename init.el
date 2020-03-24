@@ -228,8 +228,9 @@
     (ibuffer-switch-to-saved-filter-groups "default"))
   :custom ((ibuffer-saved-filter-groups
             (quote (("default"
-                     ("exwm" (or (mode . exwm-mode)
-                                 (name . "^\\*XELB-DEBUG\\*$")))
+                     ("exwm" (and (or (mode . exwm-mode)
+                                      (name . "^\\*XELB-DEBUG\\*$"))
+                                  (not (name . "Firefo[x<>1-9]+$"))))
                      ("firefox" (name . "Firefo[x<>1-9]+$"))
                      ("emms" (or (mode . emms-mode)
                                  (mode . emms-browser-mode)
