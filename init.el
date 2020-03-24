@@ -1,3 +1,21 @@
+;;; init.el --- Initializing Farlado's Illiterate GNU Emacs
+
+;; This file is not part of GNU Emacs.
+
+
+
+;;; Commentary:
+
+;; This file has been automatically tangled from `literate-emacs.org'.
+;; If you don't have a copy of that file, it is best not to use this file!
+;; All relevant commentary is in `literate-emacs.org', not here.
+;; There may not be any comments past this point.
+;; Abandon all hope, ye who enter here.
+
+
+
+;;; Code:
+
 (unless (package-installed-p 'async)
   (package-refresh-contents)
   (package-install 'async))
@@ -491,6 +509,7 @@ This function has been altered to accomodate `exwm-mode'."
          (flycheck-posframe-mode . flycheck-posframe-configure-pretty-defaults)))
 
 (use-package avy-flycheck
+  :after flycheck
   :ensure t
   :defer t
   :bind (:map prog-mode-map
@@ -989,7 +1008,7 @@ This function has been altered to accomodate `exwm-mode'."
                       "|| echo Microphone is now unmuted | tr '\n' ' '"))
              (desktop-environment-screenlock-command
               (concat "i3lock -nk --color=000000 --timecolor=ffffffff "
-                      " --datecolor=ffffffff --wrongcolor=ffffffff "
+                      "--datecolor=ffffffff --wrongcolor=ffffffff "
                       "--ringcolor=00000000 --insidecolor=00000000 "
                       "--keyhlcolor=00000000 --bshlcolor=00000000 "
                       "--separatorcolor=00000000 --ringvercolor=00000000 "
@@ -1267,3 +1286,7 @@ This function has been altered to accomodate `exwm-mode'."
          ("C-c C-t C-f" . nil)
          ("C-c C-t C-v" . nil)
          ("C-c C-t C-m" . nil)))
+
+
+
+;;; init.el ends here

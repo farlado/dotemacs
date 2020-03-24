@@ -22,6 +22,7 @@ packages and keybindings which help me bring ideas to life day after day.
   - [[#installation][Installation]]
   - [[#dependencies][Dependencies]]
   - [[#license][License]]
+- [[#giving-files-their-headers][Giving files their headers]]
 - [[#making-emacs-start-quickly][Making Emacs start quickly]]
   - [[#starting-emacs-fast][Starting Emacs FAST]]
   - [[#do-these-things-asap][Do these things ASAP]]
@@ -64,6 +65,7 @@ packages and keybindings which help me bring ideas to life day after day.
   - [[#keybindings-1][Keybindings]]
   - [[#on-startup][On startup]]
   - [[#on-logout][On logout]]
+- [[#giving-files-their-footers][Giving files their footers]]
 #+END_QUOTE
 
 * About this configuration
@@ -160,6 +162,79 @@ packages and keybindings which help me bring ideas to life day after day.
    Because I +am a lazy piece of shit who doesn't like long licenses+ don't think
    much harm could come from using a pushover license for a configuration, I am
    publishing this literate Emacs configuration under the WTFPL.
+
+* Giving files their headers
+
+  In order to make the files look at least somewhat decent for documentation
+  linters, and to warn those who are unfortunate enough to think they'll just
+  mosey on into one of them if they want to understand the config, we create
+  headers that tell people the reality of the files.
+
+*** =pdumper.el=
+
+    #+begin_src emacs-lisp :tangle "lisp/pdumper.el"
+      ;;; pdumper.el --- Making a portable dump image
+
+      ;; This file is not part of GNU Emacs.
+
+      
+
+      ;;; Commentary:
+
+      ;; This file has been automatically tangled from `literate-emacs.org'.
+      ;; If you don't have a copy of that file, it is best not to use this file!
+      ;; All relevant commentary is in `literate-emacs.org', not here.
+      ;; There may not be any comments past this point.
+      ;; Abandon all hope, ye who enter here.
+
+      
+
+      ;;; Code:
+    #+end_src
+
+*** =early-init.el=
+
+    #+begin_src emacs-lisp :tangle "early-init.el"
+      ;;; early-init.el --- Early startup for Farlado's Illiterate GNU Emacs
+
+      ;; This file is not part of GNU Emacs.
+
+      
+
+      ;;; Commentary:
+
+      ;; This file has been automatically tangled from `literate-emacs.org'.
+      ;; If you don't have a copy of that file, it is best not to use this file!
+      ;; All relevant commentary is in `literate-emacs.org', not here.
+      ;; There may not be any comments past this point.
+      ;; Abandon all hope, ye who enter here.
+
+      
+
+      ;;; Code:
+    #+end_src
+
+*** =init.el=
+
+    #+begin_src emacs-lisp :tangle "init.el"
+      ;;; init.el --- Initializing Farlado's Illiterate GNU Emacs
+
+      ;; This file is not part of GNU Emacs.
+
+      
+
+      ;;; Commentary:
+
+      ;; This file has been automatically tangled from `literate-emacs.org'.
+      ;; If you don't have a copy of that file, it is best not to use this file!
+      ;; All relevant commentary is in `literate-emacs.org', not here.
+      ;; There may not be any comments past this point.
+      ;; Abandon all hope, ye who enter here.
+
+      
+
+      ;;; Code:
+    #+end_src
 
 * Making Emacs start quickly
 
@@ -319,7 +394,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Do these things ASAP
    :properties:
-   :header-args: :tangle (locate-user-emacs-file "early-init.el")
+   :header-args: :tangle "early-init.el"
    :end:
 
    Emacs 27 introduced =early-init.el=, allowing configuration of multiple items
@@ -454,7 +529,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Early package management
    :properties:
-   :header-args: :tangle (locate-user-emacs-file "early-init.el")
+   :header-args: :tangle "early-init.el"
    :end:
 
    Because I am writing this configuration to be as independent/portable as
@@ -1639,11 +1714,11 @@ packages and keybindings which help me bring ideas to life day after day.
         :bind ("C-x g" . magit-status))
     #+end_src
 
-*** ~haskell-mode~
+*** Haskell
 
     I have started to mess around with Haskell, so I needed to grab a mode for
     that. This supplies basically everything I need as far as I know, e.g.
-    company autocompletion and flycheck information.
+    company autocomplete and ~flycheck~ information.
 
     #+begin_src emacs-lisp
       (use-package haskell-mode
@@ -1691,7 +1766,7 @@ packages and keybindings which help me bring ideas to life day after day.
         :hook (prog-mode . flycheck-mode))
     #+end_src
 
-*** On-the-fly package linting
+*** On-the-fly Emacs package linting
 
     Now that I'm dabbling in writing Emacs packages, I need to be able to lint
     packages more thoroughly. Adding a linter specifically for packages is very
@@ -1728,6 +1803,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
     #+begin_src emacs-lisp
       (use-package avy-flycheck
+        :after flycheck
         :ensure t
         :defer t
         :bind (:map prog-mode-map
@@ -2771,7 +2847,7 @@ packages and keybindings which help me bring ideas to life day after day.
      #+begin_src emacs-lisp :noweb-ref de-vars
        (desktop-environment-screenlock-command
         (concat "i3lock -nk --color=000000 --timecolor=ffffffff "
-                " --datecolor=ffffffff --wrongcolor=ffffffff "
+                "--datecolor=ffffffff --wrongcolor=ffffffff "
                 "--ringcolor=00000000 --insidecolor=00000000 "
                 "--keyhlcolor=00000000 --bshlcolor=00000000 "
                 "--separatorcolor=00000000 --ringvercolor=00000000 "
@@ -3300,5 +3376,33 @@ packages and keybindings which help me bring ideas to life day after day.
 
     #+begin_src emacs-lisp
       (shell-command "hsetroot -solid '#000000'")
+    #+end_src
+
+* Giving files their footers
+
+  Since we gave files their headers, I see no reason not to give them footers.
+
+*** =pdumper.el=
+
+    #+begin_src emacs-lisp :tangle "lisp/pdumper.el"
+      
+
+      ;;; pdumper.el ends here
+    #+end_src
+
+*** =early-init.el=
+
+    #+begin_src emacs-lisp :tangle "early-init.el"
+      
+
+      ;;; early-init.el ends here
+    #+end_src
+
+*** =init.el=
+
+    #+begin_src emacs-lisp :tangle "init.el"
+      
+
+      ;;; init.el ends here
     #+end_src
 

@@ -1,3 +1,21 @@
+;;; early-init.el --- Early startup for Farlado's Illiterate GNU Emacs
+
+;; This file is not part of GNU Emacs.
+
+
+
+;;; Commentary:
+
+;; This file has been automatically tangled from `literate-emacs.org'.
+;; If you don't have a copy of that file, it is best not to use this file!
+;; All relevant commentary is in `literate-emacs.org', not here.
+;; There may not be any comments past this point.
+;; Abandon all hope, ye who enter here.
+
+
+
+;;; Code:
+
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
@@ -141,3 +159,7 @@ This function was altered to inhibit a specific undesired behavior."
 
 (setq package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
+
+
+
+;;; early-init.el ends here
