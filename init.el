@@ -110,6 +110,9 @@
 
 (global-visual-line-mode 1)
 
+(setq-default fill-column 80)
+(add-hook 'text-mode-hook #'turn-on-auto-fill)
+
 (setq-default cursor-type 'bar)
 
 (use-package page-break-lines
@@ -175,8 +178,8 @@
 
 (setq scroll-margin 0
       auto-window-vscroll nil
-      scroll-conservatively 100000
       scroll-preserve-screen-position 1
+      scroll-conservatively most-positive-fixnum
       mouse-wheel-scroll-amount '(1 ((shift) . 1))
       mouse-wheel-progressive-speed nil
       mouse-wheel-follow-mouse t)
@@ -248,6 +251,7 @@
             (quote (("default"
                      ("exwm" (and (not (name . "Firefo[x<>1-9]+$"))
                                   (or (name . "^\\*system-packages\\*$")
+                                      (name . "^\\*Wi-Fi Networks\\*$")
                                       (name . "^\\*XELB-DEBUG\\*$")
                                       (mode . exwm-mode))))
                      ("firefox" (name . "Firefo[x<>1-9]+$"))
@@ -265,6 +269,7 @@
                      ("emacs" (or (name . "^\\*package.*results\\*$")
                                   (name . "^\\*Shell.*Output\\*$")
                                   (name . "^\\*Compile-Log\\*$")
+                                  (name . "^\\*Completions\\*$")
                                   (name . "^\\*Backtrace\\*$")
                                   (name . "^\\*dashboard\\*$")
                                   (name . "^\\*Messages\\*$")
@@ -635,6 +640,7 @@ This function has been altered to accomodate `exwm-mode'."
 (use-package nov
   :ensure t
   :defer t
+  :custom (nov-text-width 80)
   :mode ("\\.epub\\'" . nov-mode))
 
 (use-package wttrin
