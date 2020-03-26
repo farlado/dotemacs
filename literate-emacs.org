@@ -161,9 +161,23 @@ after day.
 
 ** License
 
-   Because I +am a lazy piece of shit who doesn't like long licenses+ don't think
-   much harm could come from using a pushover license for a configuration, I am
-   publishing this literate Emacs configuration under the WTFPL.
+   This package is licensed under version 3 of the GNU General Public License.
+
+   #+name: license
+   #+begin_src emacs-lisp
+     ;; This program is free software; you can redistribute it and/or modify
+     ;; it under the terms of the GNU General Public License as published by
+     ;; the Free Software Foundation, either version 3 of the License, or
+     ;; (at your option) any later version.
+
+     ;; This program is distributed in the hope that it will be useful,
+     ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+     ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     ;; GNU General Public License for more details.
+
+     ;; You should have received a copy of the GNU General Public License
+     ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   #+end_src
 
 * Giving files their headers
 
@@ -174,10 +188,12 @@ after day.
 
 *** =pdumper.el=
 
-    #+begin_src emacs-lisp :tangle "lisp/pdumper.el"
+    #+begin_src emacs-lisp :noweb yes :tangle "lisp/pdumper.el"
       ;;; pdumper.el --- Making a portable dump image
 
       ;; This file is not part of GNU Emacs.
+
+      <<license>>
 
       
 
@@ -196,10 +212,12 @@ after day.
 
 *** =early-init.el=
 
-    #+begin_src emacs-lisp :tangle "early-init.el"
+    #+begin_src emacs-lisp :noweb yes :tangle "early-init.el"
       ;;; early-init.el --- Early startup for Farlado's Illiterate GNU Emacs
 
       ;; This file is not part of GNU Emacs.
+
+      <<license>>
 
       
 
@@ -218,10 +236,12 @@ after day.
 
 *** =init.el=
 
-    #+begin_src emacs-lisp :tangle "init.el"
+    #+begin_src emacs-lisp :noweb yes :tangle "init.el"
       ;;; init.el --- Initializing Farlado's Illiterate GNU Emacs
 
       ;; This file is not part of GNU Emacs.
+
+      <<license>>
 
       
 
