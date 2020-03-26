@@ -405,6 +405,8 @@ This function has been altered to accomodate `exwm-mode'."
 
 (add-hook 'after-save-hook #'byte-compile-config-files 100)
 
+(global-set-key (kbd "C-=") #'count-words)
+
 (use-package flyspell
   :if (executable-find "aspell")
   :defer t

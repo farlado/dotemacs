@@ -1573,6 +1573,14 @@ after day.
     #+end_src
 
 ** General editing
+*** Word counter
+
+    For getting a general word count.
+
+    #+begin_src emacs-lisp
+      (global-set-key (kbd "C-=") #'count-words)
+    #+end_src
+
 *** Spell-checking
 
     This is just a useful little tool to check spelling while editing a buffer.
