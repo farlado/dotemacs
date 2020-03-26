@@ -161,7 +161,9 @@ after day.
 
 ** License
 
-   This package is licensed under version 3 of the GNU General Public License.
+   Farlado's Illiterate GNU Emacs is licensed under version 3 of the GNU General
+   Public License.  This is just a general practice for anything related to
+   Emacs, so I see no reason not to break from this practice.
 
    #+name: license
    #+begin_src emacs-lisp
