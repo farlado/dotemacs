@@ -347,6 +347,7 @@ after day.
                          org-tempo
 
                          ;; Other
+                         term
                          nov
                          wttrin
 
@@ -596,7 +597,6 @@ after day.
                                         epresent
 
                                         ;; Extend
-                                        vterm
                                         nov
                                         wttrin
 
@@ -1307,13 +1307,13 @@ after day.
                                        (mode . emms-browser-mode)
                                        (mode . emms-mode)))
                            ("ebooks" (mode . nov-mode))
-                           ("vterm" (mode . vterm-mode))
                            ("magit" (name . "^magit.*:"))
                            ("dired" (mode . dired-mode))
                            ("elisp" (mode . emacs-lisp-mode))
                            ("haskell" (mode . haskell-mode))
                            ("python" (mode . python-mode))
                            ("org"   (mode . org-mode))
+                           ("term" (mode . term-mode))
                            ("emacs" (or (name . "^\\*package.*results\\*$")
                                         (name . "^\\*Shell.*Output\\*$")
                                         (name . "^\\*Compile-Log\\*$")
@@ -2076,19 +2076,6 @@ after day.
   but also isn't a major thing, it will probably be found in here.
 
 ** Not built-in
-*** Emacs is my terminal
-
-    I've been jumping between ~vterm~ and ~ansi-term~.  In the end ~vterm~ blows
-    ~ansi-term~ clean out of the water.  In the off-chance I'm running Emacs in
-    the terminal, =C-c t= can open ~vterm~.
-
-    #+begin_src emacs-lisp
-      (use-package vterm
-        :ensure t
-        :defer t
-        :bind ("C-c t" . vterm))
-    #+end_src
-
 *** Reading ebooks in Emacs
 
     Not the best way to do epub reading, but at least it's in Emacs.
@@ -2134,6 +2121,25 @@ after day.
     #+begin_src emacs-lisp
       (global-set-key (kbd "C-h 4 m") #'man)
       (global-set-key (kbd "C-h 4 w") #'woman)
+    #+end_src
+
+*** Emacs is my terminal
+
+    I've jumped between ~ansi-term~ and ~vterm~ over and over and over but it seems
+    like the best path is to just stick to ~ansi-term~ with some of the more
+    useful stuff it can do.  I don't really like that it doesn't automatically
+    use my default shell, so I wrote my way around that with advice.
+
+    #+begin_src emacs-lisp
+      (use-package term
+        :defer t
+        :init
+        (defvar farl-term/shell (getenv "SHELL")
+          "The shell to use for `ansi-term'.")
+        (defun farl-term/use-shell (force-bash)
+          (interactive (list farl-term/shell)))
+        (advice-add 'ansi-term :before #'farl-term/use-shell)
+        :bind ("C-c t" . ansi-term))
     #+end_src
 
 ** Games
@@ -3173,8 +3179,6 @@ after day.
                                 (,(kbd "C-s-d") . enlarge-window-horizontally)
 
                                 ;; Opening programs
-                                ([XF86Calculator] . calc)
-                                ([s-return]       . vterm)
                                 ([?\s-g]          . run-gimp)
                                 ([?\s-s]          . run-steam)
                                 ([?\s-f]          . run-firefox)
@@ -3186,6 +3190,8 @@ after day.
                                 ([?\s-r]          . monitor-settings)
                                 ([?\s-n]          . network-settings)
                                 ([?\s-v]          . volume-settings)
+                                ([s-return]       . ansi-term)
+                                ([XF86Calculator] . calc)
 
                                 ;; Other desktop environment things
                                 ([?\s-x] . dmenu)

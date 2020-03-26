@@ -128,7 +128,6 @@ FILENAME and NOERROR are also passed to `require'."
                                   epresent
 
                                   ;; Extend
-                                  vterm
                                   nov
                                   wttrin
 

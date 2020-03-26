@@ -259,13 +259,13 @@
                                  (mode . emms-browser-mode)
                                  (mode . emms-mode)))
                      ("ebooks" (mode . nov-mode))
-                     ("vterm" (mode . vterm-mode))
                      ("magit" (name . "^magit.*:"))
                      ("dired" (mode . dired-mode))
                      ("elisp" (mode . emacs-lisp-mode))
                      ("haskell" (mode . haskell-mode))
                      ("python" (mode . python-mode))
                      ("org"   (mode . org-mode))
+                     ("term" (mode . term-mode))
                      ("emacs" (or (name . "^\\*package.*results\\*$")
                                   (name . "^\\*Shell.*Output\\*$")
                                   (name . "^\\*Compile-Log\\*$")
@@ -634,11 +634,6 @@ This function has been altered to accomodate `exwm-mode'."
   :bind (("C-c s-a" . open-agenda-file)
          ("C-c M-a" . org-agenda)))
 
-(use-package vterm
-  :ensure t
-  :defer t
-  :bind ("C-c t" . vterm))
-
 (use-package nov
   :ensure t
   :defer t
@@ -656,6 +651,16 @@ This function has been altered to accomodate `exwm-mode'."
 
 (global-set-key (kbd "C-h 4 m") #'man)
 (global-set-key (kbd "C-h 4 w") #'woman)
+
+(use-package term
+  :defer t
+  :init
+  (defvar farl-term/shell (getenv "SHELL")
+    "The shell to use for `ansi-term'.")
+  (defun farl-term/use-shell (force-bash)
+    (interactive (list farl-term/shell)))
+  (advice-add 'ansi-term :before #'farl-term/use-shell)
+  :bind ("C-c t" . ansi-term))
 
 (defvar games-map (make-sparse-keymap)
   "A keymap to which games can be added.")
@@ -1221,8 +1226,6 @@ This function has been altered to accomodate `exwm-mode'."
                                      (,(kbd "C-s-d") . enlarge-window-horizontally)
            
                                      ;; Opening programs
-                                     ([XF86Calculator] . calc)
-                                     ([s-return]       . vterm)
                                      ([?\s-g]          . run-gimp)
                                      ([?\s-s]          . run-steam)
                                      ([?\s-f]          . run-firefox)
@@ -1234,6 +1237,8 @@ This function has been altered to accomodate `exwm-mode'."
                                      ([?\s-r]          . monitor-settings)
                                      ([?\s-n]          . network-settings)
                                      ([?\s-v]          . volume-settings)
+                                     ([s-return]       . ansi-term)
+                                     ([XF86Calculator] . calc)
            
                                      ;; Other desktop environment things
                                      ([?\s-x] . dmenu)

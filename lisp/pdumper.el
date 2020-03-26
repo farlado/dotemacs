@@ -74,6 +74,7 @@
                    org-tempo
 
                    ;; Other
+                   term
                    nov
                    wttrin
 
