@@ -8,17 +8,18 @@
 #+html: <p align="center"><img src="logo.png" /></p>
 
 #+begin_quote
-Personally, I feel inspired whenever I open Emacs. Like a craftsman entering his
-workshop, I feel a realm of possibility open before me. I feel the comfort of an
-environment that has evolved over time to fit me perfectly -- an assortment of
-packages and keybindings which help me bring ideas to life day after day.
+Personally, I feel inspired whenever I open Emacs.  Like a craftsman entering
+his workshop, I feel a realm of possibility open before me.  I feel the comfort
+of an environment that has evolved over time to fit me perfectly -- an
+assortment of packages and keybindings which help me bring ideas to life day
+after day.
 -- [[https://www.braveclojure.com/basic-emacs/][Daniel Higginbotham]]
 #+end_quote
 
 * Table of Contents :toc:quote:
 #+BEGIN_QUOTE
 - [[#about-this-configuration][About this configuration]]
-  - [[#okay-thats-pretty-neat-why-though][Okay, that's pretty neat. Why though?]]
+  - [[#okay-thats-pretty-neat--why-though][Okay, that's pretty neat.  Why though?]]
   - [[#installation][Installation]]
   - [[#dependencies][Dependencies]]
   - [[#license][License]]
@@ -75,23 +76,23 @@ packages and keybindings which help me bring ideas to life day after day.
 
   Literate programming is a method in which programming is worked on in parallel
   with the development of documentation specifically pertaining to how said
-  program was written, alongside how to use the program at times. The end result
-  is a file that can be /tangled/ into source code and /weaved/ into documentation.
-  The benefits of this practice are far easier maintenance of a rapidly growing
-  project, and far greater control in the flow of when code is introduced in
-  documentation and where it is included in resultant source code.
+  program was written, alongside how to use the program at times.  The end
+  result is a file that can be /tangled/ into source code and /weaved/ into
+  documentation.  The benefits of this practice are far easier maintenance of a
+  rapidly growing project, and far greater control in the flow of when code is
+  introduced in documentation and where it is included in resultant source code.
 
-  This configuration is /incredibly/ opinionated, and it is very likely that most 
-  changes will not be friendly towards the typical Emacs user. Hopefully this
+  This configuration is /incredibly/ opinionated, and it is very likely that most
+  changes will not be friendly towards the typical Emacs user.  Hopefully this
   file will contain enough commentary for you to understand everything within
-  it. Regardless, the idea is that this file, when tangled, generates my entire
-  configuration. I would /highly/ recommend you *NOT* try to read the =.el= files on
-  their own. It's a jungle, especially since all of the commentary regarding the
-  configuration is in this file and this file alone.
+  it.  Regardless, the idea is that this file, when tangled, generates my entire
+  configuration.  I would /highly/ recommend you *NOT* try to read the =.el= files on
+  their own.  It's a jungle, especially since all of the commentary regarding
+  the configuration is in this file and this file alone.
 
-** Okay, that's pretty neat. Why though?
+** Okay, that's pretty neat.  Why though?
 
-   The answer is rather simple. Before I used a fully literate file, I had an
+   The answer is rather simple.  Before I used a fully literate file, I had an
    =init.el= which tangled blocks from a =config.org= on the fly (read: on startup).
    It turns out this was abysmally slow, making for a startup time of around 4.5
    seconds when loading into my desktop environment, even if saving was much
@@ -101,7 +102,7 @@ packages and keybindings which help me bring ideas to life day after day.
    Tangling blocks from a =literate-emacs.org= into byte-compiled =early-init.el=
    and =init.el= alongside the use of portable dumping (plus multiple other
    efficiency improvements, of course) cuts this time down to around 1.1 seconds
-   to load into my desktop environment. This also comes with the advantage of
+   to load into my desktop environment.  This also comes with the advantage of
    being a hub for /all/ things related to my Emacs configuration, where
    previously I had to check multiple files when I thought I might have changed
    something for the worse.
@@ -114,13 +115,14 @@ packages and keybindings which help me bring ideas to life day after day.
 ** Installation
 
    1) Clone the repo into where you store your Emacs configuration.
-   2) Make sure you have all the right dependencies. See below for more details.
+   2) Make sure you have all the right dependencies.
+      See below for more details.
 
 ** Dependencies
 
    #+begin_center
-   *THIS CONFIGURATION IS MEANT FOR EMACS 27 AND LATER. IT WILL LIKELY /NOT/ LOAD
-   PROPERLY ON EMACS 26 OR EARLIER. THE BRANCH FOR EMACS 26 OR EARLIER IS [[https://github.com/farlado/dotemacs/tree/emacs26-end][HERE]].*
+   *THIS CONFIGURATION IS MEANT FOR EMACS 27 AND LATER.  IT WILL LIKELY /NOT/ LOAD
+   PROPERLY ON EMACS 26 OR EARLIER.  THE BRANCH FOR EMACS 26 OR EARLIER IS [[https://github.com/farlado/dotemacs/tree/emacs26-end][HERE]].*
    #+end_center
 
    Everything has different dependencies so make sure you have what you need.
@@ -238,7 +240,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 * Making Emacs start quickly
 
-  This is everything related to starting Emacs quickly. First things first is
+  This is everything related to starting Emacs quickly.  First things first is
   setting up a batch script used to create a custom portable dump image,
   followed by what to execute at startup to make initialization faster.
 
@@ -248,17 +250,17 @@ packages and keybindings which help me bring ideas to life day after day.
    :end:
 
    Even with the "small" amount I ask of Emacs, it's a lot of beef to start up
-   as fast as I demand it to start up. The portable dumper is an amazing thing.
+   as fast as I demand it to start up.  The portable dumper is an amazing thing.
    This is just a minimal script for utilizing the portable dumper added to
-   Emacs 27 to make Emacs load faster. Every single ~require~ that doesn't create
+   Emacs 27 to make Emacs load faster.  Every single ~require~ that doesn't create
    a =LispObject= incompatible with the portable dumper can now be skipped while
-   loading. Before I started using the portable dumper, I saw start times of
-   around 2.5 seconds. Now I am down 1.1 seconds, having cut about half of the
+   loading.  Before I started using the portable dumper, I saw start times of
+   around 2.5 seconds.  Now I am down 1.1 seconds, having cut about half of the
    start time out.
 
    This script must be run while Emacs is *not* open, otherwise it will *crash*
    Emacs and (if you're using ~vterm~ or another virtual terminal inside of Emacs
-   to run the script) *the dump image will be corrupted*. To run the script, from
+   to run the script) *the dump image will be corrupted*.  To run the script, from
    the shell enter the following, substituting =$USER_EMACS_DIR= for wherever you
    store your Emacs configuration:
 
@@ -280,7 +282,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Store =load-path=
 
     For some reason, the dump image doesn't store =load-path=, so it needs to be
-    stored here, to be restored when =early-init.el= is loaded. A boolean is also
+    stored here, to be restored when =early-init.el= is loaded.  A boolean is also
     set to indicate a portable dump image was used when Emacs is loaded.
 
     #+begin_src emacs-lisp
@@ -290,7 +292,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** ~require~ packages
 
-    A considerable amount of time is spent loading packages during startup. The
+    A considerable amount of time is spent loading packages during startup.  The
     portable dump image is meant to load as many features at once as possible.
     These features are loaded so that they will be added to the dump image.
 
@@ -376,9 +378,9 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Pre-load the theme
 
-    A *HUGE* amount of time is spent loading the theme during startup. Loading the
-    theme ahead of time saves a significant portion of the time cut by using a
-    portable dump image.
+    A *HUGE* amount of time is spent loading the theme during startup.  Loading
+    the theme ahead of time saves a significant portion of the time cut by using
+    a portable dump image.
 
     #+begin_src emacs-lisp
       (load-theme 'dracula t t)
@@ -398,14 +400,14 @@ packages and keybindings which help me bring ideas to life day after day.
    :end:
 
    Emacs 27 introduced =early-init.el=, allowing configuration of multiple items
-   before Emacs has graphically loaded. Either I want these configured as soon
-   as possible, or they are related to Emacs starting up. Which are which is
+   before Emacs has graphically loaded.  Either I want these configured as soon
+   as possible, or they are related to Emacs starting up.  Which are which is
    left as an exercise to the reader.
 
 *** Prepare GUI (Part 1)
 
-    I want to get GUI elements out of my face as soon as I possibly can. They
-    just take up space. If I'm running Emacs as my desktop environment (see
+    I want to get GUI elements out of my face as soon as I possibly can.  They
+    just take up space.  If I'm running Emacs as my desktop environment (see
     further below), I want Emacs to immediately take on the background color of
     the theme I use to make startup marginally more aesthetically pleasing.
 
@@ -420,7 +422,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Handling portable dumping
 
-    For some reason, the portable dumper has odd behaviors. This block aims to
+    For some reason, the portable dumper has odd behaviors.  This block aims to
     address each of these behaviors so that using a custom dump image does not
     behave any different from not using one.
 
@@ -460,7 +462,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Byte-compile on first run
 
     It's done after =after-init-hook= so that we don't actually do it in the
-    middle of loading files. That would be disastrous.
+    middle of loading files.  That would be disastrous.
 
     #+begin_src emacs-lisp
       (defun farl-init/compile-user-emacs-directory ()
@@ -491,7 +493,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** File name handling setup
 
     For whatever reason, setting =file-name-handler-alist= to =nil= helps Emacs load
-    faster. After Emacs finishes loading, it's reverted to its original value.
+    faster.  After Emacs finishes loading, it's reverted to its original value.
 
     #+begin_src emacs-lisp
       (defvar startup/file-name-handler-alist file-name-handler-alist
@@ -508,9 +510,9 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Garbage collection setup
 
     Garbage collection shouldn't happen during startup, as that will slow Emacs
-    down. Do it later. This is also where more ideal garbage collection settings
-    are chosen. The functions used to defer and restore garbage collection are
-    used later on.
+    down.  Do it later.  This is also where more ideal garbage collection
+    settings are chosen.  The functions used to defer and restore garbage
+    collection are used later on.
 
     #+begin_src emacs-lisp
       (defun garbage-collect-defer ()
@@ -534,17 +536,17 @@ packages and keybindings which help me bring ideas to life day after day.
 
    Because I am writing this configuration to be as independent/portable as
    possible (e.g. I should be able to dump this onto any machine and run it), I
-   manage all packages through Emacs. All of this is done leading up to the call
-   of ~package-initialize~ between that =early-init.el= and =init.el=, which makes for
-   faster loading.
+   manage all packages through Emacs.  All of this is done leading up to the
+   call of ~package-initialize~ between that =early-init.el= and =init.el=, which
+   makes for faster loading.
 
 *** Disable ~customize~, keep ~package-autoremove~ working
 
-    I /hate/ ~customize~. I configure everything in this file, so I don't need
-    anything messing with my =init.el=, much less changing settings on me. Even
+    I /hate/ ~customize~.  I configure everything in this file, so I don't need
+    anything messing with my =init.el=, much less changing settings on me.  Even
     though I do not use ~customize~ but really like protecting packages used in my
     configuration from ~package-autoremove~, I need to still set the variable
-    =package-selected-packages= so that it'll work. Packages are listed in the
+    =package-selected-packages= so that it'll work.  Packages are listed in the
     order in which they are mentioned in this configuration.
 
     #+begin_src emacs-lisp
@@ -620,7 +622,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Disable an annoying ~customize~ function
 
     Since I don't use ~customize~, we don't need to mess with it every time a
-    package is installed or uninstalled. Because of this, I need to first load
+    package is installed or uninstalled.  Because of this, I need to first load
     everything related to package management.
 
     #+begin_src emacs-lisp
@@ -634,8 +636,8 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Configure package repositories
 
-    Next, we have to add our package repositories to the list. The GNU and MELPA
-    repositories should be enough to last me decades.
+    Next, we have to add our package repositories to the list.  The GNU and
+    MELPA repositories should be enough to last me decades.
 
     #+begin_src emacs-lisp
       (setq package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
@@ -648,13 +650,13 @@ packages and keybindings which help me bring ideas to life day after day.
    :end:
 
    This part of package management is meant to be done after ~package-initialize~
-   has been called. At this point, we can leave =early-init.el= and move into
+   has been called.  At this point, we can leave =early-init.el= and move into
    =init.el= to continue Emacs startup.
 
 *** Bootstrap ~async~
 
     Asynchronous execution of bytecode compilation and various other actions
-    makes Emacs lock SIGNIFICANTLY less often. This is a very good thing.
+    makes Emacs lock SIGNIFICANTLY less often.  This is a very good thing.
 
     #+begin_src emacs-lisp
       (unless (package-installed-p 'async)
@@ -669,7 +671,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Bootstrap ~use-package~
 
     Since I manage all Emacs packages in Emacs itself, ~use-package~ makes it much
-    easier to manage the packages I need. It also means I can see what packages
+    easier to manage the packages I need.  It also means I can see what packages
     take the longest to load, alongside configure packages in a significantly
     more declarative manner.
 
@@ -684,8 +686,9 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Automatically update packages
 
-    I don't want to have to manually update my stuff. This solution is literally
-    plop-and-forget, and updates packages on a regular interval of two days.
+    I don't want to have to manually update my stuff.  This solution is
+    literally plop-and-forget, and updates packages on a regular interval of two
+    days.
 
     #+begin_src emacs-lisp
       (use-package auto-package-update
@@ -709,8 +712,8 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Start Emacs server
 
     Having the Emacs server running allows for a lot of neat integration with
-    other parts of my desktop environment. I don't want to try to start a server
-    if one is already running, though.
+    other parts of my desktop environment.  I don't want to try to start a
+    server if one is already running, though.
 
     #+begin_src emacs-lisp
       (pdumper-require 'server)
@@ -721,7 +724,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Prepare GUI (Part 2)
 
     These settings would be great to include in =early-init.el=, but they don't
-    seem to go into effect unless they are in =init.el= instead. What a bummer.
+    seem to go into effect unless they are in =init.el= instead.  What a bummer.
 
     #+begin_src emacs-lisp
       (tooltip-mode -1)
@@ -731,8 +734,8 @@ packages and keybindings which help me bring ideas to life day after day.
 
 * Making Emacs much less ugly
 
-  Stock Emacs is /ugly/. Just straight up ugly. Suffice to say it leaves much to
-  be desired. This section is specifically meant for fixing Emacs visually and
+  Stock Emacs is /ugly/.  Just straight up ugly.  Suffice to say it leaves much to
+  be desired.  This section is specifically meant for fixing Emacs visually and
   making it much more desirable for everyday use.
 
 ** Font
@@ -742,8 +745,9 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Use UTF-8 encoding
 
-    This makes for a much easier time editing files and working with text. Why
-    isn't this the default to begin with since it's basically standard?
+    This makes for a much easier time editing files and working with text.  Why
+    isn't this the default to begin with since it's basically standard for
+    everything?
 
     #+begin_src emacs-lisp
       (prefer-coding-system 'utf-8)
@@ -758,7 +762,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Setting the font style
 
     Originally I had this set up by means of ~custom-set-faces~, but frankly that
-    is less easily configured than this method. Every part of ~customize~ simply
+    is less easily configured than this method.  Every part of ~customize~ simply
     isn't all that useful when trying to make things easier to edit directly
     from the configuration files.
 
@@ -772,7 +776,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Getting emoji to work properly
 
     God does this one feel great to have now that I use an Emacs version that
-    can handle it! Emoji now render properly in documents! 🐲
+    can handle it!  Emoji now render properly in documents! 🐲
 
     #+begin_src emacs-lisp
       (when (member "Noto Color Emoji" (font-family-list))
@@ -784,7 +788,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Don't unload fonts when not in use
 
     This solves a number of hanging issues related to a number of different
-    packages and symbols. Emacs gets annoyingly slow if this is not set.
+    packages and symbols.  Emacs gets annoyingly slow if this is not set.
 
     #+begin_src emacs-lisp
       (setq inhibit-compacting-font-caches t)
@@ -792,11 +796,11 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Theme
 
-   For the longest time I thought Leuven was seriously my best choice. As time
-   has gone by, I've gotten less and less fond of Leuven. It served me well at
+   For the longest time I thought Leuven was seriously my best choice.  As time
+   has gone by, I've gotten less and less fond of Leuven.  It served me well at
    the beginning of my exploration, but after so long using dark themes and
-   having wallpapers behind my Emacs, Leuven stopped cutting it. Currently the
-   theme I've stuck with is Dracula. It is the most comfortable and there are
+   having wallpapers behind my Emacs, Leuven stopped cutting it.  Currently the
+   theme I've stuck with is Dracula.  It is the most comfortable and there are
    GTK themes that match it very well.
 
    #+begin_src emacs-lisp :noweb yes :tangle "init.el"
@@ -814,7 +818,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Fringes
 
     Having fringes helps keep things looking good and gives the opportunity to
-    have nice indicators on the edges of buffers. I prefer when fringes are the
+    have nice indicators on the edges of buffers.  I prefer when fringes are the
     same color as the rest of the window, a choice which many themes seem not to
     agree with unfortunately.
 
@@ -826,10 +830,10 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Line numbers
 
     For some reason, some themes like to give line numbers a different color
-    background from the rest of a window. I hate that. It distracts me and looks
-    extremely tacky. Keeping the line numbers' background color the same color
-    as the background of the rest of the window leaves little in the way of
-    distractions.
+    background from the rest of a window.  I hate that.  It distracts me and
+    looks extremely tacky.  Keeping the line numbers' background color the same
+    color as the background of the rest of the window leaves little in the way
+    of distractions.
 
     #+begin_src emacs-lisp :noweb-ref theme-init
       (set-face-background 'line-number (face-background 'default))
@@ -837,8 +841,8 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Window dividers
 
-    Windows dividers make Emacs look far less sloppy. The color is grabbed from
-    the mode line for consistency. Three pixels seems to be the best looking
+    Windows dividers make Emacs look far less sloppy.  The color is grabbed from
+    the mode line for consistency.  Three pixels seems to be the best looking
     width for window dividers.
 
     #+begin_src emacs-lisp :noweb-ref theme-init
@@ -854,7 +858,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Transparent frames
 
     If there's a gimmick I can't get enough of, it's having a transparent frame.
-    At first, I thought it would look dumb, but it would make things hard to
+    At first, I thought it would look dumb, that it would make things hard to
     read since Emacs doesn't seem to differentiate between foreground and
     background when setting alpha values, but now that I have used it for a
     while, going back to an opaque frame seems tacky.
@@ -868,9 +872,9 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Better ~org-mode~ headers
 
     For some reason, theme creators don't really think of formatting ~org-mode~
-    past colors, so I have instead taken matters into my own hands. This way, I
+    past colors, so I have instead taken matters into my own hands.  This way, I
     can use whatever color scheme I want with some peace of mind that at the
-    least I don't have to look for ~org~-aware themes. +It also means I can
+    least I don't have to look for ~org~-aware themes.  +It also means I can
     override some of the dumber choices of ~org~-aware themes!+
 
     #+begin_src emacs-lisp :noweb-ref theme-init
@@ -888,7 +892,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Mode line
 
-   I hate the default mode line with a burning passion. This mode line is sleek
+   I hate the default mode line with a burning passion.  This mode line is sleek
    and minimalist for a quick startup and a compact look and saved frustration.
 
    #+begin_src emacs-lisp :noweb yes :tangle "init.el"
@@ -902,8 +906,8 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Show line/column numbers on the mode line
 
-    Why isn't this enabled by default on a /text editor/? What line and column the
-    point is on should always be visible on the mode line.
+    Why isn't this enabled by default on a /text editor/?  What line and column
+    the point is on should always be visible on the mode line.
 
     #+begin_src emacs-lisp :noweb-ref mode-line-init
       (line-number-mode 1)
@@ -913,8 +917,8 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Show clock and battery level on mode line
 
     I used to use ~fancy-battery~ for battery level but it constantly disappeared
-    on my teeny tiny screens so I just decided not to bother with it. Plus it's
-    one less package to configure lol. The clock should be in 24-hour time, and
+    on my teeny tiny screens so I just decided not to bother with it.  Plus it's
+    one less package to configure lol.  The clock should be in 24-hour time, and
     the date should also be shown.
 
     #+begin_src emacs-lisp :noweb-ref mode-line-init
@@ -933,17 +937,17 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Word wrapping
 
     This is a more point of convenience than aesthetic, even in programming
-    language buffers. Wrapping words makes for a heck of a lot more readability
+    language buffers.  Wrapping words makes for a heck of a lot more readability
     of any kind of text, whether a program or just normal language.
 
     #+begin_src emacs-lisp
       (global-visual-line-mode 1)
     #+end_src
 
-    However, I don't want to stop there. I want to keep certain limits to how
+    However, I don't want to stop there.  I want to keep certain limits to how
     wide lines can go, so I also use ~auto-fill-mode~ so words will wrap as I
-    type. I personally prefer a =fill-column= value of 80 by default. This rule
-    should only apply to modes involving prose. Configuration and programming
+    type.  I personally prefer a =fill-column= value of 80 by default.  This rule
+    should only apply to modes involving prose.  Configuration and programming
     buffers should not include this limitation.
 
     #+begin_src emacs-lisp
@@ -953,7 +957,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Make the cursor a bar
 
-    This is just a personal tastes thing. I prefer a bar over the default.
+    This is just a personal tastes thing.  I prefer a bar over the default.
 
     #+begin_src emacs-lisp
       (setq-default cursor-type 'bar)
@@ -961,8 +965,9 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Turn ^L into pretty lines
 
-    This is used in a number of places in Emacs. Better to have it on all the
-    time than never on. I didn't know it was an external package.
+    This is used in a number of places in Emacs.  Better to have it on all the
+    time than never on.  I didn't know it was an external package until I
+    uninstalled ~dashboard~ for a short time.
 
     #+begin_src emacs-lisp
       (use-package page-break-lines
@@ -973,8 +978,8 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Line numbers (on most buffers)
 
-    I like having line numbers and indicators for lines past the EOF. However, I
-    don't like line numbers in modes where it breaks the mode.
+    I like having line numbers and indicators for lines past the EOF.  However,
+    I don't like line numbers in modes where it breaks the mode.
 
     #+begin_src emacs-lisp
       (use-package display-line-numbers
@@ -1024,7 +1029,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Start screen
 
-   I like the default start screen, but it just doesn't cut it for me. I just
+   I like the default start screen, but it just doesn't cut it for me.  I just
    use this to have a nice screen when I start Emacs or close all my buffers.
 
    #+begin_src emacs-lisp :noweb yes :tangle "init.el"
@@ -1045,7 +1050,7 @@ packages and keybindings which help me bring ideas to life day after day.
    #+end_src
 
    When Emacs or ~emacsclient~ starts, the first buffer shown should be either
-   dashboard or a scratch buffer. To prevent use of a lambda (something I
+   dashboard or a scratch buffer.  To prevent use of a lambda (something I
    have come to try to avoid where I can for a number of good reasons).
 
    #+begin_src emacs-lisp :noweb-ref dashboard-init
@@ -1055,7 +1060,7 @@ packages and keybindings which help me bring ideas to life day after day.
            (get-buffer "*scratch*")))
    #+end_src
 
-   The dashboard buffer itself should be immortal. I used to close it all the
+   The dashboard buffer itself should be immortal.  I used to close it all the
    time, and this is meant to prevent that by hooking ~emacs-lock-mode~ into
    =dashboard-mode-hook= to lock the buffer from being killed.
 
@@ -1071,15 +1076,15 @@ packages and keybindings which help me bring ideas to life day after day.
   :end:
 
   Anyone who has used Emacs for any period of time can attest to the fact that
-  it can take a lot to make Emacs comfortable for one's use. That is not to say
+  it can take a lot to make Emacs comfortable for one's use.  That is not to say
   that Emacs is /bad/, but it definitely isn't the most usable piece of software
-  straight out of the box. These settings make some of the things I personally
+  straight out of the box.  These settings make some of the things I personally
   dislike about defaults in Emacs somewhat better.
 
 ** General functionality
 *** No suspending Emacs
 
-    Why is this even something bound to begin with? I really dislike this and
+    Why is this even something bound to begin with?  I really dislike this and
     when I first did it I genuinely thought I broke something.
 
     #+begin_src emacs-lisp
@@ -1107,7 +1112,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Always confirm closing Emacs
 
     I constantly kill Emacs on accident when running it in terminals, so this
-    prevents me from doing that +as easily+. Having to always confirm when I quit
+    prevents me from doing that +as easily+.  Having to always confirm when I quit
     Emacs is way better than accidentally killing Emacs when I don't want to.
 
     #+begin_src emacs-lisp
@@ -1117,7 +1122,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Make scrolling a little less crazy
 
     Not sure why the mouse wheel gets acceleration, but thankfully I don't have
-    to worry about that anymore. The goal is to make scrolling more friendly,
+    to worry about that anymore.  The goal is to make scrolling more friendly,
     e.g. it always scrolls one line at a time and the cursor stays where it is
     on the display.
 
@@ -1164,9 +1169,9 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Auto-complete in documents
 
-    This is the base package. I changed some key bindings to make it more
-    pleasant to use. It's not just for programming anymore, as seen in the next
-    block. I don't want it to start recommending things unless I've typed more
+    This is the base package.  I changed some key bindings to make it more
+    pleasant to use.  It's not just for programming anymore, as seen in the next
+    block.  I don't want it to start recommending things unless I've typed more
     than three characters and let it sit for a little under a second.
 
     #+begin_src emacs-lisp
@@ -1186,7 +1191,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Typing Emoji using Emacs
 
-    Thanks to ~company~ above, this is possible now!
+    Thanks to ~company~ above, this is possible now! 🎊
 
     #+begin_src emacs-lisp
       (use-package company-emoji
@@ -1199,9 +1204,9 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Auto-completion for commands
 
-    I /love/ ~ido-mode~, but sometimes it just doesn't cut it. For those times, I
+    I /love/ ~ido-mode~, but sometimes it just doesn't cut it.  For those times, I
     instead use ~counsel~, which provides a fancier completion experience than
-    ~ido-mode~ does currently. It's also way more ubiquitous than ~ido-mode~.
+    ~ido-mode~ does currently.  It's also way more ubiquitous than ~ido-mode~.
 
     #+begin_src emacs-lisp :noweb yes
       (use-package counsel
@@ -1216,7 +1221,7 @@ packages and keybindings which help me bring ideas to life day after day.
     #+end_src
 
     For some reason, ~ido-mode~ is enabled when ~ivy-mode~ is, which makes other
-    packages I use break. I don't want that to happen, so I hook a function
+    packages I use break.  I don't want that to happen, so I hook a function
     into =after-init-hook= to prevent that clash.
 
     #+begin_src emacs-lisp :tangle no :noweb-ref counsel-init
@@ -1264,10 +1269,10 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Sloppy focus
 
     Changing focus can also be done through sloppy focus, e.g. moving the cursor
-    between windows. I hate having to click to focus a different window, so I
-    would rather just have windows sloppily focus. This has some flaws when
+    between windows.  I hate having to click to focus a different window, so I
+    would rather just have windows sloppily focus.  This has some flaws when
     using Emacs as a desktop environment, but it's still cozier than the
-    alternative behavior. It's tangled into the window management form.
+    alternative behavior.  It's tangled into the window management form.
 
     #+begin_src emacs-lisp :noweb-ref window-management-vars :tangle no
       :custom ((focus-follows-mouse t)
@@ -1277,9 +1282,9 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Buffer management
 
     Buffer management is done using ~ibuffer~, which is orders of magnitude more
-    comfortable than other ways I've seen of managing buffers. Packages like
+    comfortable than other ways I've seen of managing buffers.  Packages like
     ~helm~ can probably do good, but I personally like using what's already
-    available to me. Buffer names should also be made unique. This looks a lot
+    available to me.  Buffer names should also be made unique.  This looks a lot
     fancier than the default behavior, and makes buffer names far easier to read
     at a glance.
 
@@ -1330,7 +1335,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
     There are built-in functions for changing focus between windows, but there
     are not good built-in functions for swapping two windows and moving buffers
-    between windows. Since ~other-window~ is hot garbage, I instead use =C-x o= as a
+    between windows.  Since ~other-window~ is hot garbage, I instead use =C-x o= as a
     prefix for the commands related to moving focus or moving windows.
 
     #+begin_src emacs-lisp :noweb yes
@@ -1355,8 +1360,8 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Follow to new windows
 
       When forming a new window, it should be followed and ~ibuffer~ should be
-      opened. This replaces the other not particularly friendly behavior, and is
-      tangled into the window management form.
+      opened.  This replaces the other not particularly friendly behavior, and
+      is tangled into the window management form.
 
       #+begin_src emacs-lisp :noweb-ref window-management-init :tangle no
         (defun split-and-follow-vertical ()
@@ -1382,7 +1387,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Immortal blank scratch buffer
 
-    I kill the scratch buffer way too often if I don't do this. While I'm here,
+    I kill the scratch buffer way too often if I don't do this.  While I'm here,
     I might as well also make the scratch buffer blank.
 
     #+begin_src emacs-lisp
@@ -1498,16 +1503,16 @@ packages and keybindings which help me bring ideas to life day after day.
   :header-args: :tangle "init.el"
   :end:
 
-  Emacs /is/ a text editor... right? This used to be a +somewhat bigger+ mess of
+  Emacs /is/ a text editor... right?  This used to be a +somewhat bigger+ mess of
   different sections, but I've been working to categorize these settings far
   better, so much of what was previously elsewhere is now set up in here.
   Everything in here /should/ be about making Emacs pleasant to use for editing
-  text of various kinds. If it isn't, I have failed.
+  text of various kinds.  If it isn't, I have failed.
 
 ** Additional major modes
 
    These are modes that enable Emacs to edit different kinds of files
-   differently. Programming major modes are further down, in the
+   differently.  Programming major modes are further down, in the
    programming section.
 
 *** ~graphviz-dot-mode~ (diagram creation)
@@ -1539,7 +1544,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Tangle literate programming files
 
     I've gotten really into literate programming lately, so this makes it much
-    easier to tangle files. Every time =after-save-hook= is run, if the filename
+    easier to tangle files.  Every time =after-save-hook= is run, if the filename
     contains "literate" and is an org-mode file, call ~org-babel-tangle~.
 
     #+begin_src emacs-lisp
@@ -1555,7 +1560,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Automatically byte-compile Emacs files
 
     This is meant to happen when I save my Emacs configuration, so that all
-    bytecode is up to date. It adds some time to each save, but it is worth it
+    bytecode is up to date.  It adds some time to each save, but it is worth it
     for never having to recompile my Emacs configuration manually again.
 
     #+begin_src emacs-lisp
@@ -1570,9 +1575,9 @@ packages and keybindings which help me bring ideas to life day after day.
 ** General editing
 *** Spell-checking
 
-    Just a useful little tool to check spelling while editing a buffer. Only
-    configured if ~aspell~ is installed. It's not super great, but it does the
-    trick well enough for me.
+    This is just a useful little tool to check spelling while editing a buffer.
+    It's only configured if ~aspell~ is installed.  It's not super great, but it
+    does the trick well enough for me.
 
     #+begin_src emacs-lisp
       (use-package flyspell
@@ -1610,8 +1615,8 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Automatically revert files on change
 
     This way if files get modified in the middle of editing them, I don't
-    overwrite the changes. This can also change ~dired~ and ~ibuffer~ buffers if I
-    am not mistaken. However, I don't need to hear every last thing about it.
+    overwrite the changes.  This can also change ~dired~ and ~ibuffer~ buffers if I
+    am not mistaken.  However, I don't need to hear every last thing about it.
 
     #+begin_src emacs-lisp
       (global-auto-revert-mode 1)
@@ -1623,8 +1628,8 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** End-of-file newlines and indent tabs
 
-    Screw indent tabs, spaces all the way. Also, if there is no end-of-file
-    newline, add it. Things that help me keep my files nice and clean.
+    Screw indent tabs, spaces all the way.  Also, if there is no end-of-file
+    newline, add it.  Things that help me keep my files nice and clean.
 
     #+begin_src emacs-lisp
       (setq require-final-newline t)
@@ -1634,7 +1639,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Manage the kill ring using a pop-up menu
 
     Having the whole kill ring easy to scroll through is much less hassle than
-    default behavior. We also set up some yanking behavior while we're at it.
+    default behavior.  We also set up some yanking behavior while we're at it.
 
     #+begin_src emacs-lisp
       (use-package popup-kill-ring
@@ -1656,10 +1661,10 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Hungrily remove all whitespace when deleting
 
-    This saves me tons of time when it comes to managing whitespace. Instead of
+    This saves me tons of time when it comes to managing whitespace.  Instead of
     having to repeatedly press delete or backspace, a single keystroke decimates
     all the whitespace between the point and whatever is in the direction the
-    deletion happens. Currently broken.
+    deletion happens.
 
     #+begin_src emacs-lisp
       (use-package hungry-delete
@@ -1672,7 +1677,8 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Move around visible portions of files faster
 
     If I want to hop around in a document without calling swiper, ~avy~ is
-    definitely the way to go.
+    definitely the way to go.  I admittedly don't use it too much, but it
+    definitely has its place when editing text.
 
     #+begin_src emacs-lisp
       (use-package avy
@@ -1732,7 +1738,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Haskell
 
     I have started to mess around with Haskell, so I needed to grab a mode for
-    that. This supplies basically everything I need as far as I know, e.g.
+    that.  This supplies basically everything I need as far as I know, e.g.
     company autocomplete and ~flycheck~ information.
 
     #+begin_src emacs-lisp
@@ -1784,7 +1790,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** On-the-fly Emacs package linting
 
     Now that I'm dabbling in writing Emacs packages, I need to be able to lint
-    packages more thoroughly. Adding a linter specifically for packages is very
+    packages more thoroughly.  Adding a linter specifically for packages is very
     comfy and cool and good.
 
     #+begin_src emacs-lisp
@@ -1814,7 +1820,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** ~avy~-style navigation but between syntax errors
 
-    This one is *SUPER COOL*. Being able to jump straight to a problem is comfy.
+    This one is *SUPER COOL*.  Being able to jump straight to a problem is comfy.
 
     #+begin_src emacs-lisp
       (use-package avy-flycheck
@@ -1844,7 +1850,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Table of Contents
 
-    This automates creating the table of contents for an ~org-mode~ document. It
+    This automates creating the table of contents for an ~org-mode~ document.  It
     also works in ~markdown-mode~ too if I ever have to use Markdown.
 
     #+begin_src emacs-lisp
@@ -1882,7 +1888,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Quality-of-life settings
 
-    These are just quick things that make ~org-mode~ much easier to use. Other
+    These are just quick things that make ~org-mode~ much easier to use.  Other
     settings are pulled into here for a cleaner tangle.
 
     #+begin_src emacs-lisp :noweb yes :noweb-ref org-custom
@@ -1917,7 +1923,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
     Since obviously dot snippets are purely harmless +as far as I know+, I just
     don't bother with having to confirm evaluation every time I try to update a
-    graphic. I also don't need to confirm evaluation of snippets in use in my
+    graphic.  I also don't need to confirm evaluation of snippets in use in my
     literate files.
 
     #+begin_src emacs-lisp
@@ -1936,10 +1942,10 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Shortcuts for various snippets
 
     First, we load ~org-tempo~, the extension that allows the old way of doing
-    things, and add it to =org-modules=. Then, we add shortcuts for the individual
-    blocks of code. Finally, we can add shortcuts for other items that aren't
-    blocks. I've grown somewhat fond of this way of organizing my shortcuts,
-    because it separates the blocks from the one-liners.
+    things, and add it to =org-modules=.  Then, we add shortcuts for the
+    individual blocks of code.  Finally, we can add shortcuts for other items
+    that aren't blocks.  I've grown somewhat fond of this way of organizing my
+    shortcuts, because it separates the blocks from the one-liners.
 
     #+begin_src emacs-lisp
       (use-package org-tempo
@@ -1998,7 +2004,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Don't give angle brackets syntax
 
     For some reason, starting with ~org-mode~ 9.3 or so, all symbols that are
-    brackets, i.e. ={}=, =()=, =<>=, are given syntax as pairs. This isn't a problem
+    brackets, i.e. ={}=, =()=, =<>=, are given syntax as pairs.  This isn't a problem
     on its own (especially since it makes quotations and parentheses far easier
     to work with), but /angle brackets specifically/ cause issues since they
     specifically are inequality operators in my books and =<= is the prefix for
@@ -2011,7 +2017,7 @@ packages and keybindings which help me bring ideas to life day after day.
         (modify-syntax-entry ?> "."))
     #+end_src
 
-    This function is hooked in =org-mode-hook=. Other hooks are pulled into here
+    This function is hooked in =org-mode-hook=.  Other hooks are pulled into here
     for a significantly cleaner tangle.
 
     #+begin_src emacs-lisp :noweb-ref org-hook
@@ -2047,7 +2053,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Automatically fix inline images generated for diagrams
 
-    This is exactly what I was looking for lmao
+    This is exactly what I was looking for lmao.
 
     #+begin_src emacs-lisp :noweb-ref org-hooks
       (org-babel-after-execute . org-redisplay-inline-images)
@@ -2058,15 +2064,15 @@ packages and keybindings which help me bring ideas to life day after day.
   :header-args: :tangle "init.el"
   :end:
 
-  Emacs is also more than just an editor, right? If it isn't about editing text
+  Emacs is also more than just an editor, right?  If it isn't about editing text
   but also isn't a major thing, it will probably be found in here.
 
 ** Not built-in
 *** Emacs is my terminal
 
-    I've been jumping between ~vterm~ and ~ansi-term~. In the end ~vterm~ blows
-    ~ansi-term~ clean out of the water. In the off-chance I'm running Emacs in the
-    terminal, =C-c t= can open ~vterm~.
+    I've been jumping between ~vterm~ and ~ansi-term~.  In the end ~vterm~ blows
+    ~ansi-term~ clean out of the water.  In the off-chance I'm running Emacs in
+    the terminal, =C-c t= can open ~vterm~.
 
     #+begin_src emacs-lisp
       (use-package vterm
@@ -2089,8 +2095,9 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Getting the weather using Emacs
 
-    Picking a service to use for this was a pain. I ended up settling for wttrin
-    because it is the fastest and easiest to use, and plays nice with my setup.
+    Picking a service to use for this was a pain.  I ended up settling for
+    wttrin because it is the fastest and easiest to use, and plays nice with my
+    setup.
 
     #+begin_src emacs-lisp
       (use-package wttrin
@@ -2112,9 +2119,9 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Reading the manpages
 
-    Wow, there's actually an Emacs mode for this! I put these into the =C-h=
-    binds, since it is a way of getting help, after all. If for some reason ~man~
-    is working, ~woman~ can still grab a manpage without calling ~man~.
+    Wow, there's actually an Emacs mode for this!  I put these into the =C-h=
+    binds, since it is a way of getting help, after all.  If for some reason ~man~
+    isn't working, ~woman~ can still grab a manpage without calling ~man~.
 
     #+begin_src emacs-lisp
       (global-set-key (kbd "C-h 4 m") #'man)
@@ -2134,7 +2141,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Yahtzee
 
-    Fun dice game. Now I can get mad at Emacs instead of my sister.
+    Fun dice game.  Now I can get mad at Emacs instead of my sister.
 
     #+begin_src emacs-lisp
       (use-package yahtzee
@@ -2158,7 +2165,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Tetris
 
-    Tetris is my childhood. No way I wouldn't set it up to be nice and comfy.
+    Tetris is my childhood.  No way I wouldn't set it up to be nice and comfy.
 
     #+begin_src emacs-lisp
       (use-package tetris
@@ -2179,7 +2186,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Chess
 
-    Just for fun. I suck at chess but it's nice to have.
+    Just for fun.  I suck at chess but it's nice to have.
 
     #+begin_src emacs-lisp
       (use-package chess
@@ -2191,8 +2198,8 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** 2048
 
-    A simple and fun game. Was a big deal when I was in high school. I still
-    play it from time to time.
+    A simple and fun game.  Was a big deal when I was in high school.  I still
+    play it from time to time, to pass the time and remember my powers of 2.
 
     #+begin_src emacs-lisp
       (use-package 2048-game
@@ -2204,9 +2211,9 @@ packages and keybindings which help me bring ideas to life day after day.
 
 * Making Emacs manage/play my music
 
-  I am big on doing as much in Emacs as possible. Having my music player moved
-  to Emacs was a HUGE step. When I first started using it, it was weird, but now
-  I have come to absolutely love it. We only configure EMMS if ~mpd~ is found.
+  I am big on doing as much in Emacs as possible.  Having my music player moved
+  to Emacs was a HUGE step.  When I first started using it, it was weird, but
+  now I have come to absolutely love it.  It's only configured if ~mpd~ is found.
 
   #+begin_src emacs-lisp :noweb yes :tangle "init.el"
     (use-package emms
@@ -2279,7 +2286,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 ** Keybindings
   
-   Making a keymap was a mistake. This is so much comfier and looks a lot nicer
+   Making a keymap was a mistake.  This is so much comfier and looks a lot nicer
    when using ~which-key~, and does not require the creation of an entire keymap.
 
    #+begin_src emacs-lisp :noweb-ref emms-keys
@@ -2332,12 +2339,12 @@ packages and keybindings which help me bring ideas to life day after day.
   :header-args: :noweb yes :noweb-ref exwm-init
   :end:
 
-  Yes, Emacs is my *entire desktop environment*. You should probably remove this
-  section if you don't plan to use Emacs as your desktop environment, but
-  including it doesn't have any disadvantages either, since it only loads if an
-  environment variable =_RUN_EXWM= exists, which it promptly unsets. Make a note
+  Yes, Emacs is my *entire desktop environment*.  You should probably remove this
+  section if you don't plan to use Emacs as your desktop environment.  Including
+  it doesn't have any disadvantages though, since it only loads if an
+  environment variable =_RUN_EXWM= exists, which it promptly unsets.  Make a note
   of this when writing your =.xinitrc= or writing a =.desktop= file to load Emacs as
-  your desktop environment. EXWM should replace the current window manager.
+  your desktop environment.  EXWM should replace the current window manager.
 
   #+begin_src emacs-lisp :noweb-ref no :tangle "init.el"
     (use-package exwm
@@ -2364,7 +2371,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Name EXWM buffers after the window title
 
-    This was annoying when I first installed EXWM. Thankfully it's easy to fix.
+    This was annoying when I first installed EXWM.  Thankfully it's easy to fix.
 
     #+begin_src emacs-lisp
       (defun farl-exwm/name-buffer-after-window-title ()
@@ -2373,7 +2380,7 @@ packages and keybindings which help me bring ideas to life day after day.
     #+end_src
 
     We hook setting the buffer name into when EXWM picks up a change in the
-    window title, aptly titled =exwm-update-title-hook=. Other hooks are pulled
+    window title, aptly titled =exwm-update-title-hook=.  Other hooks are pulled
     into this block for a cleaner tangle.
 
     #+begin_src emacs-lisp :noweb-ref exwm-hook
@@ -2383,8 +2390,9 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Configure floating window borders
 
-    Uses the same color as my mode line, uses the same width as window dividers. For
-    whatever reason, when changed via ~customize-set-variable~ these will break statup.
+    Uses the same color as my mode line, uses the same width as window dividers.
+    For whatever reason, when changed via ~customize-set-variable~ these will
+    break statup.
 
     #+begin_src emacs-lisp :noweb-ref exwm-init
       (setq exwm-floating-border-width window-divider-default-right-width
@@ -2394,10 +2402,10 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Getting a ~rofi~ equivalent
 
     Since I'm using Emacs as a window manager, I need something comparable to
-    ~rofi~ so I can open X windows I haven't bound to keys. It will be bound
-    elsewhere. I really don't want one named after +a project made by Nazis+ a
-    Suckless project, but laziness makes that hard. At some point I will make my
-    own function, preferably one considerably more minimalist.
+    ~rofi~ so I can open X windows I haven't bound to keys.  It will be bound
+    elsewhere.  I really don't want one named after +a project made by Nazis+ a
+    Suckless project, but laziness makes that hard.  At some point I will make
+    my own function, preferably one considerably more minimalist.
 
     #+begin_src emacs-lisp
       (use-package dmenu
@@ -2408,7 +2416,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Mouse follows focus
 
-    This is something I keep adding and removing repeatedly, into perpetuity. I
+    This is something I keep adding and removing repeatedly, into perpetuity.  I
     really like this behavior, even in spite of the troubled history I have with
     this specific implementation.
 
@@ -2497,8 +2505,8 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Show a list of workspaces in the echo area
 
     Because I now use so many workspaces, I need to be able to see what
-    workspace I am currently on. This makes it easier to do that. It's rather
-    buggy at times, but it does what it needs to do. A function is used to grab
+    workspace I am currently on.  This makes it easier to do that.  It's rather
+    buggy at times, but it does what it needs to do.  A function is used to grab
     the current state of the workspaces.
 
     #+begin_src emacs-lisp
@@ -2520,11 +2528,11 @@ packages and keybindings which help me bring ideas to life day after day.
 ** Multi-head configuration
 
    Thankfully, EXWM comes with hooks to handle when monitors are connected and
-   disconnected, so I can do monitor configuration entirely in Emacs Lisp. I
-   have two laptops: a ThinkPad X230 and a ThinkPad W541. Each has different
-   displays and is used for different purposes. Due to now not-so-recent updates
-   to Arch Linux and the fact that the original code here was a dumpster fire,
-   this section had to be reworked.
+   disconnected, so I can do monitor configuration entirely in Emacs Lisp.  I
+   have two laptops: a ThinkPad X230 and a ThinkPad W541.  Each has different
+   displays and is used for different purposes.  Due to now not-so-recent
+   updates to Arch Linux and the fact that the original code here was a dumpster
+   fire, this section had to be reworked.
 
 *** Getting the currently connected monitors
 
@@ -2541,7 +2549,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Configuring monitor arrangement on my X230
 
-    This one is straightforward. I never do any kind of split-monitor setup on
+    This one is straightforward.  I never do any kind of split-monitor setup on
     my ThinkPad X230, so every monitor looks over the same screen.
 
     #+begin_src emacs-lisp
@@ -2563,8 +2571,8 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Configuring monitor arrangement on my W541
 
-    This is where it gets really fun. This ThinkPad /does/ get docked, so I handle
-    very different outputs.
+    This is where it gets really fun.  This ThinkPad /does/ get docked, so I
+    handle very different outputs.
 
     #+begin_src emacs-lisp
       (defun display-setup-w541 ()
@@ -2674,7 +2682,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Steam
 
-    Gaming is possible with EXWM, if you run games windowed. I used to run it
+    Gaming is possible with EXWM, if you run games windowed.  I used to run it
     floating, but honestly just having it tile is so much easier to manage.
 
     #+begin_src emacs-lisp
@@ -2687,10 +2695,11 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Firefox
 
     Firefox has some unique abilities when it comes to how to make windows
-    behave which work better for me. I don't use tabs, and I don't want
+    behave which work better for me.  I don't use tabs, and I don't want
     anything to do with them, and Firefox lets me hide the tab bar and force all
-    tabs to actually open as new windows. It's like Suckless Surf, but +not made
-    by Nazis+ orders of magnitude faster and more comfortable.
+    tabs to actually open as new windows.  It's like Suckless Surf, but +not made
+    by Nazis+ orders of magnitude faster and more comfortable and has a proper
+    address bar.
 
     #+begin_src emacs-lisp
       (defun run-firefox ()
@@ -2755,9 +2764,9 @@ packages and keybindings which help me bring ideas to life day after day.
 ** DE components
 *** System package management
 
-    This one is a pleasant surprise to have honestly. Having Emacs handle system
-    packages as well as its own makes life a million times easier. Since I use
-    ~yay~ on Arch, I configure an entry for it and use it if it's installed.
+    This one is a pleasant surprise to have honestly.  Having Emacs handle
+    system packages as well as its own makes life a million times easier.  Since
+    I use ~yay~ on Arch, I configure an entry for it and use it if it's installed.
 
     #+begin_src emacs-lisp
       (use-package system-packages
@@ -2811,7 +2820,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
     The way ~desktop-environment-mode~ passes its keys through EXWM's mode is one
     of two options: either the keys are directly bound to =exwm-mode-map=, or the
-    keys are added to EXWM's prefix key set. I prefer the latter, because it
+    keys are added to EXWM's prefix key set.  I prefer the latter, because it
     means the keys associated with ~desktop-environment-mode~ will be properly
     unbound when the mode is toggled off.
 
@@ -2888,7 +2897,7 @@ packages and keybindings which help me bring ideas to life day after day.
 **** Screenshots
 
      This one was the least straightforward because the way it's implemented by
-     ~desktop-environment~ is *SUPER* wonky. Here are the binds:
+     ~desktop-environment~ is *SUPER* wonky.  Here are the binds:
 
      #+begin_src emacs-lisp :noweb-ref de-binds
        ("<print>" . farl-de/screenshot-part-clip)
@@ -2951,9 +2960,9 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Setting the wallpaper
 
     I've been working on [[https://github.com/farlado/emacs-wallpaper][an easy way to configure wallpapers]] which makes for way
-    less hassle. It only relies on ~feh~ as a backend for applying wallpapers, so
+    less hassle.  It only relies on ~feh~ as a backend for applying wallpapers, so
     if you use Emacs as a daemon it can manage your wallpapers even if it isn't
-    the window manager. It's on MELPA now!
+    the window manager.  It's on MELPA now!
 
     #+begin_src emacs-lisp
       (use-package wallpaper
@@ -3002,7 +3011,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Audio loop-back
 
-    Used when I play Jackbox Party Pack with friends. Also set up to launch
+    Used when I play Jackbox Party Pack with friends.  Also set up to launch
     ~pavucontrol~ to set up which programs to pass through to Discord.
 
     #+begin_src emacs-lisp
@@ -3032,7 +3041,7 @@ packages and keybindings which help me bring ideas to life day after day.
 
 *** Keyboard layout selection
 
-    It's [[https://github.com/farlado/emacs-xkb][its own package]] now. Check it out, I think it's pretty nice.
+    It's [[https://github.com/farlado/emacs-xkb][its own package]] now.  Check it out, I think it's pretty nice.
 
     #+begin_src emacs-lisp
       (use-package xkb
@@ -3060,7 +3069,7 @@ packages and keybindings which help me bring ideas to life day after day.
         (remove-hook 'kill-emacs-hook #'shut-down--computer))
     #+end_src
 
-    This function is globally bound to =C-x C-M-c=. Other binds are pulled into
+    This function is globally bound to =C-x C-M-c=.  Other binds are pulled into
     here for a cleaner end result upon tangling.
 
     #+begin_src emacs-lisp :noweb-ref exwm-bind
@@ -3251,7 +3260,7 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Send a key verbatim more easily
 
     This means there's one less key needed to send a verbatim key to an EXWM
-    buffer. It is obviously bound in =exwm-mode-map=.
+    buffer.  It is obviously bound in =exwm-mode-map=.
 
     #+begin_src emacs-lisp :noweb-ref exwm-mode-binds
       ("C-q" . exwm-input-send-next-key)
@@ -3309,10 +3318,10 @@ packages and keybindings which help me bring ideas to life day after day.
 *** Keyboard configuration
 
     This block sets the keyboard layout to US and give Caps Lock the
-    functionality of Control. I was hesitant to do this at first, but it's
-    significantly more comfortable. I almost never used caps lock as it is,
+    functionality of Control.  I was hesitant to do this at first, but it's
+    significantly more comfortable.  I almost never used caps lock as it is,
     given my keyboards have no indicator for it on my laptops, but this gives me
-    a much easier way to do commands without shifting my hand too far. Ideally,
+    a much easier way to do commands without shifting my hand too far.  Ideally,
     however, I configure my keyboards so that this setting is nothing more than
     an afterthought.
 
