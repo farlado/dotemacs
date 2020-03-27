@@ -132,6 +132,7 @@ after day.
 *** For EXWM
 
     - ~xorg~: For obvious reasons.
+    - ~dunst~: Notification daemon.
     - ~font-awesome~: For workspace names.
     - ~xcompmgr~: My compositor of choice.
     - ~arandr~: For monitor configuration.
@@ -1659,11 +1660,13 @@ after day.
 *** End-of-file newlines and indent tabs
 
     Screw indent tabs, spaces all the way.  Also, if there is no end-of-file
-    newline, add it.  Things that help me keep my files nice and clean.
+    newline, add it.  Things that help me keep my files nice and clean. Tabs
+    should probably also be significantly less wide.
 
     #+begin_src emacs-lisp
       (setq require-final-newline t)
-      (setq-default indent-tabs-mode nil)
+      (setq-default indent-tabs-mode nil
+                    tab-width 4)
     #+end_src
 
 *** Manage the kill ring using a pop-up menu
@@ -2515,17 +2518,19 @@ after day.
 
 *** Name workspaces a little more intuitively
 
-    No clue why you have to do so much just to give workspaces names, but at
-    least you can do it.
+    The variable =farl-exwm/workspace-names= is used to provide a list of
+    workspace names to be used by the function that follows.
 
     #+begin_src emacs-lisp
-      (defcustom farl-exwm/workspace-names '("" "" "" "" ""
-                                             "" "" "" "" "")
-        "The names assigned to workspaces through `exwm-workspace-index-map'."
-        :tag "Workspace names"
-        :group 'exwm
-        :type 'list)
+      (defvar farl-exwm/workspace-names '("" "" "" "" ""
+                                          "" "" "" "" "")
+        "The names assigned to workspaces through `exwm-workspace-index-map'.")
+    #+end_src
 
+    The function ~farl-exwm/workspace-index-map~ returns the name of the currently
+    selected workspace by the value in =farl-exwm/workspace-names=.
+
+    #+begin_src emacs-lisp
       (defun farl-exwm/workspace-index-map (index)
         "Return either a workspace name for a given INDEX or INDEX itself."
         (or (elt farl-exwm/workspace-names index) index))
@@ -3319,6 +3324,24 @@ after day.
     #+end_src
 
 ** On startup
+   :properties:
+   :header-args: :noweb-ref on-startup
+   :end:
+
+   This is everything that should be started or run when EXWM starts.
+
+   #+begin_src emacs-lisp :noweb yes :noweb-ref exwm-init
+     (defun farl-exwm/on-startup ()
+       "Start EXWM and related processes."
+       <<on-startup>>)
+   #+end_src
+
+   This function is run during =after-init-hook=.
+
+   #+begin_src emacs-lisp :noweb-ref exwm-hooks
+     (after-init . farl-exwm/on-startup)
+   #+end_src
+
 *** Make Emacs start fullscreen
 
     This makes Emacs startup look a lot more natural.
@@ -3401,6 +3424,16 @@ after day.
 
     #+begin_src emacs-lisp
       (start-process "Mouse banisher" nil "xbanish")
+    #+end_src
+
+*** Notifications
+
+    There is currently still no Emacs based notifications manager that I can
+    personally get behind, and I by no means have enough Emacs Lisp know-how to
+    properly write such a package. Because of this, I'm stuck using ~dunst~.
+
+    #+begin_src emacs-lisp
+      (start-process "Notifications" nil "dunst")
     #+end_src
 
 *** Start EXWM

@@ -446,7 +446,8 @@ This function has been altered to accomodate `exwm-mode'."
       auto-revert-verbose nil)
 
 (setq require-final-newline t)
-(setq-default indent-tabs-mode nil)
+(setq-default indent-tabs-mode nil
+              tab-width 4)
 
 (use-package popup-kill-ring
   :ensure t
@@ -805,13 +806,9 @@ This function has been altered to accomodate `exwm-mode'."
     :ensure t
     :defer t
     :hook (exwm-init . exwm-mff-mode))
-  (defcustom farl-exwm/workspace-names '("" "" "" "" ""
-                                         "" "" "" "" "")
-    "The names assigned to workspaces through `exwm-workspace-index-map'."
-    :tag "Workspace names"
-    :group 'exwm
-    :type 'list)
-  
+  (defvar farl-exwm/workspace-names '("" "" "" "" ""
+                                      "" "" "" "" "")
+    "The names assigned to workspaces through `exwm-workspace-index-map'.")
   (defun farl-exwm/workspace-index-map (index)
     "Return either a workspace name for a given INDEX or INDEX itself."
     (or (elt farl-exwm/workspace-names index) index))
@@ -1143,28 +1140,31 @@ This function has been altered to accomodate `exwm-mode'."
     "Pass C-k to the EXWM window."
     (interactive)
     (execute-kbd-macro (kbd "C-q C-k")))
-  (set-frame-parameter nil 'fullscreen 'fullboth)
-  (setenv "XDG_CURRENT_DESKTOP" "emacs")
-  (setenv "GTK2_RC_FILES" (user-config-file "gtk-2.0/gtkrc"))
-  (setenv "QT_QPA_PLATFORMTHEME" "gtk2")
-  (setenv "_JAVA_AWT_WM_NONREPARENTING" "1")
-  (start-process "Disable Blanking" nil "xset"
-                 "s" "off" "-dpms")
-  (start-process "Keyboard Layout" nil "setxkbmap"
-                 "us" "-option" "ctrl:nocaps")
-  (start-process "Trackpad Setup" nil "xinput"
-                 "disable" (shell-command-to-string
-                            (concat "xinput | grep Synap | head -n 1 | "
-                                    "sed -r 's/.*id=([0-9]+).*/\\1/' | "
-                                    "tr '\n' ' ' | sed 's/ //'")))
-  (start-process "Compositor" nil "xcompmgr")
-  (start-process "Fallback Cursor" nil "xsetroot"
-                 "-cursor_name" "left_ptr")
-  (start-process "Mouse banisher" nil "xbanish")
-  (exwm-enable)
-  (exwm-config-ido)
-  (exwm-randr-enable)
-  (exwm-systemtray-enable)
+  (defun farl-exwm/on-startup ()
+    "Start EXWM and related processes."
+    (set-frame-parameter nil 'fullscreen 'fullboth)
+    (setenv "XDG_CURRENT_DESKTOP" "emacs")
+    (setenv "GTK2_RC_FILES" (user-config-file "gtk-2.0/gtkrc"))
+    (setenv "QT_QPA_PLATFORMTHEME" "gtk2")
+    (setenv "_JAVA_AWT_WM_NONREPARENTING" "1")
+    (start-process "Disable Blanking" nil "xset"
+                   "s" "off" "-dpms")
+    (start-process "Keyboard Layout" nil "setxkbmap"
+                   "us" "-option" "ctrl:nocaps")
+    (start-process "Trackpad Setup" nil "xinput"
+                   "disable" (shell-command-to-string
+                              (concat "xinput | grep Synap | head -n 1 | "
+                                      "sed -r 's/.*id=([0-9]+).*/\\1/' | "
+                                      "tr '\n' ' ' | sed 's/ //'")))
+    (start-process "Compositor" nil "xcompmgr")
+    (start-process "Fallback Cursor" nil "xsetroot"
+                   "-cursor_name" "left_ptr")
+    (start-process "Mouse banisher" nil "xbanish")
+    (start-process "Notifications" nil "dunst")
+    (exwm-enable)
+    (exwm-config-ido)
+    (exwm-randr-enable)
+    (exwm-systemtray-enable))
   (defun farl-exwm/on-logout ()
     "Run this when logging out as part of `kill-emacs-hook'."
     (shell-command "hsetroot -solid '#000000'"))
@@ -1301,6 +1301,7 @@ This function has been altered to accomodate `exwm-mode'."
                                          ([?\C-g] . [escape]))))
   :hook ((exwm-update-title . farl-exwm/name-buffer-after-window-title)
          (exwm-randr-screen-change . display-and-dock-setup)
+         (after-init . farl-exwm/on-startup)
          (kill-emacs . farl-exwm/on-logout))
   :bind (("C-x C-M-c" . shut-down-computer)
          ("C-x C-M-r" . reboot-computer)
