@@ -32,8 +32,6 @@
 (require 'package)
 (package-initialize)
 
-(add-to-list 'load-path (locate-user-emacs-file "lisp/xkb"))
-
 (setq pdumper-load-path load-path
       pdumper-dumped t)
 
@@ -104,6 +102,7 @@
 
                    ;; Desktop Environment
                    exwm
+                   exwm-xim
                    exwm-randr
                    exwm-config
                    exwm-systemtray
@@ -112,8 +111,7 @@
                    minibuffer-line
                    system-packages
                    desktop-environment
-                   wallpaper
-                   xkb))
+                   wallpaper))
     (require package))
 
 (load-theme 'dracula t t)

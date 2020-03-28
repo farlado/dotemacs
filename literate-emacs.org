@@ -298,8 +298,6 @@ after day.
     #+begin_src emacs-lisp
       (require 'package)
       (package-initialize)
-
-      (add-to-list 'load-path (locate-user-emacs-file "lisp/xkb"))
     #+end_src
 
 *** Store =load-path=
@@ -387,6 +385,7 @@ after day.
 
                          ;; Desktop Environment
                          exwm
+                         exwm-xim
                          exwm-randr
                          exwm-config
                          exwm-systemtray
@@ -395,8 +394,7 @@ after day.
                          minibuffer-line
                          system-packages
                          desktop-environment
-                         wallpaper
-                         xkb))
+                         wallpaper))
           (require package))
     #+end_src
 
@@ -1236,24 +1234,11 @@ after day.
         :ensure t
         :defer t
         :init
-        <<counsel-init>>
-        :hook (after-init . farl-init/ivy-mode)
+        (ivy-mode 1)
+        (counsel-mode 1)
         :bind (("M-x" . counsel-M-x)
                ("C-x C-f" . counsel-find-file)
                ("C-c d" . counsel-cd)))
-    #+end_src
-
-    For some reason, ~ido-mode~ is enabled when ~ivy-mode~ is, which makes other
-    packages I use break.  I don't want that to happen, so I hook a function
-    into =after-init-hook= to prevent that clash.
-
-    #+begin_src emacs-lisp :tangle no :noweb-ref counsel-init
-      (defun farl-init/ivy-mode ()
-        "Start `ivy-mode' while disabling `ido-mode'."
-        (ivy-mode 1)
-        (ido-mode -1)
-        (counsel-mode 1)
-        (setq ivy-initial-inputs-alist nil))
     #+end_src
 
 ** Functions/macros
@@ -2403,6 +2388,7 @@ after day.
 
    #+begin_src emacs-lisp
      (pdumper-require 'exwm)
+     (pdumper-require 'exwm-xim)
      (pdumper-require 'exwm-randr)
      (pdumper-require 'exwm-config)
      (pdumper-require 'exwm-systemtray)
@@ -3082,17 +3068,12 @@ after day.
 
 *** Keyboard layout selection
 
-    It's [[https://github.com/farlado/emacs-xkb][its own package]] now.  Check it out, I think it's pretty nice.
+    I'm using Emacs as the input handler now, so this should make things a
+    little easier to manage... hopefully. Because of this, =C-\= needs to be added
+    to =exwm-input-prefix-keys=.
 
     #+begin_src emacs-lisp
-      (use-package xkb
-        :load-path "lisp/xkb"
-        :defer t
-        :custom ((xkb-cycle-layouts '("us"
-                                      "epo"
-                                      "de"))
-                 (xkb-options '("ctrl:nocaps")))
-        :hook (exwm-init . xkb-cycle-mode))
+      (push ?\C-\\ exwm-input-prefix-keys)
     #+end_src
 
 *** Shutting down
@@ -3440,7 +3421,7 @@ after day.
 
     #+begin_src emacs-lisp :tangle no
       (exwm-enable)
-      (exwm-config-ido)
+      (exwm-xim-enable)
       (exwm-randr-enable)
       (exwm-systemtray-enable)
     #+end_src

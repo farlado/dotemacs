@@ -231,13 +231,8 @@
   :ensure t
   :defer t
   :init
-  (defun farl-init/ivy-mode ()
-    "Start `ivy-mode' while disabling `ido-mode'."
-    (ivy-mode 1)
-    (ido-mode -1)
-    (counsel-mode 1)
-    (setq ivy-initial-inputs-alist nil))
-  :hook (after-init . farl-init/ivy-mode)
+  (ivy-mode 1)
+  (counsel-mode 1)
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
          ("C-c d" . counsel-cd)))
@@ -790,6 +785,7 @@ This function has been altered to accomodate `exwm-mode'."
   :init
   (setenv "_RUN_EXWM")
   (pdumper-require 'exwm)
+  (pdumper-require 'exwm-xim)
   (pdumper-require 'exwm-randr)
   (pdumper-require 'exwm-config)
   (pdumper-require 'exwm-systemtray)
@@ -1099,14 +1095,7 @@ This function has been altered to accomodate `exwm-mode'."
      "Audio Loop" nil (concat "pavucontrol;"
                               "pacmd unload-module module-null-sink;"
                               "pacmd unload-module module-loopback")))
-  (use-package xkb
-    :load-path "lisp/xkb"
-    :defer t
-    :custom ((xkb-cycle-layouts '("us"
-                                  "epo"
-                                  "de"))
-             (xkb-options '("ctrl:nocaps")))
-    :hook (exwm-init . xkb-cycle-mode))
+  (push ?\C-\\ exwm-input-prefix-keys)
   (defun shut-down--computer ()
     "Shut down the computer."
     (shell-command "shutdown now"))
@@ -1162,7 +1151,7 @@ This function has been altered to accomodate `exwm-mode'."
     (start-process "Mouse banisher" nil "xbanish")
     (start-process "Notifications" nil "dunst")
     (exwm-enable)
-    (exwm-config-ido)
+    (exwm-xim-enable)
     (exwm-randr-enable)
     (exwm-systemtray-enable))
   (defun farl-exwm/on-logout ()

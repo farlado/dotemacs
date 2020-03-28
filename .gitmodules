@@ -1,3 +1,0 @@
-[submodule "lisp/xkb"]
-	path = lisp/xkb
-	url = https://github.com/farlado/emacs-xkb
