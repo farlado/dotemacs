@@ -191,7 +191,7 @@ after day.
 
 *** =pdumper.el=
 
-    #+begin_src emacs-lisp :noweb yes :tangle "lisp/pdumper.el"
+    #+begin_src emacs-lisp :noweb yes :tangle "pdumper.el"
       ;;; pdumper.el --- Making a portable dump image
 
       ;; This file is not part of GNU Emacs.
@@ -269,7 +269,7 @@ after day.
 
 ** Starting Emacs FAST
    :properties:
-   :header-args: :tangle "lisp/pdumper.el"
+   :header-args: :tangle "pdumper.el"
    :end:
 
    Even with the "small" amount I ask of Emacs, it's a lot of beef to start up
@@ -288,7 +288,7 @@ after day.
    store your Emacs configuration:
 
    #+begin_src sh :tangle no
-     emacs --batch -q -l $USER_EMACS_DIR/lisp/pdumper.el
+     emacs --batch -q -l $USER_EMACS_DIR/pdumper.el
    #+end_src
 
 *** Load packages
@@ -1236,6 +1236,7 @@ after day.
         :init
         (ivy-mode 1)
         (counsel-mode 1)
+        (setq ivy-initial-inputs-alist nil)
         :bind (("M-x" . counsel-M-x)
                ("C-x C-f" . counsel-find-file)
                ("C-c d" . counsel-cd)))
@@ -3459,7 +3460,7 @@ after day.
 
 *** =pdumper.el=
 
-    #+begin_src emacs-lisp :tangle "lisp/pdumper.el"
+    #+begin_src emacs-lisp :tangle "pdumper.el"
       
 
       ;;; pdumper.el ends here
