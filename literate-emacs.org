@@ -390,7 +390,6 @@ after day.
                          exwm-config
                          exwm-systemtray
                          exwm-mff
-                         dmenu
                          minibuffer-line
                          system-packages
                          desktop-environment
@@ -632,7 +631,6 @@ after day.
 
                                         ;; Desktop Environment
                                         exwm
-                                        dmenu
                                         exwm-mff
                                         minibuffer-line
                                         system-packages
@@ -2425,21 +2423,6 @@ after day.
             exwm-floating-border-color (face-background 'mode-line))
     #+end_src
 
-*** Getting a ~rofi~ equivalent
-
-    Since I'm using Emacs as a window manager, I need something comparable to
-    ~rofi~ so I can open X windows I haven't bound to keys.  It will be bound
-    elsewhere.  I really don't want one named after +a project made by Nazis+ a
-    Suckless project, but laziness makes that hard.  At some point I will make
-    my own function, preferably one considerably more minimalist.
-
-    #+begin_src emacs-lisp
-      (use-package dmenu
-        :ensure t
-        :defer t
-        :custom (dmenu-prompt-string "s-x "))
-    #+end_src
-
 *** Mouse follows focus
 
     This is something I keep adding and removing repeatedly, into perpetuity.  I
@@ -3082,7 +3065,7 @@ after day.
     #+begin_src emacs-lisp
       (defun shut-down--computer ()
         "Shut down the computer."
-        (shell-command "shutdown now"))
+        (start-process "Shut down" nil "shutdown" "now"))
 
       (defun shut-down-computer ()
         "Shut down the computer."
@@ -3107,7 +3090,7 @@ after day.
     #+begin_src emacs-lisp
       (defun reboot--computer ()
         "Run the reboot command."
-        (shell-command "reboot"))
+        (start-process "Reboot" nil "reboot"))
 
       (defun reboot-computer ()
         "Reboot the computer."
@@ -3129,7 +3112,8 @@ after day.
       (defun suspend-computer ()
         (interactive)
         (when (yes-or-no-p "Really suspend? ")
-          (shell-command "systemctl suspend -i")))
+          (start-process "suspend" nil "systemctl"
+                         "suspend" "-i")))
     #+end_src
 
     This function is globally bound to =C-x C-M-s=.
@@ -3203,7 +3187,7 @@ after day.
                                 ([XF86Calculator] . calc)
 
                                 ;; Other desktop environment things
-                                ([?\s-x] . dmenu)
+                                ([?\s-x] . counsel-linux-app)
                                 ([s-tab] . audio-loopback)
                                 ([?\s-w] . xkb-set-layout)
 
@@ -3451,7 +3435,8 @@ after day.
     This way, it looks good when exiting Emacs.
 
     #+begin_src emacs-lisp
-      (shell-command "hsetroot -solid '#000000'")
+      (start-process "Root window" nil "hsetroot"
+                     "-solid" "'#000000'")
     #+end_src
 
 * Giving files their footers

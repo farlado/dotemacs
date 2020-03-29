@@ -795,10 +795,6 @@ This function has been altered to accomodate `exwm-mode'."
     (exwm-workspace-rename-buffer exwm-title))
   (setq exwm-floating-border-width window-divider-default-right-width
         exwm-floating-border-color (face-background 'mode-line))
-  (use-package dmenu
-    :ensure t
-    :defer t
-    :custom (dmenu-prompt-string "s-x "))
   (use-package exwm-mff
     :ensure t
     :defer t
@@ -1099,7 +1095,7 @@ This function has been altered to accomodate `exwm-mode'."
   (push ?\C-\\ exwm-input-prefix-keys)
   (defun shut-down--computer ()
     "Shut down the computer."
-    (shell-command "shutdown now"))
+    (start-process "Shut down" nil "shutdown" "now"))
   
   (defun shut-down-computer ()
     "Shut down the computer."
@@ -1109,7 +1105,7 @@ This function has been altered to accomodate `exwm-mode'."
     (remove-hook 'kill-emacs-hook #'shut-down--computer))
   (defun reboot--computer ()
     "Run the reboot command."
-    (shell-command "reboot"))
+    (start-process "Reboot" nil "reboot"))
   
   (defun reboot-computer ()
     "Reboot the computer."
@@ -1120,7 +1116,8 @@ This function has been altered to accomodate `exwm-mode'."
   (defun suspend-computer ()
     (interactive)
     (when (yes-or-no-p "Really suspend? ")
-      (shell-command "systemctl suspend -i")))
+      (start-process "suspend" nil "systemctl"
+                     "suspend" "-i")))
   (defun farl-exwm/C-s ()
     "Pass C-s to the EXWM window."
     (interactive)
@@ -1157,7 +1154,8 @@ This function has been altered to accomodate `exwm-mode'."
     (exwm-systemtray-enable))
   (defun farl-exwm/on-logout ()
     "Run this when logging out as part of `kill-emacs-hook'."
-    (shell-command "hsetroot -solid '#000000'"))
+    (start-process "Root window" nil "hsetroot"
+                   "-solid" "'#000000'"))
   :custom ((exwm-replace t)
            (exwm-workspace-number 10)
            (exwm-randr-workspace-monitor-plist '(0 "DP2-2"
@@ -1244,7 +1242,7 @@ This function has been altered to accomodate `exwm-mode'."
                                      ([XF86Calculator] . calc)
            
                                      ;; Other desktop environment things
-                                     ([?\s-x] . dmenu)
+                                     ([?\s-x] . counsel-linux-app)
                                      ([s-tab] . audio-loopback)
                                      ([?\s-w] . xkb-set-layout)
            

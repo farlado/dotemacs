@@ -155,7 +155,6 @@ FILENAME and NOERROR are also passed to `require'."
 
                                   ;; Desktop Environment
                                   exwm
-                                  dmenu
                                   exwm-mff
                                   minibuffer-line
                                   system-packages

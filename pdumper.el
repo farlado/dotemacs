@@ -107,7 +107,6 @@
                    exwm-config
                    exwm-systemtray
                    exwm-mff
-                   dmenu
                    minibuffer-line
                    system-packages
                    desktop-environment
