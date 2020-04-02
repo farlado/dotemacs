@@ -52,14 +52,6 @@
            (auto-package-update-delete-old-versions t))
   :hook (after-init . auto-package-update-maybe))
 
-(pdumper-require 'server)
-(unless (server-running-p)
-  (server-start))
-
-(tooltip-mode -1)
-(setq use-dialog-box nil
-      use-file-dialog nil)
-
 (use-package dracula-theme
   :if window-system
   :ensure t
@@ -117,46 +109,9 @@
   (column-number-mode 1)
   (display-time-mode 1)
   (display-battery-mode 1)
-  :custom ((display-time-24hr-format t)
+  :custom ((display-time-format "%a %m/%d %H:%M")
            (display-time-day-and-date t)
-           (display-time-format "%a %m/%d %H:%M")))
-
-(global-visual-line-mode 1)
-
-(setq-default fill-column 80)
-(add-hook 'text-mode-hook #'turn-on-auto-fill)
-
-(setq-default cursor-type 'bar)
-
-(use-package page-break-lines
-  :ensure t
-  :defer t
-  :hook (after-init . global-page-break-lines-mode))
-
-(use-package display-line-numbers
-  :defer t
-  :custom (indicate-empty-lines t)
-  :hook ((text-mode
-          prog-mode
-          conf-mode) . display-line-numbers-mode))
-
-(show-paren-mode 1)
-(set-face-attribute 'show-paren-match nil
-                    :weight 'extra-bold
-                    :underline t)
-(setq show-paren-style 'parentheses
-      show-paren-delay 0)
-
-(use-package rainbow-mode
-  :if window-system
-  :ensure t
-  :defer t
-  :hook (prog-mode . rainbow-mode))
-
-(use-package rainbow-delimiters
-  :ensure t
-  :defer t
-  :hook (prog-mode . rainbow-delimiters-mode))
+           (display-time-24hr-format t)))
 
 (use-package dashboard
   :ensure t
@@ -179,8 +134,51 @@
             "Welcome to Farlado's Illiterate GNU Emacs!"))
   :hook (dashboard-mode . dashboard-immortal))
 
-(global-unset-key (kbd "C-x C-z"))
-(global-unset-key (kbd "C-z"))
+(global-visual-line-mode 1)
+
+(setq-default fill-column 80)
+(add-hook 'text-mode-hook #'turn-on-auto-fill)
+
+(tooltip-mode -1)
+(setq use-dialog-box nil
+      use-file-dialog nil)
+
+(setq-default cursor-type 'bar)
+
+(use-package page-break-lines
+  :ensure t
+  :defer t
+  :hook (after-init . global-page-break-lines-mode))
+
+(use-package display-line-numbers
+  :defer t
+  :custom ((indicate-empty-lines t)
+           (display-line-numbers-type 'relative))
+  :hook ((text-mode
+          prog-mode
+          conf-mode) . display-line-numbers-mode))
+
+(show-paren-mode 1)
+(set-face-attribute 'show-paren-match nil
+                    :weight 'extra-bold
+                    :underline t)
+(setq show-paren-style 'parentheses
+      show-paren-delay 0.00000001)
+
+(use-package rainbow-mode
+  :if window-system
+  :ensure t
+  :defer t
+  :hook (prog-mode . rainbow-mode))
+
+(use-package rainbow-delimiters
+  :ensure t
+  :defer t
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+(pdumper-require 'server)
+(unless (server-running-p)
+  (server-start))
 
 (setq disabled-command-function nil)
 
@@ -205,6 +203,7 @@
 (use-package which-key
   :ensure t
   :defer t
+  :custom (echo-keystrokes 0.00000001)
   :hook (after-init . which-key-mode))
 
 (use-package company
@@ -220,6 +219,14 @@
          ("C-p" . company-select-previous)
          ("SPC" . company-abort)))
 
+(use-package counsel
+  :ensure t
+  :defer t
+  :init
+  (ivy-mode 1)
+  (counsel-mode 1)
+  (setq ivy-initial-inputs-alist nil))
+
 (use-package company-emoji
   :after company
   :ensure t
@@ -227,35 +234,14 @@
   :init
   (add-to-list 'company-backends #'company-emoji))
 
-(use-package counsel
-  :ensure t
-  :defer t
-  :init
-  (ivy-mode 1)
-  (counsel-mode 1)
-  (setq ivy-initial-inputs-alist nil)
-  :bind (("M-x" . counsel-M-x)
-         ("C-x C-f" . counsel-find-file)
-         ("C-c d" . counsel-cd)))
-
-(defun buffer-file-match (string)
-  "Find STRING in variable `buffer-file-name'."
-  (string-match-p string buffer-file-name))
-
-(defmacro user-home-file (file)
-  "Find FILE in the user's home directory."
-  (expand-file-name file (getenv "HOME")))
-
-(defmacro user-config-file (file)
-  "Find a FILE in the user's $XDG_CONFIG_HOME directory."
-  (expand-file-name file (getenv "XDG_CONFIG_HOME")))
-
 (use-package ibuffer
   :defer t
   :init
   (defun farl-ibuffer/use-default-filter-group ()
     "Switch to the intended filter group."
     (ibuffer-switch-to-saved-filter-groups "default"))
+  (with-current-buffer "*scratch*"
+    (emacs-lock-mode 'kill))
   :custom ((ibuffer-saved-filter-groups
             (quote (("default"
                      ("exwm" (and (not (name . "Firefo[x<>1-9]+$"))
@@ -286,27 +272,53 @@
                                   (name . "^\\*info\\*$")
                                   (name . "^\\*Help\\*$")))))))
            (uniquify-buffer-name-style 'forward)
-           (uniquify-after-kill-buffer-p t))
+           (uniquify-after-kill-buffer-p t)
+           (initial-scratch-message ""))
   :hook (ibuffer-mode . farl-ibuffer/use-default-filter-group)
   :bind (("C-x b" . ibuffer)
-         ("C-x C-b" . nil)))
+         ("C-x C-b" . nil)
+         ("C-x k" . kill-this-buffer)))
 
 (use-package buffer-move
   :ensure t
   :defer t
   :init
-  (defun split-and-follow-vertical ()
+  (defun split-and-follow-below ()
     "Open a new window vertically."
     (interactive)
     (split-window-below)
     (other-window 1)
     (ibuffer))
-  (defun split-and-follow-horizontal ()
+  
+  (defun split-and-follow-right ()
     "Open a new window horizontally."
     (interactive)
     (split-window-right)
     (other-window 1)
     (ibuffer))
+  (defun kill-this-buffer-and-window ()
+    "Perform `kill-buffer-and-window'.  Altered to accomodate `exwm-mode'."
+    (interactive)
+    (let ((window-to-delete (selected-window))
+          (buffer-to-kill (current-buffer))
+          (delete-window-hook (lambda ()
+                                (ignore-errors
+                                  (delete-window)))))
+      (unwind-protect
+          (progn
+            (add-hook 'kill-buffer-hook delete-window-hook t t)
+            (if (kill-buffer (current-buffer))
+                ;; If `delete-window' failed before, we repeat
+                ;; it to regenerate the error in the echo area.
+                (when (eq (selected-window) window-to-delete)
+                  (delete-window)))))))
+  (defun kill-all-buffers-and-windows ()
+    "Kill all buffers and windows."
+    (interactive)
+    (when (yes-or-no-p "Really kill all buffers and windows? ")
+      (save-some-buffers)
+      (mapc 'kill-buffer (buffer-list))
+      (delete-other-windows)))
   :custom ((focus-follows-mouse t)
            (mouse-autoselect-window t))
   :bind (("C-x o" . nil)
@@ -318,13 +330,13 @@
          ("C-x o C-a" . buf-move-left)
          ("C-x o C-s" . buf-move-down)
          ("C-x o C-d" . buf-move-right)
-         ("C-x 2" . split-and-follow-vertical)
-         ("C-x 3" . split-and-follow-horizontal)))
+         ("C-x 2" . split-and-follow-below)
+         ("C-x 3" . split-and-follow-right)
+         ("C-c b" . balance-windows)
+         ("C-x 4 0" . kill-this-buffer-and-window)
+         ("C-x 4 q" . kill-all-buffers-and-windows)))
 
-(with-current-buffer "*scratch*"
-  (emacs-lock-mode 'kill))
-
-(setq initial-scratch-message "")
+(global-set-key (kbd "C-c d") #'cd)
 
 (defun config-visit ()
   "Open the configuration file."
@@ -336,73 +348,41 @@
 (defun literate-dotfiles-visit ()
   "Open the literate dotfiles."
   (interactive)
-  (find-file (user-config-file "dotfiles/literate-dotfiles.org")))
+  (find-file "~/.config/dotfiles/literate-dotfiles.org"))
 
-(when (file-exists-p (user-config-file "dotfiles/literate-dotfiles.org"))
+(when (file-exists-p "~/.config/dotfiles/literate-dotfiles.org")
   (global-set-key (kbd "C-c M-e") #'literate-dotfiles-visit))
 
 (defun sys-config-visit ()
   "Open the literate system configuration"
   (interactive)
-  (find-file (user-config-file "dotfiles/literate-sysconfig.org")))
+  (find-file "~/.config/dotfiles/literate-sysconfig.org"))
 
-(when (file-exists-p (user-config-file "dotfiles/literate-sysconfig.org"))
+(when (file-exists-p "~/.config/dotfiles/literate-sysconfig.org")
   (global-set-key (kbd "C-c C-M-e") #'sys-config-visit))
-
-(global-set-key (kbd "C-c b") #'balance-windows)
-
-(global-set-key (kbd "C-x k") #'kill-this-buffer)
-
-(defun kill-this-buffer-and-window ()
-  "Kill the current buffer and delete the selected window.
-
-This function has been altered to accomodate `exwm-mode'."
-  (interactive)
-  (let ((window-to-delete (selected-window))
-        (buffer-to-kill (current-buffer))
-        (delete-window-hook (lambda ()
-                              (ignore-errors
-                                (delete-window)))))
-    (unwind-protect
-        (progn
-          (add-hook 'kill-buffer-hook delete-window-hook t t)
-          (if (kill-buffer (current-buffer))
-              ;; If `delete-window' failed before, we repeat
-              ;; it to regenerate the error in the echo area.
-              (when (eq (selected-window) window-to-delete)
-                (delete-window)))))))
-
-(global-set-key (kbd "C-x C-k") #'kill-this-buffer-and-window)
-
-(defun close-buffers-and-windows ()
-  "Kill every buffer and close all windows."
-  (interactive)
-  (when (yes-or-no-p "Really kill all buffers? ")
-    (save-some-buffers)
-    (mapc 'kill-buffer (buffer-list))
-    (delete-other-windows)))
-
-(global-set-key (kbd "C-x C-M-k") #'close-buffers-and-windows)
 
 (use-package sudo-edit
   :ensure t
   :defer t
   :bind ("C-x C-M-f" . sudo-edit))
 
-(use-package graphviz-dot-mode
-  :ensure t
-  :defer t
-  :mode ("\\.dot\\'" . graphviz-dot-mode))
+(global-unset-key (kbd "C-x C-z"))
+(global-unset-key (kbd "C-z"))
 
 (use-package markdown-mode
   :ensure t
   :defer t
   :mode ("\\.md\\'" . markdown-mode))
 
+(use-package graphviz-dot-mode
+  :ensure t
+  :defer t
+  :mode ("\\.dot\\'" . graphviz-dot-mode))
+
 (defun tangle-literate-program ()
   "Tangle a file if it's a literate programming file."
   (interactive)
-  (when (buffer-file-match "literate.*.org$")
+  (when (string-match-p "literate.*.org$" buffer-file-name)
     (org-babel-tangle)))
 
 (add-hook 'after-save-hook #'tangle-literate-program -100)
@@ -433,7 +413,8 @@ This function has been altered to accomodate `exwm-mode'."
 
 (setq backup-inhibited t
       make-backup-files nil
-      auto-save-default nil)
+      auto-save-default nil
+      auto-save-list-file-prefix nil)
 
 (global-auto-revert-mode 1)
 
@@ -557,7 +538,7 @@ This function has been altered to accomodate `exwm-mode'."
   (defun farl-org/confirm-babel-evaluate (lang body)
     "Don't ask to evaluate graphviz blocks or literate programming blocks."
     (not (or (string= lang "dot")
-             (buffer-file-match "literate.*.org$"))))
+             (string-match-p "literate.*.org$" buffer-file-name))))
   (use-package org-tempo
     :defer t
     :init
@@ -622,8 +603,7 @@ This function has been altered to accomodate `exwm-mode'."
   
   (when (file-directory-p "~/agendas")
     (setq org-agenda-files (directory-files-recursively
-                            (user-home-file "agendas")
-                            ".org$" nil t t)))
+                            "~/agendas" ".org$" nil t t)))
   :custom ((org-pretty-entities t)
            (org-src-fontify-natively t)
            (org-agenda-use-time-grid nil)
@@ -644,6 +624,22 @@ This function has been altered to accomodate `exwm-mode'."
   :bind (("C-c s-a" . open-agenda-file)
          ("C-c M-a" . org-agenda)))
 
+(setq calendar-week-start-day 1)
+(global-set-key (kbd "C-c l") #'calendar)
+
+(use-package term
+  :defer t
+  :init
+  (defvar farl-term/shell (getenv "SHELL")
+    "The shell to use for `ansi-term'.")
+  (defun farl-term/use-shell (force-bash)
+    (interactive (list farl-term/shell)))
+  (advice-add 'ansi-term :before #'farl-term/use-shell)
+  :bind ("C-c t" . ansi-term))
+
+(global-set-key (kbd "C-h 4 m") #'man)
+(global-set-key (kbd "C-h 4 w") #'woman)
+
 (use-package nov
   :ensure t
   :defer t
@@ -656,43 +652,21 @@ This function has been altered to accomodate `exwm-mode'."
   :custom (wttrin-default-cities '("Indianapolis"))
   :bind ("C-c w" . wttrin))
 
-(setq calendar-week-start-day 1)
-(global-set-key (kbd "C-c l") #'calendar)
-
-(global-set-key (kbd "C-h 4 m") #'man)
-(global-set-key (kbd "C-h 4 w") #'woman)
-
-(use-package term
-  :defer t
-  :init
-  (defvar farl-term/shell (getenv "SHELL")
-    "The shell to use for `ansi-term'.")
-  (defun farl-term/use-shell (force-bash)
-    (interactive (list farl-term/shell)))
-  (advice-add 'ansi-term :before #'farl-term/use-shell)
-  :bind ("C-c t" . ansi-term))
-
-(defvar games-map (make-sparse-keymap)
-  "A keymap to which games can be added.")
-
-(global-set-key (kbd "C-c g") games-map)
+(global-unset-key (kbd "C-c g"))
 
 (use-package yahtzee
   :ensure t
   :defer t
-  :bind (:map games-map
-         ("y" . yahtzee)))
+  :bind ("C-c g y" . yahtzee))
 
 (use-package sudoku
   :ensure t
   :defer t
-  :bind (:map games-map
-         ("s" . sudoku)))
+  :bind ("C-c g s" . sudoku))
 
 (use-package tetris
   :defer t
-  :bind (:map games-map
-         ("t" . 'tetris)
+  :bind (("C-c g t" . 'tetris)
          :map tetris-mode-map
          ("w" . tetris-move-bottom)
          ("a" . tetris-move-left)
@@ -707,14 +681,12 @@ This function has been altered to accomodate `exwm-mode'."
 (use-package chess
   :ensure t
   :defer t
-  :bind (:map games-map
-         ("c" . chess)))
+  :bind ("C-c g c" . chess))
 
 (use-package 2048-game
   :ensure t
   :defer t
-  :bind (:map games-map
-         ("2" . 2048-game)))
+  :bind ("C-c g 2" . 2048-game))
 
 (use-package emms
   :if (executable-find "mpd")
@@ -795,10 +767,6 @@ This function has been altered to accomodate `exwm-mode'."
     (exwm-workspace-rename-buffer exwm-title))
   (setq exwm-floating-border-width window-divider-default-right-width
         exwm-floating-border-color (face-background 'mode-line))
-  (use-package exwm-mff
-    :ensure t
-    :defer t
-    :hook (exwm-init . exwm-mff-mode))
   (defvar farl-exwm/workspace-names '("" "" "" "" ""
                                       "" "" "" "" "")
     "The names assigned to workspaces through `exwm-workspace-index-map'.")
@@ -1092,7 +1060,6 @@ This function has been altered to accomodate `exwm-mode'."
      "Audio Loop" nil (concat "pavucontrol;"
                               "pacmd unload-module module-null-sink;"
                               "pacmd unload-module module-loopback")))
-  (push ?\C-\\ exwm-input-prefix-keys)
   (defun shut-down--computer ()
     "Shut down the computer."
     (start-process "Shut down" nil "shutdown" "now"))
@@ -1127,11 +1094,22 @@ This function has been altered to accomodate `exwm-mode'."
     "Pass C-k to the EXWM window."
     (interactive)
     (execute-kbd-macro (kbd "C-q C-k")))
+  
+  (defun farl-exwm/C-a ()
+    "Pass C-a to the EXWM window."
+    (interactive)
+    (execute-kbd-macro (kbd "C-q C-a")))
+  
+  (defun farl-exwm/C-o ()
+    "Pass the equivalent of C-o to the EXWM window."
+    (interactive)
+    (execute-kbd-macro (kbd "<S-return> C-b")))
+  (push ?\C-\\ exwm-input-prefix-keys)
   (defun farl-exwm/on-startup ()
     "Start EXWM and related processes."
     (set-frame-parameter nil 'fullscreen 'fullboth)
     (setenv "XDG_CURRENT_DESKTOP" "emacs")
-    (setenv "GTK2_RC_FILES" (user-config-file "gtk-2.0/gtkrc"))
+    (setenv "GTK2_RC_FILES" (expand-file-name "~/.config/gtk-2.0/gtkrc"))
     (setenv "QT_QPA_PLATFORMTHEME" "gtk2")
     (setenv "_JAVA_AWT_WM_NONREPARENTING" "1")
     (start-process "Disable Blanking" nil "xset"
@@ -1157,6 +1135,7 @@ This function has been altered to accomodate `exwm-mode'."
     (start-process "Root window" nil "hsetroot"
                    "-solid" "'#000000'"))
   :custom ((exwm-replace t)
+           (exwm-workspace-index-map #'farl-exwm/workspace-index-map)
            (exwm-workspace-number 10)
            (exwm-randr-workspace-monitor-plist '(0 "DP2-2"
                                                  1 "DP2-1"
@@ -1184,7 +1163,6 @@ This function has been altered to accomodate `exwm-mode'."
                                          ((string= exwm-title "Event Tester")
                                           floating-mode-line nil
                                           floating t)))
-           (exwm-workspace-index-map #'farl-exwm/workspace-index-map)
            (exwm-input-global-keys `(;; Switching workspace focus
                                      ;; s-1 for 1, s-2 for 2, etc...
                                      ,@(mapcar
@@ -1295,8 +1273,10 @@ This function has been altered to accomodate `exwm-mode'."
          ("C-x C-M-r" . reboot-computer)
          ("C-x C-M-s" . suspend-computer)
          :map exwm-mode-map
-         ("C-x C-s" . farl-exwm/C-s)
          ("C-c C-l" . farl-exwm/C-k)
+         ("C-x C-s" . farl-exwm/C-s)
+         ("C-x h" . farl-exwm/C-a)
+         ("C-o" . farl-exwm/C-o)
          ("C-q" . exwm-input-send-next-key)
          ("C-c C-q" . nil)
          ("C-c C-f" . nil)

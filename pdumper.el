@@ -39,22 +39,22 @@
                    async
                    use-package
                    auto-package-update
-                   server
 
                    ;; Looks
                    dracula-theme
                    mood-line
+                   dashboard
                    page-break-lines
                    display-line-numbers
                    rainbow-mode
                    rainbow-delimiters
-                   dashboard
 
                    ;; Functionality
+                   server
                    which-key
+                   counsel
                    company
                    company-emoji
-                   counsel
                    ibuffer
                    buffer-move
                    sudo-edit
@@ -106,7 +106,6 @@
                    exwm-randr
                    exwm-config
                    exwm-systemtray
-                   exwm-mff
                    minibuffer-line
                    system-packages
                    desktop-environment

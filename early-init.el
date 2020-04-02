@@ -102,18 +102,18 @@ FILENAME and NOERROR are also passed to `require'."
                                   auto-package-update
 
                                   ;; Looks
-                                  dashboard
                                   dracula-theme
                                   mood-line
+                                  dashboard
                                   page-break-lines
                                   rainbow-mode
                                   rainbow-delimiters
 
                                   ;; Functionality
                                   which-key
+                                  counsel
                                   company
                                   company-emoji
-                                  counsel
                                   buffer-move
                                   sudo-edit
 
@@ -155,7 +155,6 @@ FILENAME and NOERROR are also passed to `require'."
 
                                   ;; Desktop Environment
                                   exwm
-                                  exwm-mff
                                   minibuffer-line
                                   system-packages
                                   desktop-environment
