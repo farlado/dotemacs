@@ -94,15 +94,17 @@
     (set-frame-parameter frame 'alpha 90))
   (add-to-list 'default-frame-alist '(alpha . 90))
   (pdumper-require 'org)
+  (set-face-attribute 'org-document-title nil
+                      :weight 'extra-bold
+                      :height 1.8)
   (set-face-attribute 'org-level-1 nil
                       :height 1.3)
   (set-face-attribute 'org-level-2 nil
                       :height 1.1)
   (set-face-attribute 'org-level-3 nil
                       :height 1.0)
-  (set-face-attribute 'org-document-title nil
-                      :weight 'extra-bold
-                      :height 1.8))
+  (set-face-attribute 'org-code nil
+                      :inherit 'font-lock-string-face))
 
 (use-package mood-line
   :ensure t

@@ -842,8 +842,8 @@ after day.
    has gone by, I've gotten less and less fond of Leuven.  It served me well at
    the beginning of my exploration, but after so long using dark themes and
    having wallpapers behind my Emacs, Leuven stopped cutting it.  Currently the
-   theme I've stuck with is Dracula.  It is the most comfortable and there are
-   GTK themes that match it very well.
+   theme I am using is Dracula.  This is probably the most comfortable theme I
+   have found, and there are GTK themes that match it very well.
 
    #+begin_src emacs-lisp :noweb yes :tangle "init.el"
      (use-package dracula-theme
@@ -912,25 +912,27 @@ after day.
       (add-to-list 'default-frame-alist '(alpha . 90))
     #+end_src
 
-*** Better ~org-mode~ headers
+*** Better Org-mode headers
 
-    For some reason, theme creators don't really think of formatting ~org-mode~
+    For some reason, theme creators don't really think of formatting Org-mode
     past colors, so I have instead taken matters into my own hands.  This way, I
     can use whatever color scheme I want with some peace of mind that at the
-    least I don't have to look for ~org~-aware themes.  It also means I can
-    override some of the dumber choices of ~org~-aware themes.
+    least I don't have to look for Org-aware themes.  It also means I can
+    override some of the dumber choices of Org-aware themes.
 
     #+begin_src emacs-lisp :noweb-ref theme-init
       (pdumper-require 'org)
+      (set-face-attribute 'org-document-title nil
+                          :weight 'extra-bold
+                          :height 1.8)
       (set-face-attribute 'org-level-1 nil
                           :height 1.3)
       (set-face-attribute 'org-level-2 nil
                           :height 1.1)
       (set-face-attribute 'org-level-3 nil
                           :height 1.0)
-      (set-face-attribute 'org-document-title nil
-                          :weight 'extra-bold
-                          :height 1.8)
+      (set-face-attribute 'org-code nil
+                          :inherit 'font-lock-string-face)
     #+end_src
 
 ** Mode line
