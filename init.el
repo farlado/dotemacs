@@ -1202,6 +1202,12 @@
                                      ;; Toggle how input is sent to X windows
                                      ([?\s-q] . exwm-input-toggle-keyboard)
            
+                                     ;; Change input method
+                                     ([?\s-w] . set-input-method)
+           
+                                     ;; Toggle floating for an X window
+                                     ([?\s-w] . exwm-floating-toggle-floating)
+           
                                      ;; Window size adjustment
                                      (,(kbd "C-s-w") . shrink-window)
                                      (,(kbd "C-s-s") . enlarge-window)
@@ -1226,7 +1232,6 @@
                                      ;; Other desktop environment things
                                      ([?\s-x] . counsel-linux-app)
                                      ([s-tab] . audio-loopback)
-                                     ([?\s-w] . xkb-set-layout)
            
                                      ;; Controlling EMMS
                                      ([XF86AudioNext] . emms-next)
