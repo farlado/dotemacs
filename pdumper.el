@@ -39,6 +39,7 @@
                    async
                    use-package
                    auto-package-update
+                   try
 
                    ;; Looks
                    dracula-theme

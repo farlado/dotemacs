@@ -52,6 +52,10 @@
            (auto-package-update-delete-old-versions t))
   :hook (after-init . auto-package-update-maybe))
 
+(use-package try
+  :ensure t
+  :defer t)
+
 (use-package dracula-theme
   :if window-system
   :ensure t

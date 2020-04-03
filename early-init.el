@@ -100,6 +100,7 @@ FILENAME and NOERROR are also passed to `require'."
                                   async
                                   use-package
                                   auto-package-update
+                                  try
 
                                   ;; Looks
                                   dracula-theme

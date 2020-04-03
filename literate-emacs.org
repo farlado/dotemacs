@@ -331,6 +331,7 @@ after day.
                          async
                          use-package
                          auto-package-update
+                         try
 
                          ;; Looks
                          dracula-theme
@@ -601,6 +602,7 @@ after day.
                                         async
                                         use-package
                                         auto-package-update
+                                        try
 
                                         ;; Looks
                                         dracula-theme
@@ -753,6 +755,18 @@ after day.
         :hook (after-init . auto-package-update-maybe))
     #+end_src
 
+*** Try out packages before including
+
+    Sometimes I just want to give a package a shot before including it in my
+    configuration and having to entirely redo my portable dump file.  This
+    package allows the temporary inclusion of a package in my Emacs environment
+    for a single session.
+
+    #+begin_src emacs-lisp
+      (use-package try
+        :ensure t
+        :defer t)
+    #+end_src
 * Making Emacs much less ugly
 
   Stock Emacs is /ugly/.  Just straight up ugly.  Suffice to say it leaves much to
