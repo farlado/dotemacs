@@ -293,7 +293,6 @@
     (split-window-below)
     (other-window 1)
     (ibuffer))
-  
   (defun split-and-follow-right ()
     "Open a new window horizontally."
     (interactive)
@@ -604,10 +603,6 @@
     (find-file (ivy-read
                 "Open agenda: "
                 (all-completions "" org-agenda-files))))
-  
-  (when (file-directory-p "~/agendas")
-    (setq org-agenda-files (directory-files-recursively
-                            "~/agendas" ".org$" nil t t)))
   :custom ((org-pretty-entities t)
            (org-src-fontify-natively t)
            (org-agenda-use-time-grid nil)
@@ -1093,17 +1088,14 @@
     "Pass C-s to the EXWM window."
     (interactive)
     (execute-kbd-macro (kbd "C-q C-s")))
-  
   (defun farl-exwm/C-k ()
     "Pass C-k to the EXWM window."
     (interactive)
     (execute-kbd-macro (kbd "C-q C-k")))
-  
   (defun farl-exwm/C-a ()
     "Pass C-a to the EXWM window."
     (interactive)
     (execute-kbd-macro (kbd "C-q C-a")))
-  
   (defun farl-exwm/C-o ()
     "Pass the equivalent of C-o to the EXWM window."
     (interactive)
@@ -1139,6 +1131,9 @@
     (start-process "Root window" nil "hsetroot"
                    "-solid" "'#000000'"))
   :custom ((exwm-replace t)
+           (org-agenda-files (when (file-directory-p "~/agendas")
+                               (directory-files-recursively
+                                "~/agendas" ".org$" nil t t)))
            (exwm-workspace-index-map #'farl-exwm/workspace-index-map)
            (exwm-workspace-number 10)
            (exwm-randr-workspace-monitor-plist '(0 "DP2-2"

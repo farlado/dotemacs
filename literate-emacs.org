@@ -1446,7 +1446,7 @@ after day.
 
 ** Window management
    :properties:
-   :header-args: :tangle no
+   :header-args: :noweb-ref window-management-init :tangle no
    :end:
 
    There are built-in functions for changing focus between windows, but there
@@ -1455,7 +1455,7 @@ after day.
    prefix for the commands related to moving focus or moving windows.  Other
    window managing settings are placed in this section.
 
-   #+begin_src emacs-lisp :noweb yes :tangle "init.el"
+   #+begin_src emacs-lisp :noweb-ref no :noweb yes :tangle "init.el"
      (use-package buffer-move
        :ensure t
        :defer t
@@ -1482,7 +1482,7 @@ after day.
     using Emacs as a desktop environment, but it's still cozier than the
     alternative behavior.  It's tangled into the window management form.
 
-    #+begin_src emacs-lisp :noweb-ref window-management-vars :tangle no
+    #+begin_src emacs-lisp :noweb-ref window-management-vars
       :custom ((focus-follows-mouse t)
                (mouse-autoselect-window t))
     #+end_src
@@ -1493,14 +1493,21 @@ after day.
     opened.  This replaces the other not particularly friendly behavior, and
     is tangled into the window management form.
 
-    #+begin_src emacs-lisp :noweb-ref window-management-init :tangle no
+    There are two functions which are used to create new windows.  The first
+    spawns a new window below the current window:
+
+    #+begin_src emacs-lisp
       (defun split-and-follow-below ()
         "Open a new window vertically."
         (interactive)
         (split-window-below)
         (other-window 1)
         (ibuffer))
+    #+end_src
 
+    The other function creates a new window to the right of the current one:
+
+    #+begin_src emacs-lisp
       (defun split-and-follow-right ()
         "Open a new window horizontally."
         (interactive)
@@ -1511,14 +1518,14 @@ after day.
 
     The new functions are bound to the "default" keys for splitting the window.
 
-    #+begin_src emacs-lisp :noweb-ref window-management-binds :tangle no
+    #+begin_src emacs-lisp :noweb-ref window-management-binds
       ("C-x 2" . split-and-follow-below)
       ("C-x 3" . split-and-follow-right)
     #+end_src
 
 *** Balancing window sizes
 
-    #+begin_src emacs-lisp :noweb-ref window-management-binds :tangle no
+    #+begin_src emacs-lisp :noweb-ref window-management-binds
       ("C-c b" . balance-windows)
     #+end_src
 
@@ -2217,10 +2224,14 @@ after day.
         (find-file (ivy-read
                     "Open agenda: "
                     (all-completions "" org-agenda-files))))
+    #+end_src
 
-      (when (file-directory-p "~/agendas")
-        (setq org-agenda-files (directory-files-recursively
-                                "~/agendas" ".org$" nil t t)))
+    The agendas are added to a list stored in the variable =org-agenda-files=.
+
+    #+begin_src emacs-lisp :noweb-ref exwm-vars
+      (org-agenda-files (when (file-directory-p "~/agendas")
+                          (directory-files-recursively
+                           "~/agendas" ".org$" nil t t)))
     #+end_src
 
     I open the agenda with =C-c M-a= and open a specific agenda file with =C-c s-a=.
@@ -3293,7 +3304,7 @@ after day.
 ** Keybindings
 
    Key bindings specifically related to window management or launching X
-   applicationes are all placed in one area to make it easier to manage them.
+   applications are all placed in one area to make it easier to manage them.
 
 *** Global binds to use across everything
 
@@ -3420,33 +3431,64 @@ after day.
     #+end_src
 
     Key sequences cannot be defined in =exwm-input-simulation-keys=, so they are
-    functions which are called in order to provide the desired behavior.  This
-    ensures that keys I use in Emacs behave similarly in X windows as they do in
-    Emacs itself.
+    functions which are called in order to provide the desired behavior.  The
+    functions that follow ensure that keys I use in Emacs behave similarly in X
+    windows as they do in Emacs itself.
 
-    #+begin_src emacs-lisp
-      (defun farl-exwm/C-s ()
-        "Pass C-s to the EXWM window."
-        (interactive)
-        (execute-kbd-macro (kbd "C-q C-s")))
+**** =C-s=
 
-      (defun farl-exwm/C-k ()
-        "Pass C-k to the EXWM window."
-        (interactive)
-        (execute-kbd-macro (kbd "C-q C-k")))
+     The first is for saving.  Since Emacs uses =C-x C-s= to save, a function has
+     to be written to simulate that by pressing =C-q= then =C-s=, to send =C-s=
+     verbatim to the X window.
 
+     #+begin_src emacs-lisp
+       (defun farl-exwm/C-s ()
+         "Pass C-s to the EXWM window."
+         (interactive)
+         (execute-kbd-macro (kbd "C-q C-s")))
+     #+end_src
+
+**** =C-k=
+
+     The next function is one meant to create a link in Telegram and do a number
+     of other things in other programs.  It is placed on the same key sequence
+     that Org-mode uses to place links: =C-c C-l=.
+
+     #+begin_src emacs-lisp
+       (defun farl-exwm/C-k ()
+         "Pass C-k to the EXWM window."
+         (interactive)
+         (execute-kbd-macro (kbd "C-q C-k")))
+     #+end_src
+
+**** =C-a=
+
+     This function is meant to push =C-a=, which selects all text.  It is bound to
+     =C-x h= since that's the equivalent key in Emacs.
+
+     #+begin_src emacs-lisp
       (defun farl-exwm/C-a ()
         "Pass C-a to the EXWM window."
         (interactive)
         (execute-kbd-macro (kbd "C-q C-a")))
+     #+end_src
 
+**** "=C-o="
+
+     This function is meant to mimic the behavior =C-o= has in a standard Emacs
+     buffer.  It should push what follows onto a new line while staying on the
+     current line.
+
+     #+begin_src emacs-lisp
       (defun farl-exwm/C-o ()
         "Pass the equivalent of C-o to the EXWM window."
         (interactive)
         (execute-kbd-macro (kbd "<S-return> C-b")))
-    #+end_src
+     #+end_src
 
-    These functions are bound to keys in =exwm-mode-map=.
+**** Binds
+
+     These functions are bound to keys in =exwm-mode-map=.
 
     #+begin_src emacs-lisp :noweb-ref exwm-mode-binds
       ("C-c C-l" . farl-exwm/C-k)
