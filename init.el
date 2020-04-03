@@ -1059,26 +1059,20 @@
      "Audio Loop" nil (concat "pavucontrol;"
                               "pacmd unload-module module-null-sink;"
                               "pacmd unload-module module-loopback")))
-  (defun shut-down--computer ()
-    "Shut down the computer."
-    (start-process "Shut down" nil "shutdown" "now"))
-  
   (defun shut-down-computer ()
     "Shut down the computer."
     (interactive)
-    (add-hook 'kill-emacs-hook #'shut-down--computer)
-    (save-buffers-kill-emacs)
-    (remove-hook 'kill-emacs-hook #'shut-down--computer))
-  (defun reboot--computer ()
-    "Run the reboot command."
-    (start-process "Reboot" nil "reboot"))
-  
+    (let ((shut-down (lambda () (shell-command "shutdown now"))))
+      (add-hook 'kill-emacs-hook shut-down)
+      (save-buffers-kill-emacs)
+      (remove-hook 'kill-emacs-hook shut-down)))
   (defun reboot-computer ()
     "Reboot the computer."
     (interactive)
-    (add-hook 'kill-emacs-hook #'reboot--computer)
-    (save-buffers-kill-emacs)
-    (remove-hook 'kill-emacs-hook #'reboot--computer))
+    (let ((reboot (lambda () (shell-command "reboot"))))
+      (add-hook 'kill-emacs-hook reboot)
+      (save-buffers-kill-emacs)
+      (remove-hook 'kill-emacs-hook reboot)))
   (defun suspend-computer ()
     (interactive)
     (when (yes-or-no-p "Really suspend? ")

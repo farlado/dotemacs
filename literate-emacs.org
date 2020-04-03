@@ -3242,16 +3242,13 @@ after day.
 *** Shutting down
 
     #+begin_src emacs-lisp
-      (defun shut-down--computer ()
-        "Shut down the computer."
-        (start-process "Shut down" nil "shutdown" "now"))
-
       (defun shut-down-computer ()
         "Shut down the computer."
         (interactive)
-        (add-hook 'kill-emacs-hook #'shut-down--computer)
-        (save-buffers-kill-emacs)
-        (remove-hook 'kill-emacs-hook #'shut-down--computer))
+        (let ((shut-down (lambda () (shell-command "shutdown now"))))
+          (add-hook 'kill-emacs-hook shut-down)
+          (save-buffers-kill-emacs)
+          (remove-hook 'kill-emacs-hook shut-down)))
     #+end_src
 
     This function is globally bound to =C-x C-M-c=.  Other binds are pulled into
@@ -3267,16 +3264,13 @@ after day.
 *** Rebooting
 
     #+begin_src emacs-lisp
-      (defun reboot--computer ()
-        "Run the reboot command."
-        (start-process "Reboot" nil "reboot"))
-
       (defun reboot-computer ()
         "Reboot the computer."
         (interactive)
-        (add-hook 'kill-emacs-hook #'reboot--computer)
-        (save-buffers-kill-emacs)
-        (remove-hook 'kill-emacs-hook #'reboot--computer))
+        (let ((reboot (lambda () (shell-command "reboot"))))
+          (add-hook 'kill-emacs-hook reboot)
+          (save-buffers-kill-emacs)
+          (remove-hook 'kill-emacs-hook reboot)))
     #+end_src
 
     This function is globally bound to =C-x C-M-r=.
