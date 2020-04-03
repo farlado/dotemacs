@@ -1062,14 +1062,16 @@
   (defun shut-down-computer ()
     "Shut down the computer."
     (interactive)
-    (let ((shut-down (lambda () (shell-command "shutdown now"))))
+    (let ((shut-down (lambda ()
+                       (shell-command "shutdown now"))))
       (add-hook 'kill-emacs-hook shut-down)
       (save-buffers-kill-emacs)
       (remove-hook 'kill-emacs-hook shut-down)))
   (defun reboot-computer ()
     "Reboot the computer."
     (interactive)
-    (let ((reboot (lambda () (shell-command "reboot"))))
+    (let ((reboot (lambda ()
+                    (shell-command "reboot"))))
       (add-hook 'kill-emacs-hook reboot)
       (save-buffers-kill-emacs)
       (remove-hook 'kill-emacs-hook reboot)))
