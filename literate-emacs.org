@@ -48,21 +48,16 @@ after day.
   - [[#programming][Programming]]
   - [[#org-mode][Org-mode]]
 - [[#making-emacs-more-than-an-editor][Making Emacs more than an editor]]
-  - [[#built-in-features][Built-in features]]
-  - [[#extensions][Extensions]]
+  - [[#minimally-configured][Minimally configured]]
+  - [[#multimedia-system][Multimedia system]]
   - [[#games][Games]]
-- [[#making-emacs-manageplay-my-music][Making Emacs manage/play my music]]
-  - [[#loading][Loading]]
-  - [[#functions][Functions]]
-  - [[#keybindings][Keybindings]]
-  - [[#configuring][Configuring]]
 - [[#making-emacs-a-desktop-environment][Making Emacs a desktop environment]]
   - [[#x-window-management][X window management]]
   - [[#workspace-configuration][Workspace configuration]]
   - [[#multi-head-configuration][Multi-head configuration]]
   - [[#x-applications][X applications]]
   - [[#de-components][DE components]]
-  - [[#keybindings-1][Keybindings]]
+  - [[#keybindings][Keybindings]]
   - [[#on-startup][On startup]]
   - [[#on-logout][On logout]]
 - [[#giving-files-their-footers][Giving files their footers]]
@@ -320,16 +315,16 @@ after day.
             pdumper-dumped t)
     #+end_src
 
-*** ~require~ packages
+*** ~require~ features
 
     This is really the most important section of the script: where all the
-    packages and features in use are loaded, save those with functionality that
-    behave erratically if loaded in this way.
+    features in use are loaded, save those with functionality that behave
+    erratically if loaded in this way.
 
     #+begin_src emacs-lisp
-      (dolist (package `(;; Core
-                         async
+      (dolist (feature `(;; Core
                          use-package
+                         async
                          auto-package-update
                          try
 
@@ -339,30 +334,34 @@ after day.
                          dashboard
                          page-break-lines
                          display-line-numbers
+                         paren
                          rainbow-mode
                          rainbow-delimiters
 
                          ;; Functionality
                          server
                          which-key
-                         counsel
                          company
+                         counsel
                          company-emoji
                          ibuffer
                          buffer-move
                          sudo-edit
 
                          ;; Editing
-                         graphviz-dot-mode
                          markdown-mode
+                         graphviz-dot-mode
                          flyspell
                          swiper
+                         autorevert
                          popup-kill-ring
                          hungry-delete
                          avy
+                         elec-pair
 
                          ;; Programming
                          haskell-mode
+                         lisp-mode
                          highlight-indent-guides
                          company-jedi
                          flycheck
@@ -370,7 +369,7 @@ after day.
                          flycheck-posframe
                          avy-flycheck
 
-                         ;; `org-mode'
+                         ;; org
                          org
                          toc-org
                          org-bullets
@@ -378,9 +377,12 @@ after day.
                          org-tempo
 
                          ;; Other
-                         term
                          nov
+                         wdired
+                         term
                          wttrin
+                         emms
+                         emms-setup
 
                          ;; games
                          yahtzee
@@ -388,10 +390,6 @@ after day.
                          tetris
                          chess
                          2048-game
-
-                         ;; Media
-                         emms
-                         emms-setup
 
                          ;; Desktop Environment
                          exwm
@@ -403,7 +401,7 @@ after day.
                          system-packages
                          desktop-environment
                          wallpaper))
-          (require package))
+          (require feature))
     #+end_src
 
 *** Pre-load the theme
@@ -704,24 +702,7 @@ after day.
    being installed, but here we only install things directly related to
    installing and updating packages.
 
-*** Bootstrap ~async~
-
-    Asynchronous execution of bytecode compilation and various other actions
-    makes Emacs lock SIGNIFICANTLY less often.  This is a very good thing.
-    Every time Emacs locks up that halts my whole desktop environment, so
-    minimizing that happening is extremely important.
-
-    #+begin_src emacs-lisp
-      (unless (package-installed-p 'async)
-        (package-refresh-contents)
-        (package-install 'async))
-
-      (dired-async-mode 1)
-      (async-bytecomp-package-mode 1)
-      (setq async-bytecomp-allowed-packages '(all))
-    #+end_src
-
-*** Bootstrap ~use-package~
+*** Easy configuration
 
     Since I manage all Emacs packages in Emacs itself, ~use-package~ makes it much
     easier to manage the packages I need.  It also means I can see what packages
@@ -738,7 +719,24 @@ after day.
       (setq use-package-compute-statistics t)
     #+end_src
 
-*** Automatically update packages
+*** Asynchronous execution
+
+    Asynchronous bytecode compilation and various other actions makes Emacs lock
+    SIGNIFICANTLY less often.  This is a very good thing.  Every time Emacs
+    locks up that halts my whole desktop environment, so minimizing that
+    happening is extremely important.
+
+    #+begin_src emacs-lisp
+      (use-package async
+        :ensure t
+        :defer t
+        :init
+        (dired-async-mode 1)
+        (async-bytecomp-package-mode 1)
+        :custom (async-bytecomp-allowed-packages '(all)))
+    #+end_src
+
+*** Automatic package updates
 
     I don't want to have to manually update my stuff.  This solution is
     literally plop-and-forget, and updates packages on a regular interval of two
@@ -755,7 +753,7 @@ after day.
         :hook (after-init . auto-package-update-maybe))
     #+end_src
 
-*** Try out packages before including
+*** Trying packages on the fly
 
     Sometimes I just want to give a package a shot before including it in my
     configuration and having to entirely redo my portable dump file.  This
@@ -1123,12 +1121,14 @@ after day.
     immediately rather than after a longer delay.
 
     #+begin_src emacs-lisp
-      (show-paren-mode 1)
-      (set-face-attribute 'show-paren-match nil
-                          :weight 'extra-bold
-                          :underline t)
-      (setq show-paren-style 'parentheses
-            show-paren-delay 0.00000001)
+      (use-package paren
+        :defer t
+        :init
+        (show-paren-mode 1)
+        :custom-face (show-paren-match ((t (:weight extra-bold
+                                            :underline t))))
+        :custom ((show-paren-style 'parentheses)
+                 (show-paren-delay 0.00000001)))
     #+end_src
 
 *** Color the background of text based on the color/hex typed
@@ -1391,7 +1391,8 @@ after day.
                                      (mode . emms-mode)))
                          ("ebooks" (mode . nov-mode))
                          ("magit" (name . "^magit.*:"))
-                         ("dired" (mode . dired-mode))
+                         ("dired" (or (mode . dired-mode)
+                                      (mode . wdired-mode)))
                          ("elisp" (mode . emacs-lisp-mode))
                          ("haskell" (mode . haskell-mode))
                          ("python" (mode . python-mode))
@@ -1621,7 +1622,7 @@ after day.
 
     #+begin_src emacs-lisp
       (defun sys-config-visit ()
-        "Open the literate system configuration"
+        "Open the literate system configuration."
         (interactive)
         (find-file "~/.config/dotfiles/literate-sysconfig.org"))
 
@@ -1789,11 +1790,13 @@ after day.
     am not mistaken.  However, I don't need to hear every last thing about it.
 
     #+begin_src emacs-lisp
-      (global-auto-revert-mode 1)
-
-      (setq global-auto-revert-non-file-buffers t
-            auto-revert-remote-files t
-            auto-revert-verbose nil)
+      (use-package autorevert
+        :defer t
+        :init
+        (global-auto-revert-mode 1)
+        :custom ((global-auto-revert-non-file-buffers t)
+                 (auto-revert-remote-files t)
+                 (auto-revert-verbose nil)))
     #+end_src
 
 *** End-of-file newlines and indent tabs
@@ -1875,12 +1878,15 @@ after day.
     things done thanks to these six lines of elisp.
 
     #+begin_src emacs-lisp
-      (setq electric-pair-pairs '((?\{ . ?\})
-                                  (?\( . ?\))
-                                  (?\[ . ?\])
-                                  (?\" . ?\")))
-      (electric-pair-mode 1)
-      (minibuffer-electric-default-mode 1)
+      (use-package elec-pair
+        :defer t
+        :init
+        (electric-pair-mode 1)
+        (minibuffer-electric-default-mode 1)
+        :custom (electric-pair-pairs '((?\{ . ?\})
+                                       (?\( . ?\))
+                                       (?\[ . ?\])
+                                       (?\" . ?\"))))
     #+end_src
 
 ** Programming
@@ -1889,19 +1895,12 @@ after day.
    comes to programming, mostly because I don't actually do all that much
    programming outside what I do for fun... and editing this file.
 
-*** Use SBCL for inferior Lisp mode
+*** Git
 
-    This seems to be the typical Common Lisp implementation people use.
-
-    #+begin_src emacs-lisp
-      (setq inferior-lisp-program "sbcl")
-    #+end_src
-
-*** ~magit~ (git but in Emacs)
-
-    I used to use a terminal for this, but this is a lot easier, a lot faster,
-    and a whole lot nicer to use overall.  It binds to =C-x g= by default but only
-    if you load the package right away, so I force it to be bound here.
+    I used to use a terminal for version control, but this is a lot easier, a
+    lot faster, and a whole lot nicer to use overall.  It binds to =C-x g= by
+    default but only if you load the package right away, so I force it to be
+    bound here.
 
     #+begin_src emacs-lisp
       (use-package magit
@@ -1925,6 +1924,17 @@ after day.
                (haskell-mode . haskell-doc-mode)
                (haskell-mode . haskell-indentation-mode)
                (haskell-mode . haskell-auto-insert-module-template)))
+    #+end_src
+
+*** Common Lisp
+
+    SBCL seems to be the typical Common Lisp implementation people use, so using
+    it seems to be the best thing to do.
+
+    #+begin_src emacs-lisp
+      (use-package lisp-mode
+        :defer t
+        :custom (inferior-lisp-program "sbcl"))
     #+end_src
 
 *** Indent guides
@@ -2254,11 +2264,10 @@ after day.
   isn't about editing text but also isn't a major thing, it will probably be
   found in here.
 
-** Built-in features
+** Minimally configured
 
-   These are additional non-text-editing features within Emacs that I use.  They
-   likely do not have much configuration, either from not seeing much use or
-   from not requiring much configuration.
+   These are features which require minimal configuration.  Some may be more
+   important than others, but these are mostly minimally configured features.
 
 *** Calendar
 
@@ -2272,6 +2281,31 @@ after day.
       (global-set-key (kbd "C-c l") #'calendar)
     #+end_src
 
+*** Reading ebooks
+
+    Not the best way to do epub reading, but at least it's in Emacs.
+
+    #+begin_src emacs-lisp
+      (use-package nov
+        :ensure t
+        :defer t
+        :custom (nov-text-width 80)
+        :mode ("\\.epub\\'" . nov-mode))
+    #+end_src
+
+*** File management
+
+    The only thing I don't like about ~dired~ is that it doesn't list directories
+    first by default.  That is done by changing the switches given to ~ls~ when
+    listing contents of a directory.
+
+    #+begin_src emacs-lisp
+      (use-package wdired
+        :defer t
+        :custom ((dired-listing-switches "-al --group-directories-first")
+                 (wdired-allow-to-change-permissions t)))
+    #+end_src
+
 *** Terminal emulator
 
     I've jumped between ~ansi-term~ and ~vterm~ over and over and over but it seems
@@ -2279,14 +2313,13 @@ after day.
     useful stuff it can do.  I don't really like that it doesn't automatically
     use my default shell, so I wrote my way around that with advice.
 
-    #+begin_src emacs-lisp
+    #+begin_src emacs-lisp :noweb yes
       (use-package term
         :defer t
         :init
-        (defvar farl-term/shell (getenv "SHELL")
-          "The shell to use for `ansi-term'.")
         (defun farl-term/use-shell (force-bash)
-          (interactive (list farl-term/shell)))
+          "Force `term' to use the default shell, ignoring FORCE-BASH."
+          (interactive (list (getenv "SHELL"))))
         (advice-add 'ansi-term :before #'farl-term/use-shell)
         :bind ("C-c t" . ansi-term))
     #+end_src
@@ -2302,24 +2335,7 @@ after day.
       (global-set-key (kbd "C-h 4 w") #'woman)
     #+end_src
 
-** Extensions
-
-   Some things I want Emacs to do are not included in the stock install.  These
-   packages are acquired through the package manager Emacs comes with.
-
-*** Reading ebooks in Emacs
-
-    Not the best way to do epub reading, but at least it's in Emacs.
-
-    #+begin_src emacs-lisp
-      (use-package nov
-        :ensure t
-        :defer t
-        :custom (nov-text-width 80)
-        :mode ("\\.epub\\'" . nov-mode))
-    #+end_src
-
-*** Getting the weather using Emacs
+*** Weather information
 
     Picking a service to use for this was a pain.  I ended up settling for
     wttrin because it is the fastest and easiest to use, and plays nice with my
@@ -2331,6 +2347,141 @@ after day.
         :defer t
         :custom (wttrin-default-cities '("Indianapolis"))
         :bind ("C-c w" . wttrin))
+    #+end_src
+
+** Multimedia system
+   :properties:
+   :header-args: :tangle no
+   :end:
+
+   I am big on doing as much in Emacs as possible.  Having my music player moved
+   to Emacs was a HUGE step.  When I first started using it, it was weird, but
+   now I have come to absolutely love it.  It's only configured if ~mpd~ is found.
+
+   #+begin_src emacs-lisp :noweb yes :tangle "init.el"
+     (use-package emms
+       :if (executable-find "mpd")
+       :ensure t
+       :defer t
+       :init
+       <<emms-init>>
+       <<emms-vars>>
+       <<emms-keys>>)
+   #+end_src
+
+*** Loading
+
+    For the package to be properly configured, first everything about it has to
+    be properly loaded.  This loads the necessary files to ensure ~emms~ starts
+    properly, and configures it to use any music player it finds.
+
+    #+begin_src emacs-lisp :noweb-ref emms-init
+      (pdumper-require 'emms-setup)
+      (require 'emms-player-mpd)
+      (emms-all)
+    #+end_src
+
+*** Functions
+    :properties:
+    :header-args: :noweb-ref emms-init
+    :end:
+
+    In order to directly control ~mpd~, some functions have to be defined.  A
+    fourth function is included to fix up a behavior I don't really like.
+
+**** Starting the daemon
+
+     #+begin_src emacs-lisp
+       (defun mpd/start-music-daemon ()
+         "Start MPD, connect to it and sync the metadata cache"
+         (interactive)
+         (shell-command "mpd")
+         (mpd/update-database)
+         (emms-player-mpd-connect)
+         (emms-cache-set-from-mpd-all)
+         (message "MPD started!"))
+     #+end_src
+
+**** Stopping the daemon
+
+     #+begin_src emacs-lisp
+       (defun mpd/kill-music-daemon ()
+         "Stop playback and kill the music daemon."
+         (interactive)
+         (emms-stop)
+         (call-process "killall" nil nil nil "mpd")
+         (message "MPD killed!"))
+     #+end_src
+
+**** Updating the database
+
+     #+begin_src emacs-lisp
+       (defun mpd/update-database ()
+         "Update the MPD database synchronously."
+         (interactive)
+         (call-process "mpc" nil nil nil "update")
+         (message "MPD database updated!"))
+     #+end_src
+
+**** Shuffling the playlist
+
+     #+begin_src emacs-lisp
+       (defun farl-emms/shuffle-with-message ()
+         "Shuffle the playlist and say so in the echo area."
+         (interactive)
+         (emms-shuffle)
+         (message "Playlist has been shuffled."))
+     #+end_src
+
+*** Keybindings
+  
+    Making a keymap was a mistake.  This is so much comfier and looks a lot
+    nicer when using ~which-key~, and does not require the creation of an entire
+    keymap.
+
+    #+begin_src emacs-lisp :noweb-ref emms-keys
+      :bind (;; Opening playlist and music browser
+             ("C-c a v" . emms)
+             ("C-c a b" . emms-smart-browse)
+
+             ;; Track navigation
+             ("C-c a C-n" . emms-next)
+             ("C-c a C-p" . emms-previous)
+             ("C-c a p" . emms-pause)
+             ("C-c a C-s" . emms-stop)
+
+             ;; Repeat/shuffle
+             ("C-c a C-r" . emms-toggle-repeat-track)
+             ("C-c a r" . emms-toggle-repeat-playlist)
+             ("C-c a s" . farl-emms/shuffle-with-message)
+
+             ;; Refreshing the emms cache
+             ("C-c a c" . emms-player-mpd-update-all-reset-cache)
+
+             ;; mpd related functions
+             ("C-c a d" . mpd/start-music-daemon)
+             ("C-c a q" . mpd/kill-music-daemon)
+             ("C-c a u" . mpd/update-database))
+    #+end_src
+
+*** Configuring
+
+    This is where ~emms~ is configured to use ~mpd~.
+
+    #+begin_src emacs-lisp :noweb-ref emms-vars
+      :custom ((emms-seek-seconds 5)
+               (emms-player-list '(emms-player-mpd))
+               (emms-info-functions '(emms-info mpd))
+               (emms-completing-read #'ivy-completing-read)
+               (emms-player-mpd-server-name "localhost")
+               (emms-player-mpd-server-port "6601"))
+    #+end_src
+
+    A couple environment variables are also set.
+
+    #+begin_src emacs-lisp :noweb-ref emms-init
+      (setenv "MPD_HOST" "localhost")
+      (setenv "MPD_PORT" "6601")
     #+end_src
 
 ** Games
@@ -2407,137 +2558,6 @@ after day.
         :defer t
         :bind ("C-c g 2" . 2048-game))
     #+end_src
-
-* Making Emacs manage/play my music
-
-  I am big on doing as much in Emacs as possible.  Having my music player moved
-  to Emacs was a HUGE step.  When I first started using it, it was weird, but
-  now I have come to absolutely love it.  It's only configured if ~mpd~ is found.
-
-  #+begin_src emacs-lisp :noweb yes :tangle "init.el"
-    (use-package emms
-      :if (executable-find "mpd")
-      :ensure t
-      :defer t
-      :init
-      <<emms-init>>
-      <<emms-vars>>
-      <<emms-keys>>)
-  #+end_src
-
-** Loading
-
-   For the package to be properly configured, first everything about it has to
-   be properly loaded.  This loads the necessary files to ensure ~emms~ starts
-   properly, and configures it to use any music player it finds.
-
-   #+begin_src emacs-lisp :noweb-ref emms-init
-     (pdumper-require 'emms-setup)
-     (require 'emms-player-mpd)
-     (emms-all)
-   #+end_src
-
-** Functions
-   :properties:
-   :header-args: :noweb-ref emms-init
-   :end:
-
-   In order to directly control ~mpd~, some functions have to be defined.  A
-   fourth function is included to fix up a behavior I don't really like.
-
-*** Starting the daemon
-
-    #+begin_src emacs-lisp
-      (defun mpd/start-music-daemon ()
-        "Start MPD, connect to it and sync the metadata cache"
-        (interactive)
-        (shell-command "mpd")
-        (mpd/update-database)
-        (emms-player-mpd-connect)
-        (emms-cache-set-from-mpd-all)
-        (message "MPD started!"))
-    #+end_src
-
-*** Stopping the daemon
-
-    #+begin_src emacs-lisp
-      (defun mpd/kill-music-daemon ()
-        "Stop playback and kill the music daemon."
-        (interactive)
-        (emms-stop)
-        (call-process "killall" nil nil nil "mpd")
-        (message "MPD killed!"))
-    #+end_src
-
-*** Updating the database
-
-    #+begin_src emacs-lisp
-      (defun mpd/update-database ()
-        "Update the MPD database synchronously."
-        (interactive)
-        (call-process "mpc" nil nil nil "update")
-        (message "MPD database updated!"))
-    #+end_src
-
-*** Shuffling the playlist
-
-    #+begin_src emacs-lisp
-      (defun farl-emms/shuffle-with-message ()
-        "Shuffle the playlist and say so in the echo area."
-        (interactive)
-        (emms-shuffle)
-        (message "Playlist has been shuffled."))
-    #+end_src
-
-** Keybindings
-  
-   Making a keymap was a mistake.  This is so much comfier and looks a lot nicer
-   when using ~which-key~, and does not require the creation of an entire keymap.
-
-   #+begin_src emacs-lisp :noweb-ref emms-keys
-     :bind (;; Opening playlist and music browser
-            ("C-c a v" . emms)
-            ("C-c a b" . emms-smart-browse)
-
-            ;; Track navigation
-            ("C-c a C-n" . emms-next)
-            ("C-c a C-p" . emms-previous)
-            ("C-c a p" . emms-pause)
-            ("C-c a C-s" . emms-stop)
-
-            ;; Repeat/shuffle
-            ("C-c a C-r" . emms-toggle-repeat-track)
-            ("C-c a r" . emms-toggle-repeat-playlist)
-            ("C-c a s" . farl-emms/shuffle-with-message)
-
-            ;; Refreshing the emms cache
-            ("C-c a c" . emms-player-mpd-update-all-reset-cache)
-
-            ;; mpd related functions
-            ("C-c a d" . mpd/start-music-daemon)
-            ("C-c a q" . mpd/kill-music-daemon)
-            ("C-c a u" . mpd/update-database))
-   #+end_src
-
-** Configuring
-
-   This is where ~emms~ is configured to use ~mpd~.
-
-   #+begin_src emacs-lisp :noweb-ref emms-vars
-     :custom ((emms-seek-seconds 5)
-              (emms-player-list '(emms-player-mpd))
-              (emms-info-functions '(emms-info mpd))
-              (emms-completing-read #'ivy-completing-read)
-              (emms-player-mpd-server-name "localhost")
-              (emms-player-mpd-server-port "6601"))
-   #+end_src
-
-   A couple environment variables are also set.
-
-   #+begin_src emacs-lisp :noweb-ref emms-init
-     (setenv "MPD_HOST" "localhost")
-     (setenv "MPD_PORT" "6601")
-   #+end_src
 
 * Making Emacs a desktop environment
   :properties:

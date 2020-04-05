@@ -35,9 +35,9 @@
 (setq pdumper-load-path load-path
       pdumper-dumped t)
 
-(dolist (package `(;; Core
-                   async
+(dolist (feature `(;; Core
                    use-package
+                   async
                    auto-package-update
                    try
 
@@ -47,30 +47,34 @@
                    dashboard
                    page-break-lines
                    display-line-numbers
+                   paren
                    rainbow-mode
                    rainbow-delimiters
 
                    ;; Functionality
                    server
                    which-key
-                   counsel
                    company
+                   counsel
                    company-emoji
                    ibuffer
                    buffer-move
                    sudo-edit
 
                    ;; Editing
-                   graphviz-dot-mode
                    markdown-mode
+                   graphviz-dot-mode
                    flyspell
                    swiper
+                   autorevert
                    popup-kill-ring
                    hungry-delete
                    avy
+                   elec-pair
 
                    ;; Programming
                    haskell-mode
+                   lisp-mode
                    highlight-indent-guides
                    company-jedi
                    flycheck
@@ -78,7 +82,7 @@
                    flycheck-posframe
                    avy-flycheck
 
-                   ;; `org-mode'
+                   ;; org
                    org
                    toc-org
                    org-bullets
@@ -86,9 +90,12 @@
                    org-tempo
 
                    ;; Other
-                   term
                    nov
+                   wdired
+                   term
                    wttrin
+                   emms
+                   emms-setup
 
                    ;; games
                    yahtzee
@@ -96,10 +103,6 @@
                    tetris
                    chess
                    2048-game
-
-                   ;; Media
-                   emms
-                   emms-setup
 
                    ;; Desktop Environment
                    exwm
@@ -111,7 +114,7 @@
                    system-packages
                    desktop-environment
                    wallpaper))
-    (require package))
+    (require feature))
 
 (load-theme 'dracula t t)
 

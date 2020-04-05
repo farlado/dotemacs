@@ -29,20 +29,20 @@
 
 ;;; Code:
 
-(unless (package-installed-p 'async)
-  (package-refresh-contents)
-  (package-install 'async))
-
-(dired-async-mode 1)
-(async-bytecomp-package-mode 1)
-(setq async-bytecomp-allowed-packages '(all))
-
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
 (pdumper-require 'use-package)
 (setq use-package-compute-statistics t)
+
+(use-package async
+  :ensure t
+  :defer t
+  :init
+  (dired-async-mode 1)
+  (async-bytecomp-package-mode 1)
+  :custom (async-bytecomp-allowed-packages '(all)))
 
 (use-package auto-package-update
   :ensure t
@@ -164,12 +164,14 @@
           prog-mode
           conf-mode) . display-line-numbers-mode))
 
-(show-paren-mode 1)
-(set-face-attribute 'show-paren-match nil
-                    :weight 'extra-bold
-                    :underline t)
-(setq show-paren-style 'parentheses
-      show-paren-delay 0.00000001)
+(use-package paren
+  :defer t
+  :init
+  (show-paren-mode 1)
+  :custom-face (show-paren-match ((t (:weight extra-bold
+                                      :underline t))))
+  :custom ((show-paren-style 'parentheses)
+           (show-paren-delay 0.00000001)))
 
 (use-package rainbow-mode
   :if window-system
@@ -261,7 +263,8 @@
                                  (mode . emms-mode)))
                      ("ebooks" (mode . nov-mode))
                      ("magit" (name . "^magit.*:"))
-                     ("dired" (mode . dired-mode))
+                     ("dired" (or (mode . dired-mode)
+                                  (mode . wdired-mode)))
                      ("elisp" (mode . emacs-lisp-mode))
                      ("haskell" (mode . haskell-mode))
                      ("python" (mode . python-mode))
@@ -359,7 +362,7 @@
   (global-set-key (kbd "C-c M-e") #'literate-dotfiles-visit))
 
 (defun sys-config-visit ()
-  "Open the literate system configuration"
+  "Open the literate system configuration."
   (interactive)
   (find-file "~/.config/dotfiles/literate-sysconfig.org"))
 
@@ -421,11 +424,13 @@
       auto-save-default nil
       auto-save-list-file-prefix nil)
 
-(global-auto-revert-mode 1)
-
-(setq global-auto-revert-non-file-buffers t
-      auto-revert-remote-files t
-      auto-revert-verbose nil)
+(use-package autorevert
+  :defer t
+  :init
+  (global-auto-revert-mode 1)
+  :custom ((global-auto-revert-non-file-buffers t)
+           (auto-revert-remote-files t)
+           (auto-revert-verbose nil)))
 
 (setq require-final-newline t)
 (setq-default indent-tabs-mode nil
@@ -454,14 +459,15 @@
 
 (global-subword-mode 1)
 
-(setq electric-pair-pairs '((?\{ . ?\})
-                            (?\( . ?\))
-                            (?\[ . ?\])
-                            (?\" . ?\")))
-(electric-pair-mode 1)
-(minibuffer-electric-default-mode 1)
-
-(setq inferior-lisp-program "sbcl")
+(use-package elec-pair
+  :defer t
+  :init
+  (electric-pair-mode 1)
+  (minibuffer-electric-default-mode 1)
+  :custom (electric-pair-pairs '((?\{ . ?\})
+                                 (?\( . ?\))
+                                 (?\[ . ?\])
+                                 (?\" . ?\"))))
 
 (use-package magit
   :ensure t
@@ -476,6 +482,10 @@
          (haskell-mode . haskell-doc-mode)
          (haskell-mode . haskell-indentation-mode)
          (haskell-mode . haskell-auto-insert-module-template)))
+
+(use-package lisp-mode
+  :defer t
+  :custom (inferior-lisp-program "sbcl"))
 
 (use-package highlight-indent-guides
   :if window-system
@@ -628,66 +638,34 @@
 (setq calendar-week-start-day 1)
 (global-set-key (kbd "C-c l") #'calendar)
 
-(use-package term
-  :defer t
-  :init
-  (defvar farl-term/shell (getenv "SHELL")
-    "The shell to use for `ansi-term'.")
-  (defun farl-term/use-shell (force-bash)
-    (interactive (list farl-term/shell)))
-  (advice-add 'ansi-term :before #'farl-term/use-shell)
-  :bind ("C-c t" . ansi-term))
-
-(global-set-key (kbd "C-h 4 m") #'man)
-(global-set-key (kbd "C-h 4 w") #'woman)
-
 (use-package nov
   :ensure t
   :defer t
   :custom (nov-text-width 80)
   :mode ("\\.epub\\'" . nov-mode))
 
+(use-package wdired
+  :defer t
+  :custom ((dired-listing-switches "-al --group-directories-first")
+           (wdired-allow-to-change-permissions t)))
+
+(use-package term
+  :defer t
+  :init
+  (defun farl-term/use-shell (force-bash)
+    "Force `term' to use the default shell, ignoring FORCE-BASH."
+    (interactive (list (getenv "SHELL"))))
+  (advice-add 'ansi-term :before #'farl-term/use-shell)
+  :bind ("C-c t" . ansi-term))
+
+(global-set-key (kbd "C-h 4 m") #'man)
+(global-set-key (kbd "C-h 4 w") #'woman)
+
 (use-package wttrin
   :ensure t
   :defer t
   :custom (wttrin-default-cities '("Indianapolis"))
   :bind ("C-c w" . wttrin))
-
-(global-unset-key (kbd "C-c g"))
-
-(use-package yahtzee
-  :ensure t
-  :defer t
-  :bind ("C-c g y" . yahtzee))
-
-(use-package sudoku
-  :ensure t
-  :defer t
-  :bind ("C-c g s" . sudoku))
-
-(use-package tetris
-  :defer t
-  :bind (("C-c g t" . 'tetris)
-         :map tetris-mode-map
-         ("w" . tetris-move-bottom)
-         ("a" . tetris-move-left)
-         ("s" . tetris-mode-down)
-         ("d" . tetris-move-right)
-         ([left] . tetris-rotate-next)
-         ([right] . tetris-rotate-prev)
-         ([?\t] . tetris-pause-game)
-         ("r" . tetris-start-game)
-         ("e" . tetris-end-game)))
-
-(use-package chess
-  :ensure t
-  :defer t
-  :bind ("C-c g c" . chess))
-
-(use-package 2048-game
-  :ensure t
-  :defer t
-  :bind ("C-c g 2" . 2048-game))
 
 (use-package emms
   :if (executable-find "mpd")
@@ -751,6 +729,42 @@
          ("C-c a d" . mpd/start-music-daemon)
          ("C-c a q" . mpd/kill-music-daemon)
          ("C-c a u" . mpd/update-database)))
+
+(global-unset-key (kbd "C-c g"))
+
+(use-package yahtzee
+  :ensure t
+  :defer t
+  :bind ("C-c g y" . yahtzee))
+
+(use-package sudoku
+  :ensure t
+  :defer t
+  :bind ("C-c g s" . sudoku))
+
+(use-package tetris
+  :defer t
+  :bind (("C-c g t" . 'tetris)
+         :map tetris-mode-map
+         ("w" . tetris-move-bottom)
+         ("a" . tetris-move-left)
+         ("s" . tetris-mode-down)
+         ("d" . tetris-move-right)
+         ([left] . tetris-rotate-next)
+         ([right] . tetris-rotate-prev)
+         ([?\t] . tetris-pause-game)
+         ("r" . tetris-start-game)
+         ("e" . tetris-end-game)))
+
+(use-package chess
+  :ensure t
+  :defer t
+  :bind ("C-c g c" . chess))
+
+(use-package 2048-game
+  :ensure t
+  :defer t
+  :bind ("C-c g 2" . 2048-game))
 
 (use-package exwm
   :if (getenv "_RUN_EXWM")
