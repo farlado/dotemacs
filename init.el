@@ -646,7 +646,7 @@
 
 (use-package wdired
   :defer t
-  :custom ((dired-listing-switches "-al --group-directories-first")
+  :custom ((dired-listing-switches "-alh --group-directories-first")
            (wdired-allow-to-change-permissions t)))
 
 (use-package term
