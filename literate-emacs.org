@@ -2297,7 +2297,8 @@ after day.
 
     The only thing I don't like about ~dired~ is that it doesn't list directories
     first by default.  That is done by changing the switches given to ~ls~ when
-    listing contents of a directory.
+    listing contents of a directory.  I also prefer being able to edit file
+    permissions through ~dired~.
 
     #+begin_src emacs-lisp
       (use-package wdired
