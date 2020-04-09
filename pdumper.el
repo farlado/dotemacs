@@ -75,7 +75,6 @@
                    ;; Programming
                    haskell-mode
                    lisp-mode
-                   highlight-indent-guides
                    company-jedi
                    flycheck
                    flycheck-package

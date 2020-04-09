@@ -362,7 +362,6 @@ after day.
                          ;; Programming
                          haskell-mode
                          lisp-mode
-                         highlight-indent-guides
                          company-jedi
                          flycheck
                          flycheck-package
@@ -629,7 +628,6 @@ after day.
                                         ;; Programming
                                         magit
                                         haskell-mode
-                                        highlight-indent-guides
                                         company-jedi
                                         flycheck
                                         flycheck-package
@@ -1935,19 +1933,6 @@ after day.
       (use-package lisp-mode
         :defer t
         :custom (inferior-lisp-program "sbcl"))
-    #+end_src
-
-*** Indent guides
-
-    This is really nice to have, because I screw up indentation all the time.
-
-    #+begin_src emacs-lisp
-      (use-package highlight-indent-guides
-        :if window-system
-        :ensure t
-        :defer t
-        :custom (highlight-indent-guides-method 'character)
-        :hook (prog-mode . highlight-indent-guides-mode))
     #+end_src
 
 *** Python autocomplete

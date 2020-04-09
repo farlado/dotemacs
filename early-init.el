@@ -129,7 +129,6 @@ FILENAME and NOERROR are also passed to `require'."
                                   ;; Programming
                                   magit
                                   haskell-mode
-                                  highlight-indent-guides
                                   company-jedi
                                   flycheck
                                   flycheck-package

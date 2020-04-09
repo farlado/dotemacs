@@ -487,13 +487,6 @@
   :defer t
   :custom (inferior-lisp-program "sbcl"))
 
-(use-package highlight-indent-guides
-  :if window-system
-  :ensure t
-  :defer t
-  :custom (highlight-indent-guides-method 'character)
-  :hook (prog-mode . highlight-indent-guides-mode))
-
 (use-package company-jedi
   :after company
   :ensure t
