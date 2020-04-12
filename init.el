@@ -92,19 +92,7 @@
   (window-divider-mode 1)
   (dolist (frame (frame-list))
     (set-frame-parameter frame 'alpha 90))
-  (add-to-list 'default-frame-alist '(alpha . 90))
-  (pdumper-require 'org)
-  (set-face-attribute 'org-document-title nil
-                      :weight 'extra-bold
-                      :height 1.8)
-  (set-face-attribute 'org-level-1 nil
-                      :height 1.3)
-  (set-face-attribute 'org-level-2 nil
-                      :height 1.1)
-  (set-face-attribute 'org-level-3 nil
-                      :height 1.0)
-  (set-face-attribute 'org-code nil
-                      :inherit 'font-lock-string-face))
+  (add-to-list 'default-frame-alist '(alpha . 90)))
 
 (use-package mood-line
   :ensure t
@@ -526,6 +514,18 @@
 (use-package org
   :defer t
   :init
+  (pdumper-require 'org)
+  (set-face-attribute 'org-document-title nil
+                      :weight 'extra-bold
+                      :height 1.8)
+  (set-face-attribute 'org-level-1 nil
+                      :height 1.3)
+  (set-face-attribute 'org-level-2 nil
+                      :height 1.1)
+  (set-face-attribute 'org-level-3 nil
+                      :height 1.0)
+  (set-face-attribute 'org-code nil
+                      :inherit 'font-lock-string-face)
   (use-package toc-org
     :ensure t
     :defer t
@@ -1138,7 +1138,7 @@
   :custom ((exwm-replace t)
            (org-agenda-files (when (file-directory-p "~/agendas")
                                (directory-files-recursively
-                                "~/agendas" ".org$" nil t t)))
+                                "~/agendas" ".org$" nil)))
            (exwm-workspace-index-map #'farl-exwm/workspace-index-map)
            (exwm-workspace-number 10)
            (exwm-randr-workspace-monitor-plist '(0 "DP2-2"
@@ -1152,7 +1152,8 @@
                                                  8 "DP2-3"
                                                  9 "DP2-2"))
            (exwm-manage-configurations '(((string= exwm-class-name "Steam")
-                                          workspace 9)
+                                          workspace 9
+                                          floating t)
                                          ((string= exwm-class-name "hl2_linux")
                                           floating-mode-line nil)
                                          ((string= exwm-class-name "TelegramDesktop")

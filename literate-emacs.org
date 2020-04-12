@@ -914,10 +914,10 @@ after day.
     past colors, so I have instead taken matters into my own hands.  This way, I
     can use whatever color scheme I want with some peace of mind that at the
     least I don't have to look for Org-aware themes.  It also means I can
-    override some of the dumber choices of Org-aware themes.
+    override some of the dumber choices of Org-aware themes.  This block is
+    tangled into Org-mode's ~use-package~ form rather than here.
 
-    #+begin_src emacs-lisp :noweb-ref theme-init
-      (pdumper-require 'org)
+    #+begin_src emacs-lisp :noweb-ref org-init
       (set-face-attribute 'org-document-title nil
                           :weight 'extra-bold
                           :height 1.8)
@@ -2012,6 +2012,7 @@ after day.
      (use-package org
        :defer t
        :init
+       (pdumper-require 'org)
        <<org-init>>
        <<org-custom>>
        <<org-hook>>
@@ -2228,7 +2229,7 @@ after day.
     #+begin_src emacs-lisp :noweb-ref exwm-vars
       (org-agenda-files (when (file-directory-p "~/agendas")
                           (directory-files-recursively
-                           "~/agendas" ".org$" nil t t)))
+                           "~/agendas" ".org$" nil)))
     #+end_src
 
     I open the agenda with =C-c M-a= and open a specific agenda file with =C-c s-a=.
@@ -2709,7 +2710,8 @@ after day.
 
     #+begin_src emacs-lisp :noweb-ref exwm-vars
       (exwm-manage-configurations '(((string= exwm-class-name "Steam")
-                                     workspace 9)
+                                     workspace 9
+                                     floating t)
                                     ((string= exwm-class-name "hl2_linux")
                                      floating-mode-line nil)
                                     ((string= exwm-class-name "TelegramDesktop")
