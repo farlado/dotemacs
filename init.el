@@ -132,7 +132,6 @@
 
 (setq-default fill-column 80)
 (add-hook 'text-mode-hook #'turn-on-auto-fill)
-(add-hook 'auto-fill-mode-hook #'display-fill-column-indicator-mode)
 
 (tooltip-mode -1)
 (setq use-dialog-box nil

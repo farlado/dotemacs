@@ -1052,7 +1052,6 @@ after day.
     #+begin_src emacs-lisp
       (setq-default fill-column 80)
       (add-hook 'text-mode-hook #'turn-on-auto-fill)
-      (add-hook 'auto-fill-mode-hook #'display-fill-column-indicator-mode)
     #+end_src
 
 *** Other GUI items
