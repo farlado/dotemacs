@@ -1233,6 +1233,7 @@
                                      ;; Other desktop environment things
                                      ([?\s-x] . counsel-linux-app)
                                      ([s-tab] . audio-loopback)
+                                     ([menu]  . counsel-M-x)
            
                                      ;; Controlling EMMS
                                      ([XF86AudioNext] . emms-next)
