@@ -854,6 +854,7 @@
                          "--off")))))
   (defun peripheral-setup ()
     "Configure peripherals I connect to my dock."
+    (interactive)
     ;; Trackball
     (let ((trackball-id (shell-command-to-string
                          (concat "xinput | grep ELECOM | head -n 1 "

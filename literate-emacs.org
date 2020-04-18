@@ -2551,7 +2551,7 @@ after day.
   :header-args: :noweb yes :noweb-ref exwm-init
   :end:
 
-  Yes, that header is accurate.  Emacs is my *entire desktop environment*.  It
+  Yes, you read that header right.  Emacs is my *entire desktop environment*.  It
   manages and launches X applications, it manages input for these windows, it
   controls the volume and backlight level, it manages my wallpapers, and it does
   a hell of a lot more as well.  You should probably remove this section if you
@@ -2825,6 +2825,7 @@ after day.
     #+begin_src emacs-lisp
       (defun peripheral-setup ()
         "Configure peripherals I connect to my dock."
+        (interactive)
         ;; Trackball
         (let ((trackball-id (shell-command-to-string
                              (concat "xinput | grep ELECOM | head -n 1 "
