@@ -2825,7 +2825,7 @@ after day.
                                  ;; Every enabled monitor needs a position.
                                  "--pos" (if (string-match-p "DP2-3" monitor)
                                              "3000x0"
-                                           (if (string= monitor "DP2-2")
+                                           (if (string-match-p "DP2-1" monitor)
                                                "1080x0"
                                              "0x0")))
                   ;; Setting a monitor as primary occurs outside enabling it.
