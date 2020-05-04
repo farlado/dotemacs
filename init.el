@@ -660,6 +660,49 @@
   :custom (wttrin-default-cities '("Indianapolis"))
   :bind ("C-c w" . wttrin))
 
+(use-package system-packages
+  :ensure t
+  :defer t
+  :init
+  (when (executable-find "yay")
+    (pdumper-require 'system-packages)
+    (add-to-list 'system-packages-supported-package-managers
+                 '(yay .
+                       ((default-sudo . nil)
+                        (install . "yay -S")
+                        (search . "yay -Ss")
+                        (uninstall . "yay -Rs")
+                        (update . "yay -Syu")
+                        (clean-cache . "yay -Sc")
+                        (log . "car /var/log/pacman.log")
+                        (get-info . "yay -Qi")
+                        (get-info-remote . "yay -Si")
+                        (list-files-provided-by . "yay -Ql")
+                        (verify-all-packages . "yay -Qkk")
+                        (verify-all-dependencies . "yay -Dk")
+                        (remove-orphaned . "yay -Rns $(yay -Qtdq)")
+                        (list-installed-packages . "yay -Qe")
+                        (list-installed-packages-all . "yay -Q")
+                        (list-dependencies-of . "yay -Qi")
+                        (noconfirm . "--noconfirm"))))
+    (setq system-packages-use-sudo nil
+          system-packages-package-manager 'yay))
+  :custom (system-packages-noconfirm t)
+  :bind (("C-c p i" . system-packages-install)
+         ("C-c p e" . system-packages-ensure)
+         ("C-c p u" . system-packages-update)
+         ("C-c p r" . system-packages-uninstall)
+         ("C-c p o" . system-packages-remove-orphaned)
+         ("C-c p c" . system-packages-clean-cache)
+         ("C-c p l" . system-packages-log)
+         ("C-c p s" . system-packages-search)
+         ("C-c p g" . system-packages-get-info)
+         ("C-c p d" . system-packages-list-dependencies-of)
+         ("C-c p f" . system-packages-list-files-provided-by)
+         ("C-c p p" . system-packages-list-installed-packages)
+         ("C-c p f" . system-packages-verify-all-dependencies)
+         ("C-c p v" . system-packages-verify-all-packages)))
+
 (use-package emms
   :if (executable-find "mpd")
   :ensure t
@@ -928,48 +971,6 @@
     "Start Transmission."
     (interactive)
     (start-process "Transmission" nil "transmission-gtk"))
-  (use-package system-packages
-    :ensure t
-    :defer t
-    :init
-    (when (executable-find "yay")
-      (pdumper-require 'system-packages)
-      (add-to-list 'system-packages-supported-package-managers
-                   '(yay .
-                         ((default-sudo . nil)
-                          (install . "yay -S")
-                          (search . "yay -Ss")
-                          (uninstall . "yay -Rs")
-                          (update . "yay -Syu")
-                          (clean-cache . "yay -Sc")
-                          (log . "car /var/log/pacman.log")
-                          (get-info . "yay -Qi")
-                          (get-info-remote . "yay -Si")
-                          (list-files-provided-by . "yay -Ql")
-                          (verify-all-packages . "yay -Qkk")
-                          (verify-all-dependencies . "yay -Dk")
-                          (remove-orphaned . "yay -Rns $(yay -Qtdq)")
-                          (list-installed-packages . "yay -Qe")
-                          (list-installed-packages-all . "yay -Q")
-                          (list-dependencies-of . "yay -Qi")
-                          (noconfirm . "--noconfirm"))))
-      (setq system-packages-use-sudo nil
-            system-packages-package-manager 'yay))
-    :custom (system-packages-noconfirm t)
-    :bind (("C-c p i" . system-packages-install)
-           ("C-c p e" . system-packages-ensure)
-           ("C-c p u" . system-packages-update)
-           ("C-c p r" . system-packages-uninstall)
-           ("C-c p o" . system-packages-remove-orphaned)
-           ("C-c p c" . system-packages-clean-cache)
-           ("C-c p l" . system-packages-log)
-           ("C-c p s" . system-packages-search)
-           ("C-c p g" . system-packages-get-info)
-           ("C-c p d" . system-packages-list-dependencies-of)
-           ("C-c p f" . system-packages-list-files-provided-by)
-           ("C-c p p" . system-packages-list-installed-packages)
-           ("C-c p f" . system-packages-verify-all-dependencies)
-           ("C-c p v" . system-packages-verify-all-packages)))
   (use-package desktop-environment
     :ensure t
     :defer t
