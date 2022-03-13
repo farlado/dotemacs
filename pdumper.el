@@ -28,3 +28,97 @@
 
 
 ;;; Code:
+
+(require 'package)
+(package-initialize)
+
+(setq pdumper-load-path load-path
+      pdumper-dumped t)
+
+(dolist (feature `(;; Core
+                   use-package
+                   async
+                   auto-package-update
+                   try
+
+                   ;; Looks
+                   dracula-theme
+                   mood-line
+                   dashboard
+                   page-break-lines
+                   display-line-numbers
+                   paren
+                   rainbow-mode
+                   rainbow-delimiters
+
+                   ;; Functionality
+                   server
+                   which-key
+                   company
+                   counsel
+                   company-emoji
+                   ibuffer
+                   buffer-move
+                   sudo-edit
+
+                   ;; Editing
+                   markdown-mode
+                   graphviz-dot-mode
+                   flyspell
+                   swiper
+                   autorevert
+                   popup-kill-ring
+                   hungry-delete
+                   avy
+                   elec-pair
+
+                   ;; Programming
+                   haskell-mode
+                   lisp-mode
+                   company-jedi
+                   flycheck
+                   flycheck-package
+                   flycheck-posframe
+                   avy-flycheck
+
+                   ;; org
+                   org
+                   toc-org
+                   org-bullets
+                   epresent
+                   org-tempo
+
+                   ;; Other
+                   nov
+                   wdired
+                   term
+                   wttrin
+                   emms
+                   emms-setup
+
+                   ;; games
+                   yahtzee
+                   sudoku
+                   tetris
+                   chess
+                   2048-game
+
+                   ;; Desktop Environment
+                   exwm
+                   exwm-xim
+                   exwm-randr
+                   exwm-config
+                   exwm-systemtray
+                   minibuffer-line
+                   system-packages
+                   desktop-environment
+                   wallpaper))
+    (require feature))
+
+(load-theme 'dracula t t)
+
+(dump-emacs-portable (locate-user-emacs-file "emacs.pdmp"))
+
+
+
+;;; pdumper.el ends here
