@@ -861,7 +861,7 @@ after day.
     agree with for some reason.
 
     #+begin_src emacs-lisp :noweb-ref theme-init
-      (set-face-background 'fringe (face-background 'default))
+      ;(set-face-background 'fringe (face-background 'default))
       (fringe-mode 10)
     #+end_src
 
@@ -874,7 +874,7 @@ after day.
     of distractions.
 
     #+begin_src emacs-lisp :noweb-ref theme-init
-      (set-face-background 'line-number (face-background 'default))
+      ;(set-face-background 'line-number (face-background 'default))
     #+end_src
 
 *** Window dividers
@@ -1266,8 +1266,6 @@ after day.
 
     #+begin_src emacs-lisp
       (use-package which-key
-        :ensure t
-        :defer t
         :custom (echo-keystrokes 0.00000001)
         :hook (after-init . which-key-mode))
     #+end_src
@@ -1602,30 +1600,6 @@ after day.
         (find-file (locate-user-emacs-file "literate-emacs.org")))
 
       (global-set-key (kbd "C-c e") #'config-visit)
-    #+end_src
-
-*** Open dotfiles configuration with =C-c M-e=
-
-    #+begin_src emacs-lisp
-      (defun literate-dotfiles-visit ()
-        "Open the literate dotfiles."
-        (interactive)
-        (find-file "~/.config/dotfiles/literate-dotfiles.org"))
-
-      (when (file-exists-p "~/.config/dotfiles/literate-dotfiles.org")
-        (global-set-key (kbd "C-c M-e") #'literate-dotfiles-visit))
-    #+end_src
-
-*** Open system configuration with =C-c C-M-e=
-
-    #+begin_src emacs-lisp
-      (defun sys-config-visit ()
-        "Open the literate system configuration."
-        (interactive)
-        (find-file "~/.config/dotfiles/literate-sysconfig.org"))
-
-      (when (file-exists-p "~/.config/dotfiles/literate-sysconfig.org")
-        (global-set-key (kbd "C-c C-M-e") #'sys-config-visit))
     #+end_src
 
 *** Edit files as superuser using =C-x C-M-f=
@@ -2739,20 +2713,20 @@ after day.
 
 *** Assign workspaces to monitors
 
-    This section is only to ensure the proper workspaces are placed on the right
-    monitors when my W541 is docked.
+    This section ensures that workspaces are placed on the right monitors. I
+    have been having some issues though, inexplicably.
 
     #+begin_src emacs-lisp :noweb-ref exwm-vars
-      (exwm-randr-workspace-monitor-plist '(0 "DP2-1"
-                                            1 "DP2-2"
-                                            2 "DP2-3"
-                                            3 "DP2-1"
-                                            4 "DP2-2"
-                                            5 "DP2-3"
-                                            6 "DP2-1"
-                                            7 "DP2-2"
-                                            8 "DP2-3"
-                                            9 "DP2-1"))
+      (exwm-randr-workspace-monitor-plist '(0 "DisplayPort-2"
+                                            1 "HDMI-A-0"
+                                            2 "DisplayPort-2"
+                                            3 "HDMI-A-0"
+                                            4 "DisplayPort-2"
+                                            5 "HDMI-A-0"
+                                            6 "DisplayPort-2"
+                                            7 "HDMI-A-0"
+                                            8 "HDMI-A-0"
+                                            9 "DisplayPort-2"))
     #+end_src
 
 *** Assign programs to workspaces
@@ -2828,64 +2802,23 @@ after day.
     my ThinkPad X230, so every monitor looks over the same screen.
 
     #+begin_src emacs-lisp
-      (defun display-setup-x230 ()
+      (defun display-setup ()
         "Set up the connected monitors on a ThinkPad X230."
         (let ((monitors (get-connected-monitors))
-              (possible '("LVDS1"
-                          "VGA1")))
+              (possible '("DisplayPort-2"
+                          "HDMI-A-0")))
           (dolist (monitor possible)
             (if (member monitor monitors)
-                (start-process "xrandr" nil "xrandr"
-                               "--output" monitor
-                               "--mode" "1366x768"
-                               "--pos" "0x0")
-              (start-process "xrandr" nil "xrandr"
-                             "--output" monitor
-                             "--off")))))
-    #+end_src
-
-*** Configuring monitor arrangement on my W541
-
-    This is where it gets really fun.  This ThinkPad /does/ get docked, so I
-    handle very different outputs.
-
-    #+begin_src emacs-lisp
-      (defun display-setup-w541 ()
-        "Set up the connected monitors on a ThinkPad W541."
-        (let* ((connected-monitors (get-connected-monitors))
-               (docked-p (member "DP2-1" connected-monitors))
-               (possible-monitors '("eDP1"
-                                    "VGA1"
-                                    "DP2-1"
-                                    "DP2-2"
-                                    "DP2-3")))
-          (dolist (monitor possible-monitors)
-            (if (and (member monitor connected-monitors)
-                     (not (and docked-p (string= "eDP1" monitor))))
-                (progn
-                  (start-process "xrandr" nil "xrandr"
-                                 "--output" monitor
-                                 ;; Any enabled monitor needs a resolution.
-                                 "--mode" "1920x1080"
-                                 ;; DP2-1 and DP2-3 are rotated.
-                                 "--rotate" (if (string= "DP2-2" monitor)
-                                                "left"
-                                              (if (string= "DP2-3" monitor)
-                                                  "right"
-                                                "normal"))
-                                 ;; Every enabled monitor needs a position.
-                                 "--pos" (if (string-match-p "DP2-3" monitor)
-                                             "3000x0"
-                                           (if (string-match-p "DP2-1" monitor)
-                                               "1080x0"
-                                             "0x0")))
-                  ;; Setting a monitor as primary occurs outside enabling it.
-                  ;; This is due to how `start-process' takes arguments.
-                  (when (or (string= "DP2-1" monitor)
-                            (string= "eDP1" monitor))
+                (if (string= monitor "HDMI-A-0")
                     (start-process "xrandr" nil "xrandr"
                                    "--output" monitor
-                                   "--primary")))
+                                   "--mode" "1920x1080"
+                                   "--pos" "1920x0")
+                  (start-process "xrandr" nil "xrandr"
+                                 "--output" monitor
+                                 "--mode" "1920x1080"
+                                 "--pos" "0x0"
+                                 "--primary"))
               (start-process "xrandr" nil "xrandr"
                              "--output" monitor
                              "--off")))))
@@ -2926,16 +2859,13 @@ after day.
     Finally, I can make my generic display-and-dock setup function.
 
     #+begin_src emacs-lisp
-      (defun display-and-dock-setup ()
+      (defun display-update ()
         "Configure displays and dock if applicable."
         (interactive)
         (unless (get-process "Monitor Settings")
-          (if (member "LVDS1" (get-connected-monitors))
-              (display-setup-x230)
-            (progn
-              (display-setup-w541)
-              (peripheral-setup)))))
-    #+end_src
+          (display-setup)
+          (peripheral-setup)))
+    #+End_src
 
     Every time EXWM detects a change in the monitors connected or active, this
     function should be called, so it's hooked to =exwm-randr-screen-change-hook=.
